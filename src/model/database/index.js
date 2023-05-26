@@ -1,3 +1,4 @@
+const enviromentalConfig = require('../../config/db.config');
 const dbConfig = enviromentalConfig.development;
 
 const Sequelize = require("sequelize");
