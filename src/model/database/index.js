@@ -21,6 +21,17 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 const Account = db.accounts = require("../account.model")(sequelize, Sequelize);
+const Validation = db.validations = require("../validation.model")(sequelize, Sequelize);
 
 
-module.exports = {db};
+//================== ONE-TO-ONE - ACCOUNT -*- VALIDATION =======================//
+
+Account.hasOne(Validation, { foreignKey: 'accountId', as: 'validation' });
+Validation.belongsTo(Account, { foreignKey: 'accountId', as: 'account' });
+
+
+module.exports = {
+  db,
+  Account,
+  Validation
+};
