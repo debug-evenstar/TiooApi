@@ -20,5 +20,7 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
+const Account = db.accounts = require("../account.model")(sequelize, Sequelize);
+
 
 module.exports = {db};

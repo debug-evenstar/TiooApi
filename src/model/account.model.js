@@ -1,0 +1,80 @@
+
+const bcrypt = require('bcrypt');
+
+module.exports = (sequelize, Sequelize) => {
+    const Account = sequelize.define('Account', {
+        id: {
+            type: Sequelize.UUID,
+            primaryKey: true,
+            defaultValue: Sequelize.UUIDV4,
+            allowNull: false,
+            autoIncrement: false,
+        },
+        name: {
+            type: Sequelize.STRING,
+            unique: true
+        },
+        email: {
+            type: Sequelize.STRING,
+            unique: true
+        },
+        phone: {
+            type: Sequelize.STRING,
+        },
+        account_type: {
+            type: Sequelize.STRING,
+            defaultValue: 'student'
+        },
+        verification_status: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0
+        },
+        flag: {
+            type: Sequelize.ENUM('active', 'banned', 'inactive'),
+            defaultValue: 'active',
+        },
+    },
+    { timestamps: true },
+    {
+        defaultScope: {
+            attributes: {
+                exclude: ['password', 'createdAt', 'updatedAt']
+            }
+        }
+    },
+
+    );
+
+
+    Account.beforeBulkCreate(async (users, options) => {
+        for (const user of users) {
+            const hashedPassword = await bcrypt.hash(user.password, 10);
+            user.password = hashedPassword;
+        }
+    });
+
+    Account.beforeCreate(async (users, options) => {
+        for (const user of users) {
+            const hashedPassword = await bcrypt.hash(user.password, 10);
+            user.password = hashedPassword;
+        }
+    });
+
+    Account.beforeUpdate(async (users, options) => {
+        for (const user of users) {
+            const hashedPassword = await bcrypt.hash(user.password, 10);
+            user.password = hashedPassword;
+        }
+    });
+
+
+    Account.prototype.comparePassword = async function (password) {
+        return bcrypt.compare(password, this.password);
+    };
+
+
+    // Account.sync();
+
+    return Account;
+
+};
