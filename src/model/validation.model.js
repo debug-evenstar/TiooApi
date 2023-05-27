@@ -9,6 +9,11 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING(6),
             allowNull: false,
         },
+        createdAt: {
+            type: Sequelize.DATE,
+            allowNull: false,
+            defaultValue: Sequelize.NOW,
+        },
         expires_at: {
             type: Sequelize.DATE,
             allowNull: false,
