@@ -30,7 +30,8 @@ router.post('/account/resend_otp', AuthenicationController.resendVerificationOTP
 
 router.get('/account/fetch', AuthenicationController.accounts);
 router.get('/account/profile', TokenMiddleware.verify, AuthenicationController.accountProfile);
-router.get('/account/update/:id',  AuthenicationController.updateAccount);
+router.put('/account/update/:id',  AuthenicationController.updateAccount);
+router.delete('/account/delete/:id',  AuthenicationController.deleteAccount);
 router.get('/account/:id', AuthenicationController.accountByID);
 
 

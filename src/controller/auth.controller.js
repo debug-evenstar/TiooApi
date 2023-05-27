@@ -265,24 +265,23 @@ class AuthController {
     static async updateAccount(req, res) {
 
         const id = req.params.id;
+        delete req.body.email;
 
         try {
 
-            const user = await Account.findByPk(id,  { attributes: { exclude: ['password', 'createdAt'], include: '' } });
+            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
 
             if (!user) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
 
-            await user.update(req.body, {
-                exclude: ['password', 'updatedAt',] 
-              });
+            await user.update(req.body, { exclude: ['password'] });
 
-              console.log(user);
+            console.log(user);
 
-              const  {name, email, phone, account_type, verification_status, flag} = user;
+            const { name, email, phone, account_type, verification_status, flag } = user;
 
-              const response =  {name, email, phone, account_type, verification_status, flag};
+            const response = { name, email, phone, account_type, verification_status, flag };
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: response });
 
@@ -294,16 +293,25 @@ class AuthController {
     }
 
 
-       /*-----------------------------------| DELETE ACCOUNT |-----------------------------------*/
+    /*-----------------------------------| DELETE ACCOUNT |-----------------------------------*/
 
-       static async deleteAccount(req, res) {
+    static async deleteAccount(req, res) {
 
         const id = req.params.id;
 
         try {
 
-          // TODO
-          
+            const user = await Account.findByPk(id);
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const response = await user.destroy();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
+
+
         } catch (error) {
             res.status(500).json({ error: 'Server Error' });
         };
