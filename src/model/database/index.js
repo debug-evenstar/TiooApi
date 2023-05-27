@@ -22,16 +22,71 @@ db.sequelize = sequelize;
 
 const Account = db.accounts = require("../account.model")(sequelize, Sequelize);
 const Validation = db.validations = require("../validation.model")(sequelize, Sequelize);
+const Subject = db.subjects = require("../subject.model")(sequelize, Sequelize);
+const Class = db.classes = require("../class.model")(sequelize, Sequelize);
+const SchoolManagement = db.schools = require("../profile/school.model")(sequelize, Sequelize);
+const Student = db.students = require("../profile/student.model")(sequelize, Sequelize);
+const Teacher = db.teachers = require("../profile/teacher.model")(sequelize, Sequelize);
 
-
-//================== ONE-TO-ONE - ACCOUNT -*- VALIDATION =======================//
+//------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
 Account.hasOne(Validation, { foreignKey: 'accountId', as: 'validation' });
 Validation.belongsTo(Account, { foreignKey: 'accountId', as: 'account' });
+
+Account.hasOne(SchoolManagement, {allowNull: true});
+SchoolManagement.belongsTo(Account, {allowNull: true});
+
+Account.hasOne(Teacher, {allowNull: true});
+Teacher.belongsTo(Account, {allowNull: true});
+
+Account.hasOne(Student, {allowNull: true});
+Student.belongsTo(Account, {allowNull: true});
+
+//---------/ ONE-TO-MANY - SCHOOL -*- CLASS | TEACHERS | STUDENT | SUBJECT /--------------------
+
+SchoolManagement.hasMany(Class);
+Class.belongsTo(SchoolManagement);
+
+SchoolManagement.hasMany(Teacher);
+Teacher.belongsTo(SchoolManagement);
+
+SchoolManagement.hasMany(Student);
+Student.belongsTo(SchoolManagement);
+
+SchoolManagement.hasMany(Subject);
+Subject.belongsTo(SchoolManagement);
+
+//---------/ ONE-TO-MANY - CLASS -*- STUDENTS /--------------------
+
+Class.hasMany(Student);
+Student.belongsTo(Class);
+
+//---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
+
+Subject.belongsToMany(Teacher, { through: 'SubjectTeachers' });
+Teacher.belongsToMany(Subject, { through: 'SubjectTeachers' });
+
+Class.belongsToMany(Subject, { through: 'ClassSubjects' });
+Subject.belongsToMany(Class, { through: 'ClassSubjects' });
+
+Teacher.belongsToMany(Class, { through: 'TeacherClasses' });
+Class.belongsToMany(Teacher, { through: 'TeacherClasses' });
 
 
 module.exports = {
   db,
   Account,
-  Validation
+  Validation,
+  SchoolManagement,
+  Student,
+  Teacher,
+  Class,
+  Subject
 };
+
+
+
+/*
+ N:B #R- pull student class to get their subject
+
+ */
