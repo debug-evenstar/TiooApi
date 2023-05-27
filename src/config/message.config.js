@@ -4,7 +4,9 @@ const ResponseMessage = {
         update: 'Resource updated successfully',
         delete: 'Resource deleted successfully',
         read: 'Resource fetched successfully',
-        register: 'Account created successfully. Kindly check email for OTP'
+        register: 'Account created successfully. Kindly check email for OTP',
+        resend_otp: 'OTP has been resent. Kindly check email for OTP',
+        verify: 'Verification successful'
     },
     fail: {
         bad_request: 'Bad Request',
@@ -12,7 +14,9 @@ const ResponseMessage = {
         not_found: 'Not Found',
         server: 'Internal Server Error',
         forbidden: 'Forbidden',
-        account_conflict: 'Account Already Exist'
+        account_conflict: 'Account Already Exist',
+        incorrect_otp: "OTP is incorrect",
+        expired_token: "OTP Expired"
     },
 
     code: {
