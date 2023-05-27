@@ -24,9 +24,9 @@ const Account = db.accounts = require("../account.model")(sequelize, Sequelize);
 const Validation = db.validations = require("../validation.model")(sequelize, Sequelize);
 const Subject = db.subjects = require("../subject.model")(sequelize, Sequelize);
 const Class = db.classes = require("../class.model")(sequelize, Sequelize);
-const SchoolManagement = db.schools = require("../profile/school.model")(sequelize, Sequelize);
-const Student = db.students = require("../profile/student.model")(sequelize, Sequelize);
-const Teacher = db.teachers = require("../profile/teacher.model")(sequelize, Sequelize);
+const SchoolManagement = db.schools = require("../profile.model/school.model")(sequelize, Sequelize);
+const Student = db.students = require("../profile.model/student.model")(sequelize, Sequelize);
+const Teacher = db.teachers = require("../profile.model/teacher.model")(sequelize, Sequelize);
 
 //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
