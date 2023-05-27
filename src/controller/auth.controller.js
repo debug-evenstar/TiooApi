@@ -264,6 +264,40 @@ class AuthController {
 
     static async updateAccount(req, res) {
 
+        const { id } = req.userData;
+        delete req.body.email;
+
+        try {
+
+            const user = await Account.findByPk(id);
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            await user.update(req.body, { exclude: ['password'] });
+
+            console.log(user);
+
+            const { name, email, phone, account_type, verification_status, flag } = user;
+
+            const response = { name, email, phone, account_type, verification_status, flag };
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+
+    /*-----------------------------------| UPDATE ACCOUNT |-----------------------------------*/
+
+    static async updateAccountById(req, res) {
+
         const id = req.params.id;
         delete req.body.email;
 
@@ -311,6 +345,36 @@ class AuthController {
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
 
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+    /*-----------------------------------| FLAG ACCOUNT |-----------------------------------*/
+
+    static async flagAccount(req, res) {
+
+        const { uid, flag } = req.body;
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const user = await Account.findByPk(id);
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const response = await user.update({ flag: flag });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
 
         } catch (error) {
             res.status(500).json({ error: 'Server Error' });
