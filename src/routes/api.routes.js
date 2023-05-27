@@ -2,18 +2,21 @@ const express = require('express');
 router = express.Router();
 
 
-//==================================== HOME ===================================//
+/*-----------------------------------| HOME |-----------------------------------*/
 
 router.get('/', (req, res)=>{ res.json({ message: "NIMO SERVER RUNNING...." })});
 
-//================================ CONTROLLERS ================================//
+/*--------------------------------| CONTROLLERS |--------------------------------*/
+
+const AuthenicationController = require('../controller/auth.controller');
+
+/*-----------------------------| REQUEST VALIDATOR |-----------------------------*/
 
 
-//================================ REQUEST VALIDATOR ============================//
+/*------------------------------| TOKEN VALIDATOR |------------------------------*/
 
 
-//================================ TOKEN VALIDATOR ===============================//
-
+router.post('/account/signup', AuthenicationController.createAccount);
 
 
 module.exports = router;
