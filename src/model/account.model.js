@@ -43,7 +43,7 @@ module.exports = (sequelize, Sequelize) => {
       timestamps: true,
       defaultScope: {
         attributes: {
-          exclude: ['password', 'createdAt', 'updatedAt'],
+          exclude: ['createdAt', 'updatedAt'],
         },
       },
     }
@@ -54,6 +54,11 @@ module.exports = (sequelize, Sequelize) => {
       const hashedPassword = await bcrypt.hash(user.password, 10);
       user.password = hashedPassword;
     }
+  });
+
+  Account.beforeSave(async (user, options) => {
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    user.password = hashedPassword;
   });
 
   Account.beforeCreate(async (user, options) => {
