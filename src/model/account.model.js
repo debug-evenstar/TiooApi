@@ -48,31 +48,18 @@ module.exports = (sequelize, Sequelize) => {
     }
   );
 
-  Account.beforeBulkCreate(async (users, options) => {
-    for (const user of users) {
-      const hashedPassword = await bcrypt.hash(user.password, 10);
-      user.password = hashedPassword;
-    }
-  });
-
-  Account.beforeSave(async (user, options) => {
-    const hashedPassword = await bcrypt.hash(user.password, 10);
-    user.password = hashedPassword;
-  });
 
   Account.beforeCreate(async (user, options) => {
     const hashedPassword = await bcrypt.hash(user.password, 10);
     user.password = hashedPassword;
   });
 
-  Account.beforeUpdate(async (user, options) => {
-    const hashedPassword = await bcrypt.hash(user.password, 10);
-    user.password = hashedPassword;
-  });
-
   Account.prototype.comparePassword = async function (password) {
+    console.log(password);
     return bcrypt.compare(password, this.password);
   };
+
+  Account.sync();
 
   return Account;
 };

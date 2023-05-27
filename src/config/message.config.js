@@ -1,12 +1,13 @@
 const ResponseMessage = {
     pass: {
-        create: 'Resource created successfully',
-        update: 'Resource updated successfully',
-        delete: 'Resource deleted successfully',
-        read: 'Resource fetched successfully',
+        create: 'Created successfully',
+        update: 'Updated successfully',
+        delete: 'Deleted successfully',
+        read: 'Fetched successfully',
         register: 'Account created successfully. Kindly check email for OTP',
         resend_otp: 'OTP has been resent. Kindly check email for OTP',
-        verify: 'Verification successful'
+        verify: 'Verification successful',
+        login: 'LoggedIn successfully'
     },
     fail: {
         bad_request: 'Bad Request',
@@ -16,7 +17,11 @@ const ResponseMessage = {
         forbidden: 'Forbidden',
         account_conflict: 'Account Already Exist',
         incorrect_otp: "OTP is incorrect",
-        expired_token: "OTP Expired"
+        expired_token: "OTP Expired",
+        no_user: "User does not exist",
+        login: "Username or Password don't match",
+        verify: "Account Not Verified"
+
     },
 
     code: {

@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
 const { Account, Validation } = require('../model/database');
+const TokenMiddleware = require('../middleware/token.middleware');
 
 class AuthController {
 
@@ -33,14 +34,12 @@ class AuthController {
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.register,
-                data: response
+                message: ResponseStatus.pass.register
             });
 
             // TODO send otp
 
         } catch (error) {
-            console.error(error);
             res.status(500).json({ error: 'Server Error' });
         };
 
@@ -88,7 +87,6 @@ class AuthController {
 
 
         } catch (error) {
-            console.error(error);
             res.status(500).json({ error: 'Server Error' });
         };
 
@@ -121,7 +119,6 @@ class AuthController {
 
 
         } catch (error) {
-            console.error(error);
             res.status(500).json({ error: 'Server Error' });
         };
 
@@ -145,6 +142,8 @@ class AuthController {
 
         resetValidation.otp = otp;
 
+        console.log(otp);
+
         await resetValidation.save();
 
         // TODO send otp
@@ -152,8 +151,164 @@ class AuthController {
         return;
     }
 
+    /*-----------------------------------| SIGNIN ACCOUNT |-----------------------------------*/
+
+    static async signInAccount(req, res) {
+
+        const { email, password } = req.body;
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const user = await Account.findOne({ where: { email: email } });
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
+            }
+
+            const isValidPassword = await user.comparePassword(password)
+
+            const isVerifedUser = user.dataValues.verification_status;
+
+            if (!isValidPassword) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
+            }
+
+            if (isVerifedUser === 0) {
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.verify });
+            }
+
+            const userData = {
+                id: user.dataValues.id,
+                email: user.dataValues.email,
+                account_type: user.dataValues.account_type,
+            };
+
+            const generatedToken = TokenMiddleware.generate(userData)
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, data: {}, token: generatedToken });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
 
 
+    /*-----------------------------------| FETCH ALL ACCOUNTS |-----------------------------------*/
+
+    static async accounts(req, res) {
+
+        try {
+
+            const users = await Account.findAll({ attributes: { exclude: ['password'], include: '' } });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: users });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+    /*-----------------------------------| FETCH ACCOUNT BY ID |-----------------------------------*/
+
+    static async accountByID(req, res) {
+
+        const id = req.params.id;
+
+        try {
+
+            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: user });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+    /*-----------------------------------| FETCH ACCOUNT AS PROFILE |-----------------------------------*/
+
+    static async accountProfile(req, res) {
+
+        const { id } = req.userData;
+
+        try {
+
+            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: user });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+    /*-----------------------------------| UPDATE ACCOUNT |-----------------------------------*/
+
+    static async updateAccount(req, res) {
+
+        const id = req.params.id;
+
+        try {
+
+            const user = await Account.findByPk(id,  { attributes: { exclude: ['password', 'createdAt'], include: '' } });
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
+            }
+
+            await user.update(req.body, {
+                exclude: ['password', 'updatedAt',] 
+              });
+
+              console.log(user);
+
+              const  {name, email, phone, account_type, verification_status, flag} = user;
+
+              const response =  {name, email, phone, account_type, verification_status, flag};
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+       /*-----------------------------------| DELETE ACCOUNT |-----------------------------------*/
+
+       static async deleteAccount(req, res) {
+
+        const id = req.params.id;
+
+        try {
+
+          // TODO
+          
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
 
 
 }
