@@ -5,7 +5,6 @@ const accountHolder = {
     email: "studentuser@gmail.com",
     phone: 08093652637,
     account_type: "student",
-    published: false,
     password: "1234"
 };
 
