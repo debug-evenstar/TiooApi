@@ -24,7 +24,8 @@ module.exports = (sequelize, Sequelize) => {
     );
 
     Validation.prototype.compareExpiryDate = function () {
-        return this.expires_at > Date.now();
+        const now = new Date(Date.now());
+        return   now > this.expires_at;
     };
 
     Validation.prototype.compareOTP = function (providedCode) {
