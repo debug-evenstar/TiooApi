@@ -23,6 +23,10 @@ module.exports = (sequelize, Sequelize) => {
         { timestamps: false },
     );
 
+    Validation.beforeSave(async (validation, options) => {
+        validation.expires_at = new Date(Date.now() + 3 * 60 * 1000);
+      });
+
     Validation.prototype.compareExpiryDate = function () {
         const now = new Date(Date.now());
         return   now > this.expires_at;
