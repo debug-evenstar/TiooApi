@@ -18,12 +18,12 @@ module.exports = (sequelize, Sequelize) => {
         { timestamps: false },
     );
 
-    Validation.prototype.compareExpiryDate = function (currentDate) {
-        return this.expires_at > currentDate;
+    Validation.prototype.compareExpiryDate = function () {
+        return this.expires_at > Date.now();
     };
 
     Validation.prototype.compareOTP = function (providedCode) {
-        return this.code === providedCode;
+        return this.otp === providedCode;
     };
 
 
