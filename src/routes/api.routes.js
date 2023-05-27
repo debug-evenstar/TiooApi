@@ -18,6 +18,7 @@ const AuthenicationController = require('../controller/auth.controller');
 
 router.post('/account/signup', AuthenicationController.createAccount);
 router.post('/account/verify', AuthenicationController.verifyAccount);
+router.post('/account/resend_otp', AuthenicationController.resendVerificationOTP);
 
 
 module.exports = router;
