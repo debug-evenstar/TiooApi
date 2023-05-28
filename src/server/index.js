@@ -5,6 +5,7 @@ const app = express();
 const { db } = require("../model/database/index");
 const PORT = process.env.PORT || 8080;
 const IndexRoute = require('../routes/index');
+const treblle = require('@treblle/express')
 
 class Server {
 
@@ -20,6 +21,13 @@ class Server {
         };
 
         app.use(cors(corsOptions));
+
+        app.use(
+            treblle({
+              apiKey: process.env.TREBLLE_API_KEY,
+              projectId: process.env.TREBLLE_PROJECT_ID,
+            })
+          );
 
         //=============== INITIALIZE DATABASE ================//
 
