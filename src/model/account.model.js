@@ -77,6 +77,11 @@ module.exports = (sequelize, Sequelize) => {
     return bcrypt.compare(password, this.password);
   };
 
+  Account.prototype.hashPassword = async function (password) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    return hashedPassword;
+  };
+
   Account.sync();
 
   return Account;

@@ -26,6 +26,8 @@ const allAuthorizedRoutesGroup = (router) => {
     router.post('/account/verify', AuthenicationController.verifyAccount);
     router.post('/account/send_otp', AuthenicationController.requestVerificationOTP);
     router.post('/account/verify_otp', AuthenicationController.verifyOTP);
+    router.put('/account/change_password', AuthenicationController.changePassword);
+    
 
 };
 

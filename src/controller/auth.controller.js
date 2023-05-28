@@ -164,7 +164,7 @@ class AuthController {
         }
 
         try {
-            
+
             const emailExist = await AuthController.validateEmail(email);
 
             if (!emailExist.pass) {
@@ -185,7 +185,7 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.incorrect_otp });
             }
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.verify, data: {email: emailExist.data.email} });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.verify, data: { email: emailExist.data.email } });
 
 
         } catch (error) {
@@ -407,13 +407,9 @@ class AuthController {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
 
-        console.log(id);
-
         try {
 
             const user = await Account.findByPk(id);
-
-         
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -429,6 +425,37 @@ class AuthController {
 
     }
 
+    /*-----------------------------------| CHANGE ACCOUNT |-----------------------------------*/
+
+    static async changePassword(req, res) {
+
+        const { email, password } = req.body;
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const user = await Account.findOne({ where: { email: email } });
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const hashPassword = await user.hashPassword(password);
+
+            const response = await user.update({ password: hashPassword });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: {} });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error x' });
+        };
+
+    }
 
 }
 
