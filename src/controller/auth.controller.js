@@ -343,7 +343,7 @@ class AuthController {
 
         const id = req.params.id;
         delete req.body.email;
-
+        delete req.verification_status;
         try {
 
             const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
@@ -352,7 +352,7 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
 
-            await user.update(req.body, { exclude: ['password'] });
+            await user.update(req.body, { exclude: ['password', 'verification_status'] });
 
             console.log(user);
 
@@ -421,7 +421,7 @@ class AuthController {
 
             const response = await user.update({ flag: flag });
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: {} });
 
         } catch (error) {
             res.status(500).json({ error: 'Server Error' });
