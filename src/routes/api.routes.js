@@ -34,8 +34,8 @@ const adminAuthorizedRoutesGroup = (router) => {
 
     router.use(AuthenticationMiddleware.verify) //--use middleware--//
     router.get('/account/fetch', AuthenicationController.accounts);
-    router.get('/account/profile', AuthenticationMiddleware.verify, AuthenicationController.accountProfile);
-    router.get('/account/profile', AuthenticationMiddleware.verify, AuthenicationController.accountProfile);
+    router.get('/account/profile', AuthenicationController.accountProfile);
+    router.get('/account/profile', AuthenicationController.accountProfile);
     router.put('/account/flag', AuthenicationController.flagAccount);
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
