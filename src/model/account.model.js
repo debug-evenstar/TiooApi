@@ -25,6 +25,16 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         defaultValue: 'student',
       },
+      school_types: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: ['Primary', 'Secondary', 'College', 'University'],
+      },
+      naming_types: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: false,
+        defaultValue: ['Alpha-Numeric', 'Numeric', 'Alphabetic'],
+      },
       verification_status: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
@@ -42,7 +52,7 @@ module.exports = (sequelize, Sequelize) => {
       timestamps: true,
       defaultScope: {
         attributes: {
-          exclude: ['createdAt', 'updatedAt'],
+          exclude: ['createdAt', 'updatedAt']
         },
       },
     }
