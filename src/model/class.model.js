@@ -12,15 +12,15 @@ module.exports = (sequelize, DataTypes) => {
             },
             type: {
                 type: DataTypes.STRING,
-                defaultValue: 'nursery',
+                defaultValue: 'Primary',
             },
             naming: {
                 type: DataTypes.STRING,
-                defaultValue: 'primary one',
+                defaultValue: 'Primary 1',
             },
-            system: {
+            category: {
                 type: DataTypes.STRING,
-                defaultValue: "pry1-6",
+                defaultValue: "A",
             },
         }, {
         timestamps: false,

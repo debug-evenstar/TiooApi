@@ -27,12 +27,10 @@ module.exports = (sequelize, Sequelize) => {
       },
       school_types: {
         type: DataTypes.ARRAY(DataTypes.STRING),
-        allowNull: false,
         defaultValue: ['Primary', 'Secondary'],
       },
       naming_types: {
         type: DataTypes.ARRAY(DataTypes.STRING),
-        allowNull: false,
         defaultValue: ['Primary 1-6 & JSS1 - SSS3'],
       },
       verification_status: {
