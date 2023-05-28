@@ -26,12 +26,22 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: 'school',
       },
       school_types: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
-        defaultValue: ['Primary', 'Secondary'],
+        type: Sequelize.TEXT, 
+        defaultValue: JSON.stringify(['Primary', 'Secondary']),
+        get() {
+          // Parse the JSON string to retrieve the array
+          const value = this.getDataValue('school_types');
+          return value ? JSON.parse(value) : [];
+        },
       },
       naming_types: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
-        defaultValue: ['Primary 1-6 & JSS1 - SSS3'],
+        type: Sequelize.TEXT,
+        defaultValue: JSON.stringify(['Primary 1-6 & JSS1 - SSS3']),
+        get() {
+          // Parse the JSON string to retrieve the array
+          const value = this.getDataValue('naming_types');
+          return value ? JSON.parse(value) : [];
+        },
       },
       verification_status: {
         type: Sequelize.INTEGER,

@@ -5,7 +5,7 @@ const ResponseMessage = {
         delete: 'Deleted successfully',
         read: 'Fetched successfully',
         register: 'Account created successfully. Kindly check email for OTP',
-        resend_otp: 'OTP has been resent. Kindly check email for OTP',
+        send_otp: 'OTP has been resent. Kindly check email for OTP',
         verify: 'Verification successful',
         login: 'LoggedIn successfully'
     },

@@ -24,7 +24,8 @@ const allAuthorizedRoutesGroup = (router) => {
     router.post('/account/signin', AuthenicationController.signInAccount);
     router.post('/account/signup', AuthenicationController.createAccount);
     router.post('/account/verify', AuthenicationController.verifyAccount);
-    router.post('/account/resend_otp', AuthenicationController.resendVerificationOTP);
+    router.post('/account/send_otp', AuthenicationController.requestVerificationOTP);
+    router.post('/account/verify_otp', AuthenicationController.verifyOTP);
 
 };
 

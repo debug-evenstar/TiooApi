@@ -40,6 +40,7 @@ class AuthController {
             // TODO send otp
 
         } catch (error) {
+            console.log(error);
             res.status(500).json({ error: 'Server Error' });
         };
 
@@ -94,7 +95,7 @@ class AuthController {
 
     /*-----------------------------| RESEND VERIFICATION OTP |-----------------------------*/
 
-    static async resendVerificationOTP(req, res) {
+    static async requestVerificationOTP(req, res) {
 
         const { email } = req.body;
         const errors = validationResult(req);
@@ -115,7 +116,7 @@ class AuthController {
 
             await AuthController.sendOTP(AccountId);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.resend_otp });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.send_otp });
 
 
         } catch (error) {
@@ -149,6 +150,48 @@ class AuthController {
         // TODO send otp
 
         return;
+    }
+
+    /*------------------------------------| VERIFY OTP |------------------------------------*/
+
+    static async verifyOTP(req, res) {
+
+        const { otp, email, } = req.body;
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+            
+            const emailExist = await AuthController.validateEmail(email);
+
+            if (!emailExist.pass) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const validation = await Validation.findOne({ where: { accountId: emailExist.data.id } });
+
+            const isValidOTP = await validation.compareOTP(otp);
+
+            const isExpired = await validation.compareExpiryDate();
+
+            if (isExpired) {
+                return res.status(ResponseStatus.code.bad_request).json({ error: true, message: ResponseStatus.fail.expired_token });
+            }
+
+            if (!isValidOTP) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.incorrect_otp });
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.verify, data: {email: emailExist.data.email} });
+
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
     }
 
     /*-----------------------------------| SIGNIN ACCOUNT |-----------------------------------*/
