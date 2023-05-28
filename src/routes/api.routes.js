@@ -4,8 +4,7 @@ router = express.Router();
 
 /*-----------------------------------| HOME |-----------------------------------*/
 
-router.get('/', (req, res)=>{ res.json({ message: "NIMO SERVER RUNNING...." })});
-
+router.get('/', (req, res) => { res.json({ message: "NIMO SERVER RUNNING...." }) });
 
 
 /*--------------------------------| CONTROLLERS |--------------------------------*/
@@ -13,30 +12,40 @@ router.get('/', (req, res)=>{ res.json({ message: "NIMO SERVER RUNNING...." })})
 const AuthenicationController = require('../controller/auth.controller');
 
 
-/*-----------------------------| MIDDLEWARE |-----------------------------*/
+/*---------------------------------| MIDDLEWARE |---------------------------------*/
 
-const TokenMiddleware = require('../middleware/token.middleware');
+const AuthenticationMiddleware = require('../middleware/token.middleware');
 
 
-/*------------------------------| ROUTES |------------------------------*/
+/*------------------------------| AUTHORIZED ROUTES |------------------------------*/
 
-router.post('/account/signin', AuthenicationController.signInAccount);
-router.post('/account/signup', AuthenicationController.createAccount);
-router.post('/account/verify', AuthenicationController.verifyAccount);
-router.post('/account/resend_otp', AuthenicationController.resendVerificationOTP);
+const allAuthorizedRoutesGroup = (router) => {
 
+    router.post('/account/signin', AuthenicationController.signInAccount);
+    router.post('/account/signup', AuthenicationController.createAccount);
+    router.post('/account/verify', AuthenicationController.verifyAccount);
+    router.post('/account/resend_otp', AuthenicationController.resendVerificationOTP);
+
+};
 
 /*------------------------------| SECURED ROUTES |------------------------------*/
 
-router.get('/account/fetch', AuthenicationController.accounts);
-router.get('/account/profile', TokenMiddleware.verify, AuthenicationController.accountProfile);
-router.put('/account/update/', TokenMiddleware.verify,  AuthenicationController.updateAccount);
-router.put('/account/update/:id',  AuthenicationController.updateAccountById);
-router.delete('/account/delete/:id',  AuthenicationController.deleteAccount);
-router.get('/account/:id', AuthenicationController.accountByID);
+const adminAuthorizedRoutesGroup = (router) => {
+
+    router.use(AuthenticationMiddleware.verify) //--use middleware--//
+    router.get('/account/fetch', AuthenicationController.accounts);
+    router.get('/account/profile', AuthenticationMiddleware.verify, AuthenicationController.accountProfile);
+    router.get('/account/profile', AuthenticationMiddleware.verify, AuthenicationController.accountProfile);
+    router.put('/account/flag', AuthenicationController.flagAccount);
+    router.put('/account/update/:id', AuthenicationController.updateAccountById);
+    router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
+    router.get('/account/:id', AuthenicationController.accountByID);
+
+};
 
 
-
+allAuthorizedRoutesGroup(router);
+adminAuthorizedRoutesGroup(router);
 
 module.exports = router;
 

@@ -357,16 +357,20 @@ class AuthController {
 
     static async flagAccount(req, res) {
 
-        const { uid, flag } = req.body;
+        const { id, flag } = req.body;
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
 
+        console.log(id);
+
         try {
 
             const user = await Account.findByPk(id);
+
+         
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
