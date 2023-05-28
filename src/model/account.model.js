@@ -23,17 +23,17 @@ module.exports = (sequelize, Sequelize) => {
       },
       account_type: {
         type: Sequelize.STRING,
-        defaultValue: 'student',
+        defaultValue: 'school',
       },
       school_types: {
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: false,
-        defaultValue: ['Primary', 'Secondary', 'College', 'University'],
+        defaultValue: ['Primary', 'Secondary'],
       },
       naming_types: {
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull: false,
-        defaultValue: ['Alpha-Numeric', 'Numeric', 'Alphabetic'],
+        defaultValue: ['Primary 1-6 & JSS1 - SSS3'],
       },
       verification_status: {
         type: Sequelize.INTEGER,
