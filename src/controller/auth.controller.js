@@ -300,7 +300,6 @@ class AuthController {
 
     }
 
-
     /*-----------------------------------| UPDATE ACCOUNT |-----------------------------------*/
 
     static async updateAccount(req, res) {
@@ -332,8 +331,6 @@ class AuthController {
         };
 
     }
-
-
 
     /*-----------------------------------| UPDATE ACCOUNT |-----------------------------------*/
 
