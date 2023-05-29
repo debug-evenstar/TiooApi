@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation } = require('../model/database');
+const { Account, Validation, TempValidation } = require('../model/database');
 const TokenMiddleware = require('../middleware/token.middleware');
 
 class AuthController {
@@ -36,8 +36,6 @@ class AuthController {
                 error: false,
                 message: ResponseStatus.pass.register
             });
-
-            // TODO send otp
 
         } catch (error) {
             console.log(error);
@@ -445,7 +443,6 @@ class AuthController {
             }
 
             const hashPassword = await user.hashPassword(password);
-
             const response = await user.update({ password: hashPassword });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: {} });
@@ -456,6 +453,89 @@ class AuthController {
         };
 
     }
+
+    /*-----------------------------------| SEND TEMP. OTP |-----------------------------------*/
+
+    static async sendTempOTP(req, res) {
+
+        const { email } = req.body;
+        const errors = validationResult(req);
+        const otp = Math.floor(Math.random() * 900000) + 100000;
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const availability = await TempValidation.findOne({ where: { email: email } });
+
+            if (!availability) {
+                const tempUser = new TempValidation();
+                tempUser.email = email;
+                tempUser.otp = otp;
+                const response = await tempUser.save();
+                console.log(otp);
+                return res.status(ResponseStatus.code.success).json({ error: true, message: ResponseStatus.pass.send_otp });
+            }
+
+            availability.otp = otp;
+
+            await availability.save();
+            console.log(otp);
+
+            return res.status(ResponseStatus.code.success).json({ error: true, message: ResponseStatus.pass.send_otp });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error x' });
+        };
+
+    }
+
+  /*-----------------------------------| VALIDATE TEMP. OTP |-----------------------------------*/
+
+    static async verifyTempEmail(req, res) {
+
+        const { email, otp } = req.body;
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const availability = await TempValidation.findOne({ where: { email: email } });
+
+            if (!availability) {
+
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const isValidOTP = await availability.compareOTP(otp);
+
+            const isExpired = await availability.compareExpiryDate();
+
+            if (isExpired) {
+                return res.status(ResponseStatus.code.bad_request).json({ error: true, message: ResponseStatus.fail.expired_token });
+            }
+
+            if (!isValidOTP) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.incorrect_otp });
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.verify });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error x' });
+        };
+
+    }x
+
+
 
 }
 
