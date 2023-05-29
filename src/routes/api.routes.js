@@ -11,7 +11,7 @@ router.get('/', (req, res) => { res.json({ message: "NIMO SERVER RUNNING...." })
 
 const AuthenicationController = require('../controller/auth.controller');
 const SchoolManagementController = require('../controller/school.controller');
-
+const ClassController = require('../controller/class.control');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -42,13 +42,17 @@ const allAuthorizedRoutesGroup = (router) => {
 const adminAuthorizedRoutesGroup = (router) => {
 
     router.use(AuthenticationMiddleware.verify) //--use middleware--//
-    router.get('/account/fetch', AuthenicationController.accounts);
-    router.get('/account/profile', AuthenicationController.accountProfile);
+    router.get('/account/read_all', AuthenicationController.accounts);
+    router.get('/account/read', AuthenicationController.accountProfile);
     router.put('/account/update', AuthenicationController.updateAccount);
     router.put('/account/flag', AuthenicationController.flagAccount);
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
-    router.get('/account/:id', AuthenicationController.accountByID);
+    router.get('/account/read/:id', AuthenicationController.accountByID);
+
+    router.post('/class/create', ClassController.create);
+    router.post('/class/create_bulk', ClassController.bulkCreate);
+
 
 };
 
