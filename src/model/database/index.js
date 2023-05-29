@@ -27,6 +27,7 @@ const Class = db.classes = require("../class.model")(sequelize, Sequelize);
 const SchoolManagement = db.schools = require("../profile.model/school.model")(sequelize, Sequelize);
 const Student = db.students = require("../profile.model/student.model")(sequelize, Sequelize);
 const Teacher = db.teachers = require("../profile.model/teacher.model")(sequelize, Sequelize);
+const TempValidation = db.tempvalidations = require("../temp.validation.model")(sequelize, Sequelize);
 
 //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -77,6 +78,7 @@ module.exports = {
   db,
   Account,
   Validation,
+  TempValidation,
   SchoolManagement,
   Student,
   Teacher,
