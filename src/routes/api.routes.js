@@ -28,10 +28,12 @@ const allAuthorizedRoutesGroup = (router) => {
     router.post('/account/verify', AuthenicationController.verifyOTP);
     router.put('/account/change_password', AuthenicationController.changePassword);
     router.put('/account/change_password', AuthenicationController.changePassword);
-    router.post('/account/school/setup', SchoolManagementController.setup);
 
     router.post('/new/account/send_otp', AuthenicationController.sendTempOTP);
     router.post('/new/account/verify', AuthenicationController.verifyTempEmail);
+
+    router.post('/school/setup', SchoolManagementController.setup);
+
 
 };
 
