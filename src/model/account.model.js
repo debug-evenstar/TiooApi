@@ -63,6 +63,14 @@ module.exports = (sequelize, Sequelize) => {
     return hashedPassword;
   };
 
+  Account.beforeBulkCreate(async (users, options) => {
+    for (const user of users) {
+        const hashedPassword = await bcrypt.hash(user.password, 10);
+        user.password = hashedPassword;
+    }
+    
+});
+
   Account.sync();
 
   return Account;
