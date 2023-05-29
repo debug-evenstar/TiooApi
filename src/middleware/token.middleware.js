@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { Account } = require('../model/database');
+const ResponseMessage = require('../config/message.config');
 
 class TokenMiddleware {
 
@@ -19,8 +20,10 @@ class TokenMiddleware {
             const id = decoded.userdata.id;
             
             Account.findOne({ where: { id: id } }).then((user) => {
-
                 
+                if(!user){
+                    return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.unauthorized });
+                }
                 const encryptedData = decoded.userData;
                 const fetchedData = user.dataValues;
 
