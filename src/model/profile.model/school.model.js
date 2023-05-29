@@ -13,13 +13,32 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: DataTypes.UUIDV4,
                 allowNull: false,
             },
-            name: {
-                type: DataTypes.STRING,
-                allowNull: false,
+            school_types: {
+                type: DataTypes.TEXT,
+                defaultValue: JSON.stringify(['Primary', 'Secondary']),
+                get() {
+                    // Parse the JSON string to retrieve the array
+                    const value = this.getDataValue('school_types');
+                    return value ? JSON.parse(value) : [];
+                },
             },
+            naming_types: {
+                type: DataTypes.TEXT,
+                defaultValue: JSON.stringify(['Primary 1-6 & JSS1 - SSS3']),
+                get() {
+                    // Parse the JSON string to retrieve the array
+                    const value = this.getDataValue('naming_types');
+                    return value ? JSON.parse(value) : [];
+                },
+            },
+            others: {
+                type: DataTypes.JSON,
+                allowNull: true
+            },
+
             dateOfBirth: {
                 type: DataTypes.DATE,
-                allowNull: false,
+                allowNull: true,
             },
             gender: {
                 type: DataTypes.STRING,
@@ -27,23 +46,13 @@ module.exports = (sequelize, DataTypes) => {
             },
             nationality: {
                 type: DataTypes.STRING,
-                allowNull: false,
+                allowNull: true,
             },
             residentialAddress: {
                 type: DataTypes.STRING,
-                allowNull: false,
+                allowNull: true,
             },
-            phoneNumber: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            email: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                validate: {
-                    isEmail: true,
-                },
-            },
+    
 
             //=========== IDENTIFICATION DOCUMENT =========// 
 
