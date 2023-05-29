@@ -5,6 +5,8 @@ const AuthController = require('../controller/auth.controller');
 
 class SchoolManagementController {
 
+    /*-----------------------------------| SETUP SCHOOL |-----------------------------------*/
+
     static async setup(req, res) {
 
         const errors = validationResult(req);
@@ -21,7 +23,7 @@ class SchoolManagementController {
         try {
 
             const emailExist = await AuthController.validateEmail(req.body.email);
-            const registeredAccount = await Account.findByPk(emailExist.data.id, {include: [SchoolManagement, Student]});
+            const registeredAccount = await Account.findByPk(emailExist.data.id, { include: [SchoolManagement, Student] });
 
             if (!emailExist.pass) {
                 return res.status(ResponseStatus.code.not_found).json({
@@ -44,15 +46,15 @@ class SchoolManagementController {
                 });
             }
 
-            if(registeredAccount.SchoolManagement){
-                return res.status(ResponseStatus.code.conflict).json({error: false, message: ResponseStatus.fail.school_deplicate});
+            if (registeredAccount.SchoolManagement) {
+                return res.status(ResponseStatus.code.conflict).json({ error: false, message: ResponseStatus.fail.school_deplicate });
             }
 
             const registeredSchoolManagement = await SchoolManagement.create(parsedBody);
-            
+
             const response = await registeredAccount.setSchoolManagement(registeredSchoolManagement);
 
-            return res.status(ResponseStatus.code.success).json({error: false, message: ResponseStatus.pass.create, data: registeredAccount });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: registeredAccount });
 
         } catch (error) {
             console.log(error);
