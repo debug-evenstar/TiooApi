@@ -25,27 +25,9 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         defaultValue: 'school',
       },
-      school_types: {
-        type: Sequelize.TEXT, 
-        defaultValue: JSON.stringify(['Primary', 'Secondary']),
-        get() {
-          // Parse the JSON string to retrieve the array
-          const value = this.getDataValue('school_types');
-          return value ? JSON.parse(value) : [];
-        },
-      },
-      naming_types: {
-        type: Sequelize.TEXT,
-        defaultValue: JSON.stringify(['Primary 1-6 & JSS1 - SSS3']),
-        get() {
-          // Parse the JSON string to retrieve the array
-          const value = this.getDataValue('naming_types');
-          return value ? JSON.parse(value) : [];
-        },
-      },
       verification_status: {
         type: Sequelize.INTEGER,
-        defaultValue: 0,
+        defaultValue: 1,
       },
       flag: {
         type: Sequelize.ENUM('active', 'banned', 'inactive'),
