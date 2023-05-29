@@ -28,6 +28,7 @@ const SchoolManagement = db.schools = require("../profile.model/school.model")(s
 const Student = db.students = require("../profile.model/student.model")(sequelize, Sequelize);
 const Teacher = db.teachers = require("../profile.model/teacher.model")(sequelize, Sequelize);
 const TempValidation = db.tempvalidations = require("../temp.validation.model")(sequelize, Sequelize);
+const ClassArm = db.classarms  = require("../classarms.model")(sequelize, Sequelize);
 
 //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -45,11 +46,8 @@ Student.belongsTo(Account, {allowNull: true});
 
 //---------/ ONE-TO-MANY - SCHOOL -*- CLASS | TEACHERS | STUDENT | SUBJECT /--------------------
 
-SchoolManagement.hasMany(Class);
-Class.belongsTo(SchoolManagement);
-
 SchoolManagement.hasMany(Teacher);
-Teacher.belongsTo(SchoolManagement);
+Teacher.belongsTo(SchoolManagement);-
 
 SchoolManagement.hasMany(Student);
 Student.belongsTo(SchoolManagement);
@@ -72,6 +70,12 @@ Subject.belongsToMany(Class, { through: 'ClassSubjects' });
 
 Teacher.belongsToMany(Class, { through: 'TeacherClasses' });
 Class.belongsToMany(Teacher, { through: 'TeacherClasses' });
+
+SchoolManagement.belongsToMany(Class, { through: 'SchoolClass' });
+Class.belongsToMany(SchoolManagement, { through: 'SchoolClass' });
+
+Class.belongsToMany(ClassArm, { through: 'ClassArmClass' });
+ClassArm.belongsToMany(Class, { through: 'ClassArmClass' });
 
 
 module.exports = {
