@@ -18,10 +18,6 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 defaultValue: 'Primary 1',
             },
-            category: {
-                type: DataTypes.STRING,
-                defaultValue: "A",
-            },
         }, {
         timestamps: false,
     });
