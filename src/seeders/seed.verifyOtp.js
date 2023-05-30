@@ -2,7 +2,7 @@ const { Account, Validation } = require('../model/database/index');
 
 const accountHolder = {
     name: "Williams Mark Jerry",
-    email: "studentuser@gmail.com",
+    email: "student1@gmail.com",
     phone: 08093652637,
     account_type: "student",
     password: "1234"
@@ -11,28 +11,6 @@ const accountHolder = {
 const randomOTP = Math.floor(Math.random() * 900000) + 100000;
 
 class Seed {
-
-    static register = async () => {
-        try {
-
-            const validationData = { otp: randomOTP }
-
-            const newAccount = await Account.create(accountHolder);
-
-            const newValidation = await Validation.create(validationData);
-
-            const response = await newAccount.setValidation(newValidation);
-
-            //TODO --send EMAIL OTP
-
-            console.log('Product seeded successfully!');
-
-        } catch (error) {
-            console.error('Error seeding database:', error);
-        } finally {
-            process.exit();
-        }
-    };
 
     static verifyOTP = async () => {
 
@@ -58,7 +36,6 @@ class Seed {
                 await registerdAccount.update({ verification_status: 1, });
                 console.log('Product seeded successfully!', isValidOTP);
             }
-
 
 
         } catch (error) {

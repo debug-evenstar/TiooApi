@@ -23,12 +23,19 @@ const nursery_primary_secondary_grade = [
     { type: "secondary", naming: "SS 2" },
     { type: "secondary", naming: "SS 3" },
 
-    { type: "grad", naming: "grad 1" },
-    { type: "grad", naming: "grad 2" },
-    { type: "grad", naming: "grad 3" },
-    { type: "grad", naming: "grad 4" },
-    { type: "grad", naming: "grad 5" },
-    { type: "grad", naming: "grad 6" },
+    { type: "pry-grade", naming: "grade 1" },
+    { type: "pry-grade", naming: "grade 2" },
+    { type: "pry-grade", naming: "grade 3" },
+    { type: "pry-grade", naming: "grade 4" },
+    { type: "pry-grade", naming: "grade 5" },
+    { type: "pry-grade", naming: "grade 6" },
+
+    { type: "sec-grade", naming: "grade 7" },
+    { type: "sec-grade", naming: "grade 8" },
+    { type: "sec-grade", naming: "grade 9" },
+    { type: "sec-grade", naming: "grade 10" },
+    { type: "sec-grade", naming: "grade 11" },
+    { type: "sec-grade", naming: "grade 12" },
 
 ];
 
