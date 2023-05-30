@@ -1,6 +1,6 @@
-const { validationResult } = require('express-validator');
+const { validationResult, body } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Student } = require('../model/database');
+const { Account, Validation, SchoolManagement, Student, Class } = require('../model/database');
 const AuthController = require('../controller/auth.controller');
 
 class SchoolManagementController {
@@ -13,7 +13,7 @@ class SchoolManagementController {
 
         const parsedBody = {
             school_types: JSON.stringify(req.body.school_types),
-            naming_types: JSON.stringify(req.body.naming_types)
+            naming_types: req.body.naming_types
         }
 
         if (!errors.isEmpty()) {
@@ -46,15 +46,46 @@ class SchoolManagementController {
                 });
             }
 
+            const compareIgnorCase = (item1, item2) => item1.toLowerCase() === item2.toLowerCase()
+            const nurseryClasses = await Class.findAll({ where: { type: 'nursery' } });
+            const primaryClasses = await Class.findAll({ where: { type: 'primary' } });
+            const secondaryClasses = await Class.findAll({ where: { type: 'secondary' } });
+            const primaryGrade = await Class.findAll({ where: { type: 'secondary' } })
+
+
             if (registeredAccount.SchoolManagement) {
-                return res.status(ResponseStatus.code.conflict).json({ error: false, message: ResponseStatus.fail.school_deplicate });
+                return res.status(ResponseStatus.code.conflict).json({ error: false, message: ResponseStatus.fail.school_duplicate });
             }
 
-            const registeredSchoolManagement = await SchoolManagement.create(parsedBody);
+            const [registeredSchoolManagement] = await SchoolManagement.findOrCreate({ where: parsedBody });
 
-            const response = await registeredAccount.setSchoolManagement(registeredSchoolManagement);
+            const assignedAccount = await registeredAccount.setSchoolManagement(registeredSchoolManagement);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: registeredAccount });
+            // /*-------------/ for standard school naming convention /-------------*/
+
+            if (req.body.naming_types === 'nurs-sec') {
+
+                if (req.body.school_types.includes('Nursery') || req.body.school_types.includes('nursery')) {
+
+                    await registeredSchoolManagement.setClasses(nurseryClasses);
+
+                }
+                if (req.body.school_types.includes('Primary') || req.body.school_types.includes('primary')) {
+
+                    await registeredSchoolManagement.addClasses(primaryClasses);
+
+                }
+                if (req.body.school_types.includes('Secondary') || req.body.school_types.includes('secondary')) {
+
+                    await registeredSchoolManagement.addClasses(secondaryClasses);
+
+                }
+
+            }
+
+            const registeredSchoolManagementWithClasses = await SchoolManagement.findOne({ where: { AccountId: emailExist.data.id }, include: [Class] });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: registeredSchoolManagementWithClasses });
 
         } catch (error) {
             console.log(error);
