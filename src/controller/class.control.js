@@ -50,6 +50,48 @@ class ClassController {
 
     };
 
+    /*-----------------------------------| FETCH ALL CLASS |-----------------------------------*/
+
+    static async readAll(req, res) {
+
+        try {
+
+            const classes = await Class.findAll({ attributes: { exclude: [''], include: '' } });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classes });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+    /*----------------------------------| FETCH CLASS BY ID |----------------------------------*/
+   
+    static async read(req, res) {
+
+        const {id} = req.params;
+
+        try {
+
+            const singleClass = await Class.findByPk(id);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: singleClass });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+    /*-------------------------------------| UPDATE CLASS |-------------------------------------*/
+
+
+    /*-------------------------------------| DELETE CLASS |-------------------------------------*/
+
+
+    /*----------------------------------| FETCH CLASSES BY SCH-ID |----------------------------------*/
+
 }
 
 
