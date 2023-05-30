@@ -34,7 +34,6 @@ const allAuthorizedRoutesGroup = (router) => {
 
     router.post('/school/setup', SchoolManagementController.setup);
 
-
 };
 
 /*------------------------------| SECURED ROUTES |------------------------------*/
@@ -50,10 +49,18 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
     router.get('/account/read/:id', AuthenicationController.accountByID);
 
+    router.get('/school/classes/:id', SchoolManagementController.classes);
+    router.get('/school/read/', SchoolManagementController.read);
+    router.get('/school/read/:id', SchoolManagementController.readById);
+    router.get('/school/read/classes/:id', SchoolManagementController.readByIdWithClasses);
+    router.post('/school/class/remove', SchoolManagementController.removeClassFromSchool);
+
     router.post('/class/create', ClassController.create);
     router.post('/class/create_bulk', ClassController.bulkCreate);
     router.get('/class/read', ClassController.readAll);
     router.get('/class/read/:id', ClassController.read);
+    router.put('/class/update/:id', ClassController.update);
+    router.delete('/class/delete/:id', ClassController.delete);
 
 
 
