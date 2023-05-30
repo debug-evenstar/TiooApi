@@ -67,14 +67,18 @@ class ClassController {
     }
 
     /*----------------------------------| FETCH CLASS BY ID |----------------------------------*/
-   
+
     static async read(req, res) {
 
-        const {id} = req.params;
+        const { id } = req.params;
 
         try {
 
             const singleClass = await Class.findByPk(id);
+
+            if (!singleClass) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: singleClass });
 
@@ -86,9 +90,57 @@ class ClassController {
 
     /*-------------------------------------| UPDATE CLASS |-------------------------------------*/
 
+    static async update(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const foundClass = await Class.findByPk(id);
+
+            console.log(foundClass);
+
+            if (!foundClass) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const response = await foundClass.update(req.body);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
 
     /*-------------------------------------| DELETE CLASS |-------------------------------------*/
 
+    static async delete(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const foundClass = await Class.findByPk(id);
+
+            console.log(foundClass);
+
+            if (!foundClass) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const response = await foundClass.destroy();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: {} });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
 
     /*----------------------------------| FETCH CLASSES BY SCH-ID |----------------------------------*/
 
