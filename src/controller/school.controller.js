@@ -50,10 +50,12 @@ class SchoolManagementController {
             const nurseryClasses = await Class.findAll({ where: { type: 'nursery' } });
             const primaryClasses = await Class.findAll({ where: { type: 'primary' } });
             const secondaryClasses = await Class.findAll({ where: { type: 'secondary' } });
-            const primaryGrade = await Class.findAll({ where: { type: 'secondary' } })
+            const primaryGrade = await Class.findAll({ where: { type: 'pry-grade' } });
+            const secondaryGrade = await Class.findAll({ where: { type: 'sec-grade' } });
 
 
             if (registeredAccount.SchoolManagement) {
+
                 return res.status(ResponseStatus.code.conflict).json({ error: false, message: ResponseStatus.fail.school_duplicate });
             }
 
@@ -61,26 +63,44 @@ class SchoolManagementController {
 
             const assignedAccount = await registeredAccount.setSchoolManagement(registeredSchoolManagement);
 
-            // /*-------------/ for standard school naming convention /-------------*/
 
-            if (req.body.naming_types === 'nurs-sec') {
+            /*-------------/ for standard school naming convention /-------------*/
 
-                if (req.body.school_types.includes('Nursery') || req.body.school_types.includes('nursery')) {
+            const action = req.body.naming_types;
 
-                    await registeredSchoolManagement.setClasses(nurseryClasses);
+            switch (action) {
 
-                }
-                if (req.body.school_types.includes('Primary') || req.body.school_types.includes('primary')) {
+                case 'nurs-sec':
 
-                    await registeredSchoolManagement.addClasses(primaryClasses);
+                    if (req.body.school_types.includes('Nursery') || req.body.school_types.includes('nursery')) {
+                        await registeredSchoolManagement.setClasses(nurseryClasses);
+                    }
 
-                }
-                if (req.body.school_types.includes('Secondary') || req.body.school_types.includes('secondary')) {
+                    if (req.body.school_types.includes('Primary') || req.body.school_types.includes('primary')) {
+                        await registeredSchoolManagement.addClasses(primaryClasses);
+                    }
 
-                    await registeredSchoolManagement.addClasses(secondaryClasses);
+                    if (req.body.school_types.includes('Secondary') || req.body.school_types.includes('secondary')) {
+                        await registeredSchoolManagement.addClasses(secondaryClasses);
+                    }
+                    break;
 
-                }
+                case 'grade':
 
+                    if (req.body.school_types.includes('Nursery') || req.body.school_types.includes('nursery')) {
+                        await registeredSchoolManagement.setClasses(primaryGrade);
+                    }
+                    if (req.body.school_types.includes('Secondary') || req.body.school_types.includes('secondary')) {
+                        await registeredSchoolManagement.addClasses(secondaryGrade);
+                    }
+                    break;
+
+                case 'custom':
+                    // TODO
+                    break;
+
+                default:
+                    console.log('Unknown action');
             }
 
             const registeredSchoolManagementWithClasses = await SchoolManagement.findOne({ where: { AccountId: emailExist.data.id }, include: [Class] });
@@ -92,6 +112,7 @@ class SchoolManagementController {
             res.status(500).json({ error: 'Server Error' });
         };
     };
+
 }
 
 
