@@ -133,7 +133,7 @@ class ClassController {
 
             const response = await foundClass.destroy();
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: {} });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
 
         } catch (error) {
             console.log(error);
