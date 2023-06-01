@@ -47,8 +47,9 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.put('/account/update', AuthenicationController.updateAccount);
     router.put('/account/flag', AuthenicationController.flagAccount);
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
-    router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
     router.get('/account/read/:id', AuthenicationController.accountByID);
+    router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
+
 
     router.get('/school/classes/:id', SchoolManagementController.classes);
     router.get('/school/read/', SchoolManagementController.read);
@@ -56,7 +57,6 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/school/read/classes/:id', SchoolManagementController.readByIdWithClasses);
     router.post('/school/class/remove', SchoolManagementController.removeClassFromSchool);
     router.get('/school/class/read', SchoolManagementController.getClassBySidANDCid);
-
 
     router.post('/class/create', ClassController.create);
     router.post('/class/create_bulk', ClassController.bulkCreate);
@@ -67,11 +67,10 @@ const adminAuthorizedRoutesGroup = (router) => {
 
     router.post('/class/arms/create', ClassArmsController.create);
     router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
-    router.post('/class/arms/read', ClassArmsController.createBulk);
+    router.get('/class/arms/read', ClassArmsController.readAll);
     router.get('/class/arms/read/:id', ClassArmsController.readById);
-
-
-
+    router.put('/class/arms/update/:id', ClassArmsController.updateById);
+    router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
 
 
 };
