@@ -82,9 +82,6 @@ Subject.belongsToMany(Class, { through: 'ClassSubjects' });
 Teacher.belongsToMany(Class, { through: 'TeacherClasses' });
 Class.belongsToMany(Teacher, { through: 'TeacherClasses' });
 
-// SchoolManagement.belongsToMany(Class, { through: 'SchoolClass' });
-// Class.belongsToMany(SchoolManagement, { through: 'SchoolClass' });
-
 
 module.exports = {
   db,
@@ -98,10 +95,3 @@ module.exports = {
   ClassArm,
   Subject
 };
-
-
-
-/*
- N:B #R- pull student class to get their subject
-
- */
