@@ -32,6 +32,7 @@ class classArms {
         }
     }
 
+    /*----------------------------------| CREATE BULK CLASS ARMS |----------------------------------*/
 
     static async createBulk(req, res) {
 
@@ -48,9 +49,9 @@ class classArms {
             const promises = arms.map(async (eachArm) => {
                 const classArmInstance = await ClassArm.create({ naming: eachArm });
                 await classInstance.addClassArm(classArmInstance);
-              });
-          
-              await Promise.all(promises);
+            });
+
+            await Promise.all(promises);
 
             const classWithArms = await Class.findByPk(classId, { include: [ClassArm] });
 
@@ -61,13 +62,14 @@ class classArms {
         }
     }
 
+    /*----------------------------------| READ CLASS ARMS BYID |----------------------------------*/
 
     static async readById(req, res) {
 
         const { id } = req.params;
 
         try {
-            
+
             const classArmInstance = await ClassArm.findByPk(id);
 
             if (!classArmInstance) {
@@ -82,8 +84,73 @@ class classArms {
         }
     }
 
+    /*----------------------------------| READ ALL CLASS ARMS |----------------------------------*/
+
+    static async readAll(req, res) {
+
+        try {
+
+            const classArmInstance = await ClassArm.findAll();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classArmInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
+
+    /*----------------------------------| UPDATE CLASS ARMS BYID |----------------------------------*/
+
+    static async updateById(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const classArmInstance = await ClassArm.findByPk(id);
+
+            if (!classArmInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const response = await classArmInstance.update(req.body);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
+
+    /*----------------------------------| DELETE CLASS ARMS BYID |----------------------------------*/
+
+    static async deleteArmById(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const classArmInstance = await ClassArm.findByPk(id);
+
+            if (!classArmInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const response = await classArmInstance.destroy();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
 
 }
+
+
 
 
 module.exports = classArms;
