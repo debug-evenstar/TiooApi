@@ -1,11 +1,10 @@
 class ClassSeeds {
     static nursery = [
-        { type: "primary", naming: "primary 1" },
-        { type: "primary", naming: "primary 2" },
-        { type: "primary", naming: "primary 3" },
-        { type: "primary", naming: "primary 4" },
-        { type: "primary", naming: "primary 5" },
-        { type: "primary", naming: "primary 6" },
+        { type: "nursery", naming: "lower kindergarten" },
+        { type: "nursery", naming: "upper kindergarten" },
+        { type: "nursery", naming: "transition" },
+        { type: "nursery", naming: "nursery 1" },
+        { type: "nursery", naming: "nursery 2" },
     ];
 
     static primary = [
@@ -33,6 +32,16 @@ class ClassSeeds {
 
     static nurseryToSecondary = [
         ...ClassSeeds.nursery,
+        ...ClassSeeds.primary,
+        ...ClassSeeds.secondary
+    ];
+
+    static nurseryAndSecondary = [
+        ...ClassSeeds.nursery,
+        ...ClassSeeds.secondary
+    ];
+
+    static primaryAndSecondary = [
         ...ClassSeeds.primary,
         ...ClassSeeds.secondary
     ];

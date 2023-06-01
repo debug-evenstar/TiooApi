@@ -67,6 +67,9 @@ const adminAuthorizedRoutesGroup = (router) => {
 
     router.post('/class/arms/create', ClassArmsController.create);
     router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
+    router.post('/class/arms/read', ClassArmsController.createBulk);
+    router.get('/class/arms/read/:id', ClassArmsController.readById);
+
 
 
 

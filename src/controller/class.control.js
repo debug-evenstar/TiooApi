@@ -17,7 +17,17 @@ class ClassController {
 
         try {
 
-            const [newClass] = await Class.findOrCreate({ where: req.body });
+            const schoolInstance = await SchoolManagement.findByPk(req.body.school_id);
+
+            if(!schoolInstance){
+
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+
+            }
+
+            const newClass = await Class.create(req.body);
+
+           await schoolInstance.addClass(newClass);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
 
@@ -39,7 +49,7 @@ class ClassController {
 
         try {
 
-            req.body.map(async (data) => { await Class.findOrCreate({ where: data }) })
+            req.body.map(async (data) => { await Class.create(data) })
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
 
@@ -106,7 +116,7 @@ class ClassController {
 
             const response = await foundClass.update(req.body);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: response });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: response });
 
         } catch (error) {
             console.log(error);

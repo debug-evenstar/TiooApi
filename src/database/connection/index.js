@@ -63,9 +63,6 @@ Class.belongsTo(SchoolManagement);
 Class.hasMany(Student);
 Student.belongsTo(Class);
 
-SchoolManagement.hasMany(ClassArm);
-ClassArm.belongsTo(SchoolManagement);
-
 Class.hasMany(ClassArm);
 ClassArm.belongsTo(Class);
 
