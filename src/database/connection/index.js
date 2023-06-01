@@ -55,10 +55,24 @@ Student.belongsTo(SchoolManagement);
 SchoolManagement.hasMany(Subject);
 Subject.belongsTo(SchoolManagement);
 
+SchoolManagement.hasMany(Class);
+Class.belongsTo(SchoolManagement);
+
 //---------/ ONE-TO-MANY - CLASS -*- STUDENTS /--------------------
 
 Class.hasMany(Student);
 Student.belongsTo(Class);
+
+SchoolManagement.hasMany(ClassArm);
+ClassArm.belongsTo(SchoolManagement);
+
+Class.hasMany(ClassArm);
+ClassArm.belongsTo(Class);
+
+ClassArm.hasMany(Student);
+Student.belongsTo(ClassArm);
+
+
 
 //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 
@@ -71,11 +85,8 @@ Subject.belongsToMany(Class, { through: 'ClassSubjects' });
 Teacher.belongsToMany(Class, { through: 'TeacherClasses' });
 Class.belongsToMany(Teacher, { through: 'TeacherClasses' });
 
-SchoolManagement.belongsToMany(Class, { through: 'SchoolClass' });
-Class.belongsToMany(SchoolManagement, { through: 'SchoolClass' });
-
-Class.belongsToMany(ClassArm, { through: 'ClassArmClass' });
-ClassArm.belongsToMany(Class, { through: 'ClassArmClass' });
+// SchoolManagement.belongsToMany(Class, { through: 'SchoolClass' });
+// Class.belongsToMany(SchoolManagement, { through: 'SchoolClass' });
 
 
 module.exports = {
@@ -87,6 +98,7 @@ module.exports = {
   Student,
   Teacher,
   Class,
+  ClassArm,
   Subject
 };
 

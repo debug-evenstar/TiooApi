@@ -12,6 +12,7 @@ router.get('/', (req, res) => { res.json({ message: "NIMO SERVER RUNNING...." })
 const AuthenicationController = require('../controller/auth.controller');
 const SchoolManagementController = require('../controller/school.controller');
 const ClassController = require('../controller/class.control');
+const ClassArmsController = require('../controller/classArms.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -54,6 +55,8 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/school/read/:id', SchoolManagementController.readById);
     router.get('/school/read/classes/:id', SchoolManagementController.readByIdWithClasses);
     router.post('/school/class/remove', SchoolManagementController.removeClassFromSchool);
+    router.get('/school/class/read', SchoolManagementController.getClassBySidANDCid);
+
 
     router.post('/class/create', ClassController.create);
     router.post('/class/create_bulk', ClassController.bulkCreate);
@@ -61,6 +64,10 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/class/read/:id', ClassController.read);
     router.put('/class/update/:id', ClassController.update);
     router.delete('/class/delete/:id', ClassController.delete);
+
+    router.post('/class/arms/create', ClassArmsController.create);
+    router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
+
 
 
 

@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, TempValidation } = require('../model/database');
+const { Account, Validation, TempValidation } = require('../database/connection');
 const TokenMiddleware = require('../middleware/token.middleware');
 
 class AuthController {

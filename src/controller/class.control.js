@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Student, Class } = require('../model/database');
+const { Account, Validation, SchoolManagement, Student, Class } = require('../database/connection');
 const AuthController = require('../controller/auth.controller');
 
 class ClassController {
@@ -142,8 +142,7 @@ class ClassController {
 
     }
 
-    /*----------------------------------| FETCH CLASSES BY SCH-ID |----------------------------------*/
-
+ 
 }
 
 

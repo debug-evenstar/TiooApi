@@ -5,10 +5,9 @@ module.exports = (sequelize, DataTypes) => {
         'Class',
         {
             id: {
-                type: DataTypes.UUID,
+                type: DataTypes.INTEGER,
                 primaryKey: true,
-                defaultValue: DataTypes.UUIDV4,
-                allowNull: false,
+                autoIncrement: true,
             },
             type: {
                 type: DataTypes.STRING,

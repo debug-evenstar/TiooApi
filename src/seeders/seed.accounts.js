@@ -1,4 +1,4 @@
-const { Account, Validation } = require('../model/database/index');
+const { Account, Validation } = require('../database/connection/index');
 
 const schools_teachers_students = [
     { name: "Bez Pry School", email: "school1@gmail.com", phone: "08093652645", account_type: "school", password: "1234" },

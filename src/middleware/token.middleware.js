@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { Account } = require('../model/database');
+const { Account } = require('../database/connection');
 const ResponseMessage = require('../config/message.config');
 
 class TokenMiddleware {

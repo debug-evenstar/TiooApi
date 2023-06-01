@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require('dotenv').config();
 const app = express();
-const { db } = require("../model/database/index");
+const { db } = require("../database/connection");
 const PORT = process.env.PORT || 8080;
 const IndexRoute = require('../routes/index');
 const treblle = require('@treblle/express')

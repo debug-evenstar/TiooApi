@@ -1,6 +1,6 @@
 const { validationResult, body } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Student, Class } = require('../model/database');
+const { Account, Validation, SchoolManagement, Student, Class, ClassArm } = require('../database/connection');
 const AuthController = require('../controller/auth.controller');
 
 class SchoolManagementController {
@@ -190,7 +190,7 @@ class SchoolManagementController {
 
             }
 
-            const classes = await schoolInstance.getClasses({ joinTableAttributes: [] });
+            const classes = await schoolInstance.getClasses({ joinTableAttributes: [], include: [ClassArm]});
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classes });
 
@@ -232,6 +232,39 @@ class SchoolManagementController {
         };
     }
 
+        /*----------------------------------| GET CLASS BY SID & CID |----------------------------------*/
+
+        static async getClassBySidANDCid(req, res) {
+
+            const { sid, cid } = req.query;
+    
+            try {
+    
+                const schoolInstance = await SchoolManagement.findByPk(sid);
+    
+                if (!schoolInstance) {
+                    console.log("school instance", schoolId)
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                }
+    
+                const classInstance = await Class.findByPk(cid);
+    
+                if (!classInstance) {
+                    console.log("class instance", classInstance)
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                }
+
+                // -----------------------DOES THE SAME BUT RETURNS ARRAY--------------------------------------
+                //const classes = await schoolInstance.getClasses({ joinTableAttributes: [], where: {id: cid} });
+
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: classInstance });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
 
 }
 
