@@ -239,7 +239,6 @@ class AuthController {
 
     }
 
-
     /*-----------------------------------| FETCH ALL ACCOUNTS |-----------------------------------*/
 
     static async accounts(req, res) {
@@ -364,7 +363,6 @@ class AuthController {
 
     }
 
-
     /*-----------------------------------| DELETE ACCOUNT |-----------------------------------*/
 
     static async deleteAccount(req, res) {
@@ -389,7 +387,6 @@ class AuthController {
         };
 
     }
-
 
     /*-----------------------------------| FLAG ACCOUNT |-----------------------------------*/
 
@@ -490,7 +487,7 @@ class AuthController {
 
     }
 
-  /*-----------------------------------| VALIDATE TEMP. OTP |-----------------------------------*/
+    /*-----------------------------------| VALIDATE TEMP. OTP |-----------------------------------*/
 
     static async verifyTempEmail(req, res) {
 
@@ -530,9 +527,7 @@ class AuthController {
             res.status(500).json({ error: 'Server Error x' });
         };
 
-    }x
-
-
+    } 
 
 }
 

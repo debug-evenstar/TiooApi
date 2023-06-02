@@ -55,8 +55,7 @@ class SchoolManagementController {
 
             const registeredSchoolManagement = await SchoolManagement.create(parsedBody);
 
-             await registeredAccount.setSchoolManagement(registeredSchoolManagement);
-
+            await registeredAccount.setSchoolManagement(registeredSchoolManagement);
 
             /*-------------/ for standard school naming convention /-------------*/
 
@@ -77,28 +76,6 @@ class SchoolManagementController {
         };
 
     };
-
-
-    static async setupSchoolClasses(schoolId, seedClass) {
-
-        console.log(schoolId);
-        console.log(seedClass);
-
-        try {
-            const classes = seedClass.map((classData) => ({
-                ...classData,
-                SchoolManagementId: schoolId,
-            }));
-
-            console.log(classes);
-            await Class.bulkCreate(classes);
-            return;
-        } catch (error) {
-            console.error('Error seeding classes:', error);
-            return;
-        }
-
-    }
 
     /*----------------------------------| ALL SCHOOLS |----------------------------------*/
 
@@ -202,7 +179,7 @@ class SchoolManagementController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const response =  await classInstance.destroy();
+            const response = await classInstance.destroy();
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: response });
 

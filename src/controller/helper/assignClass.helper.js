@@ -1,10 +1,7 @@
 const ClassSeeds = require('../../utils/class.utilities');
 const {Class} = require('../../database/connection');
 
-
-
 class SchoolUtils {
-
 
     static async processClassesForSchool(action, schoolChoice, schoolId, customClassNaming) {
         console.log('This is the action:', action);

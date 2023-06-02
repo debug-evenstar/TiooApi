@@ -19,7 +19,7 @@ class ClassController {
 
             const schoolInstance = await SchoolManagement.findByPk(req.body.school_id);
 
-            if(!schoolInstance){
+            if (!schoolInstance) {
 
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
 
@@ -27,7 +27,7 @@ class ClassController {
 
             const newClass = await Class.create(req.body);
 
-           await schoolInstance.addClass(newClass);
+            await schoolInstance.addClass(newClass);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
 
@@ -49,7 +49,18 @@ class ClassController {
 
         try {
 
-            req.body.map(async (data) => { await Class.create(data) })
+            const schoolInstance = await SchoolManagement.findByPk(req.body.school_id);
+
+            if (!schoolInstance) {
+
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+
+            }
+
+            req.body.map(async (data) => {
+                const classInstance = await Class.create(data);
+                schoolInstance.addClass(classInstance);
+            })
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
 
@@ -152,7 +163,7 @@ class ClassController {
 
     }
 
- 
+
 }
 
 
