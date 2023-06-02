@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Student, Class } = require('../database/connection');
+const { Account, Validation, SchoolManagement, Student, Class, Subject } = require('../database/connection');
 const AuthController = require('../controller/auth.controller');
 
 class ClassController {
@@ -135,6 +135,23 @@ class ClassController {
         };
 
     }
+        /*-----------------------------------| READ CLASS WITH ALL THE OFFERED SUBJECTS |-----------------------------------*/
+
+        static async readClassWithSubjects(req, res) {
+
+            const { id } = req.params;
+    
+            try {
+    
+                const classSubjects = await Class.findByPk(id, { include: [Subject]});
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classSubjects });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
 
     /*-------------------------------------| DELETE CLASS |-------------------------------------*/
 
