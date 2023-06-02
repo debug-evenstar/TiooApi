@@ -22,7 +22,7 @@ class Relationships {
         SchoolManagement.hasMany(Teacher);
         Teacher.belongsTo(SchoolManagement); -
 
-            SchoolManagement.hasMany(Student);
+        SchoolManagement.hasMany(Student);
         Student.belongsTo(SchoolManagement);
 
         SchoolManagement.hasMany(Subject);
