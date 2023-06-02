@@ -49,7 +49,7 @@ class ClassController {
 
         try {
 
-            const schoolInstance = await SchoolManagement.findByPk(req.body.school_id);
+            const schoolInstance = await SchoolManagement.findByPk(req.body[0].school_id);
 
             if (!schoolInstance) {
 
