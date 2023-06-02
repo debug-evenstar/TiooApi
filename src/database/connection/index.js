@@ -36,4 +36,4 @@ const models = [Account, Validation, Subject, Class, SchoolManagement, Student, 
 
 Relationships.group(...models);
 
-module.exports = {db, ...models};
+module.exports = {db, Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm};
