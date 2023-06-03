@@ -32,8 +32,9 @@ const seed = async () => {
             const [newAccount] = await Account.findOrCreate({ where: eachAccount });
             const newValidation = await Validation.create({ otp: newOtp });
             const setup = await newAccount.setValidation(newValidation);
-            console.log(setup);
         });
+
+
 
         console.log('Classes created for nursery, primary and secondary');
 

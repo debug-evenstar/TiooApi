@@ -14,6 +14,7 @@ const SchoolManagementController = require('../controller/school.controller');
 const ClassController = require('../controller/class.control');
 const ClassArmsController = require('../controller/classArms.controller');
 const SubjectController = require('../controller/subject.controller');
+const TeacherController = require('../controller/teacher.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -58,12 +59,14 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/school/read/classes/:id', SchoolManagementController.readByIdWithClasses);
     router.post('/school/class/remove', SchoolManagementController.removeClassFromSchool);
     router.get('/school/class/read', SchoolManagementController.getClassBySidANDCid);
+    router.get('/school/teachers/:id', SchoolManagementController.schoolTeachers);
 
     router.post('/class/create', ClassController.create);
     router.post('/class/create_bulk', ClassController.bulkCreate);
     router.get('/class/read', ClassController.readAll);
     router.get('/class/read/:id', ClassController.read);
     router.get('/class/subjects/read/:id', ClassController.readClassWithSubjects);
+    router.get('/class/teachers/read/:id', ClassController.readClassWithTeachers);
     router.put('/class/update/:id', ClassController.update);
     router.delete('/class/delete/:id', ClassController.delete);
 
@@ -82,6 +85,8 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/subjects/read/:id', SubjectController.readBySubjectId);
     router.put('/subjects/update', SubjectController.update);
     router.delete('/subjects/delete/:id', SubjectController.delete);
+
+    router.post('/teacher/invite', TeacherController.sendInvite);
 
     
 
