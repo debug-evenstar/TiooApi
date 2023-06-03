@@ -142,7 +142,7 @@ class SubjectController {
 
         try {
 
-            const subjectClasses = await Subject.findOne({ include: [Cldass], where: { id } });
+            const subjectClasses = await Subject.findOne({ include: [Class], where: { id } });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectClasses });
 
