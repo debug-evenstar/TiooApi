@@ -22,7 +22,7 @@ const ResponseMessage = {
         login: "Username or Password don't match",
         verify: "Account Not Verified",
         school_setup: "Can't setup a school with this account type",
-        school_duplicate: "School already setup"
+        school_duplicate: "School already setup",
     },
 
     code: {
