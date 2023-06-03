@@ -138,6 +138,43 @@ class SchoolManagementController {
         };
     }
 
+
+    /*----------------------------------| FETCH SCHOOLS BY ID WITH Teachers |----------------------------------*/
+
+    static async schoolTeachers(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const schoolInstance = await SchoolManagement.findByPk(id);
+
+            if (!schoolInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const schoolTeachersProfile = await schoolInstance.getTeachers();
+
+            const teacherAccountIds = schoolTeachersProfile.map(teacher => teacher.AccountId);
+           
+            let teachersAccount = [];
+
+            if (teacherAccountIds.length !== 0) {
+                teachersAccount = await Account.findAll({ where: { id: [teacherAccountIds] }, attributes: { exclude: ['password'] } });
+            }
+
+
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
     /*----------------------------------| FETCH CLASSES BY SCHOOL ID |----------------------------------*/
 
     static async classes(req, res) {
