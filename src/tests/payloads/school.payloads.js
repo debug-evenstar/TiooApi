@@ -1,5 +1,5 @@
 const SchoolPayload = {
-    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyZGF0YSI6eyJpZCI6IjI4ZGVhNjMzLWU3MDAtNGMwOS05OTcxLTA4MDc0MmNhNzIzMiIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiYWNjb3VudF90eXBlIjoiYWRtaW4ifSwiaWF0IjoxNjg1NzgwNjI3LCJleHAiOjE2ODYwMzk4Mjd9.QEoorJLam6AD-vLYh2l4Gl-Xqni90tm-GGiQeszxTkM",
+    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyZGF0YSI6eyJpZCI6ImZhZTk1YzY2LTRhODUtNDZlYi1hYmU2LTY4ZTBiODU5NzJkMCIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiYWNjb3VudF90eXBlIjoiYWRtaW4ifSwiaWF0IjoxNjg1ODc3ODkyLCJleHAiOjE2ODYxMzcwOTJ9.fuctFKYSKC1iWyV5CvH97_8JHAHoCZP-wArIeSzV6i4",
 
     setup: {
         "email": "school1@gmail.com",
