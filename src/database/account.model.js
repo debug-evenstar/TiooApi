@@ -30,7 +30,7 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: 1,
       },
       flag: {
-        type: Sequelize.ENUM('active', 'banned', 'inactive'),
+        type: Sequelize.ENUM('active', 'banned', 'inactive', 'invited'),
         defaultValue: 'active',
       },
       password: {
