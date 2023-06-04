@@ -156,7 +156,7 @@ class SchoolManagementController {
             const schoolTeachersProfile = await schoolInstance.getTeachers();
 
             const teacherAccountIds = schoolTeachersProfile.map(teacher => teacher.AccountId);
-           
+
             let teachersAccount = [];
 
             if (teacherAccountIds.length !== 0) {

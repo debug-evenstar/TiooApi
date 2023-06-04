@@ -42,7 +42,7 @@ class SubjectController {
     /*-----------------------------------| READ SUBJECTS OFFERED IN SCHOOL BY SID |-----------------------------------*/
 
 
-    static async readBySchoolId(req, res) {
+    static async readSchoolSubjects(req, res) {
 
         const { id } = req.params;
 
@@ -50,7 +50,7 @@ class SubjectController {
 
             const subjectInstance = await Subject.findAll({ where: { SchoolManagementId: id } });
 
-            
+
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
 
         } catch (error) {
