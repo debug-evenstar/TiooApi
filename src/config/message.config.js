@@ -7,7 +7,8 @@ const ResponseMessage = {
         register: 'Account created successfully',
         send_otp: 'OTP has been resent. Kindly check email for OTP',
         verify: 'Verification successful',
-        login: 'LoggedIn successfully'
+        login: 'LoggedIn successfully',
+        invite: 'Invite Accepted'
     },
     fail: {
         bad_request: 'Bad Request',
@@ -23,6 +24,8 @@ const ResponseMessage = {
         verify: "Account Not Verified",
         school_setup: "Can't setup a school with this account type",
         school_duplicate: "School already setup",
+        invite: 'Invite Not accepted yet',
+        accepted: 'Invite Already Accepted',
     },
 
     code: {
