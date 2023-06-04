@@ -36,6 +36,9 @@ const allAuthorizedRoutesGroup = (router) => {
     router.post('/new/account/verify', AuthenicationController.verifyTempEmail);
 
     router.post('/school/setup', SchoolManagementController.setup);
+    router.post('/teacher/invite/accept', TeacherController.acceptInvite);
+    router.get('/teacher/invited/:id', TeacherController.fetchInvitedTeacher);
+
 
 };
 
@@ -51,7 +54,6 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
-
 
     router.get('/school/classes/:id', SchoolManagementController.classes);
     router.get('/school/read/', SchoolManagementController.read);
@@ -77,20 +79,15 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.put('/class/arms/update/:id', ClassArmsController.updateById);
     router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
 
-
     router.post('/subjects/create', SubjectController.create);
     router.get('/subjects/read', SubjectController.readAll);
-    router.get('/subjects/school/read/:id', SubjectController.readBySchoolId);
+    router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
     router.get('/subjects/classes/read/:id', SubjectController.readSubjectWithClasses);
     router.get('/subjects/read/:id', SubjectController.readBySubjectId);
     router.put('/subjects/update', SubjectController.update);
     router.delete('/subjects/delete/:id', SubjectController.delete);
 
     router.post('/teacher/invite', TeacherController.sendInvite);
-
-    
-
-
 };
 
 
