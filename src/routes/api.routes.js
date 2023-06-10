@@ -30,8 +30,7 @@ const allAuthorizedRoutesGroup = (router) => {
     router.post('/account/send_otp', AuthenicationController.requestVerificationOTP);
     router.post('/account/verify', AuthenicationController.verifyOTP);
     router.put('/account/change_password', AuthenicationController.changePassword);
-    router.put('/account/change_password', AuthenicationController.changePassword);
-
+    
     router.post('/new/account/send_otp', AuthenicationController.sendTempOTP);
     router.post('/new/account/verify', AuthenicationController.verifyTempEmail);
 
@@ -91,6 +90,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/teacher/invite', TeacherController.sendInvite);
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
+    router.get('/teacher/:id', TeacherController.fetchTeacher)
 };
 
 
