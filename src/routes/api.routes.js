@@ -1,6 +1,9 @@
 const express = require('express');
 router = express.Router();
 
+/* -------------------------------| Validators |------------------------------- */
+
+const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator} = require("./validators/AuthValidators")
 
 /*-----------------------------------| HOME |-----------------------------------*/
 
@@ -23,20 +26,20 @@ const AuthenticationMiddleware = require('../middleware/token.middleware');
 
 const allAuthorizedRoutesGroup = (router) => {
 
-    router.post('/account/signin', AuthenicationController.signInAccount);
-    router.post('/account/signup', AuthenicationController.createAccount);
-    router.post('/account/verify', AuthenicationController.verifyAccount);
-    router.post('/account/send_otp', AuthenicationController.requestVerificationOTP);
-    router.post('/account/verify', AuthenicationController.verifyOTP);
-    router.put('/account/change_password', AuthenicationController.changePassword);
-    router.put('/account/change_password', AuthenicationController.changePassword);
-
-    router.post('/new/account/send_otp', AuthenicationController.sendTempOTP);
-    router.post('/new/account/verify', AuthenicationController.verifyTempEmail);
-
-    router.post('/school/setup', SchoolManagementController.setup);
+    router.post('/account/signin', SigninValidator,  AuthenicationController.signInAccount);
+    router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
+    router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
+    router.post('/account/send_otp', SendOTPValidator, AuthenicationController.requestVerificationOTP);
+    router.post('/account/verify', VerifyAccountValidator,  AuthenicationController.verifyOTP);
+    router.put('/account/change_password', ChangePasswordValidator, AuthenicationController.changePassword);
+    
+    router.post('/new/account/send_otp', SendOTPValidator, AuthenicationController.sendTempOTP);
+    router.post('/new/account/verify', VerifyAccountValidator, AuthenicationController.verifyTempEmail);
+    
+    router.post('/school/setup', SchoolSetupValidator, SchoolManagementController.setup);
 
 };
+
 
 /*------------------------------| SECURED ROUTES |------------------------------*/
 
