@@ -3,11 +3,12 @@ const fs = require('fs');
 const path = require('path');
 const mocha = new Mocha();
 
-// Add the test files to be executed
-mocha.addFile(path.join(__dirname, 'api.test.js'));
+
+mocha.addFile(path.join(__dirname, 'account.test.js'));
+mocha.addFile(path.join(__dirname, 'school.test.js'));
+mocha.addFile(path.join(__dirname, 'arms.test.js'));
 mocha.addFile(path.join(__dirname, 'subject.test.js'));
 
-// Run the tests
 mocha.run((failures) => {
   if (failures > 0) {
     console.error(`${failures} test(s) failed.`);
