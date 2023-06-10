@@ -20,7 +20,6 @@ const schools_teachers_students = [
     { name: "Meyene Imo", email: "student5@gmail.com", phone: "08093752645", account_type: "student", password: "1234" },
 
     { name: "Admin Account", email: "admin@gmail.com", phone: "08093752645", account_type: "admin", password: "1234" },
-
 ];
 
 const seed = async () => {

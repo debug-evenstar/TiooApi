@@ -4,18 +4,11 @@ module.exports = (sequelize, Sequelize) => {
   const Account = sequelize.define(
     'Account',
     {
-      // id: {
-      //   type: Sequelize.UUID,
-      //   primaryKey: true,
-      //   defaultValue: Sequelize.UUIDV4,
-      //   allowNull: false,
-      //   autoIncrement: false,
-      // },
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-    },
+      },
       name: {
         type: Sequelize.STRING,
       },
@@ -70,11 +63,11 @@ module.exports = (sequelize, Sequelize) => {
 
   Account.beforeBulkCreate(async (users, options) => {
     for (const user of users) {
-        const hashedPassword = await bcrypt.hash(user.password, 10);
-        user.password = hashedPassword;
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      user.password = hashedPassword;
     }
-    
-});
+
+  });
 
   Account.sync();
 
