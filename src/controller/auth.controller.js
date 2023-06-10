@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
 const { Account, Validation, TempValidation } = require('../database/connection');
 const TokenMiddleware = require('../middleware/token.middleware');
+const Mailer = require('../services/mailer');
 
 class AuthController {
 
@@ -476,8 +477,9 @@ class AuthController {
             availability.otp = otp;
 
             await availability.save();
-            console.log(otp);
 
+            Mailer().to(email).from(process.env.MAIL_FROM, "SabiKid").subject("OTP").template("emails.OTPTempEmail", { code: otp }).send();
+            console.log(otp);
             return res.status(ResponseStatus.code.success).json({ error: true, message: ResponseStatus.pass.send_otp });
 
         } catch (error) {
@@ -527,7 +529,7 @@ class AuthController {
             res.status(500).json({ error: 'Server Error x' });
         };
 
-    } 
+    }
 
 }
 
