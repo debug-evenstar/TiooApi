@@ -1,6 +1,7 @@
 const SchoolPayload = {
-    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyZGF0YSI6eyJpZCI6ImZhZTk1YzY2LTRhODUtNDZlYi1hYmU2LTY4ZTBiODU5NzJkMCIsImVtYWlsIjoiYWRtaW5AZ21haWwuY29tIiwiYWNjb3VudF90eXBlIjoiYWRtaW4ifSwiaWF0IjoxNjg1ODc3ODkyLCJleHAiOjE2ODYxMzcwOTJ9.fuctFKYSKC1iWyV5CvH97_8JHAHoCZP-wArIeSzV6i4",
 
+    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyZGF0YSI6eyJpZCI6MSwiZW1haWwiOiJzY2hvb2wxQGdtYWlsLmNvbSIsImFjY291bnRfdHlwZSI6InNjaG9vbCJ9LCJpYXQiOjE2ODYzOTQ1NTUsImV4cCI6MTY4NjY1Mzc1NX0.4tY-IsSYOHzdAoIevh6Qqz8TW5s9mPOqYDFzwrZio6U",
+    
     setup: {
         "email": "school1@gmail.com",
         "school_types": ["nursery", "primary", "secondary"],
@@ -37,10 +38,10 @@ const SchoolPayload = {
     subject: {
         "naming": "Home Economics",
         "class": [6, 7],
-        "classArm": [1, 2, 3, 7, 8, 9],
+        "classArm": [1, 2, 3, 4, 5, 6],
         "description": "desctipion can be empty",
         "SchoolManagementId": 1
-    }
+    },
 
 }
 
