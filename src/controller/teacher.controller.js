@@ -105,6 +105,31 @@ class TeacherController {
     }
 
 
+    /*-----------------------------------| READ TEACHER |-----------------------------------*/
+
+    static async fetchTeacher(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password'] } });
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const payload = {
+                account: accountInstance,
+            };
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: payload });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
 
     /*-----------------------------------| READ ALL TEACHERS |-----------------------------------*/
 
