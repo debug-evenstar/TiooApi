@@ -4,7 +4,6 @@ module.exports = (sequelize, DataTypes) => {
     const Teacher = sequelize.define(
         'Teacher',
         {
-
             //================= PERSONAL INFORMATION=========// 
 
             id: {
@@ -12,13 +11,9 @@ module.exports = (sequelize, DataTypes) => {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            name: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
             dateOfBirth: {
                 type: DataTypes.DATE,
-                allowNull: false,
+                allowNull: true,
             },
             gender: {
                 type: DataTypes.STRING,
@@ -26,22 +21,11 @@ module.exports = (sequelize, DataTypes) => {
             },
             nationality: {
                 type: DataTypes.STRING,
-                allowNull: false,
+                allowNull: true,
             },
             residentialAddress: {
                 type: DataTypes.STRING,
-                allowNull: false,
-            },
-            phoneNumber: {
-                type: DataTypes.STRING,
-                allowNull: false,
-            },
-            email: {
-                type: DataTypes.STRING,
-                allowNull: false,
-                validate: {
-                    isEmail: true,
-                },
+                allowNull: true,
             },
 
             //=========== IDENTIFICATION DOCUMENT =========// 

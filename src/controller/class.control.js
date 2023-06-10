@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Student, Class, Subject } = require('../database/connection');
+const { Account, Validation, SchoolManagement, Student, Class, Subject, Teacher } = require('../database/connection');
 const AuthController = require('../controller/auth.controller');
 
 class ClassController {
@@ -135,23 +135,6 @@ class ClassController {
         };
 
     }
-        /*-----------------------------------| READ CLASS WITH ALL THE OFFERED SUBJECTS |-----------------------------------*/
-
-        static async readClassWithSubjects(req, res) {
-
-            const { id } = req.params;
-    
-            try {
-    
-                const classSubjects = await Class.findByPk(id, { include: [Subject]});
-    
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classSubjects });
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'Server Error' });
-            };
-        }
 
     /*-------------------------------------| DELETE CLASS |-------------------------------------*/
 
@@ -178,6 +161,62 @@ class ClassController {
             res.status(500).json({ error: 'Server Error' });
         };
 
+    }
+
+    /*-----------------------------------| READ CLASS WITH ALL THE OFFERED SUBJECTS |-----------------------------------*/
+
+    static async readClassWithSubjects(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const classSubjects = await Class.findByPk(id, { include: [Subject] });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classSubjects });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+    /*-----------------------------------| READ CLASS WITH ALL ASSIGNED TEACHERS |-----------------------------------*/
+
+    static async readClassWithTeachers(req, res) {
+
+        const { id } = req.params;
+
+        try {
+            
+            const classInstance = await Class.findByPk(id, { include: [Teacher] });
+
+            if (!classInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const teacherAccountIds = classInstance.Teachers.map(teacher => teacher.AccountId);
+            
+            let teachersAccount = [];
+
+            if (teacherAccountIds.length !== 0) {
+                teachersAccount = await Account.findAll({ where: { id: [teacherAccountIds] }, attributes: { exclude: ['password'] } });
+            }
+
+            const payload = {
+                id: classInstance.id,
+                type: classInstance.type,
+                naming: classInstance.naming,
+                SchoolManagementId: classInstance.SchoolManagementId,
+                Teacher: teachersAccount
+            };
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: payload });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
     }
 
 

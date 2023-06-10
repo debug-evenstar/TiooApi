@@ -4,7 +4,6 @@ const {Class} = require('../../database/connection');
 class SchoolUtils {
 
     static async processClassesForSchool(action, schoolChoice, schoolId, customClassNaming) {
-        console.log('This is the action:', action);
 
         switch (action) {
             case 'NS':
@@ -49,9 +48,6 @@ class SchoolUtils {
     }
 
     static async setupSchoolClasses(schoolId, seedClass) {
-
-        console.log(schoolId);
-        console.log(seedClass);
 
         try {
             const classes = seedClass.map((classData) => ({
