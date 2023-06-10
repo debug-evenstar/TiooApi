@@ -4,13 +4,18 @@ module.exports = (sequelize, Sequelize) => {
   const Account = sequelize.define(
     'Account',
     {
+      // id: {
+      //   type: Sequelize.UUID,
+      //   primaryKey: true,
+      //   defaultValue: Sequelize.UUIDV4,
+      //   allowNull: false,
+      //   autoIncrement: false,
+      // },
       id: {
-        type: Sequelize.UUID,
+        type: Sequelize.INTEGER,
         primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-        autoIncrement: false,
-      },
+        autoIncrement: true,
+    },
       name: {
         type: Sequelize.STRING,
       },
