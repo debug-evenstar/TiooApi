@@ -56,7 +56,7 @@ class SchoolUtils {
             }));
 
             console.log(classes);
-           await Class.bulkCreate(classes);
+            await Class.bulkCreate(classes);
             return;
         } catch (error) {
             console.error('Error seeding classes:', error);
