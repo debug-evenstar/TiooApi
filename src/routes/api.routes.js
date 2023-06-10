@@ -89,6 +89,8 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.delete('/subjects/delete/:id', SubjectController.delete);
 
     router.post('/teacher/invite', TeacherController.sendInvite);
+    router.get('/teacher/readall', TeacherController.allTeachers);
+    router.get('/teacher/readInvited', TeacherController.invitedTeachers);
 };
 
 

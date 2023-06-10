@@ -1,5 +1,6 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult } = require('express-validator');
+const { Sequelize } = require('sequelize');
 const { Account, SchoolManagement, Teacher, Validation, Class, Subject } = require("../database/connection");
 
 
@@ -96,6 +97,46 @@ class TeacherController {
             };
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: payload });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
+
+    /*-----------------------------------| READ ALL TEACHERS |-----------------------------------*/
+
+    static async allTeachers(req, res) {
+
+        try {
+
+            const teachersAccount = await Account.findAll({ attributes: { exclude: ['password'] }, where: { account_type: 'teacher' }, include: [Teacher] });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+    /*-----------------------------------| READ INVITED TEACHERS |-----------------------------------*/
+
+    static async invitedTeachers(req, res) {
+
+        try {
+            const teachersAccount = await Account.findAll({
+                attributes: { exclude: ['password'] },
+                where: {
+                  account_type: 'teacher',
+                  '$Teacher.id$': { [Sequelize.Op.not]: null },
+                },
+                include: [Teacher],
+              });
+              
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
 
         } catch (error) {
             console.log(error);
