@@ -1,4 +1,4 @@
-const { Subject, Class } = require('../database/connection/');
+const { Subject, Class, Teacher, Account } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 
 class SubjectController {
@@ -145,6 +145,44 @@ class SubjectController {
             const subjectClasses = await Subject.findOne({ include: [Class], where: { id } });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectClasses });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+    /*-----------------------------------| READ SUBJECT BY SUBJ-ID AND ALL THE CLASSES OFFERING SUBJECT |-----------------------------------*/
+
+
+    static async subjectTeachers(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const subject = await Subject.findOne({where: { id } });
+
+            const teacherProfile = await subject.getTeachers();
+
+            const teacherAccountIds = teacherProfile.map(teacher => teacher.AccountId);
+            
+            let teachersAccount = [];
+
+            if (teacherAccountIds.length !== 0) {
+                teachersAccount = await Account.findAll({ where: { id: [teacherAccountIds] }, attributes: { exclude: ['password'] } });
+            }
+
+            console.log(teachersAccount);
+
+           
+
+            const payload = {
+                subject: subject,
+                teachers: teachersAccount
+            };
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: payload });
 
         } catch (error) {
             console.log(error);
