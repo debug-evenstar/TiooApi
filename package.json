@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "node index",
+    "dev": "nodemon index"
   },
   "keywords": [],
   "author": "",
@@ -25,5 +27,8 @@
     "mysql2": "^3.3.2",
     "nodemailer": "^6.9.2",
     "sequelize": "^6.31.1"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.0"
   }
 }
