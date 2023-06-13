@@ -474,7 +474,6 @@ class AuthController {
                 tempUser.email = email;
                 tempUser.otp = otp;
                 const response = await tempUser.save();
-                console.log(otp);
                 return res.status(ResponseStatus.code.success).json({ error: true, message: ResponseStatus.pass.send_otp });
             }
 
@@ -483,7 +482,7 @@ class AuthController {
             await availability.save();
 
             Mailer().to(email).from(process.env.MAIL_FROM, "SabiKid").subject("OTP").template("emails.OTPTempEmail", { code: otp }).send();
-            console.log(otp);
+
             return res.status(ResponseStatus.code.success).json({ error: true, message: ResponseStatus.pass.send_otp });
 
         } catch (error) {
