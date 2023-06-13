@@ -18,6 +18,7 @@ const ClassController = require('../controller/class.control');
 const ClassArmsController = require('../controller/classArms.controller');
 const SubjectController = require('../controller/subject.controller');
 const TeacherController = require('../controller/teacher.controller');
+const InviteController = require('../controller/invite.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -26,7 +27,6 @@ const AuthenticationMiddleware = require('../middleware/token.middleware');
 /*------------------------------| AUTHORIZED ROUTES |------------------------------*/
 
 const allAuthorizedRoutesGroup = (router) => {
-
 
     router.post('/account/signin', SigninValidator,  AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
@@ -43,7 +43,6 @@ const allAuthorizedRoutesGroup = (router) => {
     router.get('/teacher/invited/:id', TeacherController.fetchInvitedTeacher);
 
 };
-
 
 /*------------------------------| SECURED ROUTES |------------------------------*/
 
@@ -95,7 +94,17 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
     router.get('/teacher/:id', TeacherController.fetchTeacher)
+
+    router.post('/invites/generate', InviteController.generateLink);
+    router.get('/invites/read', InviteController.invites);
+    router.get('/invites/read/:id', InviteController.invite);
+    router.get('/invites/info/:code', InviteController.inviteByCode);
+    router.delete('/invites/delete/:id', InviteController.delete);
+
 };
+
+
+
 
 
 allAuthorizedRoutesGroup(router);
