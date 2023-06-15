@@ -1,5 +1,6 @@
 const { Subject, Class, Teacher, Account, Lesson } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
+const Sequelize = require('sequelize');
 
 class SubjectController {
 
@@ -188,6 +189,33 @@ class SubjectController {
             res.status(500).json({ error: 'Server Error' });
         };
     }
+
+        /*-----------------------------------| READ SUBJECTS WITH LESSONS COUNT |-----------------------------------*/
+
+        static async subjectsWithLessonCount(req, res) {
+
+            try {
+    
+                const subjectsLessons = await Subject.findAll({
+                    include: [
+                      {
+                        model: Lesson,
+                        attributes: [],
+                      },
+                    ],
+                    attributes: {
+                      include: [[Sequelize.literal('COUNT(Lessons.id)'), 'lessonCount']],
+                    },
+                    group: ['Subject.id'],
+                  });
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectsLessons });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
 
     /*-----------------------------------| READ SUBJECT BY SUBJ-ID AND ALL THE CLASSES OFFERING SUBJECT |-----------------------------------*/
 
