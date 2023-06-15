@@ -174,6 +174,26 @@ class SubjectController {
         };
     }
 
+
+    /*-----------------------------------| READ SCHOOL SUBJECTS LESSONS |-----------------------------------*/
+
+    static async schoolSubjectLessons(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const subjectsLessons = await Subject.findAll({ include: [Lesson], where: { SchoolManagementId: id } });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectsLessons });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
     /*-----------------------------------| READ SUBJECTS WITH LESSONS |-----------------------------------*/
 
     static async subjectsWithLessons(req, res) {
@@ -190,32 +210,32 @@ class SubjectController {
         };
     }
 
-        /*-----------------------------------| READ SUBJECTS WITH LESSONS COUNT |-----------------------------------*/
+    /*-----------------------------------| READ SUBJECTS WITH LESSONS COUNT |-----------------------------------*/
 
-        static async subjectsWithLessonCount(req, res) {
+    static async subjectsWithLessonCount(req, res) {
 
-            try {
-    
-                const subjectsLessons = await Subject.findAll({
-                    include: [
-                      {
+        try {
+
+            const subjectsLessons = await Subject.findAll({
+                include: [
+                    {
                         model: Lesson,
                         attributes: [],
-                      },
-                    ],
-                    attributes: {
-                      include: [[Sequelize.literal('COUNT(Lessons.id)'), 'lessonCount']],
                     },
-                    group: ['Subject.id'],
-                  });
-    
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectsLessons });
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'Server Error' });
-            };
-        }
+                ],
+                attributes: {
+                    include: [[Sequelize.literal('COUNT(Lessons.id)'), 'lessonCount']],
+                },
+                group: ['Subject.id'],
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectsLessons });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
 
     /*-----------------------------------| READ SUBJECT BY SUBJ-ID AND ALL THE CLASSES OFFERING SUBJECT |-----------------------------------*/
 
