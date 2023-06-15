@@ -1,6 +1,6 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult, param } = require('express-validator');
-const { Lesson } = require("../database/connection");
+const { Lesson, Subject } = require("../database/connection");
 
 
 class LessonController {
@@ -10,11 +10,15 @@ class LessonController {
 
     static async createLesson(req, res) {
 
-       req.body.file = req.file.path;
+       if(req.file){
+        req.body.file = req.file.path;
+       }
 
         try {
 
              const lessonInstance = await Lesson.create(req.body);
+             const subjectInstance = await Subject.findByPk(req.body.subject);
+             subjectInstance.addLesson(lessonInstance);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstance });
 
