@@ -1,6 +1,7 @@
 const express = require('express');
 router = express.Router();
 
+
 /* -------------------------------| Validators |------------------------------- */
 
 const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator} = require("./validators/AuthValidators")
@@ -19,10 +20,13 @@ const ClassArmsController = require('../controller/classArms.controller');
 const SubjectController = require('../controller/subject.controller');
 const TeacherController = require('../controller/teacher.controller');
 const InviteController = require('../controller/invite.controller');
+const LessonController = require('../controller/lesson.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
 const AuthenticationMiddleware = require('../middleware/token.middleware');
+
+const UploadService = require('../services/upload.service');
 
 /*------------------------------| AUTHORIZED ROUTES |------------------------------*/
 
@@ -100,6 +104,8 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/invites/read/:id', InviteController.invite);
     router.get('/invites/info/:code', InviteController.inviteByCode);
     router.delete('/invites/delete/:id', InviteController.delete);
+
+    router.post('/lesson/create', UploadService.upload.single('file'), LessonController.createLesson);
 
 };
 
