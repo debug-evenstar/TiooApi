@@ -17,6 +17,8 @@ const SchoolManagementController = require('../controller/school.controller');
 const ClassController = require('../controller/class.control');
 const ClassArmsController = require('../controller/classArms.controller');
 const SubjectController = require('../controller/subject.controller');
+const TeacherController = require('../controller/teacher.controller');
+const InviteController = require('../controller/invite.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -37,9 +39,10 @@ const allAuthorizedRoutesGroup = (router) => {
     router.post('/new/account/verify', VerifyAccountValidator, AuthenicationController.verifyTempEmail);
     
     router.post('/school/setup', SchoolSetupValidator, SchoolManagementController.setup);
+    router.post('/teacher/invite/accept', TeacherController.acceptInvite);
+    router.get('/teacher/invited/:id', TeacherController.fetchInvitedTeacher);
 
 };
-
 
 /*------------------------------| SECURED ROUTES |------------------------------*/
 
@@ -54,19 +57,20 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/account/read/:id', AuthenicationController.accountByID);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
 
-
     router.get('/school/classes/:id', SchoolManagementController.classes);
     router.get('/school/read/', SchoolManagementController.read);
     router.get('/school/read/:id', SchoolManagementController.readById);
     router.get('/school/read/classes/:id', SchoolManagementController.readByIdWithClasses);
     router.post('/school/class/remove', SchoolManagementController.removeClassFromSchool);
     router.get('/school/class/read', SchoolManagementController.getClassBySidANDCid);
+    router.get('/school/teachers/:id', SchoolManagementController.schoolTeachers);
 
     router.post('/class/create', ClassController.create);
     router.post('/class/create_bulk', ClassController.bulkCreate);
     router.get('/class/read', ClassController.readAll);
     router.get('/class/read/:id', ClassController.read);
     router.get('/class/subjects/read/:id', ClassController.readClassWithSubjects);
+    router.get('/class/teachers/read/:id', ClassController.readClassWithTeachers);
     router.put('/class/update/:id', ClassController.update);
     router.delete('/class/delete/:id', ClassController.delete);
 
@@ -77,19 +81,30 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.put('/class/arms/update/:id', ClassArmsController.updateById);
     router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
 
-
     router.post('/subjects/create', SubjectController.create);
     router.get('/subjects/read', SubjectController.readAll);
-    router.get('/subjects/school/read/:id', SubjectController.readBySchoolId);
+    router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
     router.get('/subjects/classes/read/:id', SubjectController.readSubjectWithClasses);
+    router.get('/subjects/teachers/read/:id', SubjectController.subjectTeachers);
     router.get('/subjects/read/:id', SubjectController.readBySubjectId);
     router.put('/subjects/update', SubjectController.update);
     router.delete('/subjects/delete/:id', SubjectController.delete);
 
-    
+    router.post('/teacher/invite', TeacherController.sendInvite);
+    router.get('/teacher/readall', TeacherController.allTeachers);
+    router.get('/teacher/readInvited', TeacherController.invitedTeachers);
+    router.get('/teacher/:id', TeacherController.fetchTeacher)
 
+    router.post('/invites/generate', InviteController.generateLink);
+    router.get('/invites/read', InviteController.invites);
+    router.get('/invites/read/:id', InviteController.invite);
+    router.get('/invites/info/:code', InviteController.inviteByCode);
+    router.delete('/invites/delete/:id', InviteController.delete);
 
 };
+
+
+
 
 
 allAuthorizedRoutesGroup(router);

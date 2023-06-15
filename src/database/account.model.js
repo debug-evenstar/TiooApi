@@ -5,11 +5,9 @@ module.exports = (sequelize, Sequelize) => {
     'Account',
     {
       id: {
-        type: Sequelize.UUID,
+        type: Sequelize.INTEGER,
         primaryKey: true,
-        defaultValue: Sequelize.UUIDV4,
-        allowNull: false,
-        autoIncrement: false,
+        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING,
@@ -30,7 +28,7 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: 1,
       },
       flag: {
-        type: Sequelize.ENUM('active', 'banned', 'inactive'),
+        type: Sequelize.ENUM('active', 'banned', 'inactive', 'invited'),
         defaultValue: 'active',
       },
       password: {
@@ -65,11 +63,11 @@ module.exports = (sequelize, Sequelize) => {
 
   Account.beforeBulkCreate(async (users, options) => {
     for (const user of users) {
-        const hashedPassword = await bcrypt.hash(user.password, 10);
-        user.password = hashedPassword;
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      user.password = hashedPassword;
     }
-    
-});
+
+  });
 
   Account.sync();
 

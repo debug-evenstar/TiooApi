@@ -20,7 +20,6 @@ const schools_teachers_students = [
     { name: "Meyene Imo", email: "student5@gmail.com", phone: "08093752645", account_type: "student", password: "1234" },
 
     { name: "Admin Account", email: "admin@gmail.com", phone: "08093752645", account_type: "admin", password: "1234" },
-
 ];
 
 const seed = async () => {
@@ -32,8 +31,9 @@ const seed = async () => {
             const [newAccount] = await Account.findOrCreate({ where: eachAccount });
             const newValidation = await Validation.create({ otp: newOtp });
             const setup = await newAccount.setValidation(newValidation);
-            console.log(setup);
         });
+
+
 
         console.log('Classes created for nursery, primary and secondary');
 

@@ -212,6 +212,10 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
             }
 
+            if (user.flag === 'invited') {
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.invite });
+            }
+
             const isValidPassword = await user.comparePassword(password)
 
             const isVerifedUser = user.dataValues.verification_status;
@@ -470,7 +474,6 @@ class AuthController {
                 tempUser.email = email;
                 tempUser.otp = otp;
                 const response = await tempUser.save();
-                console.log(otp);
                 return res.status(ResponseStatus.code.success).json({ error: true, message: ResponseStatus.pass.send_otp });
             }
 
@@ -479,7 +482,7 @@ class AuthController {
             await availability.save();
 
             Mailer().to(email).from(process.env.MAIL_FROM, "SabiKid").subject("OTP").template("emails.OTPTempEmail", { code: otp }).send();
-            console.log(otp);
+
             return res.status(ResponseStatus.code.success).json({ error: true, message: ResponseStatus.pass.send_otp });
 
         } catch (error) {

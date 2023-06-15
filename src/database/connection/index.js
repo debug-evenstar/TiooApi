@@ -14,7 +14,8 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     min: dbConfig.pool.min,
     acquire: dbConfig.pool.acquire,
     idle: dbConfig.pool.idle
-  }
+  },
+  logging: false, // Disable logging of SQL queries
 });
 
 const db = {};
@@ -31,9 +32,10 @@ const Student = db.students = require("../profile.model/student.model")(sequeliz
 const Teacher = db.teachers = require("../profile.model/teacher.model")(sequelize, Sequelize);
 const TempValidation = db.tempvalidations = require("../temp.validation.model")(sequelize, Sequelize);
 const ClassArm = db.classarms = require("../classarms.model")(sequelize, Sequelize);
+const Invite = db.invites = require("../invite.model")(sequelize, Sequelize);
 
 const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm]
 
 Relationships.group(...models);
 
-module.exports = {db, Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm};
+module.exports = {db, Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Invite};

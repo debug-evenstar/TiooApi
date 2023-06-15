@@ -5,7 +5,7 @@ module.exports = {
 
     SigninValidator: [
         body('email').notEmpty().isString().isEmail().withMessage("email field is required"),
-        body('password').notEmpty().isStrongPassword().withMessage("password field is required with strong password"),
+        body('password').notEmpty().withMessage("password field is required with strong password"),
     ],
 
     SignupValidator: [
@@ -13,7 +13,7 @@ module.exports = {
         body('email').notEmpty().isString().isEmail().withMessage("email field is required"),
         body('phone').notEmpty().isLength({ max: 11 }).isNumeric().withMessage("phone field is required"),
         body('account_type').notEmpty().isString().withMessage("account type field is required"),
-        body('password').notEmpty().isStrongPassword().withMessage("password field is required"),
+        body('password').notEmpty().withMessage("password field is required"),
     ],
 
     VerifyAccountValidator: [
@@ -26,7 +26,7 @@ module.exports = {
     ],
 
     ChangePasswordValidator: [
-        body('password').notEmpty().isStrongPassword().withMessage("password field is required"),
+        body('password').notEmpty().withMessage("password field is required"),
     ],
 
     SchoolSetupValidator: [
