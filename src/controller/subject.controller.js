@@ -1,4 +1,4 @@
-const { Subject, Class, Teacher, Account } = require('../database/connection/');
+const { Subject, Class, Teacher, Account, Lesson } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 
 class SubjectController {
@@ -166,6 +166,22 @@ class SubjectController {
             const lessonsInstance = await subjectInstance.getLessons();
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonsInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+    /*-----------------------------------| READ SUBJECTS WITH LESSONS |-----------------------------------*/
+
+    static async subjectsWithLessons(req, res) {
+
+        try {
+
+            const subjectsLessons = await Subject.findAll({ include: [Lesson] });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectsLessons });
 
         } catch (error) {
             console.log(error);

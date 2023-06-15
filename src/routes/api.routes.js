@@ -92,8 +92,9 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/subjects/teachers/read/:id', SubjectController.subjectTeachers);
     router.get('/subjects/read/:id', SubjectController.readBySubjectId);
     router.put('/subjects/update', SubjectController.update);
-    router.delete('/subjects/delete/:id', SubjectController.delete);
+    router.get('/subjects/lessons/', SubjectController.subjectsWithLessons);
     router.get('/subjects/lessons/:subjectId', SubjectController.subjectLessons);
+    router.delete('/subjects/delete/:id', SubjectController.delete);
 
     router.post('/teacher/invite', TeacherController.sendInvite);
     router.get('/teacher/readall', TeacherController.allTeachers);
