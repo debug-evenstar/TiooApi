@@ -1,6 +1,7 @@
 const { body } = require('express-validator');
 
 /* ----------------------- THIS IS FOR AUTH VALIDATION ---------------------- */
+
 module.exports = {
 
     SigninValidator: [

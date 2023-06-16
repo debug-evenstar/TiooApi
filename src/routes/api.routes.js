@@ -3,7 +3,7 @@ router = express.Router();
 
 /* -------------------------------| Validators |------------------------------- */
 
-const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator} = require("./validators/AuthValidators")
+const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator } = require("./validators/AuthValidators")
 
 /*-----------------------------------| HOME |-----------------------------------*/
 
@@ -23,26 +23,34 @@ const InviteController = require('../controller/invite.controller');
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
 const AuthenticationMiddleware = require('../middleware/token.middleware');
+const StudentController = require('../controller/student.controller');
+const { InviteValidator, AcceptValidator } = require('./validators/StudentValidators');
 
 /*------------------------------| AUTHORIZED ROUTES |------------------------------*/
 
 const allAuthorizedRoutesGroup = (router) => {
 
-    router.post('/account/signin', SigninValidator,  AuthenicationController.signInAccount);
+    router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
     router.post('/account/send_otp', SendOTPValidator, AuthenicationController.requestVerificationOTP);
-    router.post('/account/verify', VerifyAccountValidator,  AuthenicationController.verifyOTP);
+    router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyOTP);
     router.put('/account/change_password', ChangePasswordValidator, AuthenicationController.changePassword);
-    
+
     router.post('/new/account/send_otp', SendOTPValidator, AuthenicationController.sendTempOTP);
     router.post('/new/account/verify', VerifyAccountValidator, AuthenicationController.verifyTempEmail);
-    
+
     router.post('/school/setup', SchoolSetupValidator, SchoolManagementController.setup);
+
     router.post('/teacher/invite/accept', TeacherController.acceptInvite);
+
     router.get('/teacher/invited/:id', TeacherController.fetchInvitedTeacher);
 
+
+    router.get('/student/invited/:id', StudentController.fetchInvitedStudent);
+    router.post('/student/invite/accept', AcceptValidator, StudentController.acceptInvitation);
 };
+
 
 /*------------------------------| SECURED ROUTES |------------------------------*/
 
@@ -101,10 +109,16 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/invites/info/:code', InviteController.inviteByCode);
     router.delete('/invites/delete/:id', InviteController.delete);
 
+    router.post('/student/invite', InviteValidator, StudentController.sendInvitation);
+    router.get('/student/:id', StudentController.fetchStudent);
+    router.get('/students/readall', StudentController.allStudents);
+    router.get('/students/readinvited', StudentController.invitedStudents);
+
+
+
+
+
 };
-
-
-
 
 
 allAuthorizedRoutesGroup(router);
