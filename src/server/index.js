@@ -14,8 +14,8 @@ class Server {
     static boot() {
 
         const corsOptions = {
-            origin: "http://localhost:8081",
-            methods: ['GET', 'POST', 'PUT', 'DELETE'],
+            origin: "*",
+            methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE', 'PATCH'],
             allowedHeaders: ['Content-Type', 'Authorization'],
             credentials: true,
             preflightContinue: false,
