@@ -1,5 +1,6 @@
-const { Subject, Class, Teacher, Account } = require('../database/connection/');
+const { Subject, Class, Teacher, Account, Lesson } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
+const Sequelize = require('sequelize');
 
 class SubjectController {
 
@@ -152,6 +153,90 @@ class SubjectController {
         };
     }
 
+
+    /*-----------------------------------| READ SUBJECT LESSONS |-----------------------------------*/
+
+    static async subjectLessons(req, res) {
+
+        const { subjectId } = req.params;
+
+        try {
+
+            const subjectInstance = await Subject.findByPk(subjectId);
+
+            const lessonsInstance = await subjectInstance.getLessons();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonsInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
+    /*-----------------------------------| READ SCHOOL SUBJECTS LESSONS |-----------------------------------*/
+
+    static async schoolSubjectLessons(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const subjectsLessons = await Subject.findAll({ include: [Lesson], where: { SchoolManagementId: id } });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectsLessons });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+    /*-----------------------------------| READ SUBJECTS WITH LESSONS |-----------------------------------*/
+
+    static async subjectsWithLessons(req, res) {
+
+        try {
+
+            const subjectsLessons = await Subject.findAll({ include: [Lesson] });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectsLessons });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+    /*-----------------------------------| READ SUBJECTS WITH LESSONS COUNT |-----------------------------------*/
+
+    static async subjectsWithLessonCount(req, res) {
+
+        try {
+
+            const subjectsLessons = await Subject.findAll({
+                include: [
+                    {
+                        model: Lesson,
+                        attributes: [],
+                    },
+                ],
+                attributes: {
+                    include: [[Sequelize.literal('COUNT(Lessons.id)'), 'lessonCount']],
+                },
+                group: ['Subject.id'],
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectsLessons });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
     /*-----------------------------------| READ SUBJECT BY SUBJ-ID AND ALL THE CLASSES OFFERING SUBJECT |-----------------------------------*/
 
 
@@ -161,12 +246,12 @@ class SubjectController {
 
         try {
 
-            const subject = await Subject.findOne({where: { id } });
+            const subject = await Subject.findOne({ where: { id } });
 
             const teacherProfile = await subject.getTeachers();
 
             const teacherAccountIds = teacherProfile.map(teacher => teacher.AccountId);
-            
+
             let teachersAccount = [];
 
             if (teacherAccountIds.length !== 0) {
@@ -175,7 +260,7 @@ class SubjectController {
 
             console.log(teachersAccount);
 
-           
+
 
             const payload = {
                 subject: subject,

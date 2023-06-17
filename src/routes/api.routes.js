@@ -1,6 +1,7 @@
 const express = require('express');
 router = express.Router();
 
+
 /* -------------------------------| Validators |------------------------------- */
 
 const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator} = require("./validators/AuthValidators")
@@ -19,10 +20,13 @@ const ClassArmsController = require('../controller/classArms.controller');
 const SubjectController = require('../controller/subject.controller');
 const TeacherController = require('../controller/teacher.controller');
 const InviteController = require('../controller/invite.controller');
+const LessonController = require('../controller/lesson.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
 const AuthenticationMiddleware = require('../middleware/token.middleware');
+
+const UploadService = require('../services/upload.service');
 
 /*------------------------------| AUTHORIZED ROUTES |------------------------------*/
 
@@ -84,10 +88,14 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/subjects/create', SubjectController.create);
     router.get('/subjects/read', SubjectController.readAll);
     router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
+    router.get('/subjects/school/lessons/:id', SubjectController.schoolSubjectLessons);
     router.get('/subjects/classes/read/:id', SubjectController.readSubjectWithClasses);
     router.get('/subjects/teachers/read/:id', SubjectController.subjectTeachers);
     router.get('/subjects/read/:id', SubjectController.readBySubjectId);
     router.put('/subjects/update', SubjectController.update);
+    router.get('/subjects/lessons/', SubjectController.subjectsWithLessons);
+    router.get('/subjects/lessons/count', SubjectController.subjectsWithLessonCount);
+    router.get('/subjects/lessons/:subjectId', SubjectController.subjectLessons);
     router.delete('/subjects/delete/:id', SubjectController.delete);
 
     router.post('/teacher/invite', TeacherController.sendInvite);
@@ -100,6 +108,8 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/invites/read/:id', InviteController.invite);
     router.get('/invites/info/:code', InviteController.inviteByCode);
     router.delete('/invites/delete/:id', InviteController.delete);
+
+    router.post('/lesson/create', UploadService.upload.single('file'), LessonController.createLesson);
 
 };
 
