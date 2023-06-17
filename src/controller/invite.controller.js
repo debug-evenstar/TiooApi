@@ -1,7 +1,6 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult, param } = require('express-validator');
-const { Sequelize } = require('sequelize');
-const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite } = require("../database/connection");
+const { Invite } = require("../database/connection");
 
 
 class InviteController {
