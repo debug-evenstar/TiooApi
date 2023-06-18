@@ -61,13 +61,14 @@ const allAuthorizedRoutesGroup = (router) => {
 const adminAuthorizedRoutesGroup = (router) => {
 
     router.use(AuthenticationMiddleware.verify) //--use middleware--//
+    router.delete('/account/remove/:id', AuthenicationController.deleteAccount);
     router.get('/account/read_all', AuthenicationController.accounts);
     router.get('/account/read', AuthenicationController.accountProfile);
     router.put('/account/update', AuthenicationController.updateAccount);
     router.put('/account/flag', AuthenicationController.flagAccount);
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
-    router.post('/account/delete/:id', AuthenicationController.deleteAccount);
+    // router.post('/account/delete/:id', AuthenicationController.deleteAccount);
 
     router.get('/school/classes/:id', SchoolManagementController.classes);
     router.get('/school/read/', SchoolManagementController.read);
