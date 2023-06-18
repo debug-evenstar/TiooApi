@@ -69,7 +69,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
     router.get('/account/exist/:id', AuthenicationController.accountExist);
-    // router.post('/account/delete/:id', AuthenicationController.deleteAccount);
+    router.post('/account/testdelete/:id', AuthenicationController.deleteAccount);
 
     router.get('/school/classes/:id', SchoolManagementController.classes);
     router.get('/school/read/', SchoolManagementController.read);
