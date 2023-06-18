@@ -77,11 +77,20 @@ class ClassController {
 
         try {
 
-            const classes = await Class.findAll({ attributes: { exclude: [''], include: '' } });
+            const AccountInstance = await Account.findByPk(req.userData.id, {include: [SchoolManagement]});
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const ClassInstances = await SchoolInstances.getClasses();
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classes });
+           return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
 
         } catch (error) {
+            console.log(error);
             res.status(500).json({ error: 'Server Error' });
         };
 
