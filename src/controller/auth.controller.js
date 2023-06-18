@@ -282,6 +282,30 @@ class AuthController {
 
     }
 
+
+
+    /*-----------------------------------| FETCH ACCOUNT BY ID |-----------------------------------*/
+
+    static async accountExist(req, res) {
+
+        const id = req.params.id;
+
+        try {
+
+            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user, data: false });
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: true });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
     /*-----------------------------------| FETCH ACCOUNT AS PROFILE |-----------------------------------*/
 
     static async accountProfile(req, res) {
