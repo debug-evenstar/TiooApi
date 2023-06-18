@@ -67,6 +67,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.put('/account/flag', AuthenicationController.flagAccount);
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
+    router.get('/account/exist/:id', AuthenicationController.accountExist);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
 
     router.get('/school/classes/:id', SchoolManagementController.classes);
@@ -131,3 +132,4 @@ allAuthorizedRoutesGroup(router);
 adminAuthorizedRoutesGroup(router);
 
 module.exports = router;
+
