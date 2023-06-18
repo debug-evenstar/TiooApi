@@ -60,7 +60,7 @@ const allAuthorizedRoutesGroup = (router) => {
 
 const adminAuthorizedRoutesGroup = (router) => {
 
-   // router.use(AuthenticationMiddleware.verify) //--use middleware--//
+    router.use(AuthenticationMiddleware.verify) //--use middleware--//
     router.get('/account/read_all', AuthenicationController.accounts);
     router.get('/account/read', AuthenicationController.accountProfile);
     router.put('/account/update', AuthenicationController.updateAccount);
