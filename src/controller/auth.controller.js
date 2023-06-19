@@ -3,6 +3,11 @@ const ResponseStatus = require('../config/message.config');
 const { Account, Validation, TempValidation } = require('../database/connection');
 const TokenMiddleware = require('../middleware/token.middleware');
 const Mailer = require('../services/mailer');
+require('dotenv').config();
+const { scryptSync, randomBytes, } = require('crypto');
+
+const crypto = require('crypto');
+const { link } = require('fs');
 
 class AuthController {
 
@@ -57,7 +62,6 @@ class AuthController {
         }
 
         try {
-
             const registerdAccount = await Account.findOne({ where: { email: email } });
 
             if (!registerdAccount) {
@@ -532,6 +536,113 @@ class AuthController {
             res.status(500).json({ error: 'Server Error x' });
         };
 
+    }
+
+    /* ------------------------------ RESET PASWORD ----------------------------- */
+
+    static async resetPassword(req, res) {
+        function generateRandomPassword(length) {
+            const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let password = '';
+
+            for (let i = 0; i < length; i++) {
+                let randomIndex = Math.floor(Math.random() * charset.length);
+                password += charset[randomIndex];
+            }
+
+            return password;
+        }
+        const random_hash = generateRandomPassword(6);
+
+        const data = req.body;
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array()});
+        }
+
+        try {
+            const account = await Account.findOne({ where: { email: data.email } });
+            if (!account) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            let validation;
+            validation = await Validation.findOne({ where: { accountId: account.id } });
+
+            if (!validation) {
+                const newValidation = await Validation.create({ otp: random_hash });
+                validation = await account.setValidation(newValidation);
+            } else {
+                const newValidation = await validation.update({ otp: random_hash });
+            }
+
+            const link = `${process.env.DEV}/${validation.otp}/${account.email}`;
+
+            Mailer().to(account.email).from(process.env.MAIL_FROM, "SabiKid").subject("Reset Passord").template("emails.RestPassword", { resetLink: link }).send();
+
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false, message: ResponseStatus.pass.sucess,
+                response:  ResponseStatus.pass.reset
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+
+
+
+
+    }
+
+    /* -------------------------- VERIFY RESET PASSWORD ------------------------- */
+
+    static async verifyResetPassword(req, res) {
+        const data = req.body;
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+            const account = await Account.findOne({ where: { email: data.email } });
+
+            if (!account) {
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: true,
+                    message: ResponseStatus.fail.not_found
+                });
+            }
+
+            const validation = await Validation.findOne({ where: { accountId: account.id } });
+
+            const isCodeValid = await validation.compareOTP(data.code);
+
+            const isExpired = await validation.compareExpiryDate();
+
+            if (isExpired) {
+                return res.status(ResponseStatus.code.bad_request).json({ error: true, message: ResponseStatus.fail.expired_token });
+            }
+
+            if (!isCodeValid) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.incorrect_otp });
+            }
+
+            const hashPassword = await account.hashPassword(data.password);
+
+            const response = await account.update({ password: hashPassword });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update });
+
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
     }
 
 }
