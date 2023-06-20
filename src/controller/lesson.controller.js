@@ -15,7 +15,6 @@ class LessonController {
        }
 
         try {
-
              const lessonInstance = await Lesson.create(req.body);
              const subjectInstance = await Subject.findByPk(req.body.subject);
              subjectInstance.addLesson(lessonInstance);

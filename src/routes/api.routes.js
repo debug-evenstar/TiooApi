@@ -4,7 +4,7 @@ router = express.Router();
 
 /* -------------------------------| Validators |------------------------------- */
 
-const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator } = require("./validators/AuthValidators")
+const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator } = require("./validators/AuthValidators")
 
 /*-----------------------------------| HOME |-----------------------------------*/
 
@@ -40,6 +40,8 @@ const allAuthorizedRoutesGroup = (router) => {
     router.post('/account/send_otp', SendOTPValidator, AuthenicationController.requestVerificationOTP);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyOTP);
     router.put('/account/change_password', ChangePasswordValidator, AuthenicationController.changePassword);
+    router.post('/account/resetpassword',ResetPasswordValidator,  AuthenicationController.resetPassword);
+    router.post('/account/verify_reset_password', VerifyResetPasswordValidator ,AuthenicationController.verifyResetPassword);
 
     router.post('/new/account/send_otp', SendOTPValidator, AuthenicationController.sendTempOTP);
     router.post('/new/account/verify', VerifyAccountValidator, AuthenicationController.verifyTempEmail);
@@ -47,7 +49,6 @@ const allAuthorizedRoutesGroup = (router) => {
     router.post('/school/setup', SchoolSetupValidator, SchoolManagementController.setup);
 
     router.post('/teacher/invite/accept', TeacherController.acceptInvite);
-
     router.get('/teacher/invited/:id', TeacherController.fetchInvitedTeacher);
 
 

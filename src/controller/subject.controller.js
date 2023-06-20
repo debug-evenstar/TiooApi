@@ -28,12 +28,9 @@ class SubjectController {
 
     static async readAll(req, res) {
 
-        try {
-
+        try {   
             const subjectInstance = await Subject.findAll();
-
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
-
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: 'Server Error' });
@@ -48,7 +45,6 @@ class SubjectController {
         const { id } = req.params;
 
         try {
-
             const subjectInstance = await Subject.findAll({ where: { SchoolManagementId: id } });
 
 
