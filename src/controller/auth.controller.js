@@ -485,7 +485,7 @@ class AuthController {
 
             await availability.save();
 
-            Mailer().to(email).from(process.env.MAIL_FROM, "SabiKid").subject("OTP").template("emails.OTPTempEmail", { code: otp }).send();
+            Mailer().to(email).from(process.env.MAIL_FROM, "Praxeum").subject("OTP").template("emails.OTPTempEmail", { code: otp }).send();
 
             return res.status(ResponseStatus.code.success).json({ error: true, message: ResponseStatus.pass.send_otp });
 
@@ -579,7 +579,7 @@ class AuthController {
 
             const link = `${process.env.DEV}/${validation.otp}/${account.email}`;
 
-            Mailer().to(account.email).from(process.env.MAIL_FROM, "SabiKid").subject("Reset Passord").template("emails.RestPassword", { resetLink: link }).send();
+            Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Reset Passord").template("emails.RestPassword", { resetLink: link }).send();
 
 
             return res.status(ResponseStatus.code.success).json({
