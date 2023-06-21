@@ -284,18 +284,20 @@ class AuthController {
 
 
 
-    /*-----------------------------------| FETCH ACCOUNT BY ID |-----------------------------------*/
+    /*-----------------------------------| ACCOUNT EXIST |-----------------------------------*/
 
     static async accountExist(req, res) {
 
-        const id = req.params.id;
+        const email = req.params.email;
 
         try {
 
-            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
+            const emailExist = await AuthController.validateEmail(email);
 
-            if (!user) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user, data: false });
+            if (!emailExist.pass) {
+
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.no_user, data: false });
+
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: true });
