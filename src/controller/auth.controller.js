@@ -286,6 +286,32 @@ class AuthController {
 
     }
 
+
+
+    /*-----------------------------------| ACCOUNT EXIST |-----------------------------------*/
+
+    static async accountExist(req, res) {
+
+        const email = req.params.email;
+
+        try {
+
+            const emailExist = await AuthController.validateEmail(email);
+
+            if (!emailExist.pass) {
+
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.no_user, data: false });
+
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: true });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
     /*-----------------------------------| FETCH ACCOUNT AS PROFILE |-----------------------------------*/
 
     static async accountProfile(req, res) {

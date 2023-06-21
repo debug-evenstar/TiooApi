@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Student, Class, Subject, Teacher } = require('../database/connection');
+const { Account, Validation, SchoolManagement, Student, Class, Subject, Teacher, ClassArm } = require('../database/connection');
 const AuthController = require('../controller/auth.controller');
 
 class ClassController {
@@ -77,11 +77,73 @@ class ClassController {
 
         try {
 
-            const classes = await Class.findAll({ attributes: { exclude: [''], include: '' } });
+            const AccountInstance = await Account.findByPk(req.userData.id, { include: [SchoolManagement] });
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const ClassInstances = await SchoolInstances.getClasses();
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classes });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
 
         } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+    /*-----------------------------------| FETCH ALL CLASS WITH CLASS ARMS |-----------------------------------*/
+
+    static async readAllWithArms(req, res) {
+
+        try {
+
+            const AccountInstance = await Account.findByPk(req.userData.id, { include: [SchoolManagement] });
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const ClassInstances = await SchoolInstances.getClasses({ include: [ClassArm] });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+    /*-----------------------------------| FETCH ALL CLASS WITH CLASS ARMS |-----------------------------------*/
+
+    static async readClassWithArms(req, res) {
+
+        const { classId } = req.params;
+
+        try {
+
+            const AccountInstance = await Account.findByPk(req.userData.id, { include: [SchoolManagement] });
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const ClassInstances = await SchoolInstances.getClasses({ where: { id: classId }, include: [ClassArm] });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
+
+        } catch (error) {
+            console.log(error);
             res.status(500).json({ error: 'Server Error' });
         };
 
@@ -188,7 +250,7 @@ class ClassController {
         const { id } = req.params;
 
         try {
-            
+
             const classInstance = await Class.findByPk(id, { include: [Teacher] });
 
             if (!classInstance) {
@@ -196,7 +258,7 @@ class ClassController {
             }
 
             const teacherAccountIds = classInstance.Teachers.map(teacher => teacher.AccountId);
-            
+
             let teachersAccount = [];
 
             if (teacherAccountIds.length !== 0) {
