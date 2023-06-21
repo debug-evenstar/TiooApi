@@ -1,6 +1,7 @@
 const { body } = require('express-validator');
 
 /* ----------------------- THIS IS FOR AUTH VALIDATION ---------------------- */
+
 module.exports = {
 
     SigninValidator: [
@@ -43,6 +44,15 @@ module.exports = {
         body('naming_types').notEmpty().notEmpty().withMessage('Naming types is required.').isString().withMessage('Naming types must be a string.')
     ],
 
+    ResetPasswordValidator: [
+        body('email').notEmpty().isString().isEmail().withMessage("email field required"),
+    ],
+
+    VerifyResetPasswordValidator: [
+        body('email').notEmpty().isString().isEmail().withMessage("email field required"),
+        body('code').isLength({ max: 6 }).notEmpty().withMessage("code field with is required"),
+        body('password').notEmpty().withMessage("password field is required"),
+    ],
 
 
 

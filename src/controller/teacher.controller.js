@@ -1,7 +1,7 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult } = require('express-validator');
 const { Sequelize } = require('sequelize');
-const { Account, SchoolManagement, Teacher, Validation, Class, Subject } = require("../database/connection");
+const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite } = require("../database/connection");
 
 
 class TeacherController {
@@ -155,12 +155,12 @@ class TeacherController {
             const teachersAccount = await Account.findAll({
                 attributes: { exclude: ['password'] },
                 where: {
-                  account_type: 'teacher',
-                  '$Teacher.id$': { [Sequelize.Op.not]: null },
+                    account_type: 'teacher',
+                    '$Teacher.id$': { [Sequelize.Op.not]: null },
                 },
                 include: [Teacher],
-              });
-              
+            });
+
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
 
         } catch (error) {
@@ -213,6 +213,8 @@ class TeacherController {
         };
 
     }
+    /*-----------------------------------| GENERATE TEACHER INVITE LIKE |-----------------------------------*/
+
 }
 
 module.exports = TeacherController;

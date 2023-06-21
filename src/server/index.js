@@ -5,7 +5,9 @@ const app = express();
 const { db } = require("../database/connection");
 const PORT = process.env.PORT || 8080;
 const IndexRoute = require('../routes/index');
-const treblle = require('@treblle/express')
+const treblle = require('@treblle/express');
+const UploadService = require('../services/upload.service');
+
 
 class Server {
 
@@ -24,10 +26,10 @@ class Server {
 
         app.use(
             treblle({
-              apiKey: process.env.TREBLLE_API_KEY,
-              projectId: process.env.TREBLLE_PROJECT_ID,
+                apiKey: process.env.TREBLLE_API_KEY,
+                projectId: process.env.TREBLLE_PROJECT_ID,
             })
-          );
+        );
 
         //=============== INITIALIZE DATABASE ================//
 

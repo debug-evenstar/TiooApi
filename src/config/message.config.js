@@ -8,7 +8,10 @@ const ResponseMessage = {
         send_otp: 'OTP has been resent. Kindly check email for OTP',
         verify: 'Verification successful',
         login: 'LoggedIn successfully',
-        invite: 'Invite Accepted'
+        invite: 'Invite Accepted',
+        send_invite: 'Invitation Sent',
+        sucess: "sucess",
+        reset: "Password Reset Sucessful, Kindly check email for Further Instrution"
     },
     fail: {
         bad_request: 'Bad Request',
@@ -26,6 +29,8 @@ const ResponseMessage = {
         school_duplicate: "School already setup",
         invite: 'Invite Not accepted yet',
         accepted: 'Invite Already Accepted',
+        
+
     },
 
     code: {

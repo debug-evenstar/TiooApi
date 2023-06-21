@@ -16,6 +16,7 @@ class TokenMiddleware {
         }
 
         try {
+            
             const decoded = jwt.verify(token, process.env.JWT_SECRETE);
             const id = decoded.userdata.id;
             
