@@ -195,10 +195,7 @@ class TeacherController {
             req.body.password = await accountInstance.hashPassword(req.body.password);
             req.body.flag = 'active';
 
-            console.log(req.body)
-
             const response = await accountInstance.update(req.body);
-
 
             //TODO: Send Invite Email with this response id or email;
 
@@ -213,7 +210,68 @@ class TeacherController {
         };
 
     }
-    /*-----------------------------------| GENERATE TEACHER INVITE LIKE |-----------------------------------*/
+
+    /*-----------------------------------| READ TEACHER CLASSES |-----------------------------------*/
+
+    static async teacherClasses(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password'] } });
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+
+            const teacherInstance = await accountInstance.getTeacher({ joinTableAttributes: [] });
+
+            if (!teacherInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const classInstance = await teacherInstance.getClasses({ joinTableAttributes: [] });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
+    /*-----------------------------------| READ TEACHER SUBJECTS |-----------------------------------*/
+
+    static async teacherSubjects(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password'] } });
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const teacherInstance = await accountInstance.getTeacher({ joinTableAttributes: [] });
+
+            if (!teacherInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const subjectInstance = await teacherInstance.getSubjects({ joinTableAttributes: [] });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
 
 }
 

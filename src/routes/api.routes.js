@@ -113,6 +113,8 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/teacher/invite', TeacherController.sendInvite);
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
+    router.get('/teacher/classess/:id', TeacherController.teacherClasses);
+    router.get('/teacher/subjects/:id', TeacherController.teacherSubjects);
     router.get('/teacher/:id', TeacherController.fetchTeacher)
 
     router.post('/invites/generate', InviteController.generateLink);
