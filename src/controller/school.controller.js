@@ -256,6 +256,33 @@ class SchoolManagementController {
         };
     }
 
+
+    /*-----------------------------------| FETCH AUTHORIZED ACCOUNT |-----------------------------------*/
+
+    static async schoolProfile(req, res) {
+
+        const { id } = req.userData;
+
+        try {
+
+            const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const schoolInstance = await accountInstance.getSchoolManagement();
+
+            accountInstance.dataValues.schoolManagementId = schoolInstance.id;
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountInstance });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
 }
 
 

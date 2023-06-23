@@ -72,6 +72,7 @@ const adminAuthorizedRoutesGroup = (router) => {
 
     router.get('/school/classes/:id', SchoolManagementController.classes);
     router.get('/school/read/', SchoolManagementController.read);
+    router.get('/school/profile/', SchoolManagementController.schoolProfile);
     router.get('/school/read/:id', SchoolManagementController.readById);
     router.get('/school/read/classes/:id', SchoolManagementController.readByIdWithClasses);
     router.post('/school/class/remove', SchoolManagementController.removeClassFromSchool);
