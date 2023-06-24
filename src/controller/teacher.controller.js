@@ -64,14 +64,14 @@ class TeacherController {
 
             const link = `${process.env.DEV}/teacher/invite/${hashedUser}`;
 
-            const schoolAccount = await Account.findByPk(schoolInstance.AccountId);
+            const schoolAccount = await schoolInstance.getAccount();
+            
+            const schoolAccount2 = await Account.findByPk(schoolInstance.AccountId);
            
-            console.log('school instance',schoolInstance)
-            console.log('data', data);
-            console.log('school instance id',schoolInstance.AccountId)
-            console.log('school account', schoolAccount);
-            console.log(link);
+            console.log('school account 1',schoolAccount.dataValues)
 
+            console.log('school account 2',schoolAccount2.dataValues)
+           
 
             const check = { name: data.name, school: schoolAccount.name, Link: link };
 
