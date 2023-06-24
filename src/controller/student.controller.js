@@ -133,8 +133,8 @@ class StudentController {
             }
         }
 
-
         const errors = validationResult(req);
+
         const data = req.body;
 
         if (!errors.isEmpty()) {
@@ -144,8 +144,6 @@ class StudentController {
         try {
 
             const decryptHash = decrypt(data.accountId)
-
-
             const accountInstance = await Account.findByPk(Number(decryptHash))
 
             if (!accountInstance) {
