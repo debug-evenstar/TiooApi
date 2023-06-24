@@ -577,7 +577,7 @@ class AuthController {
                 const newValidation = await validation.update({ otp: random_hash });
             }
 
-            const link = `${process.env.DEV}/${validation.otp}/${account.email}`;
+            const link = `${process.env.DEV}/new-password/${validation.otp}/${account.email}`;
 
             Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Reset Passord").template("emails.RestPassword", { resetLink: link }).send();
 

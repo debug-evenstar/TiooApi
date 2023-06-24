@@ -78,12 +78,11 @@ class StudentController {
 
             await classarmInstance.addStudent(studentInstance);
 
-            const link = `${process.env.BASE_URL}/api/student/invited/${registeredStudent.id}`;
+            const link = `${process.env.DEV}/student/invite/${registeredStudent.id}`;
 
             //TODO: Create a Proper Invitation mail Template;
 
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: schoolAccount.name, Link: link }).send();
-
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
                 class_arm: classarmInstance,

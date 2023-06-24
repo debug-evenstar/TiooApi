@@ -2,6 +2,7 @@ const ResponseStatus = require("../config/message.config");
 const { validationResult } = require('express-validator');
 const { Sequelize } = require('sequelize');
 const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite } = require("../database/connection");
+const Mailer = require('../services/mailer');
 
 
 class TeacherController {
@@ -12,7 +13,7 @@ class TeacherController {
 
         const errors = validationResult(req);
         const otp = Math.floor(Math.random() * 900000) + 100000;
-
+        const data = req.body;
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
@@ -45,17 +46,17 @@ class TeacherController {
             await teacherInstance.addClasses(classInstance);
             await teacherInstance.addSubjects(subjectInstance);
 
-            const link = `http://127.0.0.1:8085/api/teacher/invited/${registeredAccount.id}`;
+            const link = `${process.env.DEV}/teacher/invite/${registeredAccount.id}`;
 
-            console.log(link);
+            const schoolAccount = await Account.findByPk(schoolInstance.AccountId);
 
-            //TODO: Send Invite Email with this response id or email;
-
+            Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteTeacher", { name: data.name, school: schoolAccount.name, Link: link }).send();
             return res.status(ResponseStatus.code.success).json({
-                error: false, message: ResponseStatus.pass.create,
-                classes: classInstance, subject: subjectInstance
-            });
+                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
+                class: classInstance,
+                subject: subjectInstance,
 
+            });
 
         } catch (error) {
             console.log(error);
