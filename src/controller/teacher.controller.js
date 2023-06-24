@@ -66,18 +66,9 @@ class TeacherController {
 
             const schoolAccount = await schoolInstance.getAccount();
             
-            const schoolAccount2 = await Account.findByPk(schoolInstance.AccountId);
-           
-            console.log('school account 1',schoolAccount)
-
-            console.log('school instance',schoolInstance)
-
-            console.log('school account 2',schoolAccount2)
-           
-
-            const check = { name: data.name, school: schoolAccount.name, Link: link };
-
-            console.log(check);
+            if (!schoolAccount) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "School is not tied to account"});
+            }
 
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteTeacher", { name: data.name, school: schoolAccount.name, Link: link }).send();
 
