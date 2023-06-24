@@ -70,6 +70,8 @@ class TeacherController {
            
             console.log('school account 1',schoolAccount)
 
+            console.log('school instance',schoolInstance)
+
             console.log('school account 2',schoolAccount2)
            
 
