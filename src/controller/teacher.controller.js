@@ -67,7 +67,8 @@ class TeacherController {
             const schoolAccount = await Account.findByPk(schoolInstance.AccountId);
 
             console.log('data', data);
-            console.log('school instance', schoolAccount);
+            console.log('school instance',schoolInstance)
+            console.log('school account', schoolAccount);
             console.log(link);
 
             const check = { name: data.name, school: schoolAccount.name, Link: link };
