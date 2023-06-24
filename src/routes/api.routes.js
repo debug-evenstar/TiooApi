@@ -68,10 +68,12 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.put('/account/flag', AuthenicationController.flagAccount);
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
+    router.get('/account/exist/:email', AuthenicationController.accountExist);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
 
     router.get('/school/classes/:id', SchoolManagementController.classes);
     router.get('/school/read/', SchoolManagementController.read);
+    router.get('/school/profile/', SchoolManagementController.schoolProfile);
     router.get('/school/read/:id', SchoolManagementController.readById);
     router.get('/school/read/classes/:id', SchoolManagementController.readByIdWithClasses);
     router.post('/school/class/remove', SchoolManagementController.removeClassFromSchool);
@@ -81,6 +83,8 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/class/create', ClassController.create);
     router.post('/class/create_bulk', ClassController.bulkCreate);
     router.get('/class/read', ClassController.readAll);
+    router.get('/class/readwitharms', ClassController.readAllWithArms);
+    router.get('/class/readwitharms/:classId', ClassController.readClassWithArms);
     router.get('/class/read/:id', ClassController.read);
     router.get('/class/subjects/read/:id', ClassController.readClassWithSubjects);
     router.get('/class/teachers/read/:id', ClassController.readClassWithTeachers);
@@ -110,6 +114,8 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/teacher/invite', TeacherController.sendInvite);
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
+    router.get('/teacher/classess/:id', TeacherController.teacherClasses);
+    router.get('/teacher/subjects/:id', TeacherController.teacherSubjects);
     router.get('/teacher/:id', TeacherController.fetchTeacher)
 
     router.post('/invites/generate', InviteController.generateLink);

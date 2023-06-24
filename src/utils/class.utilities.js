@@ -8,12 +8,12 @@ class ClassSeeds {
     ];
 
     static primary = [
-        { type: "primary", naming: "primary 1" },
-        { type: "primary", naming: "primary 2" },
-        { type: "primary", naming: "primary 3" },
-        { type: "primary", naming: "primary 4" },
-        { type: "primary", naming: "primary 5" },
         { type: "primary", naming: "primary 6" },
+        { type: "primary", naming: "primary 5" },
+        { type: "primary", naming: "primary 4" },
+        { type: "primary", naming: "primary 3" },
+        { type: "primary", naming: "primary 2" },
+        { type: "primary", naming: "primary 1" },
     ];
 
     static secondary = [
