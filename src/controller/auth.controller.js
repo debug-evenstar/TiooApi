@@ -33,9 +33,18 @@ class AuthController {
             const newValidation = await Validation.create({ otp });
             const response = await registeredAccount.setValidation(newValidation);
 
+            const userData = {
+                id: registeredAccount.dataValues.id,
+                email: registeredAccount.dataValues.email,
+                account_type: registeredAccount.dataValues.account_type,
+            };
+
+            const generatedToken = TokenMiddleware.generate(userData)
+
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.register
+                message: ResponseStatus.pass.register,
+                token: generatedToken,
             });
 
         } catch (error) {
