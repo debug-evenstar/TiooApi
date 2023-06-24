@@ -38,9 +38,18 @@ class AuthController {
             const newValidation = await Validation.create({ otp });
             const response = await registeredAccount.setValidation(newValidation);
 
+            const userData = {
+                id: registeredAccount.dataValues.id,
+                email: registeredAccount.dataValues.email,
+                account_type: registeredAccount.dataValues.account_type,
+            };
+
+            const generatedToken = TokenMiddleware.generate(userData)
+
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.register
+                message: ResponseStatus.pass.register,
+                token: generatedToken,
             });
 
         } catch (error) {
@@ -279,6 +288,32 @@ class AuthController {
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: user });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+
+    /*-----------------------------------| ACCOUNT EXIST |-----------------------------------*/
+
+    static async accountExist(req, res) {
+
+        const email = req.params.email;
+
+        try {
+
+            const emailExist = await AuthController.validateEmail(email);
+
+            if (!emailExist.pass) {
+
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.no_user, data: false });
+
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: true });
 
         } catch (error) {
             res.status(500).json({ error: 'Server Error' });
