@@ -14,6 +14,6 @@ module.exports = {
         body('name').notEmpty().isString().withMessage("name field is required"),
         body('phone').notEmpty().isLength({ max: 11 }).isNumeric().withMessage("phone field is required"),
         body('password').notEmpty().withMessage("password field is required"),
-        body('accountId').notEmpty().isNumeric().withMessage("accountId field is required and its numeric"),
+        body('accountId').notEmpty().isString().withMessage("accountId field is required and its numeric"),
     ],
 }

@@ -3,11 +3,25 @@ const { validationResult } = require('express-validator');
 const { Sequelize } = require('sequelize');
 const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite, Student, ClassArm } = require("../database/connection");
 const Mailer = require('../services/mailer');
+const crypto = require("crypto")
 
 class StudentController {
 
     /* ------------------------ SENDS INVITE TO Student ------------------------ */
     static async sendInvitation(req, res) {
+
+        const encrypt = (plainText) => {
+            try {
+                const iv = crypto.randomBytes(16);
+                const key = crypto.createHash('sha256').update("secret123456").digest('base64').substr(0, 32);
+                const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+                let encrypted = cipher.update(plainText);
+                encrypted = Buffer.concat([encrypted, cipher.final()])
+                return iv.toString('hex') + ':' + encrypted.toString('hex');
+            } catch (error) {
+                console.log(error);
+            }
+        }
 
         function generateRandomPassword(length) {
             const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[{]};:,<.>/?';
@@ -78,7 +92,9 @@ class StudentController {
 
             await classarmInstance.addStudent(studentInstance);
 
-            const link = `${process.env.DEV}/student/invite/${registeredStudent.id}`;
+            const hashedUser = encrypt(registeredStudent.id.toString());
+
+            const link = `${process.env.DEV}/student/invite/${hashedUser}`;
 
             //TODO: Create a Proper Invitation mail Template;
 
@@ -100,6 +116,24 @@ class StudentController {
 
     static async acceptInvitation(req, res) {
 
+        const decrypt = (encryptedText) => {
+            try {
+                const textParts = encryptedText.split(':');
+                const iv = Buffer.from(textParts.shift(), 'hex');
+
+                const encryptedData = Buffer.from(textParts.join(':'), 'hex');
+                const key = crypto.createHash('sha256').update("secret123456").digest('base64').substr(0, 32);
+                const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+
+                const decrypted = decipher.update(encryptedData);
+                const decryptedText = Buffer.concat([decrypted, decipher.final()]);
+                return decryptedText.toString();
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+
         const errors = validationResult(req);
         const data = req.body;
 
@@ -109,7 +143,10 @@ class StudentController {
 
         try {
 
-            const accountInstance = await Account.findByPk(data.accountId);
+            const decryptHash = decrypt(data.accountId)
+
+
+            const accountInstance = await Account.findByPk(Number(decryptHash))
 
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });

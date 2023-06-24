@@ -3,7 +3,7 @@ const { validationResult } = require('express-validator');
 const { Sequelize } = require('sequelize');
 const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite } = require("../database/connection");
 const Mailer = require('../services/mailer');
-
+const crypto = require("crypto")
 
 class TeacherController {
 
@@ -11,9 +11,23 @@ class TeacherController {
 
     static async sendInvite(req, res) {
 
+        const encrypt = (plainText) => {
+            try {
+                const iv = crypto.randomBytes(16);
+                const key = crypto.createHash('sha256').update("secret123456").digest('base64').substr(0, 32);
+                const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+                let encrypted = cipher.update(plainText);
+                encrypted = Buffer.concat([encrypted, cipher.final()])
+                return iv.toString('hex') + ':' + encrypted.toString('hex');
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
         const errors = validationResult(req);
         const otp = Math.floor(Math.random() * 900000) + 100000;
         const data = req.body;
+
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
@@ -46,7 +60,9 @@ class TeacherController {
             await teacherInstance.addClasses(classInstance);
             await teacherInstance.addSubjects(subjectInstance);
 
-            const link = `${process.env.DEV}/teacher/invite/${registeredAccount.id}`;
+            const hashedUser = encrypt(registeredAccount.id.toString());
+
+            const link = `${process.env.DEV}/teacher/invite/${hashedUser}`;
 
             const schoolAccount = await Account.findByPk(schoolInstance.AccountId);
 
@@ -55,7 +71,6 @@ class TeacherController {
                 error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
                 class: classInstance,
                 subject: subjectInstance,
-
             });
 
         } catch (error) {
@@ -72,7 +87,6 @@ class TeacherController {
         const { id } = req.params;
 
         try {
-
             const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password'] } });
 
             if (!accountInstance) {
@@ -174,6 +188,25 @@ class TeacherController {
 
     static async acceptInvite(req, res) {
 
+        const decrypt = (encryptedText) => {
+            try {
+                const textParts = encryptedText.split(':');
+                const iv = Buffer.from(textParts.shift(), 'hex');
+
+                const encryptedData = Buffer.from(textParts.join(':'), 'hex');
+                const key = crypto.createHash('sha256').update("secret123456").digest('base64').substr(0, 32);
+                const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+
+                const decrypted = decipher.update(encryptedData);
+                const decryptedText = Buffer.concat([decrypted, decipher.final()]);
+                return decryptedText.toString();
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+
+
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -181,9 +214,10 @@ class TeacherController {
         }
 
         try {
+            const decryptHash = decrypt(req.body.accountId)
 
 
-            const accountInstance = await Account.findByPk(req.body.accountId);
+            const accountInstance = await Account.findByPk(Number(decryptHash));
 
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -194,15 +228,11 @@ class TeacherController {
             }
 
             req.body.password = await accountInstance.hashPassword(req.body.password);
+
             req.body.flag = 'active';
 
-            console.log(req.body)
-
             const response = await accountInstance.update(req.body);
-
-
             //TODO: Send Invite Email with this response id or email;
-
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.invite,
             });

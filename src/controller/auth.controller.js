@@ -563,6 +563,7 @@ class AuthController {
         }
 
         try {
+            
             const account = await Account.findOne({ where: { email: data.email } });
             if (!account) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
