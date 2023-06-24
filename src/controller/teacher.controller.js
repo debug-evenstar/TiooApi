@@ -2,7 +2,8 @@ const ResponseStatus = require("../config/message.config");
 const { validationResult } = require('express-validator');
 const { Sequelize } = require('sequelize');
 const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite } = require("../database/connection");
-
+const Mailer = require('../services/mailer');
+const crypto = require("crypto")
 
 class TeacherController {
 
@@ -10,8 +11,22 @@ class TeacherController {
 
     static async sendInvite(req, res) {
 
+        const encrypt = (plainText) => {
+            try {
+                const iv = crypto.randomBytes(16);
+                const key = crypto.createHash('sha256').update("secret123456").digest('base64').substr(0, 32);
+                const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+                let encrypted = cipher.update(plainText);
+                encrypted = Buffer.concat([encrypted, cipher.final()])
+                return iv.toString('hex') + ':' + encrypted.toString('hex');
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
         const errors = validationResult(req);
         const otp = Math.floor(Math.random() * 900000) + 100000;
+        const data = req.body;
 
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
@@ -45,17 +60,18 @@ class TeacherController {
             await teacherInstance.addClasses(classInstance);
             await teacherInstance.addSubjects(subjectInstance);
 
-            const link = `http://127.0.0.1:8085/api/teacher/invited/${registeredAccount.id}`;
+            const hashedUser = encrypt(registeredAccount.id.toString());
 
-            console.log(link);
+            const link = `${process.env.DEV}/teacher/invite/${hashedUser}`;
 
-            //TODO: Send Invite Email with this response id or email;
+            const schoolAccount = await Account.findByPk(schoolInstance.AccountId);
 
+            Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteTeacher", { name: data.name, school: schoolAccount.name, Link: link }).send();
             return res.status(ResponseStatus.code.success).json({
-                error: false, message: ResponseStatus.pass.create,
-                classes: classInstance, subject: subjectInstance
+                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
+                class: classInstance,
+                subject: subjectInstance,
             });
-
 
         } catch (error) {
             console.log(error);
@@ -71,7 +87,6 @@ class TeacherController {
         const { id } = req.params;
 
         try {
-
             const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password'] } });
 
             if (!accountInstance) {
@@ -173,7 +188,24 @@ class TeacherController {
 
     static async acceptInvite(req, res) {
 
+        const decrypt = (encryptedText) => {
+            try {
+                const textParts = encryptedText.split(':');
+                const iv = Buffer.from(textParts.shift(), 'hex');
+                const encryptedData = Buffer.from(textParts.join(':'), 'hex');
+                const key = crypto.createHash('sha256').update("secret123456").digest('base64').substr(0, 32);
+                const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+
+                const decrypted = decipher.update(encryptedData);
+                const decryptedText = Buffer.concat([decrypted, decipher.final()]);
+                return decryptedText.toString();
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
         const errors = validationResult(req);
+        const data = req.body;
 
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
@@ -181,8 +213,9 @@ class TeacherController {
 
         try {
 
+            const decryptHash = decrypt(req.body.accountId)
 
-            const accountInstance = await Account.findByPk(req.body.accountId);
+            const accountInstance = await Account.findByPk(Number(decryptHash));
 
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -193,12 +226,24 @@ class TeacherController {
             }
 
             req.body.password = await accountInstance.hashPassword(req.body.password);
+
             req.body.flag = 'active';
 
             const response = await accountInstance.update(req.body);
 
-            //TODO: Send Invite Email with this response id or email;
+            const link = `${process.env.BASE_URL}/api/account/signin`;
 
+            const teacherInstances = await accountInstance.getTeacher({ joinTableAttributes: [] });
+
+            const schoolId = teacherInstances.dataValues.SchoolManagementId;
+
+            const school = await SchoolManagement.findByPk(schoolId, { attributes: { exclude: ['password'] } });
+
+            const schoolAccount = await school.getAccount({ joinTableAttributes: [] });
+
+            Mailer().to(accountInstance.email).from(process.env.MAIL_FROM, "Praxeum").subject("Thank You").template("emails.welcomeStudent", { name: data.name, school: schoolAccount.dataValues.name, Link: link }).send();
+
+            //TODO: Send Invite Email with this response id or email;
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.invite,
             });
