@@ -66,7 +66,10 @@ class TeacherController {
 
             const schoolAccount = await Account.findByPk(schoolInstance.AccountId);
 
-           Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteTeacher", { name: data.name, school: schoolAccount.dataValues.name, Link: link }).send();
+            const exp =  { name: data.name, school: schoolAccount.dataValues.name, Link: link };
+
+            Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteTeacher", { name: data.name, school: schoolAccount.name, Link: link }).send();
+
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
                 class: classInstance,
