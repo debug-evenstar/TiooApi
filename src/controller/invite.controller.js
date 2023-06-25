@@ -27,11 +27,9 @@ class InviteController {
 
             req.body.code = InviteController.generateReferralCode(8);
 
-            console.log(req.body);
-
             const inviteInstance = await Invite.create(req.body);
 
-            const link = `http://127.0.0.1:8085/api/${req.body.account_type}/invited/${inviteInstance.code}`;
+            const link = `${process.env.DEV}/${req.body.account_type}/invited/${inviteInstance.code}`;
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: { link } });
 
