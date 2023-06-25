@@ -71,6 +71,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/account/exist/:email', AuthenicationController.accountExist);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
 
+   
     router.get('/school/classes/:id', SchoolManagementController.classes);
     router.get('/school/read/', SchoolManagementController.read);
     router.get('/school/profile/', SchoolManagementController.schoolProfile);
@@ -78,6 +79,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/school/read/classes/:id', SchoolManagementController.readByIdWithClasses);
     router.post('/school/class/remove', SchoolManagementController.removeClassFromSchool);
     router.get('/school/class/read', SchoolManagementController.getClassBySidANDCid);
+    router.get('/school/teachers/', SchoolManagementController.authSchoolTeachers);
     router.get('/school/teachers/:id', SchoolManagementController.schoolTeachers);
 
     router.post('/class/create', ClassController.create);
