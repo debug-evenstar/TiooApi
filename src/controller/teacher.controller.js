@@ -83,7 +83,7 @@ class TeacherController {
         const decryptedId = HashUtils.decrypt(id);
 
         try {
-            const accountInstance = await Account.findByPk(decryptedId, { attributes: { exclude: ['password'] } });
+            const accountInstance = await Account.findByPk(Number(decryptedId), { attributes: { exclude: ['password'] } });
 
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
