@@ -3,26 +3,13 @@ const { validationResult } = require('express-validator');
 const { Sequelize } = require('sequelize');
 const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite } = require("../database/connection");
 const Mailer = require('../services/mailer');
-const crypto = require("crypto")
+const HashUtils = require('../utils/hash.utilities');
 
 class TeacherController {
 
     /*-----------------------------------| SEND INVITE TO TEACHERS |-----------------------------------*/
 
     static async sendInvite(req, res) {
-
-        const encrypt = (plainText) => {
-            try {
-                const iv = crypto.randomBytes(16);
-                const key = crypto.createHash('sha256').update("secret123456").digest('base64').substr(0, 32);
-                const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-                let encrypted = cipher.update(plainText);
-                encrypted = Buffer.concat([encrypted, cipher.final()])
-                return iv.toString('hex') + ':' + encrypted.toString('hex');
-            } catch (error) {
-                console.log(error);
-            }
-        }
 
         const errors = validationResult(req);
         const otp = Math.floor(Math.random() * 900000) + 100000;
@@ -60,9 +47,11 @@ class TeacherController {
             await teacherInstance.addClasses(classInstance);
             await teacherInstance.addSubjects(subjectInstance);
 
-            const hashedUser = encrypt(registeredAccount.id.toString());
+            const hashedUser = HashUtils.encrypt(registeredAccount.id.toString());
 
             const link = `${process.env.DEV}/teacher/${hashedUser}`;
+
+            console.log(link);
 
             const schoolAccount = await schoolInstance.getAccount();
 
@@ -91,8 +80,10 @@ class TeacherController {
 
         const { id } = req.params;
 
+        const decryptedId = HashUtils.decrypt(id);
+
         try {
-            const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password'] } });
+            const accountInstance = await Account.findByPk(decryptedId, { attributes: { exclude: ['password'] } });
 
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -193,22 +184,6 @@ class TeacherController {
 
     static async acceptInvite(req, res) {
 
-        const decrypt = (encryptedText) => {
-            try {
-                const textParts = encryptedText.split(':');
-                const iv = Buffer.from(textParts.shift(), 'hex');
-                const encryptedData = Buffer.from(textParts.join(':'), 'hex');
-                const key = crypto.createHash('sha256').update("secret123456").digest('base64').substr(0, 32);
-                const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-
-                const decrypted = decipher.update(encryptedData);
-                const decryptedText = Buffer.concat([decrypted, decipher.final()]);
-                return decryptedText.toString();
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
         const errors = validationResult(req);
         const data = req.body;
 
@@ -218,7 +193,7 @@ class TeacherController {
 
         try {
 
-            const decryptHash = decrypt(req.body.accountId)
+            const decryptHash = HashUtils.decrypt(req.body.accountId)
 
             const accountInstance = await Account.findByPk(Number(decryptHash));
 
