@@ -65,9 +65,9 @@ class TeacherController {
             const link = `${process.env.DEV}/teacher/${hashedUser}`;
 
             const schoolAccount = await schoolInstance.getAccount();
-            
+
             if (!schoolAccount) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "School is not tied to account"});
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "School is not tied to account" });
             }
 
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteTeacher", { name: data.name, school: schoolAccount.name, Link: link }).send();
