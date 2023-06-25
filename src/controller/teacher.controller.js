@@ -62,11 +62,16 @@ class TeacherController {
 
             const hashedUser = encrypt(registeredAccount.id.toString());
 
-            const link = `${process.env.DEV}/teacher/invite/${hashedUser}`;
+            const link = `${process.env.DEV}/teacher/${hashedUser}`;
 
-            const schoolAccount = await Account.findByPk(schoolInstance.AccountId);
+            const schoolAccount = await schoolInstance.getAccount();
+
+            if (!schoolAccount) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "School is not tied to account" });
+            }
 
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteTeacher", { name: data.name, school: schoolAccount.name, Link: link }).send();
+
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
                 class: classInstance,

@@ -94,7 +94,7 @@ class StudentController {
 
             const hashedUser = encrypt(registeredStudent.id.toString());
 
-            const link = `${process.env.DEV}/student/invite/${hashedUser}`;
+            const link = `${process.env.DEV}/student/${hashedUser}`;
 
             //TODO: Create a Proper Invitation mail Template;
 
