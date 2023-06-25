@@ -62,7 +62,7 @@ class TeacherController {
 
             const hashedUser = encrypt(registeredAccount.id.toString());
 
-            const link = `${process.env.DEV}/teacher/invite/${hashedUser}`;
+            const link = `${process.env.DEV}/teacher/${hashedUser}`;
 
             const schoolAccount = await schoolInstance.getAccount();
             
