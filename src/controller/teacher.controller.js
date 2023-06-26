@@ -147,7 +147,6 @@ class TeacherController {
     static async allTeachers(req, res) {
 
         try {
-
             const teachersAccount = await Account.findAll({ attributes: { exclude: ['password'] }, where: { account_type: 'teacher' }, include: [Teacher] });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
@@ -161,7 +160,6 @@ class TeacherController {
     /*-----------------------------------| READ INVITED TEACHERS |-----------------------------------*/
 
     static async invitedTeachers(req, res) {
-
         try {
             const teachersAccount = await Account.findAll({
                 attributes: { exclude: ['password'] },
