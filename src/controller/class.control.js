@@ -262,7 +262,7 @@ class ClassController {
             let teachersAccount = [];
 
             if (teacherAccountIds.length !== 0) {
-                teachersAccount = await Account.findAll({ where: { id: [teacherAccountIds] }, attributes: { exclude: ['password'] } });
+                teachersAccount = await Account.findAll({ where: { id: [...teacherAccountIds] }, attributes: { exclude: ['password'] } });
             }
 
             const payload = {
