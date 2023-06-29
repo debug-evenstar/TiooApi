@@ -118,7 +118,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
     router.get('/teacher/classess/:id', TeacherController.teacherClasses);
     router.get('/teacher/subjects/:id', TeacherController.teacherSubjects);
-    router.get('/teacher/:id', TeacherController.fetchTeacher)
+    router.get('/teacher/:id', TeacherController.fetchTeacher);
 
     router.post('/invites/generate', InviteController.generateLink);
     router.get('/invites/read', InviteController.invites);
@@ -130,6 +130,9 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/student/:id', StudentController.fetchStudent);
     router.get('/students/readall', StudentController.allStudents);
     router.get('/students/readinvited', StudentController.invitedStudents);
+    router.get('/students/classess/:id', StudentController.getStudentClass);
+
+
 
     router.post('/lesson/create', UploadService.upload.single('file'), LessonController.createLesson);
 

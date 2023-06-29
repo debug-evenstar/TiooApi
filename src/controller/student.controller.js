@@ -1,6 +1,6 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult } = require('express-validator');
-const { Sequelize } = require('sequelize');
+const { Sequelize, where } = require('sequelize');
 const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite, Student, ClassArm } = require("../database/connection");
 const Mailer = require('../services/mailer');
 const HashUtils = require('../utils/hash.utilities');
@@ -60,7 +60,6 @@ class StudentController {
                 ...data
             })
 
-
             // const newValidation = await Validation.create({ otp });
 
             // await registeredStudent.setValidation(newValidation);
@@ -68,7 +67,6 @@ class StudentController {
             /* -------------------- CREATES AND BIND STUDENT PROFILE -------------------- */
 
             const studentInstance = await Student.create(data);
-
             await registeredStudent.setStudent(studentInstance);
 
             /* ------------------------------ FIND CLASS ARMS ----------------------------- */
@@ -78,9 +76,16 @@ class StudentController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            await schoolInstance.addStudent(studentInstance);
+            const classInstance = await Class.findAll({ where: { id: data.class } });
 
+
+            if (!classInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            await schoolInstance.addStudent(studentInstance);
             await classarmInstance.addStudent(studentInstance);
+            await classInstance[0].addStudent(studentInstance);
 
             const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
 
@@ -92,7 +97,6 @@ class StudentController {
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
                 class_arm: classarmInstance,
-
             });
 
         } catch (error) {
@@ -179,7 +183,6 @@ class StudentController {
                 joinTableAttributes: []
             });
 
-
             if (!studentInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
@@ -213,9 +216,14 @@ class StudentController {
 
             const payload = {
                 account: accountInstance,
-            }; fetchStudent
+            };
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.status, data: payload });
+            if (accountInstance.account_type != "student") {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.student });
+            } else {
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: payload });
+
+            }
 
         } catch (error) {
             console.log(error);
@@ -226,7 +234,6 @@ class StudentController {
     /* --------------------------- FETCH ALL STUDENTS ACCOUNT --------------------------- */
 
     static async allStudents(req, res) {
-
         try {
             const studentAccount = await Account.findAll({
                 attributes: { exclude: ['password'] }, where: {
@@ -244,11 +251,12 @@ class StudentController {
         }
     }
 
-    /* -------------------------- READ INVITED TEACHERS ------------------------- */
+    /* -------------------------- READ INVITED STUDENT ------------------------- */
 
     static async invitedStudents(req, res) {
+
         try {
-            console.log("yeah")
+
             const studentAccount = await Account.findAll({
                 attributes: { exclude: ['password'] },
                 where: {
@@ -265,6 +273,71 @@ class StudentController {
             res.status(500).json({ error: 'Server Error' });
         }
     }
+
+    static async studentClasses(req, res) {
+        const { id } = req.params;
+        try {
+
+            const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password'] } });
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const studentInstance = await accountInstance.getStudent({ joinTableAttributes: [] });
+
+            if (!studentInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const classInstance = await studentInstance.getClass({ joinTableAttributes: [] });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, student_profile: studentInstance, account: accountInstance, class: classInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+
+
+    }
+
+
+    static async getStudentClass(req, res) {
+        const { id } = req.params;
+        try {
+            const classInstance = await Class.findOne({
+                where: {
+                    id: 16
+                }
+            });
+
+            const student = await classInstance.getStudents({ joinTableAttributes: [] })
+            console.log(student)
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
+
+    
+    static async deleteStudent(req, res) {
+        const { id } = req.params;
+        try {
+            const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password'] } });
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const response = await accountInstance.destroy();
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });   
+        }
+        
+    }
+
+
+
 
 }
 
