@@ -131,6 +131,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/students/readall', StudentController.allStudents);
     router.get('/students/readinvited', StudentController.invitedStudents);
     router.get('/students/classess/:id', StudentController.getStudentClass);
+    router.get('/students/delete/:id', StudentController.deleteStudent);
 
 
 

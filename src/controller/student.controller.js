@@ -312,7 +312,7 @@ class StudentController {
                 }
             });
 
-            const student = await classInstance.getStudents({ joinTableAttributes: [] })
+            const student = await classInstance.getStudents({ joinTableAttributes: [] });
             console.log(student)
         } catch (error) {
             console.log(error);
@@ -320,20 +320,27 @@ class StudentController {
         }
     }
 
-    
+
     static async deleteStudent(req, res) {
         const { id } = req.params;
         try {
             const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password'] } });
+
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const response = await accountInstance.destroy();
+            if (accountInstance.account_type != "student") {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.student });
+            } else {
+                const response = await accountInstance.destroy();
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
+            }
+
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });   
+            res.status(500).json({ error: 'Server Error' });
         }
-        
+
     }
 
 
