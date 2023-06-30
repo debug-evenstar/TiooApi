@@ -76,19 +76,13 @@ class StudentController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const classInstance = await Class.findAll({ where: { id: data.class } });
-
-
-            if (!classInstance) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-            }
-
             await schoolInstance.addStudent(studentInstance);
             await classarmInstance.addStudent(studentInstance);
             await classInstance[0].addStudent(studentInstance);
 
             const classInstance = await classarmInstance.getClass();
 
+            
             const response = await classInstance.addStudent(studentInstance);
 
             const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
