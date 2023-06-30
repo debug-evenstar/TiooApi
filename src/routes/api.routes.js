@@ -91,6 +91,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/class/subjects/read/:id', ClassController.readClassWithSubjects);
     router.get('/class/teachers/read/:id', ClassController.readClassWithTeachers);
     router.put('/class/update/:id', ClassController.update);
+    router.get('/class/students/:id', ClassController.classStudent);
     router.delete('/class/delete/:id', ClassController.delete);
 
     router.post('/class/arms/create', ClassArmsController.create);

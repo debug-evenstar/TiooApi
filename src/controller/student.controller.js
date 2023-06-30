@@ -87,6 +87,10 @@ class StudentController {
             await classarmInstance.addStudent(studentInstance);
             await classInstance[0].addStudent(studentInstance);
 
+            const classInstance = await classarmInstance.getClass();
+
+            const response = await classInstance.addStudent(studentInstance);
+
             const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
 
             const link = `${process.env.DEV}/student/${hashedUser}`;
