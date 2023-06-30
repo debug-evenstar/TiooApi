@@ -282,6 +282,30 @@ class ClassController {
     }
 
 
+
+        /*-----------------------------------| CLASS STUDENTS |-----------------------------------*/
+
+        static async classStudent(req, res) {
+
+            const { id } = req.params;
+    
+            try {
+    
+                const classStudents = await Class.findByPk(id, { include: [Student] });
+
+                const studentsId =  classStudents.Students.map((student)=> student.AccountId);
+
+                const classStudentsAccount = await Account.findAll({where: {id: [...studentsId]}, attributes: { exclude: ['password'] } });
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classStudentsAccount });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
+
+
 }
 
 
