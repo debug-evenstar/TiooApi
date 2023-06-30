@@ -134,8 +134,12 @@ class TeacherController {
                 account: accountInstance,
             };
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: payload });
-
+            if (accountInstance.account_type != "teacher") {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.teacher });
+            } else {               
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: payload });
+            }
+           
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: 'Server Error' });
@@ -147,7 +151,6 @@ class TeacherController {
     static async allTeachers(req, res) {
 
         try {
-
             const teachersAccount = await Account.findAll({ attributes: { exclude: ['password'] }, where: { account_type: 'teacher' }, include: [Teacher] });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
@@ -161,7 +164,6 @@ class TeacherController {
     /*-----------------------------------| READ INVITED TEACHERS |-----------------------------------*/
 
     static async invitedTeachers(req, res) {
-
         try {
             const teachersAccount = await Account.findAll({
                 attributes: { exclude: ['password'] },
