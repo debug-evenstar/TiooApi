@@ -76,13 +76,11 @@ class StudentController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
+            const classInstance = await classarmInstance.getClass();
             await schoolInstance.addStudent(studentInstance);
             await classarmInstance.addStudent(studentInstance);
-            await classInstance[0].addStudent(studentInstance);
+            await classInstance.addStudent(studentInstance);
 
-            const classInstance = await classarmInstance.getClass();
-
-            
             const response = await classInstance.addStudent(studentInstance);
 
             const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
@@ -169,6 +167,7 @@ class StudentController {
 
             const accountInstance = await Account.findByPk(Number(decryptedId), { attributes: { exclude: ['password'] } });
 
+            console.log(accountInstance)
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
@@ -252,10 +251,11 @@ class StudentController {
     /* -------------------------- READ INVITED STUDENT ------------------------- */
 
     static async invitedStudents(req, res) {
-
+        const { id } = req.params;
         try {
-
-            const studentAccount = await Account.findAll({
+            console.log(id)
+            const studentAccount = await Account.findOne({
+                id,
                 attributes: { exclude: ['password'] },
                 where: {
                     account_type: 'student',
