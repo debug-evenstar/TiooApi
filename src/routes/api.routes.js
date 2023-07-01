@@ -95,6 +95,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.delete('/class/delete/:id', ClassController.delete);
     router.post('/class/student', ClassController.addStudentToClass);
     router.post('/class/teacher', ClassController.addTeacherToClass);
+    router.post('/class/addSubject', ClassController.addSubjectToClass)
 
     router.post('/class/arms/create', ClassArmsController.create);
     router.post('/class/arms/create_bulk', ClassArmsController.createBulk);

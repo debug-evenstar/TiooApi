@@ -243,6 +243,34 @@ class ClassController {
         };
     }
 
+        /*-----------------------------------| ADD SUBJECT TO CLASS |-----------------------------------*/
+
+        static async addSubjectToClass(req, res) {
+
+            const { classId, subjectId } = req.body;
+
+            const {id} = req.userData;
+
+            try {
+    
+                const classSubjects = await Class.findByPk(classId);
+
+                const subjectInstance = await Subject.findByPk(subjectId);
+
+                const response = await classSubjects.addSubject(subjectId);
+
+                const newClassWithSubjects = await classSubjects.getSubjects();
+
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.added});
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
+
+
     /*-----------------------------------| READ CLASS WITH ALL ASSIGNED TEACHERS |-----------------------------------*/
 
     static async readClassWithTeachers(req, res) {

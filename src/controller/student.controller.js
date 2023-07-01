@@ -98,6 +98,8 @@ class StudentController {
 
             const link = `${process.env.DEV}/student/${hashedUser}`;
 
+            console.log(link);
+
             //TODO: Create a Proper Invitation mail Template;
 
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: schoolAccount.name, Link: link }).send();
@@ -174,10 +176,7 @@ class StudentController {
 
                 if (created) {
 
-                    const studentInstance = await Student.create(createdRecords[i]);
-
-                    console.log(studentInstance.dataValues);
-                    
+                    const studentInstance = await Student.create(createdRecords[i]);                    
 
                     await accountInstance.setStudent(studentInstance);
 
@@ -191,7 +190,9 @@ class StudentController {
 
                     const link = `${process.env.DEV}/student/${hashedUser}`;
 
-                    Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: schoolAccount.name, Link: link }).send();
+                    comsole.log(link);
+
+                    Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: accountInstance.name, Link: link }).send();
                 }
 
             }
