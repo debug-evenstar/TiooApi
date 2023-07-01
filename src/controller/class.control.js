@@ -335,6 +335,7 @@ class ClassController {
     /* -------------------------- ADD STUDENT TO CLASS -------------------------- */
 
     static async addStudentToClass(req, res) {
+
         const errors = validationResult(req);
         const data = req.body;
         try {
@@ -349,10 +350,12 @@ class ClassController {
             if (studentInstance.account_type != "student") {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.student });
             } else {
-                await classInstance.addStudent(studentInstance);
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, });
-            }
+                await classInstance.addStudent(studentInstance.id);
 
+                const classStudentArray = await classInstance.getStudents();
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classStudentArray });
+            }
 
         } catch (error) {
             console.log(error);
