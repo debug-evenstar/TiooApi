@@ -243,32 +243,32 @@ class ClassController {
         };
     }
 
-        /*-----------------------------------| ADD SUBJECT TO CLASS |-----------------------------------*/
+    /*-----------------------------------| ADD SUBJECT TO CLASS |-----------------------------------*/
 
-        static async addSubjectToClass(req, res) {
+    static async addSubjectToClass(req, res) {
 
-            const { classId, subjectId } = req.body;
+        const { classId, subjectId } = req.body;
 
-            const {id} = req.userData;
+        const { id } = req.userData;
 
-            try {
-    
-                const classSubjects = await Class.findByPk(classId);
+        try {
 
-                const subjectInstance = await Subject.findByPk(subjectId);
+            const classSubjects = await Class.findByPk(classId);
 
-                const response = await classSubjects.addSubject(subjectId);
+            const subjectInstance = await Subject.findByPk(subjectId);
 
-                const newClassWithSubjects = await classSubjects.getSubjects();
+            const response = await classSubjects.addSubject(subjectId);
 
-    
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.added});
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'Server Error' });
-            };
-        }
+            const newClassWithSubjects = await classSubjects.getSubjects();
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.added });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
 
 
     /*-----------------------------------| READ CLASS WITH ALL ASSIGNED TEACHERS |-----------------------------------*/
@@ -374,15 +374,18 @@ class ClassController {
             const classInstance = await classarmInstance.getClass();
 
             const teacherInstance = await Account.findOne({ where: { id: data.teacher_id } });
-            
+
             if (teacherInstance.account_type != "teacher") {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.teacher });
             } else {
-                console.log([classInstance]);
-                await classInstance.addTeacher(teacherInstance);
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, });
+
+                await classInstance.addTeacher(teacherInstance.id);
+
+                const z = await classInstance.getTeachers();
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.added });
             }
-         
+
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: 'Server Error' });
