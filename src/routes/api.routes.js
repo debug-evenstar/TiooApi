@@ -130,7 +130,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/student/invite', InviteValidator, StudentController.sendInvitation);
     router.get('/student/:id', StudentController.fetchStudent);
     router.get('/students/readall', StudentController.allStudents);
-    router.get('/students/readinvited', StudentController.invitedStudents);
+    router.get('/student/readinvited', StudentController.invitedStudents);
     router.get('/students/classess/:id', StudentController.getStudentClass);
     router.get('/students/delete/:id', StudentController.deleteStudent);
 
