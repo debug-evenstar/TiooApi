@@ -40,8 +40,8 @@ const allAuthorizedRoutesGroup = (router) => {
     router.post('/account/send_otp', SendOTPValidator, AuthenicationController.requestVerificationOTP);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyOTP);
     router.put('/account/change_password', ChangePasswordValidator, AuthenicationController.changePassword);
-    router.post('/account/resetpassword',ResetPasswordValidator,  AuthenicationController.resetPassword);
-    router.post('/account/verify_reset_password', VerifyResetPasswordValidator ,AuthenicationController.verifyResetPassword);
+    router.post('/account/resetpassword', ResetPasswordValidator, AuthenicationController.resetPassword);
+    router.post('/account/verify_reset_password', VerifyResetPasswordValidator, AuthenicationController.verifyResetPassword);
 
     router.post('/new/account/send_otp', SendOTPValidator, AuthenicationController.sendTempOTP);
     router.post('/new/account/verify', VerifyAccountValidator, AuthenicationController.verifyTempEmail);
@@ -71,7 +71,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/account/exist/:email', AuthenicationController.accountExist);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
 
-   
+
     router.get('/school/classes/:id', SchoolManagementController.classes);
     router.get('/school/read/', SchoolManagementController.read);
     router.get('/school/profile/', SchoolManagementController.schoolProfile);
@@ -93,6 +93,8 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.put('/class/update/:id', ClassController.update);
     router.get('/class/students/:id', ClassController.classStudent);
     router.delete('/class/delete/:id', ClassController.delete);
+    router.post('/class/student', ClassController.addStudentToClass);
+    router.post('/class/teacher', ClassController.addTeacherToClass);
 
     router.post('/class/arms/create', ClassArmsController.create);
     router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
@@ -132,7 +134,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/students/readall', StudentController.allStudents);
     router.get('/student/readinvited', StudentController.invitedStudents);
     router.get('/students/classess/:id', StudentController.getStudentClass);
-    router.get('/students/delete/:id', StudentController.deleteStudent);
+    router.delete('/students/delete/:id', StudentController.deleteStudent);
 
 
 

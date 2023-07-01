@@ -94,6 +94,7 @@ class TeacherController {
             }
 
             const teacherInstance = await accountInstance.getTeacher({ joinTableAttributes: [] });
+            
             if (!teacherInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
