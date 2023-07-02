@@ -345,14 +345,21 @@ class ClassController {
             }
             const classInstance = await classarmInstance.getClass();
 
-            const studentInstance = await Account.findOne({ where: { id: data.student_id } });
+            const studentAccountInstance = await Account.findOne({ where: { id: data.student_id } });
 
-            if (studentInstance.account_type != "student") {
+            if (studentAccountInstance.account_type != "student") {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.student });
             } else {
-                await classInstance.addStudent(studentInstance.id);
 
-                const classStudentArray = await classInstance.getStudents();
+                const studentInstance = await studentAccountInstance.getStudent();
+
+                await classInstance.addStudent(studentInstance);
+
+                await classarmInstance.addStudent(studentInstance);
+
+                const classStudentArray = await classInstance.getStudents({
+                    where: { id: studentInstance.id }, include: { model: Account, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }
+                });
 
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classStudentArray });
             }
@@ -376,13 +383,15 @@ class ClassController {
             }
             const classInstance = await classarmInstance.getClass();
 
-            const teacherInstance = await Account.findOne({ where: { id: data.teacher_id } });
+            const teacherAccountInstance = await Account.findOne({ where: { id: data.teacher_id } });
 
-            if (teacherInstance.account_type != "teacher") {
+            if (teacherAccountInstance.account_type != "teacher") {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.teacher });
             } else {
 
-                await classInstance.addTeacher(teacherInstance.id);
+                const teacherInstance = await teacherAccountInstance.getTeacher();
+
+                await classInstance.addTeacher(teacherInstance);
 
                 const z = await classInstance.getTeachers();
 
