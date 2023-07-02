@@ -39,6 +39,32 @@ class InviteController {
         };
     }
 
+    static async generateStudentLink(req, res) {
+
+        try {
+
+            const body = {
+                "account_type": "student",
+                "classes": [req.body.arm],
+                "subjects": [],
+                "schoolId": req.body.schoolId,
+                "code": InviteController.generateReferralCode(8)
+            }
+
+            console.log(body);
+
+            const inviteInstance = await Invite.create(body);
+
+            const link = `${process.env.DEV}/${body.account_type}/${inviteInstance.code}`;
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: { link } });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
     /*-----------------------------------| READ ALL INVITES |-----------------------------------*/
 
     static async invites(req, res) {
@@ -65,13 +91,39 @@ class InviteController {
 
             const inviteInstance = await Invite.findByPk(id);
 
+            if (!inviteInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: inviteInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+    /*-----------------------------------| READ STUDENT INVITE BY ID |-----------------------------------*/
+
+    static async studentInvite(req, res) {
+
+        const { code } = req.params;
+
+        try {
+
+            const inviteInstance = await Invite.findOne({ where: { code: code } });
 
             if (!inviteInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
+            const payload = {
+                "name": "",
+                "email": "",
+                "arm": inviteInstance.classes[0]
+            }
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: inviteInstance });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
         } catch (error) {
             console.log(error);
