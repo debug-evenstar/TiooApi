@@ -81,7 +81,8 @@ class TeacherController {
         const { id } = req.params;
 
         const decryptedId = HashUtils.decrypt(id);
-
+        console.log(id)
+        
         try {
             const accountInstance = await Account.findByPk(Number(decryptedId), { attributes: { exclude: ['password'] } });
 
@@ -94,7 +95,7 @@ class TeacherController {
             }
 
             const teacherInstance = await accountInstance.getTeacher({ joinTableAttributes: [] });
-            
+
             if (!teacherInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
@@ -137,10 +138,10 @@ class TeacherController {
 
             if (accountInstance.account_type != "teacher") {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.teacher });
-            } else {               
+            } else {
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: payload });
             }
-           
+
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: 'Server Error' });
