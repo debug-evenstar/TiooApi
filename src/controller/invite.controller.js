@@ -1,6 +1,6 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult, param } = require('express-validator');
-const { Invite } = require("../database/connection");
+const { Invite, ClassArm } = require("../database/connection");
 
 
 class InviteController {
@@ -117,10 +117,16 @@ class InviteController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
+            const classArmsInstance = await ClassArm.findByPk(inviteInstance.classes[0], {
+                attributes: { exclude: ['ClassId'] }
+              });
+              
+
+
             const payload = {
                 "name": "",
                 "email": "",
-                "arm": inviteInstance.classes[0]
+                "arm": classArmsInstance
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
