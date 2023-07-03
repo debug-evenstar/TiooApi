@@ -8,10 +8,20 @@ const HashUtils = require('../utils/hash.utilities');
 
 class StudentController {
 
+    static generateRandomPassword(length) {
+        const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[{]};:,<.>/?';
+        let password = '';
+
+        for (let i = 0; i < length; i++) {
+            let randomIndex = Math.floor(Math.random() * charset.length);
+            password += charset[randomIndex];
+        }
+
+        return password;
+    }
+
     /* ------------------------ SENDS INVITE TO Student ------------------------ */
     static async sendInvitation(req, res) {
-
-
 
         function generateRandomPassword(length) {
             const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[{]};:,<.>/?';
@@ -95,6 +105,102 @@ class StudentController {
                 error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
                 class_arm: classarmInstance,
             });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
+
+
+    /* ------------------------ SENDS BULK Student ------------------------ */
+
+
+    static async sendBulkInvite(req, res) {
+
+        const random_password = StudentController.generateRandomPassword(8);
+        const errors = validationResult(req);
+        const otp = Math.floor(Math.random() * 900000) + 100000;
+        const data = req.body
+        const { id } = req.userData;
+
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+
+        try {
+
+            const schoolAccountInstance = await Account.findByPk(id);
+
+            const schoolInstance = await schoolAccountInstance.getSchoolManagement();
+
+            if (!schoolAccountInstance) {
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.unauthorized });
+            }
+
+
+            if (!schoolInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const createdRecords = [];
+
+            for (let i = 0; i < req.body.email.length; i++) {
+
+                const newStudentRecord = {
+                    name: "undefined",
+                    email: req.body.email[i],
+                    account_type: "student",
+                    password: random_password,
+                    flag: "invited",
+                    verification_status: 0
+                };
+
+                createdRecords.push(newStudentRecord);
+            }
+
+            const classarmInstance = await ClassArm.findByPk(data.arm);
+
+            if (!classarmInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+
+            for (let i = 0; i < createdRecords.length; i++) {
+
+                const [accountInstance, created] = await Account.upsert(createdRecords[i]);
+
+                if (created) {
+
+                    const studentInstance = await Student.create(createdRecords[i]);
+
+                    console.log(studentInstance.dataValues);
+                    
+
+                    await accountInstance.setStudent(studentInstance);
+
+                    const classInstance = await classarmInstance.getClass();
+                    await schoolInstance.addStudent(studentInstance);
+                    await classarmInstance.addStudent(studentInstance);
+                    await classInstance.addStudent(studentInstance);
+                    await classInstance.addStudent(studentInstance);
+
+                    const hashedUser = HashUtils.encrypt(accountInstance.id.toString());
+
+                    const link = `${process.env.DEV}/student/${hashedUser}`;
+
+                    Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: schoolAccount.name, Link: link }).send();
+                }
+
+            }
+
+            const allStudentInstance = await classarmInstance.getStudents()
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite });
+
 
         } catch (error) {
             console.log(error);

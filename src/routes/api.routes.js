@@ -134,7 +134,11 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/student/readinvited', StudentController.invitedStudents);
     router.get('/students/classess/:id', StudentController.getStudentClass);
     router.delete('/students/delete/:id', StudentController.deleteStudent);
-/* --------------------------------- LESSON --------------------------------- */
+    router.post('/students/bulk/invite', StudentController.sendBulkInvite);
+
+
+
+
     router.post('/lesson/create', UploadService.upload.single('file'), LessonController.createLesson);
 
 };
