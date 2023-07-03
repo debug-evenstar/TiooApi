@@ -251,12 +251,8 @@ class SubjectController {
             let teachersAccount = [];
 
             if (teacherAccountIds.length !== 0) {
-                teachersAccount = await Account.findAll({ where: { id: [teacherAccountIds] }, attributes: { exclude: ['password'] } });
+                teachersAccount = await Account.findAll({ where: { id: [...teacherAccountIds] }, attributes: { exclude: ['password'] } });
             }
-
-            console.log(teachersAccount);
-
-
 
             const payload = {
                 subject: subject,
