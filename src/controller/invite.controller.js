@@ -158,14 +158,20 @@ class InviteController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
+            const subjects = await Subject.findAll({where: {id: [...inviteInstance.subjects]}, attributes :{exclude: ["SchoolManagementId"]}});
+
+            const classes = await Class.findAll({where: {id: [...inviteInstance.classes]}, attributes: {exclude: ["SchoolManagementId"]}});
+
+            console.log(inviteInstance.classes)
+              
 
             const payload = {
                 "name": "",
                 "email": "",
                 "account_type": inviteInstance.account_type,
                 "flag": "invited",
-                "classes": inviteInstance.classes,
-                "Subjects": inviteInstance.subjects,
+                "classes": classes,
+                "Subjects": subjects,
                 "schoolId": inviteInstance.schoolId
             }
 
