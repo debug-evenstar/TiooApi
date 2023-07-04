@@ -243,6 +243,34 @@ class ClassController {
         };
     }
 
+    /*-----------------------------------| ADD SUBJECT TO CLASS |-----------------------------------*/
+
+    static async addSubjectToClass(req, res) {
+
+        const { classId, subjectId } = req.body;
+
+        const { id } = req.userData;
+
+        try {
+
+            const classSubjects = await Class.findByPk(classId);
+
+            const subjectInstance = await Subject.findByPk(subjectId);
+
+            const response = await classSubjects.addSubject(subjectId);
+
+            const newClassWithSubjects = await classSubjects.getSubjects();
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.added });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
     /*-----------------------------------| READ CLASS WITH ALL ASSIGNED TEACHERS |-----------------------------------*/
 
     static async readClassWithTeachers(req, res) {
@@ -307,6 +335,7 @@ class ClassController {
     /* -------------------------- ADD STUDENT TO CLASS -------------------------- */
 
     static async addStudentToClass(req, res) {
+
         const errors = validationResult(req);
         const data = req.body;
         try {
@@ -317,15 +346,24 @@ class ClassController {
             }
             const classInstance = await classarmInstance.getClass();
 
-            const studentInstance = await Account.findOne({ where: { id: data.student_id } });
+            const studentAccountInstance = await Account.findOne({ where: { id: data.student_id } });
 
-            if (studentInstance.account_type != "student") {
+            if (studentAccountInstance.account_type != "student") {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.student });
             } else {
-                await classInstance.addStudent(studentInstance);
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, });
-            }
 
+                const studentInstance = await studentAccountInstance.getStudent();
+
+                await classInstance.addStudent(studentInstance);
+
+                await classarmInstance.addStudent(studentInstance);
+
+                const classStudentArray = await classInstance.getStudents({
+                    where: { id: studentInstance.id }, include: { model: Account, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }
+                });
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classStudentArray });
+            }
 
         } catch (error) {
             console.log(error);
@@ -346,14 +384,19 @@ class ClassController {
             }
             const classInstance = await classarmInstance.getClass();
 
-            const teacherInstance = await Account.findOne({ where: { id: data.teacher_id } });
+            const teacherAccountInstance = await Account.findOne({ where: { id: data.teacher_id } });
 
-            if (teacherInstance.account_type != "teacher") {
+            if (teacherAccountInstance.account_type != "teacher") {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.teacher });
             } else {
-                console.log([classInstance]);
+
+                const teacherInstance = await teacherAccountInstance.getTeacher();
+
                 await classInstance.addTeacher(teacherInstance);
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, });
+
+                const z = await classInstance.getTeachers();
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.added });
             }
 
         } catch (error) {
