@@ -1,6 +1,7 @@
 const ResponseMessage = {
     pass: {
         create: 'Created successfully',
+        added: 'Added successfully',
         update: 'Updated successfully',
         delete: 'Deleted successfully',
         read: 'Fetched successfully',

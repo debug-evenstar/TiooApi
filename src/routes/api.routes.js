@@ -50,6 +50,8 @@ const allAuthorizedRoutesGroup = (router) => {
 
     router.post('/teacher/invite/accept', TeacherController.acceptInvite);
     router.get('/teacher/invited/:id', TeacherController.fetchInvitedTeacher);
+    router.post('/invites/student/accept', InviteController.studentAccept);
+    router.post('/invites/teacher/accept', InviteController.teacherAccept);
 
 
     router.get('/student/invited/:id', StudentController.fetchInvitedStudent);
@@ -95,6 +97,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.delete('/class/delete/:id', ClassController.delete);
     router.post('/class/student', ClassController.addStudentToClass);
     router.post('/class/teacher', ClassController.addTeacherToClass);
+    router.post('/class/addSubject', ClassController.addSubjectToClass)
 
     router.post('/class/arms/create', ClassArmsController.create);
     router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
@@ -119,13 +122,16 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/teacher/invite', TeacherController.sendInvite);
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
+    router.post('/teacher/assignsubject', TeacherController.assignSubjectToTeacher);
     router.get('/teacher/classess/:id', TeacherController.teacherClasses);
     router.get('/teacher/subjects/:id', TeacherController.teacherSubjects);
     router.get('/teacher/:id', TeacherController.fetchTeacher);
 
     router.post('/invites/generate', InviteController.generateLink);
+    router.post('/invites/student/generate', InviteController.generateStudentLink);
     router.get('/invites/read', InviteController.invites);
     router.get('/invites/read/:id', InviteController.invite);
+    router.get('/invites/student/info/:code', InviteController.studentInvite);    
     router.get('/invites/info/:code', InviteController.inviteByCode);
     router.delete('/invites/delete/:id', InviteController.delete);
 
