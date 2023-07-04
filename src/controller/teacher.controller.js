@@ -48,7 +48,7 @@ class TeacherController {
             await teacherInstance.addSubjects(subjectInstance);
 
             const hashedUser = HashUtils.encrypt(registeredAccount.id.toString());
-
+            console.log(hashedUser)
             const link = `${process.env.DEV}/teacher/${hashedUser}`;
 
             console.log(link);
@@ -82,7 +82,7 @@ class TeacherController {
 
         const decryptedId = HashUtils.decrypt(id);
         console.log(id)
-        
+
         try {
             const accountInstance = await Account.findByPk(Number(decryptedId), { attributes: { exclude: ['password'] } });
 

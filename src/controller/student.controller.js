@@ -44,7 +44,7 @@ class StudentController {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
         try {
-            
+
             const existingInstance = await Account.findOne({ where: { email: data.email } });
 
             if (existingInstance) {
@@ -95,7 +95,7 @@ class StudentController {
             const response = await classInstance.addStudent(studentInstance);
 
             const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
-
+            console.log(hashedUser)
             const link = `${process.env.DEV}/student/${hashedUser}`;
 
             //TODO: Create a Proper Invitation mail Template;
@@ -124,11 +124,9 @@ class StudentController {
         const data = req.body
         const { id } = req.userData;
 
-
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
-
 
         try {
 
@@ -162,7 +160,7 @@ class StudentController {
             }
 
             const classarmInstance = await ClassArm.findByPk(data.arm);
-
+            console.log(classarmInstance)
             if (!classarmInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
@@ -177,7 +175,7 @@ class StudentController {
                     const studentInstance = await Student.create(createdRecords[i]);
 
                     console.log(studentInstance.dataValues);
-                    
+
 
                     await accountInstance.setStudent(studentInstance);
 
@@ -188,7 +186,7 @@ class StudentController {
                     await classInstance.addStudent(studentInstance);
 
                     const hashedUser = HashUtils.encrypt(accountInstance.id.toString());
-
+                    console.log(hashedUser)
                     const link = `${process.env.DEV}/student/${hashedUser}`;
 
                     Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: schoolAccount.name, Link: link }).send();
@@ -199,7 +197,8 @@ class StudentController {
             const allStudentInstance = await classarmInstance.getStudents()
 
             return res.status(ResponseStatus.code.success).json({
-                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite });
+                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite
+            });
 
 
         } catch (error) {

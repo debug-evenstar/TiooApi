@@ -311,6 +311,7 @@ class ClassController {
         const data = req.body;
         try {
             const classarmInstance = await ClassArm.findByPk(data.arm);
+            console.log("i")
             if (!classarmInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
@@ -346,7 +347,7 @@ class ClassController {
             const classInstance = await classarmInstance.getClass();
 
             const teacherInstance = await Account.findOne({ where: { id: data.teacher_id } });
-            
+
             if (teacherInstance.account_type != "teacher") {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.teacher });
             } else {
@@ -354,7 +355,7 @@ class ClassController {
                 await classInstance.addTeacher(teacherInstance);
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, });
             }
-         
+
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: 'Server Error' });

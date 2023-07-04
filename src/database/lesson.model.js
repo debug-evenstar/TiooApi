@@ -31,9 +31,9 @@ module.exports = (sequelize, Sequelize) => {
   Lesson.sync().then(() => {
     //'Tables dropped and created successfully.'
   })
-  .catch((error) => {
-    // 'Error occurred while dropping and creating tables:'
-  });
+    .catch((error) => {
+      // 'Error occurred while dropping and creating tables:'
+    });
 
   return Lesson;
 };

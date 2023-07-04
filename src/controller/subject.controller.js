@@ -28,7 +28,7 @@ class SubjectController {
 
     static async readAll(req, res) {
 
-        try {   
+        try {
             const subjectInstance = await Subject.findAll();
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
         } catch (error) {
@@ -161,6 +161,10 @@ class SubjectController {
             const subjectInstance = await Subject.findByPk(subjectId);
 
             const lessonsInstance = await subjectInstance.getLessons();
+
+            if (!lessonsInstance) {
+                return res.status(ResponseStatus.code.forbidden).json({ error: false, message: ResponseStatus.pass.read, data: [] });
+            }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonsInstance });
 
