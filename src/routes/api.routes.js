@@ -82,6 +82,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/school/class/read', SchoolManagementController.getClassBySidANDCid);
     router.get('/school/teachers/', SchoolManagementController.authSchoolTeachers);
     router.get('/school/teachers/:id', SchoolManagementController.schoolTeachers);
+    
 /* ---------------------------------- CLASS --------------------------------- */
     router.post('/class/create', ClassController.create);
     router.post('/class/create_bulk', ClassController.bulkCreate);
