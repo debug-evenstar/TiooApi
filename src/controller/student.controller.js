@@ -44,7 +44,7 @@ class StudentController {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
         try {
-            
+
             const existingInstance = await Account.findOne({ where: { email: data.email } });
 
             if (existingInstance) {
@@ -95,7 +95,7 @@ class StudentController {
             const response = await classInstance.addStudent(studentInstance);
 
             const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
-
+            console.log(hashedUser)
             const link = `${process.env.DEV}/student/${hashedUser}`;
 
             console.log(link);
@@ -126,11 +126,9 @@ class StudentController {
         const data = req.body
         const { id } = req.userData;
 
-
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
-
 
         try {
 
@@ -164,7 +162,7 @@ class StudentController {
             }
 
             const classarmInstance = await ClassArm.findByPk(data.arm);
-
+            console.log(classarmInstance)
             if (!classarmInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
@@ -187,7 +185,7 @@ class StudentController {
                     await classInstance.addStudent(studentInstance);
 
                     const hashedUser = HashUtils.encrypt(accountInstance.id.toString());
-
+                    console.log(hashedUser)
                     const link = `${process.env.DEV}/student/${hashedUser}`;
 
                     comsole.log(link);
@@ -200,7 +198,8 @@ class StudentController {
             const allStudentInstance = await classarmInstance.getStudents()
 
             return res.status(ResponseStatus.code.success).json({
-                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite });
+                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite
+            });
 
 
         } catch (error) {

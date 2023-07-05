@@ -62,7 +62,7 @@ const allAuthorizedRoutesGroup = (router) => {
 /*------------------------------| SECURED ROUTES |------------------------------*/
 
 const adminAuthorizedRoutesGroup = (router) => {
-
+    /* --------------------------------- ACCOUNT -------------------------------- */
     router.use(AuthenticationMiddleware.verify) //--use middleware--//
     router.get('/account/read_all', AuthenicationController.accounts);
     router.get('/account/read', AuthenicationController.accountProfile);
@@ -72,8 +72,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/account/read/:id', AuthenicationController.accountByID);
     router.get('/account/exist/:email', AuthenicationController.accountExist);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
-
-
+    /* --------------------------------- SCHOOL --------------------------------- */
     router.get('/school/classes/:id', SchoolManagementController.classes);
     router.get('/school/read/', SchoolManagementController.read);
     router.get('/school/profile/', SchoolManagementController.schoolProfile);
@@ -83,7 +82,8 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/school/class/read', SchoolManagementController.getClassBySidANDCid);
     router.get('/school/teachers/', SchoolManagementController.authSchoolTeachers);
     router.get('/school/teachers/:id', SchoolManagementController.schoolTeachers);
-
+    
+/* ---------------------------------- CLASS --------------------------------- */
     router.post('/class/create', ClassController.create);
     router.post('/class/create_bulk', ClassController.bulkCreate);
     router.get('/class/read', ClassController.readAll);
@@ -105,7 +105,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/class/arms/read/:id', ClassArmsController.readById);
     router.put('/class/arms/update/:id', ClassArmsController.updateById);
     router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
-
+/* -------------------------------- SUBJECTS -------------------------------- */
     router.post('/subjects/create', SubjectController.create);
     router.get('/subjects/read', SubjectController.readAll);
     router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
@@ -118,7 +118,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/subjects/lessons/count', SubjectController.subjectsWithLessonCount);
     router.get('/subjects/lessons/:subjectId', SubjectController.subjectLessons);
     router.delete('/subjects/delete/:id', SubjectController.delete);
-
+/* --------------------------------- TEACHERS -------------------------------- */
     router.post('/teacher/invite', TeacherController.sendInvite);
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
@@ -126,7 +126,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/teacher/classess/:id', TeacherController.teacherClasses);
     router.get('/teacher/subjects/:id', TeacherController.teacherSubjects);
     router.get('/teacher/:id', TeacherController.fetchTeacher);
-
+/* --------------------------------- INVITES -------------------------------- */
     router.post('/invites/generate', InviteController.generateLink);
     router.post('/invites/student/generate', InviteController.generateStudentLink);
     router.get('/invites/read', InviteController.invites);
@@ -134,17 +134,14 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/invites/student/info/:code', InviteController.studentInvite);    
     router.get('/invites/info/:code', InviteController.inviteByCode);
     router.delete('/invites/delete/:id', InviteController.delete);
-
+/* --------------------------------- STUDENT -------------------------------- */
     router.post('/student/invite', InviteValidator, StudentController.sendInvitation);
     router.get('/student/:id', StudentController.fetchStudent);
     router.get('/students/readall', StudentController.allStudents);
-    router.get('/student/readinvited', StudentController.invitedStudents);
+    router.get('/student/readinvited/:id', StudentController.invitedStudents);
     router.get('/students/classess/:id', StudentController.getStudentClass);
     router.delete('/students/delete/:id', StudentController.deleteStudent);
     router.post('/students/bulk/invite', StudentController.sendBulkInvite);
-
-
-
 
     router.post('/lesson/create', UploadService.upload.single('file'), LessonController.createLesson);
 
