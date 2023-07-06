@@ -247,26 +247,25 @@ class AuthController {
 
             const generatedToken = TokenMiddleware.generate(userData)
 
-            if (user.account_type == "teacher") {
+          
 
-                const profile = await user.getTeacher()
-
-                const payload  = {
-                    AccountId: user.id,
-                    name: user.name,
-                    email: user.email,
-                    phone: user.phone,
-                    account_type: user.account_type,
-                    verification_status: user.verification_status,
-                    flag: user.flag,
-                    profileId: profile.id,
-                    schoolManagment: profile.schoolManagment
-                }
-
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
-            } else {
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, data: {}, token: generatedToken });
+            const payload  = {
+                AccountId: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                account_type: user.account_type,
+                verification_status: user.verification_status,
+                flag: user.flag,
             }
+
+            if (user.account_type === "teacher") {
+                const profile = await user.getTeacher();
+                payload.profileId = profile.id;
+              }
+              
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
+
 
         } catch (error) {
             console.log(error)
