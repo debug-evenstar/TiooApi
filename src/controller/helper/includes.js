@@ -1,7 +1,7 @@
 const { Subject, Class, Teacher, Account, Lesson, Student } = require('../../database/connection/');
 
 class IncludeManager {
-
+    
     constructor(){
 
     }

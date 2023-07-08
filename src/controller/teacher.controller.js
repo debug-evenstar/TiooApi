@@ -1,7 +1,7 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult } = require('express-validator');
 const { Sequelize } = require('sequelize');
-const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite, Lesson, Student } = require("../database/connection");
+const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite, Lesson, Student, ClassArm } = require("../database/connection");
 const Mailer = require('../services/mailer');
 const HashUtils = require('../utils/hash.utilities');
 
@@ -263,7 +263,7 @@ class TeacherController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const classInstance = await teacherInstance.getClasses({ joinTableAttributes: [] });
+            const classInstance = await teacherInstance.getClasses({ joinTableAttributes: [], include: [ClassArm] });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classInstance });
 
