@@ -357,6 +357,7 @@ class ClassController {
                 await classInstance.addStudent(studentInstance);
 
                 await classarmInstance.addStudent(studentInstance);
+                console.log([studentInstance,])
 
                 const classStudentArray = await classInstance.getStudents({
                     where: { id: studentInstance.id }, include: { model: Account, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }
@@ -379,7 +380,7 @@ class ClassController {
         const data = req.body;
         try {
             const classarmInstance = await ClassArm.findByPk(data.arm);
-            
+
             if (!classarmInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }

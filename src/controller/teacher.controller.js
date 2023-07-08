@@ -74,7 +74,7 @@ class TeacherController {
 
     }
 
-    
+
     /*-----------------------------------| READ CLASS WITH ALL ASSIGNED TEACHERS |-----------------------------------*/
 
 
@@ -304,81 +304,79 @@ class TeacherController {
         };
     }
 
-        /*-----------------------------------| ASSIGN SUBJECT TO TEACHER |-----------------------------------*/
+    /*-----------------------------------| ASSIGN SUBJECT TO TEACHER |-----------------------------------*/
 
-        static async assignSubjectToTeacher(req, res) {
+    static async assignSubjectToTeacher(req, res) {
 
-            const { subject, teacher } = req.body;
-    
-            try {
+        const { subject, teacher } = req.body;
 
-                const teacherAccountInstance = await Account.findByPk(teacher);
-    
-                const teacherInstance = await teacherAccountInstance.getTeacher();
+        try {
 
-                console.log(teacherInstance);
-    
-                if (!teacherInstance) {
-                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
-                }
+            const teacherAccountInstance = await Account.findByPk(teacher);
 
-                
-    
-                const subjectInstance = await Subject.findOne({where:{id: subject}});
-    
-                if (!subjectInstance) {
-                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-                }
+            const teacherInstance = await teacherAccountInstance.getTeacher();
 
-                const teacherSubject = await teacherInstance.addSubject(subjectInstance);   
-                
-                const fecth = await teacherInstance.getSubjects();
+            console.log(teacherInstance);
 
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'Server Error' });
-            };
-        }
+            if (!teacherInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
 
-                /*----------------XXX-------------------| ASSIGN SUBJECT TO TEACHER |-----------------------------------*/
 
-                static async unAssignSubjectToTeacher(req, res) {
 
-                    const { subject, teacher } = req.body;
-            
-                    try {
-        
-                        const teacherAccountInstance = await Account.findByPk(teacher);
-            
-                        const teacherInstance = await teacherAccountInstance.getTeacher();
-        
-                        console.log(teacherInstance);
-            
-                        if (!teacherInstance) {
-                            return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
-                        }
-        
-                        
-            
-                        const subjectInstance = await Subject.findOne({where:{id: subject}});
-            
-                        if (!subjectInstance) {
-                            return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-                        }
-        
-                        const teacherSubject = await teacherInstance.addSubject(subjectInstance);   
-                        
-                        const fecth = await teacherInstance.getSubjects();
-        
-                        return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
-            
-                    } catch (error) {
-                        console.log(error);
-                        res.status(500).json({ error: 'Server Error' });
-                    };
-                }
+            const subjectInstance = await Subject.findOne({ where: { id: subject } });
+
+            if (!subjectInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const teacherSubject = await teacherInstance.addSubject(subjectInstance);
+
+            const fecth = await teacherInstance.getSubjects();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+    /*----------------XXX-------------------| ASSIGN SUBJECT TO TEACHER |-----------------------------------*/
+
+    static async unAssignSubjectToTeacher(req, res) {
+
+        const { subject, teacher } = req.body;
+
+        try {
+
+            const teacherAccountInstance = await Account.findByPk(teacher);
+
+            const teacherInstance = await teacherAccountInstance.getTeacher();
+
+            console.log(teacherInstance);
+
+            if (!teacherInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const subjectInstance = await Subject.findOne({ where: { id: subject } });
+
+            if (!subjectInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const teacherSubject = await teacherInstance.addSubject(subjectInstance);
+
+            const fecth = await teacherInstance.getSubjects();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
 
 
     // await teacherInstance.addSubjects(subjectInstance);
