@@ -1,7 +1,7 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult } = require('express-validator');
 const { Sequelize } = require('sequelize');
-const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite } = require("../database/connection");
+const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite, Lesson, Student } = require("../database/connection");
 const Mailer = require('../services/mailer');
 const HashUtils = require('../utils/hash.utilities');
 
@@ -274,6 +274,49 @@ class TeacherController {
     }
 
 
+    /*-----------------------------------| READ TEACHER CLASSES |-----------------------------------*/
+
+    static async teacherStudents(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password'] } });
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+
+            const teacherInstance = await accountInstance.getTeacher({ joinTableAttributes: [] });
+
+            if (!teacherInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const classInstance = await teacherInstance.getClasses({ joinTableAttributes: [] });
+
+            const classIds = classInstance.map(classes => classes.id);
+
+            const teachersStudent = await Student.findAll({where: {classId: [...classIds]}});
+
+            const filter = await Promise.all(teachersStudent.map(async (each) => {
+                const account = await each.getAccount({attributes: { exclude: ['password'] }});
+                return account;
+              }));
+
+            console.log(filter);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: filter });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
     /*-----------------------------------| READ TEACHER SUBJECTS |-----------------------------------*/
 
     static async teacherSubjects(req, res) {
@@ -304,7 +347,49 @@ class TeacherController {
         };
     }
 
-    /*-----------------------------------| ASSIGN SUBJECT TO TEACHER |-----------------------------------*/
+
+        /*-----------------------------------| READ TEACHER SUBJECTS WITH LESSONS |-----------------------------------*/
+
+        static async teacherSubjectsWithLessons(req, res) {
+
+            const { id } = req.params;
+    
+            try {
+    
+                const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password'] } });
+    
+                if (!accountInstance) {
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+                }
+    
+                const teacherInstance = await accountInstance.getTeacher({ joinTableAttributes: [] });
+    
+                if (!teacherInstance) {
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                }
+    
+                // const subjectInstance = await teacherInstance.getSubjects({ joinTableAttributes: [], include: [Lesson] });
+
+                const subjectInstance = await teacherInstance.getSubjects({
+                    joinTableAttributes: [],
+                    include: [
+                      {
+                        model: Lesson,
+                        attributes: { exclude: ['ClassId', 'ClassArmId', 'file', 'SubjectId'] },
+                      },
+                    ],
+                  });
+                  
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
+
+        /*-----------------------------------| ASSIGN SUBJECT TO TEACHER |-----------------------------------*/
 
     static async assignSubjectToTeacher(req, res) {
 

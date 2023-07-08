@@ -1,6 +1,7 @@
 const { Subject, Class, Teacher, Account, Lesson } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 const Sequelize = require('sequelize');
+const IncludeManager = require('./helper/includes');
 
 class SubjectController {
 
@@ -29,8 +30,11 @@ class SubjectController {
     static async readAll(req, res) {
 
         try {
-            const subjectInstance = await Subject.findAll();
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
+
+            const subjectInstance = await Subject.findAll({
+                include : IncludeManager.parseParamIncludes(req.query)
+            });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectInstance });
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: 'Server Error' });
