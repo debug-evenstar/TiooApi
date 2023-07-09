@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
             teacher_type: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: 'school',
+                defaultValue: 'subject',
             },
             nationality: {
                 type: DataTypes.STRING,
