@@ -299,14 +299,21 @@ class TeacherController {
 
             const classIds = classInstance.map(classes => classes.id);
 
-            const teachersStudent = await Student.findAll({where: {classId: [...classIds]}});
+            const teachersStudent = await Student.findAll({where: {classId: [...classIds]}, include: [Class]});
 
             const filter = await Promise.all(teachersStudent.map(async (each) => {
+
                 const account = await each.getAccount({attributes: { exclude: ['password'] }});
+
+                account.dataValues.class = each.dataValues.Class;
+
+                console.log(account);
+
                 return account;
               }));
 
-            console.log(filter);
+            //   console.log(filter)
+
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: filter });
 
