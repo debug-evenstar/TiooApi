@@ -134,16 +134,36 @@ class StudentController {
 
             const schoolAccountInstance = await Account.findByPk(id);
 
-            const schoolInstance = await schoolAccountInstance.getSchoolManagement();
+            let schoolInstance;
 
             if (!schoolAccountInstance) {
+
                 return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.unauthorized });
             }
 
+            schoolInstance = await schoolAccountInstance.getSchoolManagement();
+
 
             if (!schoolInstance) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+
+                const teacherInstance = await schoolAccountInstance.getTeacher();
+
+                if (!teacherInstance) {
+                    //return not found
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+
+                }
+
+                schoolInstance = await teacherInstance.getSchoolManagement();
+
+                if (!schoolInstance) {
+                    //return not found
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                }
+
             }
+
+            // console.log(schoolInstance);
 
             const createdRecords = [];
 
@@ -162,7 +182,7 @@ class StudentController {
             }
 
             const classarmInstance = await ClassArm.findByPk(data.arm);
-            console.log(classarmInstance)
+            
             if (!classarmInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
@@ -174,7 +194,7 @@ class StudentController {
 
                 if (created) {
 
-                    const studentInstance = await Student.create(createdRecords[i]);                    
+                    const studentInstance = await Student.create(createdRecords[i]);
 
                     await accountInstance.setStudent(studentInstance);
 
@@ -185,10 +205,10 @@ class StudentController {
                     await classInstance.addStudent(studentInstance);
 
                     const hashedUser = HashUtils.encrypt(accountInstance.id.toString());
-                    console.log(hashedUser)
+                    
                     const link = `${process.env.DEV}/student/${hashedUser}`;
 
-                    comsole.log(link);
+                    console.log(link);
 
                     Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: accountInstance.name, Link: link }).send();
                 }
@@ -198,7 +218,7 @@ class StudentController {
             const allStudentInstance = await classarmInstance.getStudents()
 
             return res.status(ResponseStatus.code.success).json({
-                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite
+                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
             });
 
 
