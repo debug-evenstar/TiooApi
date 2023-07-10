@@ -1,7 +1,7 @@
 class ClassSeeds {
     static nursery = [
-        { type: "nursery", naming: "Lower kindergarten" },
-        { type: "nursery", naming: "Upper kindergarten" },
+        { type: "nursery", naming: "Lower Kindergarten" },
+        { type: "nursery", naming: "Upper Kindergarten" },
         { type: "nursery", naming: "Transition" },
         { type: "nursery", naming: "Nursery 1" },
         { type: "nursery", naming: "Nursery 2" },
