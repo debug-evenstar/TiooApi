@@ -243,6 +243,34 @@ class ClassController {
         };
     }
 
+    /*-----------------------------------| ADD SUBJECT TO CLASS |-----------------------------------*/
+
+    static async addSubjectToClass(req, res) {
+
+        const { classId, subjectId } = req.body;
+
+        const { id } = req.userData;
+
+        try {
+
+            const classSubjects = await Class.findByPk(classId);
+
+            const subjectInstance = await Subject.findByPk(subjectId);
+
+            const response = await classSubjects.addSubject(subjectId);
+
+            const newClassWithSubjects = await classSubjects.getSubjects();
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.added });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
     /*-----------------------------------| READ CLASS WITH ALL ASSIGNED TEACHERS |-----------------------------------*/
 
     static async readClassWithTeachers(req, res) {
@@ -262,7 +290,7 @@ class ClassController {
             let teachersAccount = [];
 
             if (teacherAccountIds.length !== 0) {
-                teachersAccount = await Account.findAll({ where: { id: [teacherAccountIds] }, attributes: { exclude: ['password'] } });
+                teachersAccount = await Account.findAll({ where: { id: [...teacherAccountIds] }, attributes: { exclude: ['password'] } });
             }
 
             const payload = {
@@ -281,6 +309,102 @@ class ClassController {
         };
     }
 
+
+    /*-----------------------------------| CLASS STUDENTS |-----------------------------------*/
+
+    static async classStudent(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const classStudents = await Class.findByPk(id, { include: [Student] });
+
+            const studentsId = classStudents.Students.map((student) => student.AccountId);
+
+            const classStudentsAccount = await Account.findAll({ where: { id: [...studentsId] }, attributes: { exclude: ['password'] } });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classStudentsAccount });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+    /* -------------------------- ADD STUDENT TO CLASS -------------------------- */
+
+    static async addStudentToClass(req, res) {
+
+        const errors = validationResult(req);
+        const data = req.body;
+        try {
+            const classarmInstance = await ClassArm.findByPk(data.arm);
+            console.log("i")
+            if (!classarmInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const classInstance = await classarmInstance.getClass();
+
+            const studentAccountInstance = await Account.findOne({ where: { id: data.student_id } });
+
+            if (studentAccountInstance.account_type != "student") {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.student });
+            } else {
+
+                const studentInstance = await studentAccountInstance.getStudent();
+
+                await classInstance.addStudent(studentInstance);
+
+                await classarmInstance.addStudent(studentInstance);
+
+                const classStudentArray = await classInstance.getStudents({
+                    where: { id: studentInstance.id }, include: { model: Account, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }
+                });
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classStudentArray });
+            }
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+
+    }
+
+    /* ------------------------- ADD TEACHER TO A CLASS ------------------------- */
+
+    static async addTeacherToClass(req, res) {
+        const errors = validationResult(req);
+        const data = req.body;
+        try {
+            const classarmInstance = await ClassArm.findByPk(data.arm);
+            
+            if (!classarmInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const classInstance = await classarmInstance.getClass();
+
+            const teacherAccountInstance = await Account.findOne({ where: { id: data.teacher_id } });
+
+            if (teacherAccountInstance.account_type != "teacher") {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.teacher });
+            } else {
+
+                const teacherInstance = await teacherAccountInstance.getTeacher();
+
+                await classInstance.addTeacher(teacherInstance);
+
+                const z = await classInstance.getTeachers();
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.added });
+            }
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
 
 }
 

@@ -160,10 +160,8 @@ class SchoolManagementController {
             let teachersAccount = [];
 
             if (teacherAccountIds.length !== 0) {
-                teachersAccount = await Account.findAll({ where: { id: [teacherAccountIds] }, attributes: { exclude: ['password'] } });
+                teachersAccount = await Account.findAll({ where: { id: [...teacherAccountIds] }, attributes: { exclude: ['password'] } });
             }
-
-
 
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
@@ -174,6 +172,48 @@ class SchoolManagementController {
         };
     }
 
+
+
+        /*----------------------------------| FETCH AUTH SCHOOLS TEACHERS |----------------------------------*/
+
+        static async authSchoolTeachers(req, res) {
+
+            try {
+    
+                const AccountInstance = await Account.findByPk(req.userData.id, { include: [SchoolManagement] });
+                if (!AccountInstance) {
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+                }
+                const SchoolInstances = await AccountInstance.getSchoolManagement();
+                if (!SchoolInstances) {
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                }
+    
+                const schoolInstance = await SchoolManagement.findByPk(SchoolInstances.id);
+    
+                if (!schoolInstance) {
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                }
+    
+                const schoolTeachersProfile = await schoolInstance.getTeachers();
+    
+                const teacherAccountIds = schoolTeachersProfile.map(teacher => teacher.AccountId);
+    
+                let teachersAccount = [];
+    
+                if (teacherAccountIds.length !== 0) {
+                    teachersAccount = await Account.findAll({ where: { id: [...teacherAccountIds] }, attributes: { exclude: ['password'] } });
+                }
+        
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
+    
 
     /*----------------------------------| FETCH CLASSES BY SCHOOL ID |----------------------------------*/
 
@@ -254,6 +294,33 @@ class SchoolManagementController {
             console.log(error);
             res.status(500).json({ error: 'Server Error' });
         };
+    }
+
+
+    /*-----------------------------------| FETCH AUTHORIZED ACCOUNT |-----------------------------------*/
+
+    static async schoolProfile(req, res) {
+
+        const { id } = req.userData;
+
+        try {
+
+            const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const schoolInstance = await accountInstance.getSchoolManagement();
+
+            accountInstance.dataValues.schoolManagementId = schoolInstance.id;
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountInstance });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
     }
 
 }

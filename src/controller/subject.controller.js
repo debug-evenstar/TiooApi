@@ -1,6 +1,7 @@
 const { Subject, Class, Teacher, Account, Lesson } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 const Sequelize = require('sequelize');
+const IncludeManager = require('./helper/includes');
 
 class SubjectController {
 
@@ -28,9 +29,12 @@ class SubjectController {
 
     static async readAll(req, res) {
 
-        try {   
-            const subjectInstance = await Subject.findAll();
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
+        try {
+
+            const subjectInstance = await Subject.findAll({
+                include : IncludeManager.parseParamIncludes(req.query)
+            });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectInstance });
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: 'Server Error' });
@@ -162,6 +166,10 @@ class SubjectController {
 
             const lessonsInstance = await subjectInstance.getLessons();
 
+            if (!lessonsInstance) {
+                return res.status(ResponseStatus.code.forbidden).json({ error: false, message: ResponseStatus.pass.read, data: [] });
+            }
+
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonsInstance });
 
         } catch (error) {
@@ -251,12 +259,8 @@ class SubjectController {
             let teachersAccount = [];
 
             if (teacherAccountIds.length !== 0) {
-                teachersAccount = await Account.findAll({ where: { id: [teacherAccountIds] }, attributes: { exclude: ['password'] } });
+                teachersAccount = await Account.findAll({ where: { id: [...teacherAccountIds] }, attributes: { exclude: ['password'] } });
             }
-
-            console.log(teachersAccount);
-
-
 
             const payload = {
                 subject: subject,

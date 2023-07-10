@@ -50,6 +50,7 @@ class Relationships {
 
         ClassArm.hasMany(Lesson);
         Lesson.belongsTo(ClassArm);
+        
 
         //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 
@@ -61,6 +62,8 @@ class Relationships {
 
         Teacher.belongsToMany(Class, { through: 'TeacherClasses' });
         Class.belongsToMany(Teacher, { through: 'TeacherClasses' });
+
+        
 
 
         // Define the associations

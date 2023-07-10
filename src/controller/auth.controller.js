@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, TempValidation } = require('../database/connection');
+const { Account, Validation, TempValidation, Teacher } = require('../database/connection');
 const TokenMiddleware = require('../middleware/token.middleware');
 const Mailer = require('../services/mailer');
 require('dotenv').config();
@@ -38,9 +38,18 @@ class AuthController {
             const newValidation = await Validation.create({ otp });
             const response = await registeredAccount.setValidation(newValidation);
 
+            const userData = {
+                id: registeredAccount.dataValues.id,
+                email: registeredAccount.dataValues.email,
+                account_type: registeredAccount.dataValues.account_type,
+            };
+
+            const generatedToken = TokenMiddleware.generate(userData)
+
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.register
+                message: ResponseStatus.pass.register,
+                token: generatedToken,
             });
 
         } catch (error) {
@@ -200,7 +209,7 @@ class AuthController {
     /*-----------------------------------| SIGNIN ACCOUNT |-----------------------------------*/
 
     static async signInAccount(req, res) {
-
+      
         const { email, password } = req.body;
         const errors = validationResult(req);
 
@@ -209,13 +218,11 @@ class AuthController {
         }
 
         try {
-
             const user = await Account.findOne({ where: { email: email } });
-
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
             }
-
+          
             if (user.flag === 'invited') {
                 return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.invite });
             }
@@ -240,9 +247,28 @@ class AuthController {
 
             const generatedToken = TokenMiddleware.generate(userData)
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, data: {}, token: generatedToken });
+          
+
+            const payload  = {
+                AccountId: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                account_type: user.account_type,
+                verification_status: user.verification_status,
+                flag: user.flag,
+            }
+
+            if (user.account_type === "teacher") {
+                const profile = await user.getTeacher();
+                payload.profileId = profile.id;
+              }
+              
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
+
 
         } catch (error) {
+            console.log(error)
             res.status(500).json({ error: 'Server Error' });
         };
 
@@ -585,10 +611,11 @@ class AuthController {
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
-            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array()});
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
 
         try {
+
             const account = await Account.findOne({ where: { email: data.email } });
             if (!account) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -603,14 +630,14 @@ class AuthController {
                 const newValidation = await validation.update({ otp: random_hash });
             }
 
-            const link = `${process.env.DEV}/${validation.otp}/${account.email}`;
+            const link = `${process.env.DEV}/new-password/${validation.otp}/${account.email}`;
 
             Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Reset Passord").template("emails.RestPassword", { resetLink: link }).send();
 
 
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.sucess,
-                response:  ResponseStatus.pass.reset
+                response: ResponseStatus.pass.reset
             });
 
         } catch (error) {
