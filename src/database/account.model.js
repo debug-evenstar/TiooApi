@@ -40,7 +40,7 @@ module.exports = (sequelize, Sequelize) => {
       timestamps: true,
       defaultScope: {
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ['updatedAt']
         },
       },
     }
