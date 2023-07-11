@@ -126,6 +126,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
     router.post('/teacher/assignsubject', TeacherController.assignSubjectToTeacher);
+    router.post('/teacher/unassignsubject', TeacherController.unAssignSubjectToTeacher);
     router.get('/teacher/students/:id', TeacherController.teacherStudents);
     router.get('/teacher/subjectswithLessons/:id', TeacherController.teacherSubjectsWithLessons)
     router.get('/teacher/subjectswithLessonscount/:id', TeacherController.teacherSubjectsWithLessonsCount)

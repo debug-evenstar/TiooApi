@@ -484,7 +484,7 @@ class TeacherController {
         };
     }
 
-    /*----------------XXX-------------------| ASSIGN SUBJECT TO TEACHER |-----------------------------------*/
+    /*-----------------------------------| ASSIGN SUBJECT TO TEACHER |-----------------------------------*/
 
     static async unAssignSubjectToTeacher(req, res) {
 
@@ -496,13 +496,9 @@ class TeacherController {
 
             const teacherInstance = await teacherAccountInstance.getTeacher();
 
-            console.log(teacherInstance);
-
             if (!teacherInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
-
-
 
             const subjectInstance = await Subject.findOne({ where: { id: subject } });
 
@@ -510,11 +506,11 @@ class TeacherController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const teacherSubject = await teacherInstance.addSubject(subjectInstance);
+            const removalResponse = await teacherInstance.removeSubject(subjectInstance);
 
-            const fecth = await teacherInstance.getSubjects();
+            console.log(removalResponse);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed });
 
         } catch (error) {
             console.log(error);
