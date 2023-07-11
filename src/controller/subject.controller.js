@@ -1,4 +1,4 @@
-const { Subject, Class, Teacher, Account, Lesson } = require('../database/connection/');
+const { Subject, Class, Teacher, Account, Lesson, ClassArm } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 const Sequelize = require('sequelize');
 const IncludeManager = require('./helper/includes');
@@ -143,7 +143,7 @@ class SubjectController {
 
         try {
 
-            const subjectClasses = await Subject.findOne({ include: [Class], where: { id } });
+            const subjectClasses = await Subject.findOne({ include: [Class, ClassArm], where: { id } });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectClasses });
 

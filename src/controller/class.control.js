@@ -271,6 +271,36 @@ class ClassController {
     }
 
 
+        /*-----------------------------------| REMOVE SUBJECT FROM CLASS |-----------------------------------*/
+
+        static async removeSubjectFromClass(req, res) {
+
+            const { classId, subjectId } = req.body;
+    
+            const { id } = req.userData;
+    
+            try {
+    
+                const classSubjects = await Class.findByPk(classId);
+    
+                const subjectInstance = await Subject.findByPk(subjectId);
+    
+                const response = await classSubjects.removeSubject(subjectInstance);
+
+                console.log(response);
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
+
+
+    
+
+
     /*-----------------------------------| READ CLASS WITH ALL ASSIGNED TEACHERS |-----------------------------------*/
 
     static async readClassWithTeachers(req, res) {
