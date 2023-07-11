@@ -100,12 +100,12 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/class/teacher', ClassController.addTeacherToClass);
     router.post('/class/addSubject', ClassController.addSubjectToClass)
     router.post('/class/remove/subject', ClassController.removeSubjectFromClass)
-
-
+/* --------------------------------- CLASS ARMS -------------------------------- */
     router.post('/class/arms/create', ClassArmsController.create);
     router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
     router.get('/class/arms/read', ClassArmsController.readAll);
     router.get('/class/arms/read/:id', ClassArmsController.readById);
+    router.get('/class/arms/students/:id', ClassArmsController.classArmStudents);
     router.put('/class/arms/update/:id', ClassArmsController.updateById);
     router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
 /* -------------------------------- SUBJECTS -------------------------------- */
