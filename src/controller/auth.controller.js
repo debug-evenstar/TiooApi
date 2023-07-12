@@ -374,7 +374,28 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: user });
+            const payload = {...user.dataValues};
+
+            if(payload.account_type === 'student'){
+
+                const profile  = await user.getStudent(); 
+                const schoolManagementId = profile.SchoolManagementId;
+                
+                const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
+                const studentSchoolAccount = await studentSchool.getAccount();
+                const classData = await profile.getClass();
+                const studentSubject = await classData.getSubjects();
+                
+                payload.schoolName = studentSchoolAccount.name;
+                payload.studentClass =  classData.naming;
+                payload.subjectsCount = studentSubject.length;
+                payload.term = "undefined";
+
+                payload.status = payload.flag === 'active' ? "On Track" : "??";
+
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
         } catch (error) {
             res.status(500).json({ error: 'Server Error' });
