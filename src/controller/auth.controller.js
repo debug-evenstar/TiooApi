@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, TempValidation, Teacher } = require('../database/connection');
+const { Account, Validation, TempValidation, Teacher, SchoolManagement } = require('../database/connection');
 const TokenMiddleware = require('../middleware/token.middleware');
 const Mailer = require('../services/mailer');
 require('dotenv').config();
@@ -265,6 +265,25 @@ class AuthController {
                 payload.profileId = profile.id;
                 payload.teacher_type = profile.teacher_type;
                 payload.schoolManagement = profile.SchoolManagementId
+
+              }else if(user.account_type === 'student'){
+                
+                const profile  = await user.getStudent(); 
+                const schoolManagementId = profile.SchoolManagementId;
+                
+                const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
+                const studentSchoolAccount = await studentSchool.getAccount();
+                const classData = await profile.getClass();
+                const studentSubject = await classData.getSubjects();
+                
+                payload.schoolName = studentSchoolAccount.name;
+                payload.studentClass =  classData.naming;
+                payload.subjectsCount = studentSubject.length;
+                payload.term = "undefined";
+
+                payload.status = payload.flag === 'active' ? "On Track" : "??";
+        
+
               }
               
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
