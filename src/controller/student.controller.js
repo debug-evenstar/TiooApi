@@ -182,7 +182,7 @@ class StudentController {
             }
 
             const classarmInstance = await ClassArm.findByPk(data.arm);
-            
+
             if (!classarmInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
@@ -205,7 +205,7 @@ class StudentController {
                     await classInstance.addStudent(studentInstance);
 
                     const hashedUser = HashUtils.encrypt(accountInstance.id.toString());
-                    
+
                     const link = `${process.env.DEV}/student/${hashedUser}`;
 
                     console.log(link);
@@ -445,6 +445,43 @@ class StudentController {
         }
     }
 
+    static async studentSubjects(req, res) {
+        
+        const { id } = req.userData;
+
+        try {
+            
+            const studentAccount = await Account.findByPk(id);
+
+            if (!studentAccount) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            if(studentAccount.account_type !== 'student'){
+
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.bad_request });
+            }
+
+            const studentInstance = await studentAccount.getStudent();
+
+            const studentClass = await studentInstance.getClass();
+
+            const classSubjects = await studentClass.getSubjects();
+
+            const subjectsData = classSubjects.map(subject => {
+              const { naming, description, id} = subject;
+              return { naming, description, id, image: 'https://images.unsplash.com/photo-1488229297570-58520851e868'};
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, subjects: subjectsData });
+
+        } catch (error) {
+            console.log(error);
+
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
+
 
     static async deleteStudent(req, res) {
         const { id } = req.params;
@@ -462,7 +499,7 @@ class StudentController {
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
             }
 
-        } catch (error) {
+        } catch (error) {    
             res.status(500).json({ error: 'Server Error' });
         }
 

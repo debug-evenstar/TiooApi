@@ -144,12 +144,14 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.delete('/invites/delete/:id', InviteController.delete);
 /* --------------------------------- STUDENT -------------------------------- */
     router.post('/student/invite', InviteValidator, StudentController.sendInvitation);
-    router.get('/student/:id', StudentController.fetchStudent);
     router.get('/students/readall', StudentController.allStudents);
     router.get('/student/readinvited/:id', StudentController.invitedStudents);
-    router.get('/students/classess/:id', StudentController.getStudentClass);
+    router.get('/students/classess/:id', StudentController.getStudentClass); //something is wrong with this controller Six;
     router.delete('/students/delete/:id', StudentController.deleteStudent);
     router.post('/students/bulk/invite', StudentController.sendBulkInvite);
+    router.get('/student/subjects', StudentController.studentSubjects);
+    router.get('/student/:id', StudentController.fetchStudent);
+
 
     router.post('/lesson/create', UploadService.upload.single('file'), LessonController.createLesson);
 
