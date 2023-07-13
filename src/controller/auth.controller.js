@@ -348,7 +348,7 @@ class AuthController {
 
             }
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: user });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
         } catch (error) {
             res.status(500).json({ error: 'Server Error' });
