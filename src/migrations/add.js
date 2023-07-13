@@ -18,16 +18,16 @@ class makeMigration {
   };
 
 
-  static addSchoolName = async () => {
+  static addAdmin = async () => {
     try {
-      await db.sequelize.queryInterface.addColumn('Accounts', 'school_name', {
+      await db.sequelize.queryInterface.addColumn('Accounts', 'admin', {
         type: db.sequelize.Sequelize.STRING,
         allowNull: true,
         defaultValue: 'undefined',
       });
-      console.log('school_name column added successfully.');
+      console.log('admin column added successfully.');
     } catch (error) {
-      console.error('Error adding school_name column:', error);
+      console.error('Error adding admin column:', error);
     } finally {
       // Close the Sequelize connection
       await db.sequelize.close();
@@ -37,4 +37,4 @@ class makeMigration {
 }
 
 
-makeMigration.addSchoolName()
+makeMigration.addAdmin()

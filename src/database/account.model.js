@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING,
       },
-      school_name: {
+      admin: {
         type: Sequelize.STRING,
         defaultValue: 'undefined',
       },

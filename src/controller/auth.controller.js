@@ -282,8 +282,9 @@ class AuthController {
                 payload.term = "undefined";
 
                 payload.status = payload.flag === 'active' ? "On Track" : "??";
-        
+              }else{
 
+                payload.admin = user.school_owner;
               }
               
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
