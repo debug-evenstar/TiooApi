@@ -407,6 +407,37 @@ class ClassController {
         }
     }
 
+    /* ---------------- GET  TEACHERS AND STUDENTS IN A CLASS --------------- */
+
+    static async readStudentsTeachers(req, res) {
+        const { id } = req.params;
+        try {
+            const classInstance = await Class.findByPk(id, { include: [Teacher, Student] });
+
+            if (!classInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const teacherAccountIds = classInstance.Teachers.map(teacher => teacher.AccountId);
+
+            const studentAccountIds = classInstance.Students.map(student => student.AccountId);
+
+            const accounts = await Account.findAll({ where: { id: [...studentAccountIds, ...teacherAccountIds] }, attributes: { exclude: ['password'] } });
+
+            let student = [], teacher = []
+            const teachersAccount = accounts.forEach(account => {
+                account.account_type == "teacher" ? teacher.push(account) : null
+                account.account_type == "student" ? student.push(account) : null
+
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, teachers: teacher, students: student  });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
+
 }
 
 

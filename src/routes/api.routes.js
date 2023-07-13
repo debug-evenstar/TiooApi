@@ -87,6 +87,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/class/create_bulk', ClassController.bulkCreate);
     router.get('/class/read', ClassController.readAll);
     router.get('/class/readwitharms', ClassController.readAllWithArms);
+    router.get('/class/students/teachers/:id', ClassController.readStudentsTeachers);
     router.get('/class/readwitharms/:classId', ClassController.readClassWithArms);
     router.get('/class/read/:id', ClassController.read);
     router.get('/class/subjects/read/:id', ClassController.readClassWithSubjects);
