@@ -284,7 +284,7 @@ class AuthController {
                 payload.status = payload.flag === 'active' ? "On Track" : "??";
               }else{
 
-                payload.admin = user.school_owner;
+                payload.admin = user.admin;
               }
               
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
@@ -327,6 +327,27 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
 
+            const payload = {...user.dataValues};
+
+            if(payload.account_type === 'student'){
+
+                const profile  = await user.getStudent(); 
+                const schoolManagementId = profile.SchoolManagementId;
+                
+                const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
+                const studentSchoolAccount = await studentSchool.getAccount();
+                const classData = await profile.getClass();
+                const studentSubject = await classData.getSubjects();
+                
+                payload.schoolName = studentSchoolAccount.name;
+                payload.studentClass =  classData.naming;
+                payload.subjectsCount = studentSubject.length;
+                payload.term = "undefined";
+
+                payload.status = payload.flag === 'active' ? "On Track" : "??";
+
+            }
+
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: user });
 
         } catch (error) {
@@ -350,8 +371,8 @@ class AuthController {
             if (!emailExist.pass) {
 
                 return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.no_user, data: false });
-
             }
+            
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: true });
 
