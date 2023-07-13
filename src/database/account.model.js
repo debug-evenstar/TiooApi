@@ -12,6 +12,10 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING,
       },
+      school_name: {
+        type: Sequelize.STRING,
+        defaultValue: 'Primary 1A',
+      },
       email: {
         type: Sequelize.STRING,
         unique: true,
