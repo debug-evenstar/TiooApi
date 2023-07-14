@@ -17,7 +17,10 @@ class LessonController {
         try {
              const lessonInstance = await Lesson.create(req.body);
              const subjectInstance = await Subject.findByPk(req.body.subject);
-             subjectInstance.addLesson(lessonInstance);
+
+             console.log(subjectInstance);
+            
+             await subjectInstance.addLesson(lessonInstance);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstance });
 

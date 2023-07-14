@@ -9,11 +9,12 @@ module.exports = (sequelize, DataTypes) => {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            title: {
+            name: {
                 type: DataTypes.STRING,
                 allowNull: true,
+                defaultValue: 'Chapter 1',
             },
-            description: {
+            title: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },

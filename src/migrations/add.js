@@ -34,7 +34,33 @@ class makeMigration {
     }
   };
 
+
+  static addDateColumns = async () => {
+    try {
+      await db.sequelize.queryInterface.addColumn('Lessons', 'start_date', {
+        type: db.sequelize.Sequelize.DATE,
+        allowNull: false,
+        defaultValue: db.sequelize.Sequelize.literal('CURRENT_TIMESTAMP'),
+      });
+  
+      await db.sequelize.queryInterface.addColumn('Lessons', 'end_date', {
+        type: db.sequelize.Sequelize.DATE,
+        allowNull: false,
+        defaultValue: db.sequelize.Sequelize.literal('CURRENT_TIMESTAMP'),
+      });
+  
+      console.log('start_date and end_date columns added successfully.');
+    } catch (error) {
+      console.error('Error adding date columns:', error);
+    } finally {
+      // Close the Sequelize connection
+      await db.sequelize.close();
+    }
+  };
+
+
+
 }
 
 
-makeMigration.addAdmin()
+makeMigration.addDateColumns();

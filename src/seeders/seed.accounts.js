@@ -1,11 +1,11 @@
-const { Account, Validation } = require('../database/connection/index');
+const { Account, Validation, SchoolManagement } = require('../database/connection/index');
 
 const schools_teachers_students = [
-    { name: "Bez Pry School", email: "school1@gmail.com", phone: "08093652645", account_type: "school", password: "1234" },
-    { name: "Winners Pry School", email: "school2@gmail.com", phone: "08093652645", account_type: "school", password: "1234" },
-    { name: "Bella Academy", email: "school3@gmail.com", phone: "08093652645", account_type: "school", password: "1234" },
-    { name: "Xena Pry School", email: "school4@gmail.com", phone: "08093652645", account_type: "school", password: "1234" },
-    { name: "Bez Pry School", email: "school5@gmail.com", phone: "08093652645", account_type: "school", password: "1234" },
+    { name: "Bez Pry School",  admin: "Peter Okon", email: "school1@gmail.com", phone: "08093652645", account_type: "school", password: "1234" },
+    { name: "Winners Pry School", admin: "Frank Williams",  email: "school2@gmail.com", phone: "08093652645", account_type: "school", password: "1234" },
+    { name: "Bella Academy", admin: "Jerry Tim",  email: "school3@gmail.com", phone: "08093652645", account_type: "school", password: "1234" },
+    { name: "Xena Pry School", admin: "Williams Ken",  email: "school4@gmail.com", phone: "08093652645", account_type: "school", password: "1234" },
+    { name: "Bez Pry School", admin: "Timi Sammuel",  email: "school5@gmail.com", phone: "08093652645", account_type: "school", password: "1234" },
 
     { name: "Wills Franch", email: "teacher1@gmail.com", phone: "08093652645", account_type: "teacher", password: "1234" },
     { name: "David John", email: "teacher2@gmail.com", phone: "08093452645", account_type: "teacher", password: "1234" },
@@ -31,6 +31,7 @@ const seed = async () => {
             const [newAccount] = await Account.findOrCreate({ where: eachAccount });
             const newValidation = await Validation.create({ otp: newOtp });
             const setup = await newAccount.setValidation(newValidation);
+
         });
 
 
