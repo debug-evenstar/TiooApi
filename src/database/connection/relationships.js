@@ -57,10 +57,6 @@ class Relationships {
         Chapter.hasMany(Lesson);
         Lesson.belongsTo(Chapter); 
 
-        ClassArm.hasMany(Subject);
-        Subject.belongsTo(ClassArm);
-        
-
         //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 
         Subject.belongsToMany(Teacher, { through: 'SubjectTeachers' });
@@ -68,6 +64,9 @@ class Relationships {
 
         Class.belongsToMany(Subject, { through: 'ClassSubjects' });
         Subject.belongsToMany(Class, { through: 'ClassSubjects' });
+
+        ClassArm.belongsToMany(Subject, { through: 'ClassArmSubjects' });
+        Subject.belongsToMany(ClassArm, { through: 'ClassArmSubjects' });
 
         Teacher.belongsToMany(Class, { through: 'TeacherClasses' });
         Class.belongsToMany(Teacher, { through: 'TeacherClasses' });

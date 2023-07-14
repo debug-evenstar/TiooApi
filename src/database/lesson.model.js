@@ -54,16 +54,5 @@ module.exports = (sequelize, Sequelize) => {
     { timestamps: true }
   );
 
-  Lesson.beforeCreate(async (invite, options) => {
-
-  });
-
-  Lesson.sync().then(() => {
-    //'Tables dropped and created successfully.'
-  })
-    .catch((error) => {
-      // 'Error occurred while dropping and creating tables:'
-    });
-
   return Lesson;
 };

@@ -15,9 +15,14 @@ class SubjectController {
 
             const classInstance = await Class.findAll({ where: { id: [...req.body.class] } });
 
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.classArm] } });
+
             const newItems = await subjectInstance.addClasses(classInstance);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: newItems });
+            const subjectArms = await subjectInstance.addClassArms(classarmInstances);
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, subjectArms: subjectArms });
 
         } catch (error) {
             console.log(error);
