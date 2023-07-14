@@ -271,6 +271,36 @@ class ClassController {
     }
 
 
+        /*-----------------------------------| REMOVE SUBJECT FROM CLASS |-----------------------------------*/
+
+        static async removeSubjectFromClass(req, res) {
+
+            const { classId, subjectId } = req.body;
+    
+            const { id } = req.userData;
+    
+            try {
+    
+                const classSubjects = await Class.findByPk(classId);
+    
+                const subjectInstance = await Subject.findByPk(subjectId);
+    
+                const response = await classSubjects.removeSubject(subjectInstance);
+
+                console.log(response);
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
+
+
+    
+
+
     /*-----------------------------------| READ CLASS WITH ALL ASSIGNED TEACHERS |-----------------------------------*/
 
     static async readClassWithTeachers(req, res) {
@@ -340,7 +370,7 @@ class ClassController {
         const data = req.body;
         try {
             const classarmInstance = await ClassArm.findByPk(data.arm);
-            console.log("i")
+
             if (!classarmInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
@@ -372,6 +402,47 @@ class ClassController {
 
     }
 
+
+    /* -------------------------- REMOVE STUDENT TO CLASS -------------------------- */
+
+    static async removeStudentFromClass(req, res) {
+
+        const errors = validationResult(req);
+        const data = req.body;
+        try {
+            const classarmInstance = await ClassArm.findByPk(data.arm);
+
+            if (!classarmInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const classInstance = await classarmInstance.getClass();
+
+            const studentAccountInstance = await Account.findOne({ where: { id: data.student_id } });
+
+            if (studentAccountInstance.account_type != "student") {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.student });
+            } else {
+
+                const studentInstance = await studentAccountInstance.getStudent();
+
+                await classInstance.removeStudent(studentInstance);
+
+                await classarmInstance.removeStudent(studentInstance);
+
+                const classStudentArray = await classInstance.getStudents({
+                    where: { id: studentInstance.id }, include: { model: Account, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }
+                });
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classStudentArray });
+            }
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+
+    }
+
     /* ------------------------- ADD TEACHER TO A CLASS ------------------------- */
 
     static async addTeacherToClass(req, res) {
@@ -379,7 +450,7 @@ class ClassController {
         const data = req.body;
         try {
             const classarmInstance = await ClassArm.findByPk(data.arm);
-            
+
             if (!classarmInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }

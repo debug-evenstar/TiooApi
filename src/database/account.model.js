@@ -12,6 +12,10 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING,
       },
+      admin: {
+        type: Sequelize.STRING,
+        defaultValue: 'undefined',
+      },
       email: {
         type: Sequelize.STRING,
         unique: true,
@@ -40,7 +44,7 @@ module.exports = (sequelize, Sequelize) => {
       timestamps: true,
       defaultScope: {
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ['updatedAt']
         },
       },
     }

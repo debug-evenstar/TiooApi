@@ -1,4 +1,4 @@
-const { SchoolManagement, ClassArm, Class } = require('../database/connection');
+const { SchoolManagement, ClassArm, Class, Account } = require('../database/connection');
 const ResponseStatus = require('../config/message.config');
 
 class classArms {
@@ -147,6 +147,35 @@ class classArms {
             res.status(500).json({ error: 'Server Error' });
         }
     }
+
+
+        /*----------------------------------|  |----------------------------------*/
+
+        static async classArmStudents(req, res) {
+
+            const { id } = req.params;
+    
+            try {
+    
+                const classArmInstance = await ClassArm.findByPk(id);
+    
+                if (!classArmInstance) {
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                }
+    
+                const classStudents = await classArmInstance.getStudents();
+
+                const studentsId = classStudents.map((student) => student.AccountId);
+
+                const classStudentsAccount = await Account.findAll({ where: { id: [...studentsId] }, attributes: { exclude: ['password'] } });    
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classStudentsAccount });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            }
+        }
 
 }
 
