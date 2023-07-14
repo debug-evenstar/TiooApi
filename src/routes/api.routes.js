@@ -21,6 +21,7 @@ const SubjectController = require('../controller/subject.controller');
 const TeacherController = require('../controller/teacher.controller');
 const InviteController = require('../controller/invite.controller');
 const LessonController = require('../controller/lesson.controller');
+const ChapterController = require('../controller/chapter.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -114,6 +115,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/subjects/school/lessons/:id', SubjectController.schoolSubjectLessons);
     router.get('/subjects/classes/read/:id', SubjectController.readSubjectWithClasses);
     router.get('/subjects/teachers/read/:id', SubjectController.subjectTeachers);
+    router.get('/subjects/students/read/:id', SubjectController.subjectStudents);
     router.get('/subjects/read/:id', SubjectController.readBySubjectId);
     router.put('/subjects/update', SubjectController.update);
     router.get('/subjects/lessons/', SubjectController.subjectsWithLessons);
@@ -149,10 +151,14 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.delete('/students/delete/:id', StudentController.deleteStudent);
     router.post('/students/bulk/invite', StudentController.sendBulkInvite);
     router.get('/student/subjects', StudentController.studentSubjects);
+    router.get('/student/classteacher', StudentController.studentClassTeacher);
+    router.get('/student/classmates', StudentController.studentMates);
+    router.get('/student/classarmsmates', StudentController.studentArmsMates);
     router.get('/student/:id', StudentController.fetchStudent);
 
-
     router.post('/lesson/create', UploadService.upload.single('file'), LessonController.createLesson);
+
+    router.get('/chapter/subject/:id', ChapterController.read);
 
 };
 

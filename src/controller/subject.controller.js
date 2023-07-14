@@ -280,6 +280,48 @@ class SubjectController {
         };
     }
 
+
+    static async subjectStudents(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            // Will be modified later
+
+            const subject = await Subject.findOne({ where: { id } });
+
+            if (!subject) {
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: [] });
+            }
+
+            const classes = await subject.getClasses();
+
+            const students =  await classes[classes.length - 1].getStudents();
+
+            // const studentsPerClass = await Promise.all(classes.map(async (classObj) => {
+            //     const students = await classObj.getStudents();
+            //     return students;
+            //   }));
+
+          const studentAccount = await Promise.all(students.map(async (profile) => {
+                const students = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                return students;
+
+              }));
+
+              const payload = {subject: subject, students: studentAccount};
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
+
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
 }
 
 module.exports = SubjectController;

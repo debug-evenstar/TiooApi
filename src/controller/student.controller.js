@@ -424,7 +424,6 @@ class StudentController {
             res.status(500).json({ error: 'Server Error' });
         }
 
-
     }
 
 
@@ -507,6 +506,93 @@ class StudentController {
 
 
 
+    /*-----------------------------------| STUDENTS CLASS TEACHER |-----------------------------------*/
+
+    static async studentClassTeacher(req, res) {
+
+        const { id } = req.userData;
+
+        try {
+
+            const classStudents = await Student.findByPk(id);
+
+            const studentClass =  await classStudents.getClass();
+
+            const classTeachers = await studentClass.getTeachers({where: {teacher_type: 'class'}});
+
+            const teachersAccount = await Promise.all(classTeachers.map(async (profile) => {
+                const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                return teachers;
+
+              }));
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
+        /*-----------------------------------| STUDENTS CLASS MATES |-----------------------------------*/
+
+        static async studentMates(req, res) {
+
+            const { id } = req.userData;
+    
+            try {
+    
+                const classStudents = await Student.findByPk(id);
+    
+                const studentClass =  await classStudents.getClass();
+    
+                const classMates = await studentClass.getStudents();
+    
+                const classMatesAccount = await Promise.all(classMates.map(async (profile) => {
+                    const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                    return teachers;
+    
+                  }));
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classMatesAccount });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
+
+
+
+        /*-----------------------------------| STUDENTS CLASS ARMS MATES |-----------------------------------*/
+
+        static async studentArmsMates(req, res) {
+
+            const { id } = req.userData;
+    
+            try {
+    
+                const classStudents = await Student.findByPk(id);
+    
+                const studentClass =  await classStudents.getClassArm();
+    
+                const classMates = await studentClass.getStudents();
+    
+                const classMatesAccount = await Promise.all(classMates.map(async (profile) => {
+                    const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                    return teachers;
+    
+                  }));
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classMatesAccount });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
 
 }
 
