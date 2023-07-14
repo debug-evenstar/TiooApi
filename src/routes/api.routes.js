@@ -114,6 +114,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
     router.get('/subjects/school/lessons/:id', SubjectController.schoolSubjectLessons);
     router.get('/subjects/classes/read/:id', SubjectController.readSubjectWithClasses);
+    router.post('/subjects/classes/add', SubjectController.addClassesToSubjects);
     router.get('/subjects/teachers/read/:id', SubjectController.subjectTeachers);
     router.get('/subjects/students/read/:id', SubjectController.subjectStudents);
     router.get('/subjects/read/:id', SubjectController.readBySubjectId);

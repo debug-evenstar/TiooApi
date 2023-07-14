@@ -322,6 +322,30 @@ class SubjectController {
         };
     }
 
+    /* ------------------------- ADD CLASSES TO SUBJECTS ------------------------ */
+    static async addClassesToSubjects(req, res) {
+
+        try {
+
+            const subjectInstance = await Subject.findByPk(req.body.subjectId);
+
+            const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
+
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.classArms] } });
+
+            const newItems = await subjectInstance.addClasses(classInstance);
+
+            const subjectArms = await subjectInstance.addClassArms(classarmInstances);
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, subjectArms: subjectArms });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
 }
 
 module.exports = SubjectController;
