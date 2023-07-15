@@ -422,15 +422,17 @@ class ClassController {
             const studentAccountIds = classInstance.Students.map(student => student.AccountId);
 
             const accounts = await Account.findAll({ where: { id: [...studentAccountIds, ...teacherAccountIds] }, attributes: { exclude: ['password'] } });
+            
+            const mapType = (type) => accounts.filter(
+                account => account.account_type == type
+            );
+            // const mapType = (type) => accounts.map((account) => {
+            //     if (account.account_type == type) {
+            //         return account;
+            //     }
+            // })
 
-            let student = [], teacher = []
-            const teachersAccount = accounts.forEach(account => {
-                account.account_type == "teacher" ? teacher.push(account) : null
-                account.account_type == "student" ? student.push(account) : null
-
-            });
-
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, teachers: teacher, students: student  });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, teachers: mapType("teacher"), students: mapType("student") });
 
         } catch (error) {
             console.log(error);

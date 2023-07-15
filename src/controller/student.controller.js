@@ -22,7 +22,7 @@ class StudentController {
 
     /* ------------------------ SENDS INVITE TO Student ------------------------ */
     static async sendInvitation(req, res) {
-
+      
         function generateRandomPassword(length) {
             const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[{]};:,<.>/?';
             let password = '';
@@ -174,7 +174,7 @@ class StudentController {
 
                 if (created) {
 
-                    const studentInstance = await Student.create(createdRecords[i]);                    
+                    const studentInstance = await Student.create(createdRecords[i]);
 
                     await accountInstance.setStudent(studentInstance);
 
