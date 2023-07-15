@@ -48,14 +48,9 @@ class SchoolManagementController {
                 });
             }
 
-            if (registeredAccount.SchoolManagement) {
 
-                return res.status(ResponseStatus.code.conflict).json({ error: false, message: ResponseStatus.fail.school_duplicate });
-            }
+            const registeredSchoolManagement = await registeredAccount.SchoolManagement.update(parsedBody);
 
-            const registeredSchoolManagement = await SchoolManagement.create(parsedBody);
-
-            await registeredAccount.setSchoolManagement(registeredSchoolManagement);
 
             /*-------------/ for standard school naming convention /-------------*/
 

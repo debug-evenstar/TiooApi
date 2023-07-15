@@ -38,6 +38,16 @@ class AuthController {
             const newValidation = await Validation.create({ otp });
             const response = await registeredAccount.setValidation(newValidation);
 
+            // Create school record if account type is school
+            if(req.body.account_type === "school"){
+                const registeredSchoolManagement = await SchoolManagement.create({
+                    school_name : req.body.school
+                });
+    
+                await registeredAccount.setSchoolManagement(registeredSchoolManagement);
+            }
+
+
             const userData = {
                 id: registeredAccount.dataValues.id,
                 email: registeredAccount.dataValues.email,
@@ -161,6 +171,8 @@ class AuthController {
 
         // TODO send otp
 
+        Mailer().to(email).from(process.env.MAIL_FROM, "Praxeum").subject("OTP").template("emails.OTPTempEmail", { code: otp }).send();
+
         return;
     }
 
@@ -218,7 +230,7 @@ class AuthController {
         }
 
         try {
-            const user = await Account.findOne({ where: { email: email } });
+            const user = await Account.findOne({ where: { email: email }, include: [SchoolManagement]});
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
             }
@@ -257,6 +269,10 @@ class AuthController {
                 account_type: user.account_type,
                 verification_status: user.verification_status,
                 flag: user.flag,
+            }
+
+            if(user.account_type === "School"){
+                payload.school = user.SchoolManagement.school_name
             }
 
             if (user.account_type === "teacher") {
