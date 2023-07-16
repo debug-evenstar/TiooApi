@@ -271,7 +271,7 @@ class AuthController {
                 flag: user.flag,
             }
 
-            if(user.account_type === "School"){
+            if(user.account_type === "school"){
                 payload.school = user.SchoolManagement.school_name
             }
 
