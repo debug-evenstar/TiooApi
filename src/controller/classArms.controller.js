@@ -177,6 +177,31 @@ class classArms {
             }
         }
 
+
+
+        static async classArmSubjects(req, res) {
+
+            const { id } = req.params;
+    
+            try {
+    
+                const classArmInstance = await ClassArm.findByPk(id);
+    
+                if (!classArmInstance) {
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                }
+    
+                const classSubjects = await classArmInstance.getSubjects();
+   
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classSubjects });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            }
+        }
+
 }
 
 

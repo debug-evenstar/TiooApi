@@ -106,6 +106,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/class/arms/read', ClassArmsController.readAll);
     router.get('/class/arms/read/:id', ClassArmsController.readById);
     router.get('/class/arms/students/:id', ClassArmsController.classArmStudents);
+    router.get('/class/arms/:id/subjects', ClassArmsController.classArmSubjects); // This is the a better route format /entity/:entityId/relationship
     router.put('/class/arms/update/:id', ClassArmsController.updateById);
     router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
     /* -------------------------------- SUBJECTS -------------------------------- */

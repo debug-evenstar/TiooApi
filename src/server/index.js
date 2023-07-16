@@ -32,7 +32,7 @@ class Server {
         );
 
         //=============== INITIALIZE DATABASE ================//
-
+//{force : true}
         db.sequelize.sync()
             .then(() => {
                 console.log("Synced db.");
