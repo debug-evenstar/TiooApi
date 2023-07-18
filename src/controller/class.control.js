@@ -111,7 +111,9 @@ class ClassController {
             if (!SchoolInstances) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
-            const ClassInstances = await SchoolInstances.getClasses({ include: [ClassArm] });
+            const ClassInstances = await SchoolInstances.getClasses({ include: [
+                { model : ClassArm , include : [Subject]}
+            ]});
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
 
