@@ -71,7 +71,9 @@ class Relationships {
         Teacher.belongsToMany(Class, { through: 'TeacherClasses' });
         Class.belongsToMany(Teacher, { through: 'TeacherClasses' });
 
-
+        Teacher.belongsToMany(ClassArm, { through: 'TeacherClassArms' });
+        ClassArm.belongsToMany(Teacher, { through: 'TeacherClassArms' });
+        
         // Define the associations
 
         // Subject.hasMany(Lesson);

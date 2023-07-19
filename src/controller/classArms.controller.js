@@ -100,6 +100,7 @@ class classArms {
         }
     }
 
+
     /*----------------------------------| UPDATE CLASS ARMS BYID |----------------------------------*/
 
     static async updateById(req, res) {

@@ -41,17 +41,17 @@ class TeacherController {
             await registeredAccount.setTeacher(teacherInstance);
 
             const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
+            const classArmsInstance = await ClassArm.findAll({ where: { id: [...req.body.classarms] } });
             const subjectInstance = await Subject.findAll({ where: { id: [...req.body.Subjects] } });
 
             await schoolInstance.addTeacher(teacherInstance)
             await teacherInstance.addClasses(classInstance);
+            await teacherInstance.addClassArms(classArmsInstance);
             await teacherInstance.addSubjects(subjectInstance);
 
             const hashedUser = HashUtils.encrypt(registeredAccount.id.toString());
-            console.log(hashedUser)
-            const link = `${process.env.DEV}/teacher/${hashedUser}`;
-
-            console.log(link);
+     
+            const link = `${process.env.WEB_URL}/teacher/${hashedUser}`;
 
             const schoolAccount = await schoolInstance.getAccount();
 
