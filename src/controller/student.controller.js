@@ -96,7 +96,7 @@ class StudentController {
 
             const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
             console.log(hashedUser)
-            const link = `${process.env.DEV}/student/${hashedUser}`;
+            const link = `${process.env.WEB_URL}/student/${hashedUser}`;
 
             console.log(link);
 
