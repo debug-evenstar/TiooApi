@@ -628,6 +628,8 @@ class AuthController {
 
     }
 
+
+
     /*-----------------------------------| VALIDATE TEMP. OTP |-----------------------------------*/
 
     static async verifyTempEmail(req, res) {
@@ -777,6 +779,41 @@ class AuthController {
             res.status(500).json({ error: 'Server Error' });
         }
     }
+
+
+
+    /*-----------------------------------| CHANGE ACCOUNT |-----------------------------------*/
+
+    static async resetAuthPassword(req, res) {
+
+        const { password } = req.body;
+        const errors = validationResult(req);
+        const {id} = req.userData;
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const user = await Account.findByPk(id);
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const hashPassword = await user.hashPassword(password);
+            const response = await user.update({ password: hashPassword });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: {} });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error x' });
+        };
+
+    }
+
 
 }
 
