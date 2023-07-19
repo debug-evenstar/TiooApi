@@ -102,7 +102,7 @@ class StudentController {
 
             //TODO: Create a Proper Invitation mail Template;
 
-            Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: schoolAccount.name, Link: link }).send();
+            Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: schoolInstance.school_name, Link: link }).send();
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
                 class_arm: classarmInstance,
@@ -206,11 +206,11 @@ class StudentController {
 
                     const hashedUser = HashUtils.encrypt(accountInstance.id.toString());
 
-                    const link = `${process.env.DEV}/student/${hashedUser}`;
+                    const link = `${process.env.WEB_URL}/student/${hashedUser}`;
 
                     console.log(link);
 
-                    Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: accountInstance.name, Link: link }).send();
+                    Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: "Sir/Ma", school: schoolInstance.school_name, Link: link }).send();
                 }
 
             }
