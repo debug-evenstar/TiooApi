@@ -272,14 +272,16 @@ class AuthController {
             }
 
             if(user.account_type === "school"){
-                payload.school = user.SchoolManagement.school_name
+                payload.school = user.SchoolManagement.school_name;
+                payload.redirect = "https://dashboard.tioo.ng";
             }
 
             if (user.account_type === "teacher") {
                 const profile = await user.getTeacher();
                 payload.profileId = profile.id;
                 payload.teacher_type = profile.teacher_type;
-                payload.schoolManagement = profile.SchoolManagementId
+                payload.schoolManagement = profile.SchoolManagementId;
+                payload.redirect = "https://dashboard.tioo.ng";
 
               }else if(user.account_type === 'student'){
                 
@@ -295,6 +297,7 @@ class AuthController {
                 payload.studentClass =  classData.naming;
                 payload.subjectsCount = studentSubject.length;
                 payload.term = "undefined";
+                payload.redirect = "https://student.tioo.ng";
 
                 payload.status = payload.flag === 'active' ? "On Track" : "??";
               }else{
