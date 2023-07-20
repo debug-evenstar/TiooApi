@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
 
             //================= PERSONAL INFORMATION=========// 
 
-             id: {
+            id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
                     const value = this.getDataValue('school_types');
                     return value ? JSON.parse(value) : [];
                 },
+            },
+            school_name : {
+                type : DataTypes.TEXT,
+                allowNull : false
             },
             naming_types: {
                 type: DataTypes.TEXT,

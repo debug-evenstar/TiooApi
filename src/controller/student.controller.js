@@ -96,7 +96,7 @@ class StudentController {
 
             const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
             console.log(hashedUser)
-            const link = `${process.env.DEV}/student/${hashedUser}`;
+            const link = `${process.env.WEB_URL}/student/${hashedUser}`;
 
             console.log(link);
 
@@ -134,16 +134,36 @@ class StudentController {
 
             const schoolAccountInstance = await Account.findByPk(id);
 
-            const schoolInstance = await schoolAccountInstance.getSchoolManagement();
+            let schoolInstance;
 
             if (!schoolAccountInstance) {
+
                 return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.unauthorized });
             }
 
+            schoolInstance = await schoolAccountInstance.getSchoolManagement();
+
 
             if (!schoolInstance) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+
+                const teacherInstance = await schoolAccountInstance.getTeacher();
+
+                if (!teacherInstance) {
+                    //return not found
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+
+                }
+
+                schoolInstance = await teacherInstance.getSchoolManagement();
+
+                if (!schoolInstance) {
+                    //return not found
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                }
+
             }
+
+            // console.log(schoolInstance);
 
             const createdRecords = [];
 
@@ -162,7 +182,7 @@ class StudentController {
             }
 
             const classarmInstance = await ClassArm.findByPk(data.arm);
-            console.log(classarmInstance)
+
             if (!classarmInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
@@ -174,7 +194,7 @@ class StudentController {
 
                 if (created) {
 
-                    const studentInstance = await Student.create(createdRecords[i]);                    
+                    const studentInstance = await Student.create(createdRecords[i]);
 
                     await accountInstance.setStudent(studentInstance);
 
@@ -185,10 +205,10 @@ class StudentController {
                     await classInstance.addStudent(studentInstance);
 
                     const hashedUser = HashUtils.encrypt(accountInstance.id.toString());
-                    console.log(hashedUser)
+
                     const link = `${process.env.DEV}/student/${hashedUser}`;
 
-                    comsole.log(link);
+                    console.log(link);
 
                     Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: accountInstance.name, Link: link }).send();
                 }
@@ -198,7 +218,7 @@ class StudentController {
             const allStudentInstance = await classarmInstance.getStudents()
 
             return res.status(ResponseStatus.code.success).json({
-                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite
+                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
             });
 
 
@@ -404,7 +424,6 @@ class StudentController {
             res.status(500).json({ error: 'Server Error' });
         }
 
-
     }
 
 
@@ -421,6 +440,43 @@ class StudentController {
             console.log(student)
         } catch (error) {
             console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
+
+    static async studentSubjects(req, res) {
+        
+        const { id } = req.userData;
+
+        try {
+            
+            const studentAccount = await Account.findByPk(id);
+
+            if (!studentAccount) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            if(studentAccount.account_type !== 'student'){
+
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.bad_request });
+            }
+
+            const studentInstance = await studentAccount.getStudent();
+
+            const studentClass = await studentInstance.getClass();
+
+            const classSubjects = await studentClass.getSubjects();
+
+            const subjectsData = classSubjects.map(subject => {
+              const { naming, description, id} = subject;
+              return { naming, description, id, image: 'https://images.unsplash.com/photo-1488229297570-58520851e868'};
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, subjects: subjectsData });
+
+        } catch (error) {
+            console.log(error);
+
             res.status(500).json({ error: 'Server Error' });
         }
     }
@@ -442,7 +498,7 @@ class StudentController {
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
             }
 
-        } catch (error) {
+        } catch (error) {    
             res.status(500).json({ error: 'Server Error' });
         }
 
@@ -450,6 +506,93 @@ class StudentController {
 
 
 
+    /*-----------------------------------| STUDENTS CLASS TEACHER |-----------------------------------*/
+
+    static async studentClassTeacher(req, res) {
+
+        const { id } = req.userData;
+
+        try {
+
+            const classStudents = await Student.findByPk(id);
+
+            const studentClass =  await classStudents.getClass();
+
+            const classTeachers = await studentClass.getTeachers({where: {teacher_type: 'class'}});
+
+            const teachersAccount = await Promise.all(classTeachers.map(async (profile) => {
+                const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                return teachers;
+
+              }));
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
+        /*-----------------------------------| STUDENTS CLASS MATES |-----------------------------------*/
+
+        static async studentMates(req, res) {
+
+            const { id } = req.userData;
+    
+            try {
+    
+                const classStudents = await Student.findByPk(id);
+    
+                const studentClass =  await classStudents.getClass();
+    
+                const classMates = await studentClass.getStudents();
+    
+                const classMatesAccount = await Promise.all(classMates.map(async (profile) => {
+                    const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                    return teachers;
+    
+                  }));
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classMatesAccount });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
+
+
+
+        /*-----------------------------------| STUDENTS CLASS ARMS MATES |-----------------------------------*/
+
+        static async studentArmsMates(req, res) {
+
+            const { id } = req.userData;
+    
+            try {
+    
+                const classStudents = await Student.findByPk(id);
+    
+                const studentClass =  await classStudents.getClassArm();
+    
+                const classMates = await studentClass.getStudents();
+    
+                const classMatesAccount = await Promise.all(classMates.map(async (profile) => {
+                    const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                    return teachers;
+    
+                  }));
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classMatesAccount });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
 
 }
 

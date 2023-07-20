@@ -32,7 +32,7 @@ class InviteController {
 
             const inviteInstance = await Invite.create(req.body);
 
-            const link = `${process.env.DEV}/${req.body.account_type}/${inviteInstance.code}`;
+            const link = `${process.env.WEB_URL}/${req.body.account_type}/${inviteInstance.code}`;
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: { link } });
 
@@ -58,7 +58,7 @@ class InviteController {
 
             const inviteInstance = await Invite.create(body);
 
-            const link = `${process.env.DEV}/${body.account_type}/${inviteInstance.code}`;
+            const link = `${process.env.WEB_URL}/${body.account_type}/${inviteInstance.code}`;
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: { link } });
 
