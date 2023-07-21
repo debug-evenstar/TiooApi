@@ -7,5 +7,5 @@ db.sequelize.sync({force: true})
         console.log('Database schema synchronized.');
     })
     .catch((err) => {
-        console.error('Error synchronizing database:', error);
+        console.error('Error synchronizing database:', err);
     });

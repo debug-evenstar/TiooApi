@@ -1,8 +1,10 @@
 const ResponseMessage = {
     pass: {
         create: 'Created successfully',
+        added: 'Added successfully',
         update: 'Updated successfully',
         delete: 'Deleted successfully',
+        removed: 'Removed successfully',
         read: 'Fetched successfully',
         register: 'Account created successfully',
         send_otp: 'OTP has been resent. Kindly check email for OTP',

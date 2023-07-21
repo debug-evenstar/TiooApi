@@ -1,7 +1,7 @@
 
 class Relationships {
 
-    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson) {
+    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter) {
 
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -42,15 +42,20 @@ class Relationships {
         ClassArm.hasMany(Student);
         Student.belongsTo(ClassArm);
 
-        Subject.hasMany(Lesson);
-        Lesson.belongsTo(Subject);
+        Subject.hasMany(Lesson);  // Might be commented
+        Lesson.belongsTo(Subject); // might be commented
 
         Class.hasMany(Lesson);
         Lesson.belongsTo(Class);
 
         ClassArm.hasMany(Lesson);
         Lesson.belongsTo(ClassArm);
-        
+
+        Subject.hasMany(Chapter);
+        Chapter.belongsTo(Subject);
+
+        Chapter.hasMany(Lesson);
+        Lesson.belongsTo(Chapter);
 
         //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 
@@ -60,12 +65,15 @@ class Relationships {
         Class.belongsToMany(Subject, { through: 'ClassSubjects' });
         Subject.belongsToMany(Class, { through: 'ClassSubjects' });
 
+        ClassArm.belongsToMany(Subject, { through: 'ClassArmSubjects' });
+        Subject.belongsToMany(ClassArm, { through: 'ClassArmSubjects' });
+
         Teacher.belongsToMany(Class, { through: 'TeacherClasses' });
         Class.belongsToMany(Teacher, { through: 'TeacherClasses' });
 
+        Teacher.belongsToMany(ClassArm, { through: 'TeacherClassArms' });
+        ClassArm.belongsToMany(Teacher, { through: 'TeacherClassArms' });
         
-
-
         // Define the associations
 
         // Subject.hasMany(Lesson);

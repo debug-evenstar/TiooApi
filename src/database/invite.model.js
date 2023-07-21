@@ -21,6 +21,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.JSON,
         allowNull: true,
       },
+      classarms: {
+        type: Sequelize.JSON,
+        allowNull: true,
+      },
       subjects: {
         type: Sequelize.JSON,
         allowNull: true,

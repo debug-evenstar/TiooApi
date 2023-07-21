@@ -8,10 +8,20 @@ const HashUtils = require('../utils/hash.utilities');
 
 class StudentController {
 
+    static generateRandomPassword(length) {
+        const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[{]};:,<.>/?';
+        let password = '';
+
+        for (let i = 0; i < length; i++) {
+            let randomIndex = Math.floor(Math.random() * charset.length);
+            password += charset[randomIndex];
+        }
+
+        return password;
+    }
+
     /* ------------------------ SENDS INVITE TO Student ------------------------ */
     static async sendInvitation(req, res) {
-
-
 
         function generateRandomPassword(length) {
             const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[{]};:,<.>/?';
@@ -34,6 +44,7 @@ class StudentController {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
         try {
+
             const existingInstance = await Account.findOne({ where: { email: data.email } });
 
             if (existingInstance) {
@@ -84,8 +95,10 @@ class StudentController {
             const response = await classInstance.addStudent(studentInstance);
 
             const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
+            console.log(hashedUser)
+            const link = `${process.env.WEB_URL}/student/${hashedUser}`;
 
-            const link = `${process.env.DEV}/student/${hashedUser}`;
+            console.log(link);
 
             //TODO: Create a Proper Invitation mail Template;
 
@@ -101,6 +114,119 @@ class StudentController {
         }
     }
 
+
+    /* ------------------------ SENDS BULK Student ------------------------ */
+
+
+    static async sendBulkInvite(req, res) {
+
+        const random_password = StudentController.generateRandomPassword(8);
+        const errors = validationResult(req);
+        const otp = Math.floor(Math.random() * 900000) + 100000;
+        const data = req.body
+        const { id } = req.userData;
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const schoolAccountInstance = await Account.findByPk(id);
+
+            let schoolInstance;
+
+            if (!schoolAccountInstance) {
+
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.unauthorized });
+            }
+
+            schoolInstance = await schoolAccountInstance.getSchoolManagement();
+
+
+            if (!schoolInstance) {
+
+                const teacherInstance = await schoolAccountInstance.getTeacher();
+
+                if (!teacherInstance) {
+                    //return not found
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+
+                }
+
+                schoolInstance = await teacherInstance.getSchoolManagement();
+
+                if (!schoolInstance) {
+                    //return not found
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                }
+
+            }
+
+            // console.log(schoolInstance);
+
+            const createdRecords = [];
+
+            for (let i = 0; i < req.body.email.length; i++) {
+
+                const newStudentRecord = {
+                    name: "undefined",
+                    email: req.body.email[i],
+                    account_type: "student",
+                    password: random_password,
+                    flag: "invited",
+                    verification_status: 0
+                };
+
+                createdRecords.push(newStudentRecord);
+            }
+
+            const classarmInstance = await ClassArm.findByPk(data.arm);
+
+            if (!classarmInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+
+            for (let i = 0; i < createdRecords.length; i++) {
+
+                const [accountInstance, created] = await Account.upsert(createdRecords[i]);
+
+                if (created) {
+
+                    const studentInstance = await Student.create(createdRecords[i]);
+
+                    await accountInstance.setStudent(studentInstance);
+
+                    const classInstance = await classarmInstance.getClass();
+                    await schoolInstance.addStudent(studentInstance);
+                    await classarmInstance.addStudent(studentInstance);
+                    await classInstance.addStudent(studentInstance);
+                    await classInstance.addStudent(studentInstance);
+
+                    const hashedUser = HashUtils.encrypt(accountInstance.id.toString());
+
+                    const link = `${process.env.DEV}/student/${hashedUser}`;
+
+                    console.log(link);
+
+                    Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: accountInstance.name, Link: link }).send();
+                }
+
+            }
+
+            const allStudentInstance = await classarmInstance.getStudents()
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
+            });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
 
 
     /* ------------------------------ ACCEPT INVITE ----------------------------- */
@@ -298,7 +424,6 @@ class StudentController {
             res.status(500).json({ error: 'Server Error' });
         }
 
-
     }
 
 
@@ -315,6 +440,43 @@ class StudentController {
             console.log(student)
         } catch (error) {
             console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
+
+    static async studentSubjects(req, res) {
+        
+        const { id } = req.userData;
+
+        try {
+            
+            const studentAccount = await Account.findByPk(id);
+
+            if (!studentAccount) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            if(studentAccount.account_type !== 'student'){
+
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.bad_request });
+            }
+
+            const studentInstance = await studentAccount.getStudent();
+
+            const studentClass = await studentInstance.getClass();
+
+            const classSubjects = await studentClass.getSubjects();
+
+            const subjectsData = classSubjects.map(subject => {
+              const { naming, description, id} = subject;
+              return { naming, description, id, image: 'https://images.unsplash.com/photo-1488229297570-58520851e868'};
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, subjects: subjectsData });
+
+        } catch (error) {
+            console.log(error);
+
             res.status(500).json({ error: 'Server Error' });
         }
     }
@@ -336,7 +498,7 @@ class StudentController {
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
             }
 
-        } catch (error) {
+        } catch (error) {    
             res.status(500).json({ error: 'Server Error' });
         }
 
@@ -344,6 +506,93 @@ class StudentController {
 
 
 
+    /*-----------------------------------| STUDENTS CLASS TEACHER |-----------------------------------*/
+
+    static async studentClassTeacher(req, res) {
+
+        const { id } = req.userData;
+
+        try {
+
+            const classStudents = await Student.findByPk(id);
+
+            const studentClass =  await classStudents.getClass();
+
+            const classTeachers = await studentClass.getTeachers({where: {teacher_type: 'class'}});
+
+            const teachersAccount = await Promise.all(classTeachers.map(async (profile) => {
+                const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                return teachers;
+
+              }));
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
+        /*-----------------------------------| STUDENTS CLASS MATES |-----------------------------------*/
+
+        static async studentMates(req, res) {
+
+            const { id } = req.userData;
+    
+            try {
+    
+                const classStudents = await Student.findByPk(id);
+    
+                const studentClass =  await classStudents.getClass();
+    
+                const classMates = await studentClass.getStudents();
+    
+                const classMatesAccount = await Promise.all(classMates.map(async (profile) => {
+                    const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                    return teachers;
+    
+                  }));
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classMatesAccount });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
+
+
+
+        /*-----------------------------------| STUDENTS CLASS ARMS MATES |-----------------------------------*/
+
+        static async studentArmsMates(req, res) {
+
+            const { id } = req.userData;
+    
+            try {
+    
+                const classStudents = await Student.findByPk(id);
+    
+                const studentClass =  await classStudents.getClassArm();
+    
+                const classMates = await studentClass.getStudents();
+    
+                const classMatesAccount = await Promise.all(classMates.map(async (profile) => {
+                    const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                    return teachers;
+    
+                  }));
+
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classMatesAccount });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
 
 }
 
