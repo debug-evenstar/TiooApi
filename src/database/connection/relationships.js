@@ -55,7 +55,7 @@ class Relationships {
         Chapter.belongsTo(Subject);
 
         Chapter.hasMany(Lesson);
-        Lesson.belongsTo(Chapter); 
+        Lesson.belongsTo(Chapter);
 
         //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 

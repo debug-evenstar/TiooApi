@@ -17,7 +17,6 @@ class makeMigration {
     }
   };
 
-
   static addAdmin = async () => {
     try {
       await db.sequelize.queryInterface.addColumn('Accounts', 'admin', {
@@ -58,9 +57,23 @@ class makeMigration {
     }
   };
 
+  static addSchoolName = async () => {
+    try {
+      await db.sequelize.queryInterface.addColumn('SchoolManagements', 'school_name', {
+        type: db.sequelize.Sequelize.TEXT,
+        allowNull: true,
+        defaultValue: 'undefined',
+      });
+      console.log('school_name column added successfully.');
+    } catch (error) {
+      console.error('Error adding school_name column:', error);
+    } finally {
+      await db.sequelize.close();
+    }
+  };
 
 
 }
 
 
-makeMigration.addDateColumns();
+makeMigration.addSchoolName();
