@@ -57,6 +57,13 @@ const allAuthorizedRoutesGroup = (router) => {
 
     router.get('/student/invited/:id', StudentController.fetchInvitedStudent);
     router.post('/student/invite/accept', AcceptValidator, StudentController.acceptInvitation);
+
+    router.post('/invites/generate', InviteController.generateLink);
+    router.post('/invites/student/generate', InviteController.generateStudentLink);
+    router.get('/invites/read', InviteController.invites);
+    router.get('/invites/read/:id', InviteController.invite);
+    router.get('/invites/student/info/:code', InviteController.studentInvite);
+    router.get('/invites/info/:code', InviteController.inviteByCode);
 };
 
 
@@ -140,12 +147,6 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/teacher/:id', TeacherController.fetchTeacher);
 
     /* --------------------------------- INVITES -------------------------------- */
-    router.post('/invites/generate', InviteController.generateLink);
-    router.post('/invites/student/generate', InviteController.generateStudentLink);
-    router.get('/invites/read', InviteController.invites);
-    router.get('/invites/read/:id', InviteController.invite);
-    router.get('/invites/student/info/:code', InviteController.studentInvite);
-    router.get('/invites/info/:code', InviteController.inviteByCode);
     router.delete('/invites/delete/:id', InviteController.delete);
     /* --------------------------------- STUDENT -------------------------------- */
     router.post('/student/invite', InviteValidator, StudentController.sendInvitation);
