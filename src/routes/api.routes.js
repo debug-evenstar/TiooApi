@@ -51,9 +51,6 @@ const allAuthorizedRoutesGroup = (router) => {
 
     router.post('/teacher/invite/accept', TeacherController.acceptInvite);
     router.get('/teacher/invited/:id', TeacherController.fetchInvitedTeacher);
-    router.post('/invites/student/accept', InviteController.studentAccept);
-    router.post('/invites/teacher/accept', InviteController.teacherAccept);
-
 
     router.get('/student/invited/:id', StudentController.fetchInvitedStudent);
     router.post('/student/invite/accept', AcceptValidator, StudentController.acceptInvitation);
@@ -66,6 +63,9 @@ const allAuthorizedRoutesGroup = (router) => {
     router.get('/invites/student/info/:code', InviteController.studentInvite);
     router.get('/invites/info/:code', InviteController.inviteByCode);
     router.delete('/invites/delete/:id', InviteController.delete);
+    router.post('/invites/student/accept', InviteController.studentAccept);
+    router.post('/invites/teacher/accept', InviteController.teacherAccept);
+
 };
 
 
