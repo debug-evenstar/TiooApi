@@ -32,6 +32,8 @@ class InviteController {
 
             const inviteInstance = await Invite.create(req.body);
 
+            console.log(inviteInstance);
+
             const link = `${process.env.WEB_URL}/${req.body.account_type}/${inviteInstance.code}`;
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: { link } });
