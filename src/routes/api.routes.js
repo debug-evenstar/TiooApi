@@ -54,6 +54,8 @@ const allAuthorizedRoutesGroup = (router) => {
 
     router.get('/student/invited/:id', StudentController.fetchInvitedStudent);
     router.post('/student/invite/accept', AcceptValidator, StudentController.acceptInvitation);
+    router.post('/student/parent/signup', StudentController.parentSignup);
+
 
     /* --------------------------------- INVITES -------------------------------- */
     router.post('/invites/generate', InviteController.generateLink);

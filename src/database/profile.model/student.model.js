@@ -28,6 +28,24 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
+
+            parent: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            class: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            school: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            age: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            },
+        
             //=========== IDENTIFICATION DOCUMENT =========// 
             passportNumber: {
                 type: DataTypes.STRING,
