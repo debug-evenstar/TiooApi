@@ -117,6 +117,6 @@ static addStudentColumns = async () => {
 }
 
 
-makeMigration.addStudentColumns();
+makeMigration.addAdmin();
 
 
