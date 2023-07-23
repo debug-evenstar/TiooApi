@@ -8,6 +8,7 @@ const { scryptSync, randomBytes, } = require('crypto');
 
 const crypto = require('crypto');
 const { link } = require('fs');
+const { MD5 } = require('crypto-js');
 
 class AuthController {
 
@@ -56,6 +57,8 @@ class AuthController {
 
             const generatedToken = TokenMiddleware.generate(userData)
 
+            await AuthController.sendVerificationEmail(registeredAccount);
+
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.register,
@@ -73,7 +76,7 @@ class AuthController {
 
     static async verifyAccount(req, res) {
 
-        const { otp, email, } = req.body;
+        const { token } = req.body;
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -81,7 +84,16 @@ class AuthController {
         }
 
         try {
-            const registerdAccount = await Account.findOne({ where: { email: email } });
+            const validation = await Validation.findOne({ where : { token } });
+
+            if(!validation){
+                return res.status(ResponseStatus.code.forbidden).json({
+                    error: true,
+                    message: ResponseStatus.fail.forbidden
+                });
+            }
+
+            const registerdAccount = await Account.findOne({ where: { id: validation.accountId } });
 
             if (!registerdAccount) {
                 return res.status(ResponseStatus.code.not_found).json({
@@ -90,18 +102,16 @@ class AuthController {
                 });
             }
 
-            const setValidation = await Validation.findOne({ where: { accountId: registerdAccount.dataValues.id } });
+            const isExpired = await validation.compareExpiryDate();
 
-            const isValidOTP = await setValidation.compareOTP(otp);
-
-            const isExpired = await setValidation.compareExpiryDate();
+            const isTokenValid = await validation.isTokenValid(token);
 
             if (isExpired) {
                 return res.status(ResponseStatus.code.bad_request).json({ error: true, message: ResponseStatus.fail.expired_token });
             }
 
-            if (!isValidOTP) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.incorrect_otp });
+            if (!isTokenValid) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.forbidden });
             }
 
             await registerdAccount.update({ verification_status: 1, });
@@ -815,6 +825,31 @@ class AuthController {
             res.status(500).json({ error: 'Server Error x' });
         };
 
+    }
+
+
+    static async sendVerificationEmail(account){
+
+        const expiry = (new Date(Date.now() + 30 * 60 * 1000));
+        const hash = MD5(account.id + expiry).toString();
+        const tokenRecord = await Validation.findOne({ where: { accountId: account.id } });
+
+        if (!tokenRecord) {
+            const validate = new Validation();
+            validate.accountId = account.id
+            validate.token = hash
+            validate.expires_at = expiry;
+            const response = await validate.save();
+        }
+
+        tokenRecord.token = hash;
+        tokenRecord.expires_at = expiry;
+
+        await tokenRecord.save();
+
+        const link = `${process.env.WEB_URL}/account/verify/${hash}`;
+
+        Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { link }).send();
     }
 
 
