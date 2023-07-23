@@ -1,7 +1,12 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult } = require('express-validator');
 const { Sequelize, where } = require('sequelize');
-const { Account, SchoolManagement, Teacher, Validation, Class, Subject, Invite, Student, ClassArm } = require("../database/connection");
+const TokenMiddleware = require('../middleware/token.middleware');
+const { Account, SchoolManagement, Validation, Teacher, Class, Subject, Invite, Student, ClassArm } = require("../database/connection");
+
+const AuthController = require('../controller/auth.controller');
+
+
 const Mailer = require('../services/mailer');
 const HashUtils = require('../utils/hash.utilities');
 
@@ -121,6 +126,7 @@ class StudentController {
     static async sendBulkInvite(req, res) {
 
         const random_password = StudentController.generateRandomPassword(8);
+
         const errors = validationResult(req);
         const otp = Math.floor(Math.random() * 900000) + 100000;
         const data = req.body
@@ -204,22 +210,22 @@ class StudentController {
                     await classInstance.addStudent(studentInstance);
                     await classInstance.addStudent(studentInstance);
 
-                    const hashedUser = HashUtils.encrypt(accountInstance.id.toString());
+                    const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
 
-                    const link = `${process.env.WEB_URL}/student/${hashedUser}`;
+                    const link = `${process.env.DEV}/student/${hashedUser}`;
 
-                    console.log(link);
+                    //TODO: Create a Proper Invitation mail Template;
 
-                    Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: "Sir/Ma", school: schoolInstance.school_name, Link: link }).send();
+                    Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: schoolAccount.name, Link: link }).send();
+
                 }
 
+                return res.status(ResponseStatus.code.success).json({
+                    error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
+                    class_arm: classarmInstance,
+                });
+
             }
-
-            const allStudentInstance = await classarmInstance.getStudents()
-
-            return res.status(ResponseStatus.code.success).json({
-                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
-            });
 
 
         } catch (error) {
@@ -445,18 +451,18 @@ class StudentController {
     }
 
     static async studentSubjects(req, res) {
-        
+
         const { id } = req.userData;
 
         try {
-            
+
             const studentAccount = await Account.findByPk(id);
 
             if (!studentAccount) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
 
-            if(studentAccount.account_type !== 'student'){
+            if (studentAccount.account_type !== 'student') {
 
                 return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.bad_request });
             }
@@ -468,8 +474,8 @@ class StudentController {
             const classSubjects = await studentClass.getSubjects();
 
             const subjectsData = classSubjects.map(subject => {
-              const { naming, description, id} = subject;
-              return { naming, description, id, image: 'https://images.unsplash.com/photo-1488229297570-58520851e868'};
+                const { naming, description, id } = subject;
+                return { naming, description, id, image: 'https://images.unsplash.com/photo-1488229297570-58520851e868' };
             });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, subjects: subjectsData });
@@ -498,7 +504,7 @@ class StudentController {
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
             }
 
-        } catch (error) {    
+        } catch (error) {
             res.status(500).json({ error: 'Server Error' });
         }
 
@@ -516,15 +522,15 @@ class StudentController {
 
             const classStudents = await Student.findByPk(id);
 
-            const studentClass =  await classStudents.getClass();
+            const studentClass = await classStudents.getClass();
 
-            const classTeachers = await studentClass.getTeachers({where: {teacher_type: 'class'}});
+            const classTeachers = await studentClass.getTeachers({ where: { teacher_type: 'class' } });
 
             const teachersAccount = await Promise.all(classTeachers.map(async (profile) => {
                 const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
                 return teachers;
 
-              }));
+            }));
 
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
@@ -536,63 +542,114 @@ class StudentController {
     }
 
 
-        /*-----------------------------------| STUDENTS CLASS MATES |-----------------------------------*/
+    /*-----------------------------------| STUDENTS CLASS MATES |-----------------------------------*/
 
-        static async studentMates(req, res) {
+    static async studentMates(req, res) {
 
-            const { id } = req.userData;
-    
-            try {
-    
-                const classStudents = await Student.findByPk(id);
-    
-                const studentClass =  await classStudents.getClass();
-    
-                const classMates = await studentClass.getStudents();
-    
-                const classMatesAccount = await Promise.all(classMates.map(async (profile) => {
-                    const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
-                    return teachers;
-    
-                  }));
+        const { id } = req.userData;
 
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classMatesAccount });
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'Server Error' });
-            };
+        try {
+
+            const classStudents = await Student.findByPk(id);
+
+            const studentClass = await classStudents.getClass();
+
+            const classMates = await studentClass.getStudents();
+
+            const classMatesAccount = await Promise.all(classMates.map(async (profile) => {
+                const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                return teachers;
+
+            }));
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classMatesAccount });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
+
+    /*-----------------------------------| STUDENTS CLASS ARMS MATES |-----------------------------------*/
+
+    static async studentArmsMates(req, res) {
+
+        const { id } = req.userData;
+
+        try {
+
+            const classStudents = await Student.findByPk(id);
+
+            const studentClass = await classStudents.getClassArm();
+
+            const classMates = await studentClass.getStudents();
+
+            const classMatesAccount = await Promise.all(classMates.map(async (profile) => {
+                const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                return teachers;
+
+            }));
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classMatesAccount });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
+    /*-----------------------------------| TEACHER ACCEPT |-----------------------------------*/
+
+    static async parentSignup(req, res) {
+
+        const errors = validationResult(req);
+        const otp = Math.floor(Math.random() * 900000) + 100000;
+        const data = req.body;
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
 
+        try {
+
+            const emailExist = await AuthController.validateEmail(req.body.email);
+
+            if (emailExist.pass) {
+                return res.status(ResponseStatus.code.conflict).json({
+                    error: true, message:
+                        ResponseStatus.fail.account_conflict
+                });
+            }
 
 
-        /*-----------------------------------| STUDENTS CLASS ARMS MATES |-----------------------------------*/
+            const registeredAccount = await Account.create(req.body);
+            const newValidation = await Validation.create({ otp });
+            await registeredAccount.setValidation(newValidation);
 
-        static async studentArmsMates(req, res) {
+            const studentInstance = await Student.create(req.body);
+            await registeredAccount.setStudent(studentInstance);
 
-            const { id } = req.userData;
-    
-            try {
-    
-                const classStudents = await Student.findByPk(id);
-    
-                const studentClass =  await classStudents.getClassArm();
-    
-                const classMates = await studentClass.getStudents();
-    
-                const classMatesAccount = await Promise.all(classMates.map(async (profile) => {
-                    const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
-                    return teachers;
-    
-                  }));
 
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classMatesAccount });
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'Server Error' });
+
+            const userData = {
+                id: registeredAccount.dataValues.id,
+                email: registeredAccount.dataValues.email,
+                account_type: registeredAccount.dataValues.account_type,
             };
-        }
+
+            const generatedToken = TokenMiddleware.generate(userData)
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: { token: generatedToken } });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
 
 }
 

@@ -9,6 +9,7 @@ const { scryptSync, randomBytes, } = require('crypto');
 const crypto = require('crypto');
 const { link } = require('fs');
 const { MD5 } = require('crypto-js');
+const { log } = require('console');
 
 class AuthController {
 
@@ -42,7 +43,7 @@ class AuthController {
             // Create school record if account type is school
             if(req.body.account_type === "school"){
                 const registeredSchoolManagement = await SchoolManagement.create({
-                    school_name : req.body.school
+                    school_name : req.body.name
                 });
     
                 await registeredAccount.setSchoolManagement(registeredSchoolManagement);
@@ -268,8 +269,6 @@ class AuthController {
             };
 
             const generatedToken = TokenMiddleware.generate(userData)
-
-          
 
             const payload  = {
                 AccountId: user.id,
@@ -575,7 +574,7 @@ class AuthController {
 
     static async changePassword(req, res) {
 
-        const { email, password } = req.body;
+        const { token, password } = req.body;
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -584,7 +583,15 @@ class AuthController {
 
         try {
 
-            const user = await Account.findOne({ where: { email: email } });
+            const validationInstance = await Validation.findOne({where: {otp: token}});
+
+            if(!validationInstance){
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.bad_request });
+            }
+
+            
+
+            const user = await validationInstance.getAccount();
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -728,8 +735,9 @@ class AuthController {
             const link = `${process.env.DEV}/new-password/${validation.otp}/${account.email}`;
 
             Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Reset Passord").template("emails.RestPassword", { resetLink: link }).send();
-
-
+            
+            console.log(link);
+            
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.sucess,
                 response: ResponseStatus.pass.reset
