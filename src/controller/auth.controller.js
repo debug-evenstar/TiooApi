@@ -117,7 +117,7 @@ class AuthController {
 
             await registerdAccount.update({ verification_status: 1, });
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.verify });
+            return res.status(ResponseStatus.code.success).json({ error: false, data: registerdAccount,message: ResponseStatus.pass.verify });
 
 
         } catch (error) {
