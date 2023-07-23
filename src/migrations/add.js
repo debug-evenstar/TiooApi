@@ -72,7 +72,6 @@ class makeMigration {
     }
   };
 
-  // Assuming you have already defined your Sequelize model for the Student table
 
 static addStudentColumns = async () => {
   try {
@@ -110,6 +109,7 @@ static addStudentColumns = async () => {
   } finally {
     await db.sequelize.close();
   }
+
 };
 
 
@@ -117,6 +117,6 @@ static addStudentColumns = async () => {
 }
 
 
-makeMigration.addAdmin();
+makeMigration.addStudentColumns();
 
 

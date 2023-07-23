@@ -1,9 +1,11 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult } = require('express-validator');
 const { Sequelize, where } = require('sequelize');
-const { Account, SchoolManagement, Teacher, Class, Subject, Invite, Student, ClassArm } = require("../database/connection");
+const TokenMiddleware = require('../middleware/token.middleware');
+const { Account, SchoolManagement, Validation, Teacher, Class, Subject, Invite, Student, ClassArm } = require("../database/connection");
 
 const AuthController = require('../controller/auth.controller');
+
 
 const Mailer = require('../services/mailer');
 const HashUtils = require('../utils/hash.utilities');
