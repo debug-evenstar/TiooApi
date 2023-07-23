@@ -121,6 +121,7 @@ class StudentController {
     static async sendBulkInvite(req, res) {
 
         const random_password = StudentController.generateRandomPassword(8);
+
         const errors = validationResult(req);
         const otp = Math.floor(Math.random() * 900000) + 100000;
         const data = req.body
@@ -204,22 +205,22 @@ class StudentController {
                     await classInstance.addStudent(studentInstance);
                     await classInstance.addStudent(studentInstance);
 
-                    const hashedUser = HashUtils.encrypt(accountInstance.id.toString());
+                    const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
 
-                    const link = `${process.env.WEB_URL}/student/${hashedUser}`;
+                    const link = `${process.env.DEV}/student/${hashedUser}`;
 
-                    console.log(link);
+                    //TODO: Create a Proper Invitation mail Template;
 
-                    Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: "Sir/Ma", school: schoolInstance.school_name, Link: link }).send();
+                    Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: schoolAccount.name, Link: link }).send();
+
                 }
 
+                return res.status(ResponseStatus.code.success).json({
+                    error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
+                    class_arm: classarmInstance,
+                });
+
             }
-
-            const allStudentInstance = await classarmInstance.getStudents()
-
-            return res.status(ResponseStatus.code.success).json({
-                error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
-            });
 
 
         } catch (error) {
