@@ -262,6 +262,7 @@ class InviteController {
 
             const generatedToken = TokenMiddleware.generate(userData)
 
+            await AuthController.sendVerificationEmail(registeredAccount);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {token: generatedToken} });
 
@@ -327,7 +328,8 @@ class InviteController {
                 };
     
                 const generatedToken = TokenMiddleware.generate(userData)
-    
+
+                await AuthController.sendVerificationEmail(registeredAccount);
             
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {token: generatedToken} });
     
