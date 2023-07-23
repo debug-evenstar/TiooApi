@@ -13,6 +13,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         defaultValue: 'teacher',
       },
+      teacher_type: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: 'subject',
+    },
       code: {
         type: Sequelize.STRING,
         allowNull: false,

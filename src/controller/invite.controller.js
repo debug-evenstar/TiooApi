@@ -167,7 +167,9 @@ class InviteController {
             console.log(inviteInstance.classes)
               
 
-            const payload = {
+            let payload;
+            
+            payload = {
                 "name": "",
                 "email": "",
                 "account_type": inviteInstance.account_type,
@@ -175,6 +177,10 @@ class InviteController {
                 "classes": classes,
                 "Subjects": subjects,
                 "schoolId": inviteInstance.schoolId
+            }
+
+            if(inviteInstance.account_type == 'teacher'){
+                payload.teacher_type = inviteInstance.teacher_type;
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
