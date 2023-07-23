@@ -32,7 +32,7 @@ module.exports = {
 
     SchoolSetupValidator: [
         body('email').notEmpty().isString().isEmail().withMessage("email field required"),
-        body('school_types').isArray().withMessage('School types must be an array.').custom((value) => {
+        body('school_types').if(body('naming_types').not().equals('C')).isArray().withMessage('School types must be an array.').custom((value) => {
             if (value.length === 0) {
                 throw new Error('At least one school type must be selected.');
             }
