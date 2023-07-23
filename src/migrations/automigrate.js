@@ -49,14 +49,13 @@ class AutoMigrate {
         for (let index = 0; index < fields.length; index++) {
             const field = fields[index];
             try {
-                await database.sequelize.queryInterface.addColumn(model.tableName, field.fieldName, {
+                await database.sequelize.getQueryInterface().addColumn(model.tableName, field.fieldName, {
                   type: field.type,
                   allowNull: field.allowNull,
                 });
             } catch (error) {
                 console.error('Error adding column', error);
             } finally {
-                await database.sequelize.close();
             }
         }
 
@@ -66,11 +65,10 @@ class AutoMigrate {
         for (let index = 0; index < fields.length; index++) {
             const field = fields[index];
             try {
-                await database.sequelize.queryInterface.removeColumn(model.tableName, field.fieldName,)
+                await database.sequelize.getQueryInterface().removeColumn(model.tableName, field.fieldName,)
             } catch (error) {
                 console.error('Error adding column', error);
             } finally {
-                await database.sequelize.close();
             }
         }
 
