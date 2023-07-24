@@ -54,12 +54,11 @@ const allAuthorizedRoutesGroup = (router) => {
 
     router.get('/student/invited/:id', StudentController.fetchInvitedStudent);
     router.post('/student/invite/accept', AcceptValidator, StudentController.acceptInvitation);
-    router.post('/student/parent/signup', StudentController.parentSignup);
-
-
-    /* --------------------------------- INVITES -------------------------------- */
+    router.post('/student/parent/signup_first', StudentController.parentSignupOne);
+    router.post('/student/parent/signup_second', StudentController.parentSignupTwo);
 
     /* --------------------------------- INVITES -------------------------------- */
+    
     router.post('/invites/generate', InviteController.generateLink);
     router.post('/invites/student/generate', InviteController.generateStudentLink);
     router.get('/invites/read', InviteController.invites);
@@ -123,7 +122,9 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/class/arms/:id/subjects', ClassArmsController.classArmSubjects); // This is the a better route format /entity/:entityId/relationship
     router.put('/class/arms/update/:id', ClassArmsController.updateById);
     router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
+    
     /* -------------------------------- SUBJECTS -------------------------------- */
+    
     router.post('/subjects/create', SubjectController.create);
     router.get('/subjects/read', SubjectController.readAll);
     router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
@@ -138,7 +139,9 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/subjects/lessons/count', SubjectController.subjectsWithLessonCount);
     router.get('/subjects/lessons/:subjectId', SubjectController.subjectLessons);
     router.delete('/subjects/delete/:id', SubjectController.delete);
+
     /* --------------------------------- TEACHERS -------------------------------- */
+  
     router.post('/teacher/invite', TeacherController.sendInvite);
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
@@ -152,6 +155,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/teacher/:id', TeacherController.fetchTeacher);
 
     /* --------------------------------- STUDENT -------------------------------- */
+
     router.post('/student/invite', InviteValidator, StudentController.sendInvitation);
     router.get('/students/readall', StudentController.allStudents);
     router.get('/student/readinvited/:id', StudentController.invitedStudents);
