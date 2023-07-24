@@ -32,6 +32,8 @@ class InviteController {
 
             const inviteInstance = await Invite.create(req.body);
 
+            console.log(inviteInstance);
+
             const link = `${process.env.WEB_URL}/${req.body.account_type}/${inviteInstance.code}`;
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: { link } });
@@ -165,7 +167,9 @@ class InviteController {
             console.log(inviteInstance.classes)
               
 
-            const payload = {
+            let payload;
+            
+            payload = {
                 "name": "",
                 "email": "",
                 "account_type": inviteInstance.account_type,
@@ -173,6 +177,10 @@ class InviteController {
                 "classes": classes,
                 "Subjects": subjects,
                 "schoolId": inviteInstance.schoolId
+            }
+
+            if(inviteInstance.account_type == 'teacher'){
+                payload.teacher_type = inviteInstance.teacher_type;
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
@@ -262,6 +270,7 @@ class InviteController {
 
             const generatedToken = TokenMiddleware.generate(userData)
 
+            await AuthController.sendVerificationEmail(registeredAccount);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {token: generatedToken} });
 
@@ -327,7 +336,8 @@ class InviteController {
                 };
     
                 const generatedToken = TokenMiddleware.generate(userData)
-    
+
+                await AuthController.sendVerificationEmail(registeredAccount);
             
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {token: generatedToken} });
     

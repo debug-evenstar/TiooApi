@@ -8,6 +8,8 @@ const { scryptSync, randomBytes, } = require('crypto');
 
 const crypto = require('crypto');
 const { link } = require('fs');
+const { MD5 } = require('crypto-js');
+const { log } = require('console');
 
 class AuthController {
 
@@ -41,7 +43,7 @@ class AuthController {
             // Create school record if account type is school
             if(req.body.account_type === "school"){
                 const registeredSchoolManagement = await SchoolManagement.create({
-                    school_name : req.body.school
+                    school_name : req.body.name
                 });
     
                 await registeredAccount.setSchoolManagement(registeredSchoolManagement);
@@ -55,6 +57,8 @@ class AuthController {
             };
 
             const generatedToken = TokenMiddleware.generate(userData)
+
+            await AuthController.sendVerificationEmail(registeredAccount);
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
@@ -73,7 +77,7 @@ class AuthController {
 
     static async verifyAccount(req, res) {
 
-        const { otp, email, } = req.body;
+        const { token } = req.body;
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -81,7 +85,16 @@ class AuthController {
         }
 
         try {
-            const registerdAccount = await Account.findOne({ where: { email: email } });
+            const validation = await Validation.findOne({ where : { token } });
+
+            if(!validation){
+                return res.status(ResponseStatus.code.forbidden).json({
+                    error: true,
+                    message: ResponseStatus.fail.forbidden
+                });
+            }
+
+            const registerdAccount = await Account.findOne({ where: { id: validation.accountId } });
 
             if (!registerdAccount) {
                 return res.status(ResponseStatus.code.not_found).json({
@@ -90,23 +103,21 @@ class AuthController {
                 });
             }
 
-            const setValidation = await Validation.findOne({ where: { accountId: registerdAccount.dataValues.id } });
+            const isExpired = await validation.compareExpiryDate();
 
-            const isValidOTP = await setValidation.compareOTP(otp);
-
-            const isExpired = await setValidation.compareExpiryDate();
+            const isTokenValid = await validation.isTokenValid(token);
 
             if (isExpired) {
                 return res.status(ResponseStatus.code.bad_request).json({ error: true, message: ResponseStatus.fail.expired_token });
             }
 
-            if (!isValidOTP) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.incorrect_otp });
+            if (!isTokenValid) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.forbidden });
             }
 
             await registerdAccount.update({ verification_status: 1, });
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.verify });
+            return res.status(ResponseStatus.code.success).json({ error: false, data: registerdAccount,message: ResponseStatus.pass.verify });
 
 
         } catch (error) {
@@ -258,8 +269,6 @@ class AuthController {
             };
 
             const generatedToken = TokenMiddleware.generate(userData)
-
-          
 
             const payload  = {
                 AccountId: user.id,
@@ -565,7 +574,7 @@ class AuthController {
 
     static async changePassword(req, res) {
 
-        const { email, password } = req.body;
+        const { token, password } = req.body;
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -574,7 +583,15 @@ class AuthController {
 
         try {
 
-            const user = await Account.findOne({ where: { email: email } });
+            const validationInstance = await Validation.findOne({where: {otp: token}});
+
+            if(!validationInstance){
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.bad_request });
+            }
+
+            
+
+            const user = await validationInstance.getAccount();
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -718,8 +735,9 @@ class AuthController {
             const link = `${process.env.DEV}/new-password/${validation.otp}/${account.email}`;
 
             Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Reset Passord").template("emails.RestPassword", { resetLink: link }).send();
-
-
+            
+            console.log(link);
+            
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.sucess,
                 response: ResponseStatus.pass.reset
@@ -815,6 +833,31 @@ class AuthController {
             res.status(500).json({ error: 'Server Error x' });
         };
 
+    }
+
+
+    static async sendVerificationEmail(account){
+
+        const expiry = (new Date(Date.now() + 30 * 60 * 1000));
+        const hash = MD5(account.id + expiry).toString();
+        const tokenRecord = await Validation.findOne({ where: { accountId: account.id } });
+
+        if (!tokenRecord) {
+            const validate = new Validation();
+            validate.accountId = account.id
+            validate.token = hash
+            validate.expires_at = expiry;
+            const response = await validate.save();
+        }
+
+        tokenRecord.token = hash;
+        tokenRecord.expires_at = expiry;
+
+        await tokenRecord.save();
+
+        const link = `${process.env.WEB_URL}/account/verify/${hash}`;
+
+        Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { link }).send();
     }
 
 

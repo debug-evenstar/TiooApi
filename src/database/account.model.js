@@ -29,7 +29,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       verification_status: {
         type: Sequelize.INTEGER,
-        defaultValue: 1,
+        defaultValue: 0,
       },
       flag: {
         type: Sequelize.ENUM('active', 'banned', 'inactive', 'invited'),
