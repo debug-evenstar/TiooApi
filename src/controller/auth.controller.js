@@ -49,6 +49,16 @@ class AuthController {
                 await registeredAccount.setSchoolManagement(registeredSchoolManagement);
             }
 
+            if(req.body.account_type === "freelancer"){
+                const registeredSchoolManagement = await SchoolManagement.create({
+                    school_name : req.body.name,
+                    school_types: '[Custome]',
+                    naming_types: 'C'
+                });
+    
+                await registeredAccount.setSchoolManagement(registeredSchoolManagement);
+            }
+
 
             const userData = {
                 id: registeredAccount.dataValues.id,
@@ -856,6 +866,8 @@ class AuthController {
         await tokenRecord.save();
 
         const link = `${process.env.WEB_URL}/account/verify/${hash}`;
+
+        console.log(link);
 
         Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { link }).send();
     }

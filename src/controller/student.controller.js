@@ -601,13 +601,16 @@ class StudentController {
     }
 
 
-    /*-----------------------------------| TEACHER ACCEPT |-----------------------------------*/
+    /*-----------------------------------| PARENT TEACHER SIGNUP |-----------------------------------*/
 
-    static async parentSignup(req, res) {
+    static async parentSignupOne(req, res) {
 
         const errors = validationResult(req);
         const otp = Math.floor(Math.random() * 900000) + 100000;
+        const random_hash = StudentController.generateRandomPassword(6);
+
         const data = req.body;
+
 
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
@@ -626,13 +629,8 @@ class StudentController {
 
 
             const registeredAccount = await Account.create(req.body);
-            const newValidation = await Validation.create({ otp });
+            const newValidation = await Validation.create({ otp: random_hash });
             await registeredAccount.setValidation(newValidation);
-
-            const studentInstance = await Student.create(req.body);
-            await registeredAccount.setStudent(studentInstance);
-
-
 
             const userData = {
                 id: registeredAccount.dataValues.id,
@@ -640,16 +638,58 @@ class StudentController {
                 account_type: registeredAccount.dataValues.account_type,
             };
 
-            const generatedToken = TokenMiddleware.generate(userData)
 
+            const link = `${process.env.DEV}/new-password/${newValidation.otp}/${registeredAccount.email}`;
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: { token: generatedToken } });
+            console.log(link);
+
+            Mailer().to(registeredAccount.email).from(process.env.MAIL_FROM, "Praxeum").subject("Reset Passord").template("emails.RestPassword", { resetLink: link }).send();
+            
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: { } });
 
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: 'Server Error' });
         };
     }
+
+        /*-----------------------------------| TEACHER ACCEPT |-----------------------------------*/
+
+        static async parentSignupTwo(req, res) {
+
+            const data = req.body;
+    
+            try {
+                
+                const validationInstance = await Validation.findOne({where: {otp: data.token}});
+
+                if (!validationInstance) {
+                    return res.status(ResponseStatus.code.not_found).json({
+                        error: true, message:
+                            ResponseStatus.fail.not_found
+                    });
+                }
+
+                const registeredAccount = await validationInstance.getAccount();
+                const studentInstance = await Student.create(req.body);
+                await registeredAccount.setStudent(studentInstance);
+    
+                const userData = {
+                    id: registeredAccount.dataValues.id,
+                    email: registeredAccount.dataValues.email,
+                    account_type: registeredAccount.dataValues.account_type,
+                };
+    
+                const generatedToken = TokenMiddleware.generate(userData)
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: { token: generatedToken } });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+        }
 
 }
 
