@@ -639,7 +639,7 @@ class StudentController {
             };
 
 
-            const link = `${process.env.DEV}/new-password/${newValidation.otp}/${registeredAccount.email}`;
+            const link = `${process.env.DEV}/student/${newValidation.otp}/${registeredAccount.email}`;
 
             console.log(link);
 
