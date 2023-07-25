@@ -629,8 +629,8 @@ class StudentController {
 
 
             const registeredAccount = await Account.create(req.body);
-            const newValidation = await Validation.create({ otp: random_hash });
-            await registeredAccount.setValidation(newValidation);
+            // const newValidation = await Validation.create({ otp: random_hash });
+            // await registeredAccount.setValidation(newValidation);
 
             const userData = {
                 id: registeredAccount.dataValues.id,
@@ -656,7 +656,7 @@ class StudentController {
     
             try {
                 
-                const validationInstance = await Validation.findOne({where: {otp: data.token}});
+                const validationInstance = await Validation.findOne({where: {token: data.token}});
 
                 if (!validationInstance) {
                     return res.status(ResponseStatus.code.not_found).json({
