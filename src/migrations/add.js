@@ -72,6 +72,47 @@ class makeMigration {
     }
   };
 
+  // Assuming you have already defined your Sequelize model for the Student table
+
+static addStudentColumns = async () => {
+  try {
+    // Add the 'parent' column
+    await db.sequelize.queryInterface.addColumn('Students', 'parent', {
+      type: db.sequelize.Sequelize.STRING,
+      defaultValue: 'undefined',
+      allowNull: false,
+    });
+
+    // Add the 'class' column
+    await db.sequelize.queryInterface.addColumn('Students', 'class', {
+      type: db.sequelize.Sequelize.STRING,
+      defaultValue: 'undefined',
+      allowNull: false,
+    });
+
+    // Add the 'school' column
+    await db.sequelize.queryInterface.addColumn('Students', 'school', {
+      type: db.sequelize.Sequelize.STRING,
+      defaultValue: 'undefined',
+      allowNull: false,
+    });
+
+    // Add the 'age' column
+    await db.sequelize.queryInterface.addColumn('Students', 'age', {
+      type: db.sequelize.Sequelize.INTEGER,
+      defaultValue: '23',
+      allowNull: false,
+    });
+
+    console.log('Columns added to the Students table successfully.');
+  } catch (error) {
+    console.error('Error adding columns to the Students table:', error);
+  } finally {
+    await db.sequelize.close();
+  }
+};
+
+
 
 static addStudentColumns = async () => {
   try {
