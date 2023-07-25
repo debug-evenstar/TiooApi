@@ -15,7 +15,7 @@ class Routes {
 
         register(){
             let instance = this
-            instance.app.use('/api/', globalRoute);
+            instance.app.use('/', globalRoute);
         }
 }
 
