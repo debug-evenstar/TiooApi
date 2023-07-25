@@ -31,7 +31,6 @@ class StudentController {
                 let randomIndex = Math.floor(Math.random() * charset.length);
                 password += charset[randomIndex];
             }
-
             return password;
         }
 
