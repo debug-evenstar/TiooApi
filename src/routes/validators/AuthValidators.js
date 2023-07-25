@@ -15,11 +15,11 @@ module.exports = {
         body('phone').notEmpty().isNumeric().withMessage("phone field is required"),
         body('account_type').notEmpty().isString().withMessage("account type field is required"),
         body('password').notEmpty().withMessage("password field is required"),
+        body('school').if(body('account_type').equals('school')).isString().notEmpty()
     ],
 
     VerifyAccountValidator: [
-        body('email').notEmpty().isString().isEmail().withMessage("email field is required"),
-        body('otp').isLength({ max: 6 }).notEmpty().isNumeric().withMessage("otp field with is required"),
+        body('token').notEmpty().withMessage("Token is required"),
     ],
 
     SendOTPValidator: [
@@ -32,7 +32,7 @@ module.exports = {
 
     SchoolSetupValidator: [
         body('email').notEmpty().isString().isEmail().withMessage("email field required"),
-        body('school_types').isArray().withMessage('School types must be an array.').custom((value) => {
+        body('school_types').if(body('naming_types').not().equals('C')).isArray().withMessage('School types must be an array.').custom((value) => {
             if (value.length === 0) {
                 throw new Error('At least one school type must be selected.');
             }

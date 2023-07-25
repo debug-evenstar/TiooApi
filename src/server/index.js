@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 8080;
 const IndexRoute = require('../routes/index');
 const treblle = require('@treblle/express');
 const UploadService = require('../services/upload.service');
+const AutoMigrate = require("../migrations/automigrate");
 
 
 class Server {
@@ -32,9 +33,10 @@ class Server {
         );
 
         //=============== INITIALIZE DATABASE ================//
-
+//{force : true}
         db.sequelize.sync()
             .then(() => {
+                AutoMigrate.validateModelsIntegrity();
                 console.log("Synced db.");
             })
             .catch((err) => {

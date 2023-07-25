@@ -15,19 +15,20 @@ router.get('/', (req, res) => { res.json({ message: "NIMO SERVER RUNNING...." })
 
 const AuthenicationController = require('../controller/auth.controller');
 const SchoolManagementController = require('../controller/school.controller');
+const FreelancerController = require('../controller/freelancer.controller');
 const ClassController = require('../controller/class.control');
 const ClassArmsController = require('../controller/classArms.controller');
 const SubjectController = require('../controller/subject.controller');
 const TeacherController = require('../controller/teacher.controller');
 const InviteController = require('../controller/invite.controller');
 const LessonController = require('../controller/lesson.controller');
+const ChapterController = require('../controller/chapter.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
 const AuthenticationMiddleware = require('../middleware/token.middleware');
 const StudentController = require('../controller/student.controller');
 const { InviteValidator, AcceptValidator } = require('./validators/StudentValidators');
-
 const UploadService = require('../services/upload.service');
 
 /*------------------------------| AUTHORIZED ROUTES |------------------------------*/
@@ -47,14 +48,28 @@ const allAuthorizedRoutesGroup = (router) => {
     router.post('/new/account/verify', VerifyAccountValidator, AuthenicationController.verifyTempEmail);
 
     router.post('/school/setup', SchoolSetupValidator, SchoolManagementController.setup);
+    router.post('/freelancer/setup', SchoolSetupValidator, FreelancerController.setup);
+
 
     router.post('/teacher/invite/accept', TeacherController.acceptInvite);
     router.get('/teacher/invited/:id', TeacherController.fetchInvitedTeacher);
-    router.post('/invites/student/accept', InviteController.studentAccept);
-    router.post('/invites/teacher/accept', InviteController.teacherAccept);
 
     router.get('/student/invited/:id', StudentController.fetchInvitedStudent);
     router.post('/student/invite/accept', AcceptValidator, StudentController.acceptInvitation);
+    router.post('/student/parent/signup_first', StudentController.parentSignupOne);
+    router.post('/student/parent/signup_second', StudentController.parentSignupTwo);
+
+    /* --------------------------------- INVITES -------------------------------- */
+    
+    router.post('/invites/generate', InviteController.generateLink);
+    router.post('/invites/student/generate', InviteController.generateStudentLink);
+    router.get('/invites/read', InviteController.invites);
+    router.get('/invites/read/:id', InviteController.invite);
+    router.get('/invites/student/info/:code', InviteController.studentInvite);
+    router.get('/invites/info/:code', InviteController.inviteByCode);
+    router.delete('/invites/delete/:id', InviteController.delete);
+    router.post('/invites/student/accept', InviteController.studentAccept);
+    router.post('/invites/teacher/accept', InviteController.teacherAccept);
 };
 
 
@@ -67,10 +82,12 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/account/read', AuthenicationController.accountProfile);
     router.put('/account/update', AuthenicationController.updateAccount);
     router.put('/account/flag', AuthenicationController.flagAccount);
+    router.post('/account/auth/resetpassword', AuthenicationController.resetAuthPassword);
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
     router.get('/account/exist/:email', AuthenicationController.accountExist);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
+
     /* --------------------------------- SCHOOL --------------------------------- */
     router.get('/school/classes/:id', SchoolManagementController.classes);
     router.get('/school/read/', SchoolManagementController.read);
@@ -81,8 +98,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/school/class/read', SchoolManagementController.getClassBySidANDCid);
     router.get('/school/teachers/', SchoolManagementController.authSchoolTeachers);
     router.get('/school/teachers/:id', SchoolManagementController.schoolTeachers);
-    
-/* ---------------------------------- CLASS --------------------------------- */
+    /* ---------------------------------- CLASS --------------------------------- */
     router.post('/class/create', ClassController.create);
     router.post('/class/create_bulk', ClassController.bulkCreate);
     router.get('/class/read', ClassController.readAll);
@@ -96,57 +112,68 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/class/students/:id', ClassController.classStudent);
     router.delete('/class/delete/:id', ClassController.delete);
     router.post('/class/student', ClassController.addStudentToClass);
+    router.post('/class/remove/student', ClassController.removeStudentFromClass);
     router.post('/class/teacher', ClassController.addTeacherToClass);
     router.post('/class/addSubject', ClassController.addSubjectToClass)
-
+    router.post('/class/remove/subject', ClassController.removeSubjectFromClass)
+    /* --------------------------------- CLASS ARMS -------------------------------- */
     router.post('/class/arms/create', ClassArmsController.create);
     router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
     router.get('/class/arms/read', ClassArmsController.readAll);
     router.get('/class/arms/read/:id', ClassArmsController.readById);
+    router.get('/class/arms/students/:id', ClassArmsController.classArmStudents);
+    router.get('/class/arms/:id/subjects', ClassArmsController.classArmSubjects); // This is the a better route format /entity/:entityId/relationship
     router.put('/class/arms/update/:id', ClassArmsController.updateById);
     router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
-/* -------------------------------- SUBJECTS -------------------------------- */
+    
+    /* -------------------------------- SUBJECTS -------------------------------- */
+    
     router.post('/subjects/create', SubjectController.create);
     router.get('/subjects/read', SubjectController.readAll);
     router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
     router.get('/subjects/school/lessons/:id', SubjectController.schoolSubjectLessons);
     router.get('/subjects/classes/read/:id', SubjectController.readSubjectWithClasses);
+    router.post('/subjects/classes/add', SubjectController.addClassesToSubjects);
     router.get('/subjects/teachers/read/:id', SubjectController.subjectTeachers);
+    router.get('/subjects/students/read/:id', SubjectController.subjectStudents);
     router.get('/subjects/read/:id', SubjectController.readBySubjectId);
     router.put('/subjects/update', SubjectController.update);
     router.get('/subjects/lessons/', SubjectController.subjectsWithLessons);
     router.get('/subjects/lessons/count', SubjectController.subjectsWithLessonCount);
     router.get('/subjects/lessons/:subjectId', SubjectController.subjectLessons);
     router.delete('/subjects/delete/:id', SubjectController.delete);
-/* --------------------------------- TEACHERS -------------------------------- */
+
+    /* --------------------------------- TEACHERS -------------------------------- */
+  
     router.post('/teacher/invite', TeacherController.sendInvite);
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
     router.post('/teacher/assignsubject', TeacherController.assignSubjectToTeacher);
+    router.post('/teacher/unassignsubject', TeacherController.unAssignSubjectToTeacher);
     router.get('/teacher/students/:id', TeacherController.teacherStudents);
     router.get('/teacher/subjectswithLessons/:id', TeacherController.teacherSubjectsWithLessons)
+    router.get('/teacher/subjectswithLessonscount/:id', TeacherController.teacherSubjectsWithLessonsCount)
     router.get('/teacher/classess/:id', TeacherController.teacherClasses);
     router.get('/teacher/subjects/:id', TeacherController.teacherSubjects);
     router.get('/teacher/:id', TeacherController.fetchTeacher);
 
-/* --------------------------------- INVITES -------------------------------- */
-    router.post('/invites/generate', InviteController.generateLink);
-    router.post('/invites/student/generate', InviteController.generateStudentLink);
-    router.get('/invites/read', InviteController.invites);
-    router.get('/invites/read/:id', InviteController.invite);
-    router.get('/invites/student/info/:code', InviteController.studentInvite);    
-    router.get('/invites/info/:code', InviteController.inviteByCode);
-    router.delete('/invites/delete/:id', InviteController.delete);
-/* --------------------------------- STUDENT -------------------------------- */
+    /* --------------------------------- STUDENT -------------------------------- */
+
     router.post('/student/invite', InviteValidator, StudentController.sendInvitation);
-    router.get('/student/:id', StudentController.fetchStudent);
     router.get('/students/readall', StudentController.allStudents);
     router.get('/student/readinvited/:id', StudentController.invitedStudents);
-    router.get('/students/classess/:id', StudentController.getStudentClass);
+    router.get('/students/classess/:id', StudentController.getStudentClass); //something is wrong with this controller Six;
     router.delete('/students/delete/:id', StudentController.deleteStudent);
     router.post('/students/bulk/invite', StudentController.sendBulkInvite);
+    router.get('/student/subjects', StudentController.studentSubjects);
+    router.get('/student/classteacher', StudentController.studentClassTeacher);
+    router.get('/student/classmates', StudentController.studentMates);
+    router.get('/student/classarmsmates', StudentController.studentArmsMates);
+    router.get('/student/:id', StudentController.fetchStudent);
 
     router.post('/lesson/create', UploadService.upload.single('file'), LessonController.createLesson);
+
+    router.get('/chapter/subject/:id', ChapterController.read);
 
 };
 

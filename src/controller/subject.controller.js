@@ -1,4 +1,4 @@
-const { Subject, Class, Teacher, Account, Lesson } = require('../database/connection/');
+const { Subject, Class, Teacher, Account, Lesson, ClassArm } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 const Sequelize = require('sequelize');
 const IncludeManager = require('./helper/includes');
@@ -15,9 +15,14 @@ class SubjectController {
 
             const classInstance = await Class.findAll({ where: { id: [...req.body.class] } });
 
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.classArm] } });
+
             const newItems = await subjectInstance.addClasses(classInstance);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: newItems });
+            const subjectArms = await subjectInstance.addClassArms(classarmInstances);
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, subjectArms: subjectArms });
 
         } catch (error) {
             console.log(error);
@@ -143,7 +148,7 @@ class SubjectController {
 
         try {
 
-            const subjectClasses = await Subject.findOne({ include: [Class], where: { id } });
+            const subjectClasses = await Subject.findOne({ include: [Class, ClassArm], where: { id } });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectClasses });
 
@@ -268,6 +273,72 @@ class SubjectController {
             };
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: payload });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
+    static async subjectStudents(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            // Will be modified later
+
+            const subject = await Subject.findOne({ where: { id } });
+
+            if (!subject) {
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: [] });
+            }
+
+            const classes = await subject.getClasses();
+
+            const students =  await classes[classes.length - 1].getStudents();
+
+            // const studentsPerClass = await Promise.all(classes.map(async (classObj) => {
+            //     const students = await classObj.getStudents();
+            //     return students;
+            //   }));
+
+          const studentAccount = await Promise.all(students.map(async (profile) => {
+                const students = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                return students;
+
+              }));
+
+              const payload = {subject: subject, students: studentAccount};
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
+
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+    /* ------------------------- ADD CLASSES TO SUBJECTS ------------------------ */
+    static async addClassesToSubjects(req, res) {
+
+        try {
+
+            const subjectInstance = await Subject.findByPk(req.body.subjectId);
+
+            const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
+
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.classArms] } });
+
+            const newItems = await subjectInstance.addClasses(classInstance);
+
+            const subjectArms = await subjectInstance.addClassArms(classarmInstances);
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, subjectArms: subjectArms });
 
         } catch (error) {
             console.log(error);

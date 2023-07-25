@@ -13,11 +13,20 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         defaultValue: 'teacher',
       },
+      teacher_type: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: 'subject',
+    },
       code: {
         type: Sequelize.STRING,
         allowNull: false,
       },
       classes: {
+        type: Sequelize.JSON,
+        allowNull: true,
+      },
+      classarms: {
         type: Sequelize.JSON,
         allowNull: true,
       },

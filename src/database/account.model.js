@@ -12,6 +12,10 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING,
       },
+      admin: {
+        type: Sequelize.STRING,
+        defaultValue: 'undefined',
+      },
       email: {
         type: Sequelize.STRING,
         unique: true,
@@ -25,7 +29,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       verification_status: {
         type: Sequelize.INTEGER,
-        defaultValue: 1,
+        defaultValue: 0,
       },
       flag: {
         type: Sequelize.ENUM('active', 'banned', 'inactive', 'invited'),
@@ -40,7 +44,7 @@ module.exports = (sequelize, Sequelize) => {
       timestamps: true,
       defaultScope: {
         attributes: {
-          exclude: ['createdAt', 'updatedAt']
+          exclude: ['updatedAt']
         },
       },
     }
