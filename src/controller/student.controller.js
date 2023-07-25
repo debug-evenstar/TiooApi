@@ -638,14 +638,8 @@ class StudentController {
                 account_type: registeredAccount.dataValues.account_type,
             };
 
-
-            const link = `${process.env.DEV}/student/${newValidation.otp}/${registeredAccount.email}`;
-
-            console.log(link);
-
-            Mailer().to(registeredAccount.email).from(process.env.MAIL_FROM, "Praxeum").subject("Reset Passord").template("emails.RestPassword", { resetLink: link }).send();
+            await AuthController.sendVerificationEmail(registeredAccount);
             
-
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: { } });
 
         } catch (error) {
