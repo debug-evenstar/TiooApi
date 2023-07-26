@@ -284,7 +284,7 @@ class AuthController {
                 AccountId: user.id,
                 name: user.name,
                 email: user.email,
-                status: user.status,
+                status: user.status ? user.status : "undefined",
                 phone: user.phone,
                 account_type: user.account_type,
                 verification_status: user.verification_status,
