@@ -125,7 +125,7 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.forbidden });
             }
 
-            await registerdAccount.update({ verification_status: 1, });
+            await registerdAccount.update({ verification_status: 1, status: 'verified' });
 
             return res.status(ResponseStatus.code.success).json({ error: false, data: registerdAccount,message: ResponseStatus.pass.verify });
 
