@@ -34,7 +34,7 @@ const UploadService = require('../services/upload.service');
 /*------------------------------| AUTHORIZED ROUTES |------------------------------*/
 
 const allAuthorizedRoutesGroup = (router) => {
-
+    
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
