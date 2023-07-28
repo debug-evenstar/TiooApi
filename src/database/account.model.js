@@ -31,6 +31,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         defaultValue: 0,
       },
+      status: {
+        type: Sequelize.STRING,
+        defaultValue: 'registered',
+      },
       flag: {
         type: Sequelize.ENUM('active', 'banned', 'inactive', 'invited'),
         defaultValue: 'active',
