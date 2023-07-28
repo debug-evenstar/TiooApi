@@ -179,7 +179,7 @@ const adminAuthorizedRoutesGroup = (router) => {
 
 
 allAuthorizedRoutesGroup(router);
-// adminAuthorizedRoutesGroup(router);
+adminAuthorizedRoutesGroup(router);
 
 module.exports = router;
 
