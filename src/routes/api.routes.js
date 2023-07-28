@@ -85,6 +85,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/account/auth/resetpassword', AuthenicationController.resetAuthPassword);
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
+    router.get('/account', AuthenicationController.getAuthAccount);
     router.get('/account/exist/:email', AuthenicationController.accountExist);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
 
