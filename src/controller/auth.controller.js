@@ -317,7 +317,7 @@ class AuthController {
                 payload.studentClass =  classData.naming;
                 payload.subjectsCount = studentSubject.length;
                 payload.term = "undefined";
-                payload.redirect = "https://student.tioo.ng";
+                payload.redirect = "https://student.hellotioo.com";
 
                 payload.status = payload.flag === 'active' ? "On Track" : "??";
               }else{
