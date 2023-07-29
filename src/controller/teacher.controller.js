@@ -454,27 +454,29 @@ class TeacherController {
 
         try {
 
-            const teacherAccountInstance = await Account.findByPk(teacher);
+            const teacherInstances = await Teacher.findAll({where : {AccountId : teacher}});
 
-            const teacherInstance = await teacherAccountInstance.getTeacher();
-
-            console.log(teacherInstance);
-
-            if (!teacherInstance) {
+            if (!teacherInstances) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
 
+            const subjectInstances = await Subject.findAll({ where: { id: subject } });
 
-
-            const subjectInstance = await Subject.findOne({ where: { id: subject } });
-
-            if (!subjectInstance) {
+            if (!subjectInstances) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const teacherSubject = await teacherInstance.addSubject(subjectInstance);
-
-            const fecth = await teacherInstance.getSubjects();
+            if(teacherInstances.length > 1){
+                for (let index = 0; index < teacherInstances.length; index++) {
+                    const teacherInstance = teacherInstances[index];
+                    await teacherInstance.addSubject(subjectInstances);
+                }
+            }else if(subjectInstances.length > 1){
+                for (let index = 0; index < subjectInstances.length; index++) {
+                    const subjectInstance = subjectInstances[index];
+                    await teacherInstances[0].addSubject(subjectInstance);
+                } 
+            }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
 

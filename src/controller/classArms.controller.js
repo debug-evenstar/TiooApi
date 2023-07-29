@@ -46,12 +46,11 @@ class classArms {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const promises = arms.map(async (eachArm) => {
-                const classArmInstance = await ClassArm.create({ naming: eachArm });
+            for (let index = 0; index < arms.length; index++) {
+                const arm = arms[index];
+                const classArmInstance = await ClassArm.create({ naming: arm });
                 await classInstance.addClassArm(classArmInstance);
-            });
-
-            await Promise.all(promises);
+            }
 
             const classWithArms = await Class.findByPk(classId, { include: [ClassArm] });
 

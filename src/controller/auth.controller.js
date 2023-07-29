@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, TempValidation, Teacher, SchoolManagement } = require('../database/connection');
+const { Account, Validation, TempValidation, Teacher, SchoolManagement, Student } = require('../database/connection');
 const TokenMiddleware = require('../middleware/token.middleware');
 const Mailer = require('../services/mailer');
 require('dotenv').config();
@@ -539,6 +539,13 @@ class AuthController {
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            // Temp fix for Cascading relationships -- to be removed
+            if(user.account_type == "student"){
+                (await Student.findOne({ where : {AccountId : id}})).destroy();
+            }
+            if(user.account_type == "teacher"){
+                (await Teacher.findOne({ where : {AccountId : id}})).destroy();
             }
 
             const response = await user.destroy();

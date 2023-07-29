@@ -449,23 +449,30 @@ class ClassController {
         const data = req.body;
         try {
             const classarmInstance = await ClassArm.findAll({where : {id : data.arms}});
+            
+            const classIds = classarmInstance.map(arm => arm.ClassId);
+
+            const classInstances = await Class.findAll({ where : { id : classIds.filter((id,index) => index == classIds.indexOf(id) ) } });
 
             if (!classarmInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
-            const classInstance = await classarmInstance.getClass();
 
-            const teacherAccountInstance = await Account.findOne({ where: { id: data.teacher_id } });
+            const teacherInstance = await Teacher.findOne({ where: { AccountId: data.teacher_id } });
 
-            if (teacherAccountInstance.account_type != "teacher") {
+            if (!teacherInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.teacher });
             } else {
 
-                const teacherInstance = await teacherAccountInstance.getTeacher();
+                // Class arms add teacher
+                for(var i = 0; i < classarmInstance.length; i++){
+                    await classarmInstance[i].addTeacher(teacherInstance);
+                }
 
-                await classInstance.addTeacher(teacherInstance);
-
-                const z = await classInstance.getTeachers();
+                // Class instances add teacher
+                for(var i = 0; i < classInstances.length; i++){
+                    await classInstances[i].addTeacher(teacherInstance);
+                }
 
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.added });
             }
