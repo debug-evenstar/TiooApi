@@ -1,4 +1,4 @@
-const { SchoolManagement, ClassArm, Class, Account } = require('../database/connection');
+const { SchoolManagement, ClassArm, Class, Account, Teacher, Student, Subject } = require('../database/connection');
 const ResponseStatus = require('../config/message.config');
 
 class classArms {
@@ -80,6 +80,25 @@ class classArms {
 
         } catch (error) {
             console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
+
+    /* ---------------------------- READ BY CLASS ID ---------------------------- */
+
+    static async readAllByClass(req, res) {
+
+        try {
+            const classArms = await ClassArm.findAll({
+                where : { ClassId : req.params.id},
+                include : [
+                    { model : Subject },
+                    { model : Student, include : [Account]},
+                    { model : Teacher, include : [Account]},
+                ]
+            });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classArms });
+        } catch (error) {
             res.status(500).json({ error: 'Server Error' });
         }
     }

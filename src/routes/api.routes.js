@@ -119,6 +119,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/class/arms/create', ClassArmsController.create);
     router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
     router.get('/class/arms/read', ClassArmsController.readAll);
+    router.get('/class/:id/arms', ClassArmsController.readAllByClass);
     router.get('/class/arms/read/:id', ClassArmsController.readById);
     router.get('/class/arms/students/:id', ClassArmsController.classArmStudents);
     router.get('/class/arms/:id/subjects', ClassArmsController.classArmSubjects); // This is the a better route format /entity/:entityId/relationship

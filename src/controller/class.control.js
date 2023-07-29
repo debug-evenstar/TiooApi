@@ -349,14 +349,11 @@ class ClassController {
         const { id } = req.params;
 
         try {
-
-            const classStudents = await Class.findByPk(id, { include: [Student] });
-
-            const studentsId = classStudents.Students.map((student) => student.AccountId);
-
-            const classStudentsAccount = await Account.findAll({ where: { id: [...studentsId] }, attributes: { exclude: ['password'] } });
-
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classStudentsAccount });
+            const classStudents = await Student.findAll({
+                where : {ClassId : id},
+                include : [Account, ClassArm]
+            })
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classStudents });
 
         } catch (error) {
             console.log(error);
@@ -451,7 +448,7 @@ class ClassController {
         const errors = validationResult(req);
         const data = req.body;
         try {
-            const classarmInstance = await ClassArm.findByPk(data.arm);
+            const classarmInstance = await ClassArm.findAll({where : {id : data.arms}});
 
             if (!classarmInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
