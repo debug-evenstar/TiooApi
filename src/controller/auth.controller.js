@@ -428,7 +428,7 @@ class AuthController {
 
         try {
 
-            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
+            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: [SchoolManagement] } });
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
