@@ -293,7 +293,7 @@ class AuthController {
 
             if(user.account_type === "school"){
                 payload.school = user.SchoolManagement.school_name;
-                payload.redirect = "https://dashboard.hellotioo.com";
+                payload.redirect = "https://dashboard.hellotioo.com/auth";
             }
 
             if (user.account_type === "teacher") {
@@ -301,7 +301,7 @@ class AuthController {
                 payload.profileId = profile.id;
                 payload.teacher_type = profile.teacher_type;
                 payload.schoolManagement = profile.SchoolManagementId;
-                payload.redirect = "https://dashboard.hellotioo.com";
+                payload.redirect = "https://dashboard.hellotioo.com/auth";
 
               }else if(user.account_type === 'student'){
                 
@@ -317,7 +317,7 @@ class AuthController {
                 payload.studentClass =  classData.naming;
                 payload.subjectsCount = studentSubject.length;
                 payload.term = "undefined";
-                payload.redirect = "https://student.hellotioo.com";
+                payload.redirect = "https://student.hellotioo.com/auth";
 
                 payload.status = payload.flag === 'active' ? "On Track" : "??";
               }else{
