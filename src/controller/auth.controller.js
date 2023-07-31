@@ -293,7 +293,7 @@ class AuthController {
 
             if(user.account_type === "school"){
                 payload.school = user.SchoolManagement.school_name;
-                payload.redirect = "https://dashboard.tioo.ng";
+                payload.redirect = "https://dashboard.hellotioo.com";
             }
 
             if (user.account_type === "teacher") {
@@ -301,7 +301,7 @@ class AuthController {
                 payload.profileId = profile.id;
                 payload.teacher_type = profile.teacher_type;
                 payload.schoolManagement = profile.SchoolManagementId;
-                payload.redirect = "https://dashboard.tioo.ng";
+                payload.redirect = "https://dashboard.hellotioo.com";
 
               }else if(user.account_type === 'student'){
                 
