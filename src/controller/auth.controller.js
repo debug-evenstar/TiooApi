@@ -296,6 +296,11 @@ class AuthController {
                 payload.redirect = "https://dashboard.hellotioo.com/auth";
             }
 
+            if(user.account_type === "freelancer"){
+                payload.school = user.SchoolManagement.school_name;
+                payload.redirect = "https://dashboard.hellotioo.com/auth";
+            }
+
             if (user.account_type === "teacher") {
                 const profile = await user.getTeacher();
                 payload.profileId = profile.id;
