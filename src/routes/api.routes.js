@@ -39,6 +39,7 @@ const allAuthorizedRoutesGroup = (router) => {
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
     router.post('/account/send_otp', SendOTPValidator, AuthenicationController.requestVerificationOTP);
+    router.post('/account/verify/resend', SendOTPValidator, AuthenicationController.resendVerification);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyOTP);
     router.put('/account/change_password', ChangePasswordValidator, AuthenicationController.changePassword);
     router.post('/account/resetpassword', ResetPasswordValidator, AuthenicationController.resetPassword);

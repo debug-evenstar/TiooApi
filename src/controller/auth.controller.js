@@ -863,6 +863,32 @@ class AuthController {
 
     }
 
+    static async resendVerification(req, res){
+
+        const { email } = req.body;
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const account = await Account.findOne({ where : {email : email}});
+
+            if (!account) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            await AuthController.sendVerificationEmail(account);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.send_otp });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
 
     static async sendVerificationEmail(account){
 
@@ -884,8 +910,6 @@ class AuthController {
         await tokenRecord.save();
 
         const link = `${process.env.WEB_URL}/account/verify/${hash}`;
-
-        console.log(link);
 
         Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { link }).send();
     }
