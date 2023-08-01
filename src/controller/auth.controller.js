@@ -269,7 +269,7 @@ class AuthController {
             }
 
             if (isVerifedUser === 0) {
-                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.verify });
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, action: "verify", message: ResponseStatus.fail.verify });
             }
 
             const userData = {
