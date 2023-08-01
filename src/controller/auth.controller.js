@@ -319,7 +319,6 @@ class AuthController {
                 payload.term = "undefined";
                 payload.redirect = "https://student.hellotioo.com/auth";
 
-                payload.status = payload.flag === 'active' ? "On Track" : "??";
               }else{
 
                 payload.admin = user.admin;
