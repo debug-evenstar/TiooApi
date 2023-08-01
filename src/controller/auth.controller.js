@@ -444,6 +444,10 @@ class AuthController {
                 payload.school = user.SchoolManagement.school_name;
             }
 
+            if(payload.account_type === "freelancer"){
+                payload.school = user.SchoolManagement.school_name;
+            }
+
             if (payload.account_type === "teacher") {
                 const profile = await user.getTeacher();
                 payload.profileId = profile.id;
