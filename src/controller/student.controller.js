@@ -500,7 +500,9 @@ class StudentController {
             if (accountInstance.account_type != "student") {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.student });
             } else {
-                const response = await accountInstance.destroy();
+                const studentInstance = await Student.findOne({ where: {AccountId : id}});
+                await studentInstance.destroy();
+                await accountInstance.destroy();
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
             }
 
