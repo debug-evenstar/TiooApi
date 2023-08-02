@@ -324,6 +324,11 @@ class AuthController {
                     payload.schoolName = studentSchoolAccount.name;
                     payload.studentClass =  classData.naming;
                     payload.subjectsCount = studentSubject.length;
+                    payload.schoolStudent = true;
+                }else{
+                    payload.schoolStudent = false;
+                    payload.schoolName = profile.school;
+                    payload.studentClass = profile.class; 
                 }
                 payload.term = "undefined";
                 payload.redirect = "https://student.hellotioo.com/auth";
@@ -436,7 +441,7 @@ class AuthController {
 
         try {
 
-            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' }, include : [SchoolManagement, Student] });
+            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' }, include : [SchoolManagement] });
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -470,9 +475,13 @@ class AuthController {
                     payload.schoolName = studentSchoolAccount.name;
                     payload.studentClass =  classData.naming;
                     payload.subjectsCount = studentSubject.length;
+                    payload.schoolStudent = true;
+                }else{
+                    payload.schoolStudent = false;
+                    payload.schoolName = profile.school;
+                    payload.studentClass = profile.class; 
                 }
                 payload.term = "undefined";
-
                 payload.status = payload.flag === 'active' ? "On Track" : "??";
 
             }
