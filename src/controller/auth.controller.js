@@ -316,15 +316,15 @@ class AuthController {
                 
                 const profile  = await user.getStudent(); 
                 const schoolManagementId = profile.SchoolManagementId;
-                
-                const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
-                const studentSchoolAccount = await studentSchool.getAccount();
-                const classData = await profile.getClass();
-                const studentSubject = await classData.getSubjects();
-                
-                payload.schoolName = studentSchoolAccount.name;
-                payload.studentClass =  classData.naming;
-                payload.subjectsCount = studentSubject.length;
+                if(schoolManagementId) {
+                    const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
+                    const studentSchoolAccount = await studentSchool.getAccount();
+                    const classData = await profile.getClass();
+                    const studentSubject = await classData.getSubjects();
+                    payload.schoolName = studentSchoolAccount.name;
+                    payload.studentClass =  classData.naming;
+                    payload.subjectsCount = studentSubject.length;
+                }
                 payload.term = "undefined";
                 payload.redirect = "https://student.hellotioo.com/auth";
 
@@ -463,15 +463,15 @@ class AuthController {
 
                 const profile  = await user.getStudent(); 
                 const schoolManagementId = profile.SchoolManagementId;
-                
-                const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
-                const studentSchoolAccount = await studentSchool.getAccount();
-                const classData = await profile.getClass();
-                const studentSubject = await classData.getSubjects();
-                
-                payload.schoolName = studentSchoolAccount.name;
-                payload.studentClass =  classData.naming;
-                payload.subjectsCount = studentSubject.length;
+                if(schoolManagementId) {
+                    const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
+                    const studentSchoolAccount = await studentSchool.getAccount();
+                    const classData = await profile.getClass();
+                    const studentSubject = await classData.getSubjects();
+                    payload.schoolName = studentSchoolAccount.name;
+                    payload.studentClass =  classData.naming;
+                    payload.subjectsCount = studentSubject.length;
+                }
                 payload.term = "undefined";
 
                 payload.status = payload.flag === 'active' ? "On Track" : "??";
