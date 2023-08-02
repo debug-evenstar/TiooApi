@@ -500,7 +500,9 @@ class StudentController {
             if (accountInstance.account_type != "student") {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.student });
             } else {
-                const response = await accountInstance.destroy();
+                const studentInstance = await Student.findOne({ where: {AccountId : id}});
+                await studentInstance.destroy();
+                await accountInstance.destroy();
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
             }
 
@@ -629,8 +631,8 @@ class StudentController {
 
 
             const registeredAccount = await Account.create(req.body);
-            const newValidation = await Validation.create({ otp: random_hash });
-            await registeredAccount.setValidation(newValidation);
+            // const newValidation = await Validation.create({ otp: random_hash });
+            // await registeredAccount.setValidation(newValidation);
 
             const userData = {
                 id: registeredAccount.dataValues.id,
@@ -638,14 +640,8 @@ class StudentController {
                 account_type: registeredAccount.dataValues.account_type,
             };
 
-
-            const link = `${process.env.DEV}/student/${newValidation.otp}/${registeredAccount.email}`;
-
-            console.log(link);
-
-            Mailer().to(registeredAccount.email).from(process.env.MAIL_FROM, "Praxeum").subject("Reset Passord").template("emails.RestPassword", { resetLink: link }).send();
+            await AuthController.sendVerificationEmail(registeredAccount);
             
-
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: { } });
 
         } catch (error) {
@@ -662,7 +658,7 @@ class StudentController {
     
             try {
                 
-                const validationInstance = await Validation.findOne({where: {otp: data.token}});
+                const validationInstance = await Validation.findOne({where: {token: data.token}});
 
                 if (!validationInstance) {
                     return res.status(ResponseStatus.code.not_found).json({
@@ -672,6 +668,10 @@ class StudentController {
                 }
 
                 const registeredAccount = await validationInstance.getAccount();
+                
+                registeredAccount.status = 'active';
+                await registeredAccount.save();
+
                 const studentInstance = await Student.create(req.body);
                 await registeredAccount.setStudent(studentInstance);
     

@@ -1,4 +1,4 @@
-const { SchoolManagement, ClassArm, Class, Account } = require('../database/connection');
+const { SchoolManagement, ClassArm, Class, Account, Teacher, Student, Subject } = require('../database/connection');
 const ResponseStatus = require('../config/message.config');
 
 class classArms {
@@ -46,12 +46,11 @@ class classArms {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const promises = arms.map(async (eachArm) => {
-                const classArmInstance = await ClassArm.create({ naming: eachArm });
+            for (let index = 0; index < arms.length; index++) {
+                const arm = arms[index];
+                const classArmInstance = await ClassArm.create({ naming: arm });
                 await classInstance.addClassArm(classArmInstance);
-            });
-
-            await Promise.all(promises);
+            }
 
             const classWithArms = await Class.findByPk(classId, { include: [ClassArm] });
 
@@ -80,6 +79,25 @@ class classArms {
 
         } catch (error) {
             console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
+
+    /* ---------------------------- READ BY CLASS ID ---------------------------- */
+
+    static async readAllByClass(req, res) {
+
+        try {
+            const classArms = await ClassArm.findAll({
+                where : { ClassId : req.params.id},
+                include : [
+                    { model : Subject },
+                    { model : Student, include : [Account]},
+                    { model : Teacher, include : [Account]},
+                ]
+            });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classArms });
+        } catch (error) {
             res.status(500).json({ error: 'Server Error' });
         }
     }

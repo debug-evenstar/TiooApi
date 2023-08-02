@@ -122,10 +122,11 @@ class InviteController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const classArmsInstance = await ClassArm.findByPk(inviteInstance.classes[0], {
+            const linkedClassArms = JSON.parse(inviteInstance.classes);
+
+            const classArmsInstance = await ClassArm.findByPk(linkedClassArms[0], {
                 attributes: { exclude: ['ClassId'] }
             });
-
 
 
             const payload = {

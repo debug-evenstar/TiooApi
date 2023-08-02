@@ -54,8 +54,10 @@ class SubjectController {
         const { id } = req.params;
 
         try {
-            const subjectInstance = await Subject.findAll({ where: { SchoolManagementId: id } });
-
+            const subjectInstance = await Subject.findAll({ 
+                where: { SchoolManagementId: id },
+                include : [ClassArm]
+            });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
 

@@ -34,12 +34,12 @@ const UploadService = require('../services/upload.service');
 /*------------------------------| AUTHORIZED ROUTES |------------------------------*/
 
 const allAuthorizedRoutesGroup = (router) => {
-
+    
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
     router.post('/account/send_otp', SendOTPValidator, AuthenicationController.requestVerificationOTP);
-    router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyOTP);
+    router.post('/account/verify/resend', SendOTPValidator, AuthenicationController.resendVerification);
     router.put('/account/change_password', ChangePasswordValidator, AuthenicationController.changePassword);
     router.post('/account/resetpassword', ResetPasswordValidator, AuthenicationController.resetPassword);
     router.post('/account/verify_reset_password', VerifyResetPasswordValidator, AuthenicationController.verifyResetPassword);
@@ -119,6 +119,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/class/arms/create', ClassArmsController.create);
     router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
     router.get('/class/arms/read', ClassArmsController.readAll);
+    router.get('/class/:id/arms', ClassArmsController.readAllByClass);
     router.get('/class/arms/read/:id', ClassArmsController.readById);
     router.get('/class/arms/students/:id', ClassArmsController.classArmStudents);
     router.get('/class/arms/:id/subjects', ClassArmsController.classArmSubjects); // This is the a better route format /entity/:entityId/relationship

@@ -43,7 +43,9 @@ class FreelancerController {
 
             const updated = await registeredSchoolManagement.update(parsedBody);
 
-            console.log(registeredSchoolManagement);
+            registeredAccount.status = 'active';
+            
+            await registeredAccount.save();
 
             /*-------------/ for standard school naming convention /-------------*/
 
