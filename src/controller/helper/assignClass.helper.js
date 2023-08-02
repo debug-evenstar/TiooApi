@@ -55,7 +55,6 @@ class SchoolUtils {
                 SchoolManagementId: schoolId,
             }));
 
-            console.log(classes);
             await Class.bulkCreate(classes);
             return;
         } catch (error) {

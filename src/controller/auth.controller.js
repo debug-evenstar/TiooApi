@@ -910,13 +910,14 @@ class AuthController {
             validate.accountId = account.id
             validate.token = hash
             validate.expires_at = expiry;
-            const response = await validate.save();
+            await validate.save();
+        }else{
+            tokenRecord.token = hash;
+            tokenRecord.expires_at = expiry;
+            await tokenRecord.save();
         }
 
-        tokenRecord.token = hash;
-        tokenRecord.expires_at = expiry;
 
-        await tokenRecord.save();
 
         const link = `${process.env.WEB_URL}/account/verify/${hash}`;
 
