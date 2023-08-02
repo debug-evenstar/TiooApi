@@ -670,9 +670,15 @@ class StudentController {
                 const registeredAccount = await validationInstance.getAccount();
                 
                 registeredAccount.status = 'active';
+
+                const studentInstance = await Student.create({
+                    ...req.body,
+                    parent : registeredAccount.name
+                });
+
+                registeredAccount.name = req.body.name
                 await registeredAccount.save();
 
-                const studentInstance = await Student.create(req.body);
                 await registeredAccount.setStudent(studentInstance);
     
                 const userData = {
