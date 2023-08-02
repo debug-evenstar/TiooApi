@@ -104,7 +104,11 @@ class AuthController {
                 });
             }
 
-            const registerdAccount = await Account.findOne({ where: { id: validation.accountId } });
+            const registerdAccount = await Account.findOne({ 
+                where: { id: validation.accountId } ,
+                include : [SchoolManagement, Teacher, Student],
+                attributes: { exclude: ['password'] }
+            });
 
             if (!registerdAccount) {
                 return res.status(ResponseStatus.code.not_found).json({
