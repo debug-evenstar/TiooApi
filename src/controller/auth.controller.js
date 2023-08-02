@@ -436,7 +436,7 @@ class AuthController {
 
         try {
 
-            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' }, include : [SchoolManagement] });
+            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' }, include : [SchoolManagement, Student] });
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -460,7 +460,6 @@ class AuthController {
             }
 
             if(payload.account_type === 'student'){
-
                 const profile  = await user.getStudent(); 
                 const schoolManagementId = profile.SchoolManagementId;
                 if(schoolManagementId) {
