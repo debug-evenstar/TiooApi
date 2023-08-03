@@ -33,7 +33,7 @@ const UploadService = require('../services/upload.service');
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
 const OpenRoutesGroup = (router) => {
-    
+
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
@@ -185,9 +185,11 @@ const AdminRoutesGroup = (router) => {
     router.use(AuthenticationMiddleware.admin) //--use middleware--//
 
     router.get('/admin/schools', AdminController.schools);
-    
+    router.get('/admin/freelancer', AdminController.freeLancers);
+    router.get('/admin/freelancer/:id', AdminController.freeLancersById);
+
     /* --------------------------------- School -------------------------------- */
- 
+
 };
 
 OpenRoutesGroup(router);
