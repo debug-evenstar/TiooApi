@@ -215,6 +215,8 @@ class TeacherController {
 
             req.body.flag = 'active';
 
+            req.body.status = 'active';
+
             const response = await accountInstance.update(req.body);
 
             const link = `${process.env.BASE_URL}/api/account/signin`;
