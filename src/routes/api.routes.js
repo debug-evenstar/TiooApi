@@ -21,7 +21,7 @@ const TeacherController = require('../controller/teacher.controller');
 const InviteController = require('../controller/invite.controller');
 const LessonController = require('../controller/lesson.controller');
 const ChapterController = require('../controller/chapter.controller');
-const AdminController = require('../controller/admin.controller');
+const AdminController = require('../controller/admin/school.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -182,7 +182,7 @@ const AuthorizedRoutesGroup = (router) => {
 const AdminRoutesGroup = (router) => {
     router.use(AuthenticationMiddleware.admin) //--use middleware--//
 
-    router.get('/schools', AdminController.schools);
+    router.get('/admin/schools', AdminController.schools);
     
     /* --------------------------------- School -------------------------------- */
  

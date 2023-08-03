@@ -1,5 +1,5 @@
-const ResponseStatus = require('../config/message.config');
-const { Account, Validation, Teacher, SchoolManagement } = require('../database/connection');
+const ResponseStatus = require('../../config/message.config');
+const { Account, Validation, Teacher, SchoolManagement } = require('../../database/connection');
 
 class AdminController {
 
