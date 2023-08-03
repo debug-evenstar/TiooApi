@@ -27,21 +27,27 @@ class AdminController {
             const accountData = await Promise.all(accountInstances.map(async (account) => {
                 const payload = {};
 
+             
                 const schoolInstance = await account.getSchoolManagement();
+
+               let school = {...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residentialAddress}
 
                 const teacherInstances = await schoolInstance.getTeachers({attributes: { exclude: ['passportNumber', 'residentialAddress', 'nationality'] }, include: Account});
 
+                const hybridTeachers = await schoolInstance.getTeachers({where: {teacher_type: 'subject'}},{attributes: { exclude: ['passportNumber', 'residentialAddress', 'nationality'] }, include: Account});
+
                 const classInstances = await schoolInstance.getClasses();
 
-                const studentInstances = await schoolInstance.getStudents();
+                const studentInstances = await schoolInstance.getStudents({attributes: { exclude: ['nationality', 'residentialAddress', 'passportNumber', 'dateOfBirth', 'gender', 'parent', 'class', 'school', 'age'] }, include: Account});
 
                 const subjectInstances = await schoolInstance.getSubjects();
 
-                payload.account = account;
-                payload.subjects = subjectInstances;
-                payload.teachers = teacherInstances;
-                payload.classes = classInstances;
-                payload.students = studentInstances; 
+                payload.school = school;
+                payload.subjects = subjectInstances.length;
+                payload.teachers = teacherInstances.length;
+                payload.hybrid_teachers = hybridTeachers.length;
+                payload.students = studentInstances.length;
+                payload.classes = classInstances.length; 
 
                 //const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
                 return payload;
