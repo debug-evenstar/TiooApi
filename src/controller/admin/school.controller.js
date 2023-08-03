@@ -3,7 +3,7 @@ const { Account, Validation, Teacher, SchoolManagement } = require('../../databa
 
 class AdminController {
 
-    /*-----------------------------------| SETUP SCHOOL |-----------------------------------*/
+    /*-----------------------------------| SCHOOL RELATIONAL DATA |-----------------------------------*/
 
     static async schools(req, res) {
 
@@ -13,7 +13,6 @@ class AdminController {
                 attributes: { exclude: ['password'] },
                 where: {
                     account_type: 'school',
-                    // '$Teacher.id$': { [Sequelize.Op.not]: null },
                 },
             });
 
@@ -49,7 +48,6 @@ class AdminController {
                 payload.students = studentInstances.length;
                 payload.classes = classInstances.length; 
 
-                //const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
                 return payload;
 
             }));
