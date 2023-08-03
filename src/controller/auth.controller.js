@@ -459,9 +459,11 @@ class AuthController {
 
             if (payload.account_type === "teacher") {
                 const profile = await user.getTeacher();
+                const schoolManagement = await user.getSchoolManagement();
                 payload.profileId = profile.id;
                 payload.teacher_type = profile.teacher_type;
-                payload.schoolManagement = profile.SchoolManagementId;
+                payload.schoolManagement = schoolManagement.id;
+                payload.school = schoolManagement.school_name;
             }
 
             if(payload.account_type === 'student'){

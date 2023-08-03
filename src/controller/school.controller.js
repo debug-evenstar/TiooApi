@@ -298,7 +298,7 @@ class SchoolManagementController {
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
-
+            
             const schoolInstance = await accountInstance.getSchoolManagement();
 
             accountInstance.dataValues.schoolManagementId = schoolInstance.id;
