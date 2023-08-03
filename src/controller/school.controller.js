@@ -1,6 +1,6 @@
 const { validationResult, body } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Student, Class, ClassArm } = require('../database/connection');
+const { Account, Validation, SchoolManagement, Student, Class, ClassArm, Subject } = require('../database/connection');
 const AuthController = require('../controller/auth.controller');
 const ClassSeeds = require('../utils/class.utilities');
 const SchoolUtils = require('./helper/assignClass.helper');
@@ -51,6 +51,8 @@ class SchoolManagementController {
 
             const registeredSchoolManagement = await registeredAccount.SchoolManagement.update(parsedBody);
 
+            registeredAccount.status = 'active';
+            await registeredAccount.save();
 
             /*-------------/ for standard school naming convention /-------------*/
 
@@ -148,18 +150,9 @@ class SchoolManagementController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const schoolTeachersProfile = await schoolInstance.getTeachers();
+            const schoolTeachersProfile = await schoolInstance.getTeachers({ include : [Account, Subject, Class, ClassArm]});
 
-            const teacherAccountIds = schoolTeachersProfile.map(teacher => teacher.AccountId);
-
-            let teachersAccount = [];
-
-            if (teacherAccountIds.length !== 0) {
-                teachersAccount = await Account.findAll({ where: { id: [...teacherAccountIds] }, attributes: { exclude: ['password'] } });
-            }
-
-
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: schoolTeachersProfile });
 
         } catch (error) {
             console.log(error);
@@ -305,7 +298,7 @@ class SchoolManagementController {
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
-
+            
             const schoolInstance = await accountInstance.getSchoolManagement();
 
             accountInstance.dataValues.schoolManagementId = schoolInstance.id;

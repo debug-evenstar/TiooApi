@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, TempValidation, Teacher, SchoolManagement } = require('../database/connection');
+const { Account, Validation, TempValidation, Teacher, SchoolManagement, Student } = require('../database/connection');
 const TokenMiddleware = require('../middleware/token.middleware');
 const Mailer = require('../services/mailer');
 require('dotenv').config();
@@ -104,7 +104,11 @@ class AuthController {
                 });
             }
 
-            const registerdAccount = await Account.findOne({ where: { id: validation.accountId } });
+            const registerdAccount = await Account.findOne({ 
+                where: { id: validation.accountId } ,
+                include : [SchoolManagement, Teacher, Student],
+                attributes: { exclude: ['password'] }
+            });
 
             if (!registerdAccount) {
                 return res.status(ResponseStatus.code.not_found).json({
@@ -125,7 +129,7 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.forbidden });
             }
 
-            await registerdAccount.update({ verification_status: 1, });
+            await registerdAccount.update({ verification_status: 1, status: 'verified' });
 
             return res.status(ResponseStatus.code.success).json({ error: false, data: registerdAccount, message: ResponseStatus.pass.verify });
 
@@ -269,7 +273,7 @@ class AuthController {
             }
 
             if (isVerifedUser === 0) {
-                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.verify });
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, action: "verify", message: ResponseStatus.fail.verify });
             }
 
             const userData = {
@@ -284,6 +288,7 @@ class AuthController {
                 AccountId: user.id,
                 name: user.name,
                 email: user.email,
+                status: user.status === null ? "undefined" : user.status,
                 phone: user.phone,
                 account_type: user.account_type,
                 verification_status: user.verification_status,
@@ -292,7 +297,12 @@ class AuthController {
 
             if (user.account_type === "school") {
                 payload.school = user.SchoolManagement.school_name;
-                payload.redirect = "https://dashboard.tioo.ng";
+                payload.redirect = "https://dashboard.hellotioo.com/auth";
+            }
+
+            if(user.account_type === "freelancer"){
+                payload.school = user.SchoolManagement.school_name;
+                payload.redirect = "https://dashboard.hellotioo.com/auth";
             }
 
             if (user.account_type === "teacher") {
@@ -300,26 +310,30 @@ class AuthController {
                 payload.profileId = profile.id;
                 payload.teacher_type = profile.teacher_type;
                 payload.schoolManagement = profile.SchoolManagementId;
-                payload.redirect = "https://dashboard.tioo.ng";
+                payload.redirect = "https://dashboard.hellotioo.com/auth";
 
             } else if (user.account_type === 'student') {
 
                 const profile = await user.getStudent();
                 const schoolManagementId = profile.SchoolManagementId;
-
-                const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
-                const studentSchoolAccount = await studentSchool.getAccount();
-                const classData = await profile.getClass();
-                const studentSubject = await classData.getSubjects();
-
-                payload.schoolName = studentSchoolAccount.name;
-                payload.studentClass = classData.naming;
-                payload.subjectsCount = studentSubject.length;
+                if(schoolManagementId) {
+                    const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
+                    const studentSchoolAccount = await studentSchool.getAccount();
+                    const classData = await profile.getClass();
+                    const studentSubject = await classData.getSubjects();
+                    payload.schoolName = studentSchoolAccount.name;
+                    payload.studentClass =  classData.naming;
+                    payload.subjectsCount = studentSubject.length;
+                    payload.schoolStudent = true;
+                }else{
+                    payload.schoolStudent = false;
+                    payload.schoolName = profile.school;
+                    payload.studentClass = profile.class; 
+                }
                 payload.term = "undefined";
-                payload.redirect = "https://student.tioo.ng";
+                payload.redirect = "https://student.hellotioo.com/auth";
 
-                payload.status = payload.flag === 'active' ? "On Track" : "??";
-            } else {
+              }else{
 
                 payload.admin = user.admin;
             }
@@ -470,7 +484,7 @@ class AuthController {
 
         try {
 
-            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
+            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' }, include : [SchoolManagement] });
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -478,21 +492,41 @@ class AuthController {
 
             const payload = { ...user.dataValues };
 
-            if (payload.account_type === 'student') {
+            if(payload.account_type === "school"){
+                payload.school = user.SchoolManagement.school_name;
+            }
 
-                const profile = await user.getStudent();
+            if(payload.account_type === "freelancer"){
+                payload.school = user.SchoolManagement.school_name;
+            }
+
+            if (payload.account_type === "teacher") {
+                const profile = await user.getTeacher();
+                const schoolManagement = await profile.getSchoolManagement();
+                payload.profileId = profile.id;
+                payload.teacher_type = profile.teacher_type;
+                payload.schoolManagement = schoolManagement.id;
+                payload.school = schoolManagement.school_name;
+            }
+
+            if(payload.account_type === 'student'){
+                const profile  = await user.getStudent(); 
                 const schoolManagementId = profile.SchoolManagementId;
-
-                const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
-                const studentSchoolAccount = await studentSchool.getAccount();
-                const classData = await profile.getClass();
-                const studentSubject = await classData.getSubjects();
-
-                payload.schoolName = studentSchoolAccount.name;
-                payload.studentClass = classData.naming;
-                payload.subjectsCount = studentSubject.length;
+                if(schoolManagementId) {
+                    const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
+                    const studentSchoolAccount = await studentSchool.getAccount();
+                    const classData = await profile.getClass();
+                    const studentSubject = await classData.getSubjects();
+                    payload.schoolName = studentSchoolAccount.name;
+                    payload.studentClass =  classData.naming;
+                    payload.subjectsCount = studentSubject.length;
+                    payload.schoolStudent = true;
+                }else{
+                    payload.schoolStudent = false;
+                    payload.schoolName = profile.school;
+                    payload.studentClass = profile.class; 
+                }
                 payload.term = "undefined";
-
                 payload.status = payload.flag === 'active' ? "On Track" : "??";
 
             }
@@ -581,6 +615,13 @@ class AuthController {
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            // Temp fix for Cascading relationships -- to be removed
+            if(user.account_type == "student"){
+                (await Student.findOne({ where : {AccountId : id}})).destroy();
+            }
+            if(user.account_type == "teacher"){
+                (await Teacher.findOne({ where : {AccountId : id}})).destroy();
             }
 
             const response = await user.destroy();
@@ -888,6 +929,32 @@ class AuthController {
 
     }
 
+    static async resendVerification(req, res){
+
+        const { email } = req.body;
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const account = await Account.findOne({ where : {email : email}});
+
+            if (!account) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            await AuthController.sendVerificationEmail(account);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.send_otp });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
 
     static async sendVerificationEmail(account) {
 
@@ -900,17 +967,16 @@ class AuthController {
             validate.accountId = account.id
             validate.token = hash
             validate.expires_at = expiry;
-            const response = await validate.save();
+            await validate.save();
+        }else{
+            tokenRecord.token = hash;
+            tokenRecord.expires_at = expiry;
+            await tokenRecord.save();
         }
 
-        tokenRecord.token = hash;
-        tokenRecord.expires_at = expiry;
 
-        await tokenRecord.save();
 
         const link = `${process.env.WEB_URL}/account/verify/${hash}`;
-
-        console.log(link);
 
         Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { link }).send();
     }

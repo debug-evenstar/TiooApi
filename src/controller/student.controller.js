@@ -499,7 +499,9 @@ class StudentController {
             if (accountInstance.account_type != "student") {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.student });
             } else {
-                const response = await accountInstance.destroy();
+                const studentInstance = await Student.findOne({ where: {AccountId : id}});
+                await studentInstance.destroy();
+                await accountInstance.destroy();
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
             }
 
@@ -665,7 +667,17 @@ class StudentController {
                 }
 
                 const registeredAccount = await validationInstance.getAccount();
-                const studentInstance = await Student.create(req.body);
+                
+                registeredAccount.status = 'active';
+
+                const studentInstance = await Student.create({
+                    ...req.body,
+                    parent : registeredAccount.name
+                });
+
+                registeredAccount.name = req.body.name
+                await registeredAccount.save();
+
                 await registeredAccount.setStudent(studentInstance);
     
                 const userData = {
