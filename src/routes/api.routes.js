@@ -1,7 +1,6 @@
 const express = require('express');
 router = express.Router();
 
-
 /* -------------------------------| Validators |------------------------------- */
 
 const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator } = require("./validators/AuthValidators")
@@ -9,7 +8,6 @@ const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidat
 /*-----------------------------------| HOME |-----------------------------------*/
 
 router.get('/', (req, res) => { res.json({ message: "NIMO SERVER RUNNING...." }) });
-
 
 /*--------------------------------| CONTROLLERS |--------------------------------*/
 
@@ -23,6 +21,7 @@ const TeacherController = require('../controller/teacher.controller');
 const InviteController = require('../controller/invite.controller');
 const LessonController = require('../controller/lesson.controller');
 const ChapterController = require('../controller/chapter.controller');
+const AdminController = require('../controller/admin/school.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -31,9 +30,9 @@ const StudentController = require('../controller/student.controller');
 const { InviteValidator, AcceptValidator } = require('./validators/StudentValidators');
 const UploadService = require('../services/upload.service');
 
-/*------------------------------| AUTHORIZED ROUTES |------------------------------*/
+/*------------------------------| OPEN ROUTES |------------------------------*/
 
-const allAuthorizedRoutesGroup = (router) => {
+const OpenRoutesGroup = (router) => {
     
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
@@ -73,9 +72,9 @@ const allAuthorizedRoutesGroup = (router) => {
 };
 
 
-/*------------------------------| SECURED ROUTES |------------------------------*/
+/*------------------------------| AUTHORIZED ROUTES |------------------------------*/
 
-const adminAuthorizedRoutesGroup = (router) => {
+const AuthorizedRoutesGroup = (router) => {
     /* --------------------------------- ACCOUNT -------------------------------- */
     router.use(AuthenticationMiddleware.verify) //--use middleware--//
     router.get('/account/read_all', AuthenicationController.accounts);
@@ -180,8 +179,20 @@ const adminAuthorizedRoutesGroup = (router) => {
 };
 
 
-allAuthorizedRoutesGroup(router);
-adminAuthorizedRoutesGroup(router);
+/*------------------------------| Admin ROUTES |------------------------------*/
+
+const AdminRoutesGroup = (router) => {
+    router.use(AuthenticationMiddleware.admin) //--use middleware--//
+
+    router.get('/admin/schools', AdminController.schools);
+    
+    /* --------------------------------- School -------------------------------- */
+ 
+};
+
+OpenRoutesGroup(router);
+AuthorizedRoutesGroup(router);
+AdminRoutesGroup(router);
 
 module.exports = router;
 
