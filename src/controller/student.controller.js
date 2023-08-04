@@ -27,7 +27,7 @@ class StudentController {
 
     /* ------------------------ SENDS INVITE TO Student ------------------------ */
     static async sendInvitation(req, res) {
-
+      
         function generateRandomPassword(length) {
             const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[{]};:,<.>/?';
             let password = '';
@@ -36,7 +36,6 @@ class StudentController {
                 let randomIndex = Math.floor(Math.random() * charset.length);
                 password += charset[randomIndex];
             }
-
             return password;
         }
 
