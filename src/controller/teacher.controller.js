@@ -271,8 +271,8 @@ class TeacherController {
             const classArmInstance = await teacherInstance.getClassArms({ joinTableAttributes: [] });
 
             for (let index = 0; index < classInstance.length; index++) {
-                classInstance[index].ClassArm = classArmInstance.filter((arm) => {
-                    return arm.ClassId == classInstance[index];
+                classInstance[index].dataValues.ClassArms = classArmInstance.filter((arm) => {
+                    return arm.ClassId == classInstance[index].id;
                 });
             }
 
