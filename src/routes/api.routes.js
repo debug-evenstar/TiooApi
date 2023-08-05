@@ -194,6 +194,8 @@ const AdminRoutesGroup = (router) => {
 
     router.post('/admin/settings/pricing', PriceController.create);
     router.get('/admin/settings/pricing', PriceController.read);
+    router.put('/admin/settings/pricing', PriceController.update);
+    router.delete('/admin/settings/pricing/:id', PriceController.delete);
 
     router.get('/admin/freelancer', AdminController.freeLancers);
     router.get('/admin/freelancer/:id', AdminController.freeLancersById);
