@@ -22,6 +22,8 @@ const InviteController = require('../controller/invite.controller');
 const LessonController = require('../controller/lesson.controller');
 const ChapterController = require('../controller/chapter.controller');
 const AdminController = require('../controller/admin/school.controller');
+const HomeController = require('../controller/admin/home.controller');
+const PriceController = require('../controller/admin/pricing.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -183,9 +185,14 @@ const AdminRoutesGroup = (router) => {
     router.use(AuthenticationMiddleware.admin) //--use middleware--//
 
     router.get('/admin/schools', AdminController.schools);
+    router.get('/admin/home/dashboard', HomeController.dashboard);
+    router.get('/admin/home/dashboard/activeusers', HomeController.activeUser);
+
+    /* --------------------------------- PRICING -------------------------------- */
+
+    router.post('/admin/settings/pricing', PriceController.create);
+    router.get('/admin/settings/pricing', PriceController.read);
     
-    /* --------------------------------- School -------------------------------- */
- 
 };
 
 OpenRoutesGroup(router);
