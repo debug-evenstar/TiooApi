@@ -100,11 +100,13 @@ class TeacherController {
             }
 
             const classInstance = await accountInstance.Teacher.getClasses({ joinTableAttributes: [] });
+            const classArmInstance = await accountInstance.Teacher.getClassArms({ joinTableAttributes: [] });
             const subjectInstance = await accountInstance.Teacher.getSubjects({ joinTableAttributes: [] });
 
             const payload = {
                 account: accountInstance,
                 classes: classInstance,
+                classarms: classArmInstance,
                 subjects: subjectInstance
             };
 
