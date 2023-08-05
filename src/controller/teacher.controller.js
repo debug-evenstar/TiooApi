@@ -266,7 +266,15 @@ class TeacherController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const classInstance = await teacherInstance.getClasses({ joinTableAttributes: [], include: [ClassArm] });
+            const classInstance = await teacherInstance.getClasses({ joinTableAttributes: [] });
+
+            const classArmInstance = await teacherInstance.getClassArms({ joinTableAttributes: [] });
+
+            for (let index = 0; index < classInstance.length; index++) {
+                classInstance[index].ClassArm = classArmInstance.filter((arm) => {
+                    return arm.ClassId == classInstance[index];
+                });
+            }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classInstance });
 
