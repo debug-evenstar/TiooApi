@@ -35,7 +35,7 @@ const UploadService = require('../services/upload.service');
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
 const OpenRoutesGroup = (router) => {
-    
+
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
@@ -61,7 +61,7 @@ const OpenRoutesGroup = (router) => {
     router.post('/student/parent/signup_second', StudentController.parentSignupTwo);
 
     /* --------------------------------- INVITES -------------------------------- */
-    
+
     router.post('/invites/generate', InviteController.generateLink);
     router.post('/invites/student/generate', InviteController.generateStudentLink);
     router.get('/invites/read', InviteController.invites);
@@ -84,6 +84,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.put('/account/update', AuthenicationController.updateAccount);
     router.put('/account/flag', AuthenicationController.flagAccount);
     router.post('/account/auth/resetpassword', AuthenicationController.resetAuthPassword);
+    router.get('/account/auth/account', AuthenicationController.authAccountByID);
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
     router.get('/account/exist/:email', AuthenicationController.accountExist);
@@ -104,6 +105,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/class/create_bulk', ClassController.bulkCreate);
     router.get('/class/read', ClassController.readAll);
     router.get('/class/readwitharms', ClassController.readAllWithArms);
+    router.get('/class/students/teachers/:id', ClassController.readStudentsTeachers);
     router.get('/class/readwitharms/:classId', ClassController.readClassWithArms);
     router.get('/class/read/:id', ClassController.read);
     router.get('/class/subjects/read/:id', ClassController.readClassWithSubjects);
@@ -126,9 +128,9 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/class/arms/:id/subjects', ClassArmsController.classArmSubjects); // This is the a better route format /entity/:entityId/relationship
     router.put('/class/arms/update/:id', ClassArmsController.updateById);
     router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
-    
+
     /* -------------------------------- SUBJECTS -------------------------------- */
-    
+
     router.post('/subjects/create', SubjectController.create);
     router.get('/subjects/read', SubjectController.readAll);
     router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
@@ -145,7 +147,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.delete('/subjects/delete/:id', SubjectController.delete);
 
     /* --------------------------------- TEACHERS -------------------------------- */
-  
+
     router.post('/teacher/invite', TeacherController.sendInvite);
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
@@ -192,7 +194,10 @@ const AdminRoutesGroup = (router) => {
 
     router.post('/admin/settings/pricing', PriceController.create);
     router.get('/admin/settings/pricing', PriceController.read);
-    
+
+    router.get('/admin/freelancer', AdminController.freeLancers);
+    router.get('/admin/freelancer/:id', AdminController.freeLancersById);
+
 };
 
 OpenRoutesGroup(router);

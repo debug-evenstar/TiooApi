@@ -27,7 +27,7 @@ class StudentController {
 
     /* ------------------------ SENDS INVITE TO Student ------------------------ */
     static async sendInvitation(req, res) {
-
+      
         function generateRandomPassword(length) {
             const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[{]};:,<.>/?';
             let password = '';
@@ -36,7 +36,6 @@ class StudentController {
                 let randomIndex = Math.floor(Math.random() * charset.length);
                 password += charset[randomIndex];
             }
-
             return password;
         }
 
@@ -670,9 +669,15 @@ class StudentController {
                 const registeredAccount = await validationInstance.getAccount();
                 
                 registeredAccount.status = 'active';
+
+                const studentInstance = await Student.create({
+                    ...req.body,
+                    parent : registeredAccount.name
+                });
+
+                registeredAccount.name = req.body.name
                 await registeredAccount.save();
 
-                const studentInstance = await Student.create(req.body);
                 await registeredAccount.setStudent(studentInstance);
     
                 const userData = {

@@ -41,21 +41,21 @@ class AuthController {
             const response = await registeredAccount.setValidation(newValidation);
 
             // Create school record if account type is school
-            if(req.body.account_type === "school"){
+            if (req.body.account_type === "school") {
                 const registeredSchoolManagement = await SchoolManagement.create({
-                    school_name : req.body.name
+                    school_name: req.body.name
                 });
-    
+
                 await registeredAccount.setSchoolManagement(registeredSchoolManagement);
             }
 
-            if(req.body.account_type === "freelancer"){
+            if (req.body.account_type === "freelancer") {
                 const registeredSchoolManagement = await SchoolManagement.create({
-                    school_name : req.body.name,
-                    school_types: '[Custome]',
+                    school_name: req.body.name,
+                    school_types: '[Custom]',
                     naming_types: 'C'
                 });
-    
+
                 await registeredAccount.setSchoolManagement(registeredSchoolManagement);
             }
 
@@ -95,9 +95,9 @@ class AuthController {
         }
 
         try {
-            const validation = await Validation.findOne({ where : { token } });
+            const validation = await Validation.findOne({ where: { token } });
 
-            if(!validation){
+            if (!validation) {
                 return res.status(ResponseStatus.code.forbidden).json({
                     error: true,
                     message: ResponseStatus.fail.forbidden
@@ -131,7 +131,7 @@ class AuthController {
 
             await registerdAccount.update({ verification_status: 1, status: 'verified' });
 
-            return res.status(ResponseStatus.code.success).json({ error: false, data: registerdAccount,message: ResponseStatus.pass.verify });
+            return res.status(ResponseStatus.code.success).json({ error: false, data: registerdAccount, message: ResponseStatus.pass.verify });
 
 
         } catch (error) {
@@ -246,7 +246,7 @@ class AuthController {
     /*-----------------------------------| SIGNIN ACCOUNT |-----------------------------------*/
 
     static async signInAccount(req, res) {
-      
+
         const { email, password } = req.body;
         const errors = validationResult(req);
 
@@ -255,11 +255,11 @@ class AuthController {
         }
 
         try {
-            const user = await Account.findOne({ where: { email: email }, include: [SchoolManagement]});
+            const user = await Account.findOne({ where: { email: email }, include: [SchoolManagement] });
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
             }
-          
+
             if (user.flag === 'invited') {
                 return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.invite });
             }
@@ -284,7 +284,7 @@ class AuthController {
 
             const generatedToken = TokenMiddleware.generate(userData)
 
-            const payload  = {
+            const payload = {
                 AccountId: user.id,
                 name: user.name,
                 email: user.email,
@@ -295,7 +295,7 @@ class AuthController {
                 flag: user.flag,
             }
 
-            if(user.account_type === "school"){
+            if (user.account_type === "school") {
                 payload.school = user.SchoolManagement.school_name;
                 payload.redirect = "https://dashboard.hellotioo.com/auth";
             }
@@ -312,9 +312,9 @@ class AuthController {
                 payload.schoolManagement = profile.SchoolManagementId;
                 payload.redirect = "https://dashboard.hellotioo.com/auth";
 
-              }else if(user.account_type === 'student'){
-                
-                const profile  = await user.getStudent(); 
+            } else if (user.account_type === 'student') {
+
+                const profile = await user.getStudent();
                 const schoolManagementId = profile.SchoolManagementId;
                 if(schoolManagementId) {
                     const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
@@ -336,8 +336,8 @@ class AuthController {
               }else{
 
                 payload.admin = user.admin;
-              }
-              
+            }
+
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
 
 
@@ -364,6 +364,9 @@ class AuthController {
 
     }
 
+
+
+
     /*-----------------------------------| FETCH ACCOUNT BY ID |-----------------------------------*/
 
     static async accountByID(req, res) {
@@ -378,20 +381,20 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
 
-            const payload = {...user.dataValues};
+            const payload = { ...user.dataValues };
 
-            if(payload.account_type === 'student'){
+            if (payload.account_type === 'student') {
 
-                const profile  = await user.getStudent(); 
+                const profile = await user.getStudent();
                 const schoolManagementId = profile.SchoolManagementId;
-                
+
                 const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
                 const studentSchoolAccount = await studentSchool.getAccount();
                 const classData = await profile.getClass();
                 const studentSubject = await classData.getSubjects();
-                
+
                 payload.schoolName = studentSchoolAccount.name;
-                payload.studentClass =  classData.naming;
+                payload.studentClass = classData.naming;
                 payload.subjectsCount = studentSubject.length;
                 payload.term = "undefined";
 
@@ -408,6 +411,46 @@ class AuthController {
     }
 
 
+    static async authAccountByID(req, res) {
+
+        const { id } = req.userData;
+
+        try {
+
+            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const payload = { ...user.dataValues };
+
+            if (payload.account_type === 'student') {
+
+                const profile = await user.getStudent();
+                const schoolManagementId = profile.SchoolManagementId;
+
+                const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
+                const studentSchoolAccount = await studentSchool.getAccount();
+                const classData = await profile.getClass();
+                const studentSubject = await classData.getSubjects();
+
+                payload.schoolName = studentSchoolAccount.name;
+                payload.studentClass = classData.naming;
+                payload.subjectsCount = studentSubject.length;
+                payload.term = "undefined";
+
+                payload.status = payload.flag === 'active' ? "On Track" : "??";
+
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
 
     /*-----------------------------------| ACCOUNT EXIST |-----------------------------------*/
 
@@ -423,7 +466,7 @@ class AuthController {
 
                 return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.no_user, data: false });
             }
-            
+
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: true });
 
@@ -447,7 +490,7 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
 
-            const payload = {...user.dataValues};
+            const payload = { ...user.dataValues };
 
             if(payload.account_type === "school"){
                 payload.school = user.SchoolManagement.school_name;
@@ -459,9 +502,11 @@ class AuthController {
 
             if (payload.account_type === "teacher") {
                 const profile = await user.getTeacher();
+                const schoolManagement = await profile.getSchoolManagement();
                 payload.profileId = profile.id;
                 payload.teacher_type = profile.teacher_type;
-                payload.schoolManagement = profile.SchoolManagementId;
+                payload.schoolManagement = schoolManagement.id;
+                payload.school = schoolManagement.school_name;
             }
 
             if(payload.account_type === 'student'){
@@ -632,13 +677,13 @@ class AuthController {
 
         try {
 
-            const validationInstance = await Validation.findOne({where: {otp: token}});
+            const validationInstance = await Validation.findOne({ where: { otp: token } });
 
-            if(!validationInstance){
+            if (!validationInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.bad_request });
             }
 
-            
+
 
             const user = await validationInstance.getAccount();
 
@@ -784,9 +829,9 @@ class AuthController {
             const link = `${process.env.DEV}/new-password/${validation.otp}/${account.email}`;
 
             Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Reset Passord").template("emails.RestPassword", { resetLink: link }).send();
-            
+
             console.log(link);
-            
+
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.sucess,
                 response: ResponseStatus.pass.reset
@@ -858,7 +903,7 @@ class AuthController {
 
         const { password } = req.body;
         const errors = validationResult(req);
-        const {id} = req.userData;
+        const { id } = req.userData;
 
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
@@ -911,7 +956,7 @@ class AuthController {
     }
 
 
-    static async sendVerificationEmail(account){
+    static async sendVerificationEmail(account) {
 
         const expiry = (new Date(Date.now() + 30 * 60 * 1000));
         const hash = MD5(account.id + expiry).toString();

@@ -386,6 +386,7 @@ class ClassController {
                 await classInstance.addStudent(studentInstance);
 
                 await classarmInstance.addStudent(studentInstance);
+                console.log([studentInstance,])
 
                 const classStudentArray = await classInstance.getStudents({
                     where: { id: studentInstance.id }, include: { model: Account, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }
@@ -476,6 +477,39 @@ class ClassController {
 
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.added });
             }
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        }
+    }
+
+    /* ---------------- GET  TEACHERS AND STUDENTS IN A CLASS --------------- */
+
+    static async readStudentsTeachers(req, res) {
+        const { id } = req.params;
+        try {
+            const classInstance = await Class.findByPk(id, { include: [Teacher, Student] });
+
+            if (!classInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const teacherAccountIds = classInstance.Teachers.map(teacher => teacher.AccountId);
+
+            const studentAccountIds = classInstance.Students.map(student => student.AccountId);
+
+            const accounts = await Account.findAll({ where: { id: [...studentAccountIds, ...teacherAccountIds] }, attributes: { exclude: ['password'] } });
+            
+            const mapType = (type) => accounts.filter(
+                account => account.account_type == type
+            );
+            // const mapType = (type) => accounts.map((account) => {
+            //     if (account.account_type == type) {
+            //         return account;
+            //     }
+            // })
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, teachers: mapType("teacher"), students: mapType("student") });
 
         } catch (error) {
             console.log(error);
