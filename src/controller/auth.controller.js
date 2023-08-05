@@ -43,7 +43,7 @@ class AuthController {
             // Create school record if account type is school
             if(req.body.account_type === "school"){
                 const registeredSchoolManagement = await SchoolManagement.create({
-                    school_name : req.body.name
+                    school_name : req.body.school
                 });
     
                 await registeredAccount.setSchoolManagement(registeredSchoolManagement);
@@ -51,8 +51,8 @@ class AuthController {
 
             if(req.body.account_type === "freelancer"){
                 const registeredSchoolManagement = await SchoolManagement.create({
-                    school_name : req.body.name,
-                    school_types: '[Custome]',
+                    school_name : req.body.school,
+                    school_types: '["Custome"]',
                     naming_types: 'C'
                 });
     
