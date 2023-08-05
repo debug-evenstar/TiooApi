@@ -83,10 +83,9 @@ class TeacherController {
         const { id } = req.params;
 
         const decryptedId = HashUtils.decrypt(id);
-        console.log(id)
 
         try {
-            const accountInstance = await Account.findByPk(Number(decryptedId), { attributes: { exclude: ['password'] } });
+            const accountInstance = await Account.findByPk(Number(decryptedId), { attributes: { exclude: ['password'] }, include : [Teacher] });
 
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -96,14 +95,12 @@ class TeacherController {
                 return res.status(ResponseStatus.code.bad_request).json({ error: true, message: ResponseStatus.fail.accepted });
             }
 
-            const teacherInstance = await accountInstance.getTeacher({ joinTableAttributes: [] });
-
-            if (!teacherInstance) {
+            if (!accountInstance.Teacher) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const classInstance = await teacherInstance.getClasses({ joinTableAttributes: [] });
-            const subjectInstance = await teacherInstance.getSubjects({ joinTableAttributes: [] });
+            const classInstance = await accountInstance.Teacher.getClasses({ joinTableAttributes: [] });
+            const subjectInstance = await accountInstance.Teacher.getSubjects({ joinTableAttributes: [] });
 
             const payload = {
                 account: accountInstance,
