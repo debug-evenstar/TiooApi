@@ -8,7 +8,7 @@ const HashUtils = require('../../utils/hash.utilities');
 
 class AuthorizationController {
 
-    /*-----------------------------------| CREATE ACCOUNT |-----------------------------------*/
+    /*-----------------------------------| ADD ADMIN USER |-----------------------------------*/
 
     static async addAdminUser(req, res) {
 
@@ -76,6 +76,46 @@ class AuthorizationController {
         };
 
     }
+
+
+     /*-----------------------------------| READ ADMIN USER |-----------------------------------*/
+
+    static async readAdminUser(req, res) {
+
+        try {
+
+           const authorization = await Authorization.findAll();
+
+           const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
+            const user = await auth.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+            const payload = {};
+            payload.fullname = user.name;
+            payload.email = user.email;
+            payload.status = auth.status;
+            payload.role = auth.role;
+            payload.access_level = auth.access_level
+            return payload;
+
+        }));
+
+           console.log(authorization);
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: authoorizedUsers
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+
+
 
 }
 
