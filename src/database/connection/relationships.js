@@ -1,7 +1,7 @@
 
 class Relationships {
 
-    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter) {
+    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization) {
 
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -17,12 +17,15 @@ class Relationships {
         Account.hasOne(Student, { allowNull: true });
         Student.belongsTo(Account, { allowNull: true });
 
+        Account.hasOne(Authorization, { allowNull: true });
+        Authorization.belongsTo(Account, { allowNull: true });
+
         //---------/ ONE-TO-MANY - SCHOOL -*- CLASS | TEACHERS | STUDENT | SUBJECT /--------------------
 
         SchoolManagement.hasMany(Teacher);
         Teacher.belongsTo(SchoolManagement); -
 
-        SchoolManagement.hasMany(Student);
+            SchoolManagement.hasMany(Student);
         Student.belongsTo(SchoolManagement);
 
         SchoolManagement.hasMany(Subject);
@@ -73,11 +76,8 @@ class Relationships {
 
         Teacher.belongsToMany(ClassArm, { through: 'TeacherClassArms' });
         ClassArm.belongsToMany(Teacher, { through: 'TeacherClassArms' });
-        
-        // Define the associations
 
-        // Subject.hasMany(Lesson);
-        // Lesson.belongsTo(Subject);
+
     }
 
 }

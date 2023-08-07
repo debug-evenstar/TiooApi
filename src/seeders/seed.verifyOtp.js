@@ -3,7 +3,7 @@ const { Account, Validation } = require('../model/database/index');
 const accountHolder = {
     name: "Williams Mark Jerry",
     email: "student1@gmail.com",
-    phone: 08093652637,
+    phone: "08093652637",
     account_type: "student",
     password: "1234"
 };

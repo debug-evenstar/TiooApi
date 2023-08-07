@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: { "quater": 0.000, "half": 0.000, "yearly": 0.000 },
                 get() {
                     const value = this.getDataValue('students_breakdown');
-                    return value ? JSON.parse(value) : []; // Return the value directly without parsing, as it is already an array
+                    return value ? JSON.parse(value) : []; 
                 },
             },
             teachers_breakdown: {
@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: { "quater": 0.000, "half": 0.000, "yearly": 0.000 },
                 get() {
                     const value = this.getDataValue('teachers_breakdown');
-                    return value ? JSON.parse(value) : []; // Return the value directly without parsing, as it is already an array
+                    return value ? JSON.parse(value) : [];
                 },
             },
         }, {
