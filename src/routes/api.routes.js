@@ -31,6 +31,7 @@ const AuthenticationMiddleware = require('../middleware/token.middleware');
 const StudentController = require('../controller/student.controller');
 const { InviteValidator, AcceptValidator } = require('./validators/StudentValidators');
 const UploadService = require('../services/upload.service');
+const AuthorizationController = require('../controller/admin/authorization.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -196,6 +197,8 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/settings/pricing', PriceController.read);
     router.put('/admin/settings/pricing', PriceController.update);
     router.delete('/admin/settings/pricing/:id', PriceController.delete);
+
+    router.post('/admin/user', AuthorizationController.addAdminUser)
 
     router.get('/admin/freelancer', AdminController.freeLancers);
     router.get('/admin/freelancer/:id', AdminController.freeLancersById);
