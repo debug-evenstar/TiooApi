@@ -83,28 +83,10 @@ class PriceController {
 
             }));
 
-            delete schoolPricing[0].dataValues.accounts;
-            delete freelancerPricing[0].dataValues.accounts
+            // delete schoolPricing[0].dataValues.accounts;
+            // delete freelancerPricing[0].dataValues.accounts
 
             /*-----------------------------------| SCHOOL TEACHERS & STUDENTS DISCOUNTS  |-----------------------------------*/
-
-            schoolPricing[0].dataValues.teachers_quater_discount = schoolPricing[0].teachers_price - 500;
-            schoolPricing[0].dataValues.teachers_semannual_discount = schoolPricing[0].teachers_price - 1000;
-            schoolPricing[0].dataValues.teachers_annual_discount = schoolPricing[0].teachers_price - 1500
-
-            schoolPricing[0].dataValues.students_quater_discount = schoolPricing[0].student_price - 500;
-            schoolPricing[0].dataValues.students_semannual_discount = schoolPricing[0].student_price - 1000;
-            schoolPricing[0].dataValues.students_annual_discount = schoolPricing[0].student_price - 1500;
-
-            /*-----------------------------------| FREELANCER TEACHERS & STUDENTS DISCOUNTS  |-----------------------------------*/
-
-            freelancerPricing[0].dataValues.teachers_quater_discount = freelancerPricing[0].teachers_price - 500;
-            freelancerPricing[0].dataValues.teachers_semannual_discount = freelancerPricing[0].teachers_price - 1000;
-            freelancerPricing[0].dataValues.teachers_annual_discount = freelancerPricing[0].teachers_price - 1500
-
-            freelancerPricing[0].dataValues.students_quater_discount = freelancerPricing[0].student_price - 500;
-            freelancerPricing[0].dataValues.students_semannual_discount = freelancerPricing[0].student_price - 1000;
-            freelancerPricing[0].dataValues.students_annual_discount = freelancerPricing[0].student_price - 1500;
 
             payload.schools = schoolPricing[0];
             payload.freelancers = freelancerPricing[0];
@@ -145,7 +127,8 @@ class PriceController {
                 return res.status(ResponseStatus.code.bad_request).json({ error: false, message: ResponseStatus.fail.bad_request, data: {} });
             }
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: updatedInstance });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update});
+
 
         } catch (error) {
             console.log(error);

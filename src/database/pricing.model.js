@@ -24,6 +24,23 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
                 defaultValue: 'school',
             },
+
+            students_breakdown: {
+                type: DataTypes.JSON,
+                defaultValue: { "quater": 0.000, "half": 0.000, "yearly": 0.000 },
+                get() {
+                    const value = this.getDataValue('students_breakdown');
+                    return value ? JSON.parse(value) : []; // Return the value directly without parsing, as it is already an array
+                },
+            },
+            teachers_breakdown: {
+                type: DataTypes.JSON,
+                defaultValue: { "quater": 0.000, "half": 0.000, "yearly": 0.000 },
+                get() {
+                    const value = this.getDataValue('teachers_breakdown');
+                    return value ? JSON.parse(value) : []; // Return the value directly without parsing, as it is already an array
+                },
+            },
         }, {
         timestamps: false,
     });
