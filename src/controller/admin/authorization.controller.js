@@ -5,6 +5,8 @@ const { Account, Authorization, Permission, Validation, Admin } = require('../..
 const { use } = require('chai');
 const HashUtils = require('../../utils/hash.utilities');
 const AuthorizationSeed = require("../../seeders/seed.authorization");
+const TokenMiddleware = require('../../middleware/token.middleware');
+
 
 
 
@@ -57,7 +59,8 @@ class AuthorizationController {
 
             authorization.setAdmin(registeredAdmin);
 
-            // console.log(password);  // TODO - Notify User of previlage
+            console.log(password); 
+             // TODO - Notify User of previlage
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,

@@ -72,6 +72,9 @@ const OpenRoutesGroup = (router) => {
     router.delete('/invites/delete/:id', InviteController.delete);
     router.post('/invites/student/accept', InviteController.studentAccept);
     router.post('/invites/teacher/accept', InviteController.teacherAccept);
+
+    router.post('/admin/login', AuthorizationController.login);
+
 };
 
 
