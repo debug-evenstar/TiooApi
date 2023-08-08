@@ -2,21 +2,21 @@ module.exports = (sequelize, DataTypes) => {
   const Authorization = sequelize.define(
     'Authorization',
     {
-      status: {
+      role: {
         type: DataTypes.STRING,
         allowNull: false,
-        default: "normal"
+        default: 'admin'
       },
-      role: {
+      position: {
         type: DataTypes.STRING,
         allowNull: false,
         default: "Developer"
       },
-      access_level: {
+      permissions: {
         type: DataTypes.JSON,
         defaultValue: [],
         get() {
-            const value = this.getDataValue('access_level');
+            const value = this.getDataValue('permissions');
             return value ? JSON.parse(value) : [];
         },
     },

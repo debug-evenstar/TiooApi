@@ -1,9 +1,11 @@
 const AuthController = require('../auth.controller');
 const { validationResult } = require('express-validator');
 const ResponseStatus = require("../../config/message.config");
-const { Account, Authorization, Permission, Validation } = require('../../database/connection');
+const { Account, Authorization, Permission, Validation, Admin } = require('../../database/connection');
 const { use } = require('chai');
 const HashUtils = require('../../utils/hash.utilities');
+const AuthorizationSeed = require("../../seeders/seed.authorization");
+
 
 
 class AuthorizationController {
@@ -24,46 +26,38 @@ class AuthorizationController {
 
         try {
 
-            const emailExist = await AuthController.validateEmail(data.email);
+            const adminInstance = await Admin.findOne({ where: { email: data.email } });
 
-            let user;
-
-            if (!emailExist.pass) {
-                    data.account_type = 'admin';
-                    data.password = password;
-                    data.status = 'active';
-                    data.flag = 'active';
-                    data.verification_status = 1;
-                    const registeredAccount = await Account.create(req.body);
-                    const newValidation = await Validation.create({ otp });
-                    await registeredAccount.setValidation(newValidation);
-                    user = registeredAccount;
-            }else{
-
-                user = await Account.findByPk(emailExist.data.id);
-
+            if (adminInstance) {
+                return res.status(ResponseStatus.code.conflict).json({ error: true, message: "Already and admin user" });
             }
 
-            const permissions = await Permission.findAll({where : {id: data.access_level}});
+            data.password = password;
+            const registeredAdmin = await Admin.create(req.body);
+            const newValidation = await Validation.create({ otp });
+            await registeredAdmin.setValidation(newValidation);
+
+
+            let permissions = await Permission.findAll({ where: { id: data.permissions } });
+
+            if (permissions.length === 0) {
+                await AuthorizationSeed.permission();
+                permissions = await Permission.findAll({ where: { id: data.permissions } });
+            }
+
             const permission_code = permissions.map((permission) => permission.code);
 
             const authorizationData = {
-                status: data.status,
+                position: data.position,
                 role: data.role,
-                access_level: permission_code
+                permissions: permission_code
             };
 
-           const isAuthorizedAdmin = await user.getAuthorization();
-           
-           if(isAuthorizedAdmin){
-            return res.status(ResponseStatus.code.conflict).json({ error: true, message: "Already and admin user"});
-           }
+            const authorization = await Authorization.create(authorizationData);
 
-           const authorization = await Authorization.create(authorizationData);
+            authorization.setAdmin(registeredAdmin);
 
-           authorization.setAccount(user);
-
-            console.log(password);  // TODO - Notify User of previlage
+            // console.log(password);  // TODO - Notify User of previlage
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
@@ -78,27 +72,27 @@ class AuthorizationController {
     }
 
 
-     /*-----------------------------------| READ ADMIN USER |-----------------------------------*/
+    /*-----------------------------------| READ ADMIN USER |-----------------------------------*/
 
     static async readAdminUser(req, res) {
 
         try {
 
-           const authorization = await Authorization.findAll();
+            const authorization = await Authorization.findAll();
 
-           const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
-            const user = await auth.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
-            const payload = {};
-            payload.fullname = user.name;
-            payload.email = user.email;
-            payload.status = auth.status;
-            payload.role = auth.role;
-            payload.access_level = auth.access_level
-            return payload;
+            const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
+                const user = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                
+                let payload = {};
+                payload.fullname = user.name;
+                payload.email = user.email;
+                payload.status = auth.status;
+                payload.role = auth.role;
+                payload.permissions = auth.permissions
+                return payload;
 
-        }));
+            }));
 
-           console.log(authorization);
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
@@ -114,7 +108,59 @@ class AuthorizationController {
     }
 
 
+      /*-----------------------------------| SIGNIN ACCOUNT |-----------------------------------*/
 
+      static async login(req, res) {
+
+        const { email, password } = req.body;
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+            const user = await Admin.findOne({ where: { email: email }});
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
+            }
+
+            const isValidPassword = await user.comparePassword(password);
+
+            if (!isValidPassword) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
+            }
+
+            const userData = {
+                id: user.dataValues.id,
+                email: user.dataValues.email,
+                account_type: user.dataValues.account_type,
+            };
+
+            const generatedToken = TokenMiddleware.generate(userData)
+
+            const payload = {
+                AccountId: user.id,
+                name: user.name,
+                email: user.email,
+                status: user.status === null ? "undefined" : user.status,
+                phone: user.phone,
+                account_type: user.account_type,
+                verification_status: user.verification_status,
+                flag: user.flag,
+            }
+       
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
+
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
 
 
 }

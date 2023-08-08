@@ -15,7 +15,7 @@ const { Role, Permission } = require('../database/connection/index');
     static permission = async () => {
         try {
           const createdPermissions =  await Permission.bulkCreate(permissionsData);
-            console.log('Seeding completed successfully.', createdPermissions);
+            console.log('Seeding completed successfully.');
           } catch (error) {
             console.error('Error seeding data:', error);
           }
