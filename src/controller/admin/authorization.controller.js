@@ -36,7 +36,7 @@ class AuthorizationController {
                     data.verification_status = 1;
                     const registeredAccount = await Account.create(req.body);
                     const newValidation = await Validation.create({ otp });
-                    const response = await registeredAccount.setValidation(newValidation);
+                    await registeredAccount.setValidation(newValidation);
                     user = registeredAccount;
             }else{
 
