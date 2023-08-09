@@ -1,7 +1,7 @@
 
 class Relationships {
 
-    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin) {
+    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon) {
 
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -40,6 +40,9 @@ class Relationships {
 
         SchoolManagement.hasMany(Class);
         Class.belongsTo(SchoolManagement);
+
+        Coupon.hasMany(Account);
+        Account.belongsTo(Coupon);
 
         //---------/ ONE-TO-MANY - CLASS -*- STUDENTS /--------------------
 

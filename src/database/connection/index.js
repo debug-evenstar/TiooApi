@@ -41,10 +41,12 @@ const Admin = db.admins = require("../admin.model")(sequelize, Sequelize);
 const Authorization = db.roles = require("../authorization.model")(sequelize, Sequelize);
 const Permission = db.permissions = require("../permission.model")(sequelize, Sequelize);
 
+const Coupon = db.coupons = require("../coupon.model")(sequelize, Sequelize);
 
 
 
-const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin]
+
+const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon]
 
 Relationships.group(...models);
 
@@ -65,5 +67,6 @@ module.exports = {
   Price,
   Authorization,
   Permission,
-  Admin
+  Admin,
+  Coupon
 };
