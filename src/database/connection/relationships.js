@@ -20,19 +20,19 @@ class Relationships {
         Account.hasOne(Authorization, { allowNull: true });
         Authorization.belongsTo(Account, { allowNull: true });
 
-        Admin.hasOne(Validation,  { allowNull: true });
-        Validation.belongsTo(Admin,  { allowNull: true });
+        Admin.hasOne(Validation, { allowNull: true });
+        Validation.belongsTo(Admin, { allowNull: true });
 
         Admin.hasOne(Authorization, { allowNull: true });
         Authorization.belongsTo(Admin, { allowNull: true });
-        
+
 
         //---------/ ONE-TO-MANY - SCHOOL -*- CLASS | TEACHERS | STUDENT | SUBJECT /--------------------
 
         SchoolManagement.hasMany(Teacher);
         Teacher.belongsTo(SchoolManagement); -
 
-        SchoolManagement.hasMany(Student);
+            SchoolManagement.hasMany(Student);
         Student.belongsTo(SchoolManagement);
 
         SchoolManagement.hasMany(Subject);
@@ -40,9 +40,6 @@ class Relationships {
 
         SchoolManagement.hasMany(Class);
         Class.belongsTo(SchoolManagement);
-
-        Coupon.hasMany(Account);
-        Account.belongsTo(Coupon);
 
         //---------/ ONE-TO-MANY - CLASS -*- STUDENTS /--------------------
 
@@ -71,6 +68,9 @@ class Relationships {
         Lesson.belongsTo(Chapter);
 
         //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
+
+        Coupon.belongsToMany(Account, { through: 'CouponAccount' });
+        Account.belongsToMany(Coupon, { through: 'CouponAccount' });
 
         Subject.belongsToMany(Teacher, { through: 'SubjectTeachers' });
         Teacher.belongsToMany(Subject, { through: 'SubjectTeachers' });
