@@ -18,6 +18,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.JSON,
         allowNull: true,
       },
+      description: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: 'none',
+      },
       objective: {
         type: Sequelize.STRING,
         allowNull: true,

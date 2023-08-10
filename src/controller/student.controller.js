@@ -262,7 +262,8 @@ class StudentController {
 
             data.password = await accountInstance.hashPassword(data.password);
 
-            data.flag = "active"
+            data.flag = "active";
+            data.status = "active";
 
             data.verification_status = 1
 
