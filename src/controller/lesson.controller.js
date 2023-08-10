@@ -51,7 +51,7 @@ class LessonController {
     }
 
 
-    /*-----------------------------------| UPLOAD LESSON |-----------------------------------*/
+    /*-----------------------------------| NEXT WEEKS LESSON |-----------------------------------*/
 
     static async nextWeeksLessons(req, res) {
 
@@ -64,12 +64,9 @@ class LessonController {
         const nextSunday = new Date(nextMonday);
         nextSunday.setDate(nextMonday.getDate() + daysUntilNextSunday);
 
-
         try {
 
-
-
-            const allLessons = await Lesson.findAll();
+            const allLessons = await Lesson.findAll({ attributes: ['topic', 'description', 'start_date', 'end_date'],});
 
             const lessonsWithinNextWeek = allLessons.filter((lesson) => {
                 const lessonStartDate = new Date(lesson.start_date);
@@ -78,7 +75,6 @@ class LessonController {
             });
 
             return res.status(ResponseStatus.code.success).json({ error: false, 
-                extra: `${nextMonday} - ${nextSunday}`,
                 message: ResponseStatus.pass.read, data: lessonsWithinNextWeek });
 
 
@@ -88,6 +84,32 @@ class LessonController {
         };
 
     }
+
+
+
+        /*-----------------------------------| FETCH SUBJECT LESSONS |-----------------------------------*/
+
+        static async subjectLessons(req, res) {
+
+            const {id} = req.params;
+
+            try {
+    
+                const subjectInstance = await Subject.findByPk(id);
+                const lessons = await subjectInstance.getLessons({
+                    attributes: ['topic', 'description'],
+                });
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, 
+                    message: ResponseStatus.pass.read, data: lessons });
+    
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'Server Error' });
+            };
+    
+        }
 
 }
 
