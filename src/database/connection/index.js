@@ -35,9 +35,38 @@ const ClassArm = db.classarms = require("../classarms.model")(sequelize, Sequeli
 const Invite = db.invites = require("../invite.model")(sequelize, Sequelize);
 const Lesson = db.lessons = require("../lesson.model")(sequelize, Sequelize);
 const Chapter = db.chapters = require("../chapter.model")(sequelize, Sequelize);
+const Price = db.prices = require("../pricing.model")(sequelize, Sequelize);
 
-const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter]
+const Admin = db.admins = require("../admin.model")(sequelize, Sequelize);
+const Authorization = db.roles = require("../authorization.model")(sequelize, Sequelize);
+const Permission = db.permissions = require("../permission.model")(sequelize, Sequelize);
+
+const Coupon = db.coupons = require("../coupon.model")(sequelize, Sequelize);
+
+
+
+
+const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon]
 
 Relationships.group(...models);
 
-module.exports = {db, Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Invite, Lesson, Chapter};
+module.exports = {
+  db,
+  Account,
+  Validation,
+  Subject,
+  Class,
+  SchoolManagement,
+  Student,
+  Teacher,
+  TempValidation,
+  ClassArm,
+  Invite,
+  Lesson,
+  Chapter,
+  Price,
+  Authorization,
+  Permission,
+  Admin,
+  Coupon
+};

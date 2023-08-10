@@ -1,7 +1,7 @@
 
 class Relationships {
 
-    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter) {
+    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon) {
 
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -17,12 +17,22 @@ class Relationships {
         Account.hasOne(Student, { allowNull: true });
         Student.belongsTo(Account, { allowNull: true });
 
+        Account.hasOne(Authorization, { allowNull: true });
+        Authorization.belongsTo(Account, { allowNull: true });
+
+        Admin.hasOne(Validation, { allowNull: true });
+        Validation.belongsTo(Admin, { allowNull: true });
+
+        Admin.hasOne(Authorization, { allowNull: true });
+        Authorization.belongsTo(Admin, { allowNull: true });
+
+
         //---------/ ONE-TO-MANY - SCHOOL -*- CLASS | TEACHERS | STUDENT | SUBJECT /--------------------
 
         SchoolManagement.hasMany(Teacher);
         Teacher.belongsTo(SchoolManagement); -
 
-        SchoolManagement.hasMany(Student);
+            SchoolManagement.hasMany(Student);
         Student.belongsTo(SchoolManagement);
 
         SchoolManagement.hasMany(Subject);
@@ -59,6 +69,9 @@ class Relationships {
 
         //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 
+        Coupon.belongsToMany(Account, { through: 'CouponAccount' });
+        Account.belongsToMany(Coupon, { through: 'CouponAccount' });
+
         Subject.belongsToMany(Teacher, { through: 'SubjectTeachers' });
         Teacher.belongsToMany(Subject, { through: 'SubjectTeachers' });
 
@@ -73,11 +86,8 @@ class Relationships {
 
         Teacher.belongsToMany(ClassArm, { through: 'TeacherClassArms' });
         ClassArm.belongsToMany(Teacher, { through: 'TeacherClassArms' });
-        
-        // Define the associations
 
-        // Subject.hasMany(Lesson);
-        // Lesson.belongsTo(Subject);
+
     }
 
 }

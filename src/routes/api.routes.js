@@ -1,7 +1,6 @@
 const express = require('express');
 router = express.Router();
 
-
 /* -------------------------------| Validators |------------------------------- */
 
 const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator } = require("./validators/AuthValidators")
@@ -9,7 +8,6 @@ const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidat
 /*-----------------------------------| HOME |-----------------------------------*/
 
 router.get('/', (req, res) => { res.json({ message: "NIMO SERVER RUNNING...." }) });
-
 
 /*--------------------------------| CONTROLLERS |--------------------------------*/
 
@@ -23,6 +21,10 @@ const TeacherController = require('../controller/teacher.controller');
 const InviteController = require('../controller/invite.controller');
 const LessonController = require('../controller/lesson.controller');
 const ChapterController = require('../controller/chapter.controller');
+const AdminController = require('../controller/admin/school.controller');
+const HomeController = require('../controller/admin/home.controller');
+const PriceController = require('../controller/admin/pricing.controller');
+const CouponController = require('../controller/admin/coupon.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -30,11 +32,12 @@ const AuthenticationMiddleware = require('../middleware/token.middleware');
 const StudentController = require('../controller/student.controller');
 const { InviteValidator, AcceptValidator } = require('./validators/StudentValidators');
 const UploadService = require('../services/upload.service');
+const AuthorizationController = require('../controller/admin/authorization.controller');
 
-/*------------------------------| AUTHORIZED ROUTES |------------------------------*/
+/*------------------------------| OPEN ROUTES |------------------------------*/
 
-const allAuthorizedRoutesGroup = (router) => {
-    
+const OpenRoutesGroup = (router) => {
+
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
@@ -60,7 +63,7 @@ const allAuthorizedRoutesGroup = (router) => {
     router.post('/student/parent/signup_second', StudentController.parentSignupTwo);
 
     /* --------------------------------- INVITES -------------------------------- */
-    
+
     router.post('/invites/generate', InviteController.generateLink);
     router.post('/invites/student/generate', InviteController.generateStudentLink);
     router.get('/invites/read', InviteController.invites);
@@ -70,12 +73,15 @@ const allAuthorizedRoutesGroup = (router) => {
     router.delete('/invites/delete/:id', InviteController.delete);
     router.post('/invites/student/accept', InviteController.studentAccept);
     router.post('/invites/teacher/accept', InviteController.teacherAccept);
+
+    router.post('/admin/login', AuthorizationController.login);
+
 };
 
 
-/*------------------------------| SECURED ROUTES |------------------------------*/
+/*------------------------------| AUTHORIZED ROUTES |------------------------------*/
 
-const adminAuthorizedRoutesGroup = (router) => {
+const AuthorizedRoutesGroup = (router) => {
     /* --------------------------------- ACCOUNT -------------------------------- */
     router.use(AuthenticationMiddleware.verify) //--use middleware--//
     router.get('/account/read_all', AuthenicationController.accounts);
@@ -83,6 +89,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.put('/account/update', AuthenicationController.updateAccount);
     router.put('/account/flag', AuthenicationController.flagAccount);
     router.post('/account/auth/resetpassword', AuthenicationController.resetAuthPassword);
+    router.get('/account/auth/account', AuthenicationController.authAccountByID);
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
     router.get('/account/exist/:email', AuthenicationController.accountExist);
@@ -103,6 +110,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.post('/class/create_bulk', ClassController.bulkCreate);
     router.get('/class/read', ClassController.readAll);
     router.get('/class/readwitharms', ClassController.readAllWithArms);
+    router.get('/class/students/teachers/:id', ClassController.readStudentsTeachers);
     router.get('/class/readwitharms/:classId', ClassController.readClassWithArms);
     router.get('/class/read/:id', ClassController.read);
     router.get('/class/subjects/read/:id', ClassController.readClassWithSubjects);
@@ -125,9 +133,9 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/class/arms/:id/subjects', ClassArmsController.classArmSubjects); // This is the a better route format /entity/:entityId/relationship
     router.put('/class/arms/update/:id', ClassArmsController.updateById);
     router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
-    
+
     /* -------------------------------- SUBJECTS -------------------------------- */
-    
+
     router.post('/subjects/create', SubjectController.create);
     router.get('/subjects/read', SubjectController.readAll);
     router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
@@ -144,7 +152,7 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.delete('/subjects/delete/:id', SubjectController.delete);
 
     /* --------------------------------- TEACHERS -------------------------------- */
-  
+
     router.post('/teacher/invite', TeacherController.sendInvite);
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
@@ -171,6 +179,8 @@ const adminAuthorizedRoutesGroup = (router) => {
     router.get('/student/classarmsmates', StudentController.studentArmsMates);
     router.get('/student/:id', StudentController.fetchStudent);
 
+    router.get('/lesson/read', LessonController.nextWeeksLessons);
+    router.get('/lesson/subjectlessons/:id', LessonController.subjectLessons);
     router.post('/lesson/create', UploadService.upload.single('file'), LessonController.createLesson);
 
     router.get('/chapter/subject/:id', ChapterController.read);
@@ -178,8 +188,38 @@ const adminAuthorizedRoutesGroup = (router) => {
 };
 
 
-allAuthorizedRoutesGroup(router);
-adminAuthorizedRoutesGroup(router);
+/*------------------------------| Admin ROUTES |------------------------------*/
+
+const AdminRoutesGroup = (router) => {
+    router.use(AuthenticationMiddleware.admin) //--use middleware--//
+
+    router.get('/admin/schools', AdminController.schools);
+    router.get('/admin/home/dashboard', HomeController.dashboard);
+    router.get('/admin/home/dashboard/activeusers', HomeController.activeUser);
+
+    /* --------------------------------- PRICING -------------------------------- */
+
+    router.post('/admin/settings/pricing', PriceController.create);
+    router.get('/admin/settings/pricing', PriceController.read);
+    router.put('/admin/settings/pricing', PriceController.update);
+    router.delete('/admin/settings/pricing/:id', PriceController.delete);
+
+    router.post('/admin/user', AuthorizationController.addAdminUser)
+    router.get('/admin/user', AuthorizationController.readAdminUser)
+
+
+    router.get('/admin/freelancer', AdminController.freeLancers);
+    router.get('/admin/freelancer/:id', AdminController.freeLancersById);
+
+    router.post('/admin/coupon', CouponController.create);
+    router.get('/admin/coupon', CouponController.read);
+    router.post('/admin/coupon/activate', CouponController.activate);
+
+};
+
+OpenRoutesGroup(router);
+AuthorizedRoutesGroup(router);
+AdminRoutesGroup(router);
 
 module.exports = router;
 

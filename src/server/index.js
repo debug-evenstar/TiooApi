@@ -8,6 +8,10 @@ const IndexRoute = require('../routes/index');
 const treblle = require('@treblle/express');
 const UploadService = require('../services/upload.service');
 const AutoMigrate = require("../migrations/automigrate");
+const AuthorizationSeed = require("../seeders/seed.authorization");
+
+
+
 
 
 class Server {
@@ -33,10 +37,11 @@ class Server {
         );
 
         //=============== INITIALIZE DATABASE ================//
-//{force : true}
+        //{force : true}
         db.sequelize.sync()
-            .then(() => {
+            .then(async () => {
                 AutoMigrate.validateModelsIntegrity();
+                // AuthorizationSeed.permission();
                 console.log("Synced db.");
             })
             .catch((err) => {
