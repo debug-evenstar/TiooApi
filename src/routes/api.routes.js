@@ -179,7 +179,9 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/classarmsmates', StudentController.studentArmsMates);
     router.get('/student/:id', StudentController.fetchStudent);
 
+    router.get('/lesson/read', LessonController.nextWeeksLessons);
     router.post('/lesson/create', UploadService.upload.single('file'), LessonController.createLesson);
+    
 
     router.get('/chapter/subject/:id', ChapterController.read);
 

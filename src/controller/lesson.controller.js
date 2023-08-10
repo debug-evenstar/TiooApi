@@ -25,7 +25,7 @@ class LessonController {
             const chapter = new Chapter();
             chapter.name = req.body.chapter_name;
             chapter.title = req.body.chapter_title;
-            
+
             const chapterInstance = await chapter.save();
 
             const classInstance = await Class.findByPk(req.body.class);
@@ -48,6 +48,45 @@ class LessonController {
             console.log(error);
             res.status(500).json({ error: 'Server Error' });
         };
+    }
+
+
+    /*-----------------------------------| UPLOAD LESSON |-----------------------------------*/
+
+    static async nextWeeksLessons(req, res) {
+
+        const today = new Date();
+        const daysUntilNextMonday = (1 - today.getDay() + 7) % 7;
+        const nextMonday = new Date(today);
+        nextMonday.setDate(today.getDate() + daysUntilNextMonday);
+        
+        const daysUntilNextSunday = (7 - nextMonday.getDay()) % 7;
+        const nextSunday = new Date(nextMonday);
+        nextSunday.setDate(nextMonday.getDate() + daysUntilNextSunday);
+
+
+        try {
+
+
+
+            const allLessons = await Lesson.findAll();
+
+            const lessonsWithinNextWeek = allLessons.filter((lesson) => {
+                const lessonStartDate = new Date(lesson.start_date);
+                const lessonEndDate = new Date(lesson.end_date);
+                return lessonStartDate >= nextMonday && lessonStartDate <= nextSunday;
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, 
+                extra: `${nextMonday} - ${nextSunday}`,
+                message: ResponseStatus.pass.read, data: lessonsWithinNextWeek });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
     }
 
 }
