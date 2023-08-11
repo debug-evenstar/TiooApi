@@ -191,7 +191,7 @@ const AuthorizedRoutesGroup = (router) => {
 /*------------------------------| Admin ROUTES |------------------------------*/
 
 const AdminRoutesGroup = (router) => {
-    router.use(AuthenticationMiddleware.verify) //--use middleware--//
+    router.use(AuthenticationMiddleware.admin) //--use middleware--//
 
     router.get('/admin/schools', AdminController.schools);
     router.get('/admin/home/dashboard', HomeController.dashboard);
