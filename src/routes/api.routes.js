@@ -191,7 +191,7 @@ const AuthorizedRoutesGroup = (router) => {
 /*------------------------------| Admin ROUTES |------------------------------*/
 
 const AdminRoutesGroup = (router) => {
-    router.use(AuthenticationMiddleware.admin) //--use middleware--//
+    router.use(AuthenticationMiddleware.verify) //--use middleware--//
 
     router.get('/admin/schools', AdminController.schools);
     router.get('/admin/home/dashboard', HomeController.dashboard);
@@ -213,6 +213,8 @@ const AdminRoutesGroup = (router) => {
 
     router.post('/admin/coupon', CouponController.create);
     router.get('/admin/coupon', CouponController.read);
+    router.delete('/admin/coupon', CouponController.delete);
+    router.put('/admin/coupon', CouponController.update);
     router.post('/admin/coupon/activate', CouponController.activate);
 
 };
