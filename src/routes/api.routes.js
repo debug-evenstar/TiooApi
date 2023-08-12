@@ -81,6 +81,8 @@ const OpenRoutesGroup = (router) => {
 
     router.post('/tio/setup', TioController.setup);
     router.get('/tio/classes', TioController.classes);
+    router.get('/tio/subjects', TioController.subjects);
+    router.get('/tio/subjectslessons', TioController.subjectsLessons);
 
 };
 

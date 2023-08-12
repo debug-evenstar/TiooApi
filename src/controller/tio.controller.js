@@ -1,6 +1,6 @@
 const { validationResult, body } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Class, ClassArm, Subject, } = require('../database/connection');
+const { Account, Validation, SchoolManagement, Class, ClassArm, Subject, Lesson, } = require('../database/connection');
 const AuthController = require('../controller/auth.controller');
 const ClassSeeds = require('../utils/class.utilities');
 const SchoolUtils = require('./helper/assignClass.helper');
@@ -90,9 +90,10 @@ class TioController {
 
             const updatedTioSchool = await SchoolManagement.findOne({ where: { AccountId: tioAccount.id }, include: [Class] });
 
-            // GENERATE CLASSES ARMS FOR EACH CLASSESS
 
             if (updatedTioSchool) {
+
+                 // GENERATE CLASSES ARMS FOR EACH CLASSESS
 
                 const classes = updatedTioSchool.Classes;
                 let generatedClassArms = [];
@@ -108,9 +109,9 @@ class TioController {
 
                     await classInstance.addClassArm(classArmInstance);
 
-                    console.log('done');
                 }
 
+                 // GENERATE SUBJECTS
 
                 for (let index = 0; index < tioSubjeects.length; index++) {
 
@@ -126,7 +127,6 @@ class TioController {
                     const classarmInstances = await ClassArm.findAll({ where: { id: [generatedClassArms[index]] } });
                     const newItems = await subjectInstance1.addClasses(classInstance);
                     const subjectArms = await subjectInstance2.addClassArms(classarmInstances);
-                    console.log('checked', generatedClassArms);
 
                 }
 
@@ -143,31 +143,88 @@ class TioController {
 
 
 
-        /*-----------------------------------| TIO AVAILABLE CLASSES |-----------------------------------*/
+    /*-----------------------------------| TIO AVAILABLE CLASSES |-----------------------------------*/
 
-        static async classes(req, res) {
+    static async classes(req, res) {
 
-            try {
-    
-                const AccountInstance = await Account.findOne({where: {email: 'tio@gmail.com'}}, { include: [SchoolManagement] });
-               
-                if (!AccountInstance) {
-                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
-                }
-                const SchoolInstances = await AccountInstance.getSchoolManagement();
-                if (!SchoolInstances) {
-                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-                }
-                const ClassInstances = await SchoolInstances.getClasses();
-    
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'Server Error' });
-            };
-    
-        }
+        try {
+
+            const AccountInstance = await Account.findOne({ where: { email: 'tio@gmail.com' } }, { include: [SchoolManagement] });
+
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const ClassInstances = await SchoolInstances.getClasses();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+
+    /*-----------------------------------| TIO AVAILABLE SUBJECTS |-----------------------------------*/
+
+    static async subjects(req, res) {
+
+        try {
+
+            const AccountInstance = await Account.findOne({ where: { email: 'tio@gmail.com' } });
+
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const subjectInstance = await SchoolInstances.getSubjects({ attributes: { exclude: ['SchoolManagementId'] }});
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+      /*-----------------------------------| TIO AVAILABLE SUBJECTS |-----------------------------------*/
+
+      static async subjectsLessons(req, res) {
+
+        try {
+
+            const AccountInstance = await Account.findOne({ where: { email: 'tio@gmail.com' } });
+
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const subjectInstance = await SchoolInstances.getSubjects({ attributes: { exclude: ['SchoolManagementId'] }, include: [Lesson]});
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
 
 
 }
