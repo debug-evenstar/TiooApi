@@ -9,6 +9,7 @@ const AuthController = require('../controller/auth.controller');
 
 const Mailer = require('../services/mailer');
 const HashUtils = require('../utils/hash.utilities');
+const { classArmStudents } = require("./classArms.controller");
 
 
 class StudentController {
@@ -687,7 +688,23 @@ class StudentController {
                     account_type: registeredAccount.dataValues.account_type,
                 };
     
-                const generatedToken = TokenMiddleware.generate(userData)
+                const generatedToken = TokenMiddleware.generate(userData);
+
+                // BIND STUDENT TO TIO ACADEMY
+
+                const tiooAccount = await Account.findOne({where: {email: ResponseStatus.tio.email}});
+
+                if(tiooAccount){
+                    
+                    const classInstance = await Class.findByPk(data.class);
+                    const armInstance = await classInstance.getClassArms();
+                    const tioo = await tiooAccount.getSchoolManagement();
+
+                    await tioo.addStudent(studentInstance);
+                    await classInstance.addStudent(studentInstance);
+                    await armInstance[0].addStudent(studentInstance);
+                    
+                }
     
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: { token: generatedToken } });
     

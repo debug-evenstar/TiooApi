@@ -13,7 +13,7 @@ class TioController {
 
         const data = {
             name: "Tio Academy",
-            email: "tio@gmail.com",
+            email:  ResponseStatus.tio.email,
             admin: "Developer",
             phone: "09083674873",
             school: "Tio Academy",
@@ -25,7 +25,7 @@ class TioController {
         }
 
         const tioData = {
-            email: "tio@gmail.com",
+            email:  ResponseStatus.tio.email,
             school_types: ["Level"],
             naming_types: "C",
             class_namings: [
@@ -149,7 +149,7 @@ class TioController {
 
         try {
 
-            const AccountInstance = await Account.findOne({ where: { email: 'tio@gmail.com' } }, { include: [SchoolManagement] });
+            const AccountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } }, { include: [SchoolManagement] });
 
             if (!AccountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -177,7 +177,7 @@ class TioController {
 
         try {
 
-            const AccountInstance = await Account.findOne({ where: { email: 'tio@gmail.com' } });
+            const AccountInstance = await Account.findOne({ where: { email:  ResponseStatus.tio.email } });
 
             if (!AccountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -205,7 +205,7 @@ class TioController {
 
         try {
 
-            const AccountInstance = await Account.findOne({ where: { email: 'tio@gmail.com' } });
+            const AccountInstance = await Account.findOne({ where: { email:  ResponseStatus.tio.email } });
 
             if (!AccountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
