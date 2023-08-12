@@ -25,6 +25,8 @@ const AdminController = require('../controller/admin/school.controller');
 const HomeController = require('../controller/admin/home.controller');
 const PriceController = require('../controller/admin/pricing.controller');
 const CouponController = require('../controller/admin/coupon.controller');
+const TioController = require('../controller/tio.controller');
+
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -75,6 +77,9 @@ const OpenRoutesGroup = (router) => {
     router.post('/invites/teacher/accept', InviteController.teacherAccept);
 
     router.post('/admin/login', AuthorizationController.login);
+
+
+    router.post('/tio', TioController.setup);
 
 };
 
