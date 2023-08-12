@@ -6,6 +6,7 @@ const { use } = require('chai');
 const HashUtils = require('../../utils/hash.utilities');
 const AuthorizationSeed = require("../../seeders/seed.authorization");
 const TokenMiddleware = require('../../middleware/token.middleware');
+const Mailer = require('../../services/mailer');
 
 
 
@@ -31,7 +32,7 @@ class AuthorizationController {
             const adminInstance = await Admin.findOne({ where: { email: data.email } });
 
             if (adminInstance) {
-                return res.status(ResponseStatus.code.conflict).json({ error: true, message: "Already and admin user" });
+                return res.status(ResponseStatus.code.conflict).json({ error: true, message: "Already an admin user" });
             }
 
             data.password = password;
@@ -59,8 +60,12 @@ class AuthorizationController {
 
             authorization.setAdmin(registeredAdmin);
 
-            console.log(password); 
-             // TODO - Notify User of previlage
+            console.log(password);
+
+
+            Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
+
+            // TODO - Notify User of previlage
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
@@ -85,7 +90,7 @@ class AuthorizationController {
 
             const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
                 const user = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
-                
+
                 let payload = {};
                 payload.fullname = user.name;
                 payload.email = user.email;
@@ -111,9 +116,9 @@ class AuthorizationController {
     }
 
 
-      /*-----------------------------------| SIGNIN ACCOUNT |-----------------------------------*/
+    /*-----------------------------------| SIGNIN ACCOUNT |-----------------------------------*/
 
-      static async login(req, res) {
+    static async login(req, res) {
 
         const { email, password } = req.body;
         const errors = validationResult(req);
@@ -123,7 +128,7 @@ class AuthorizationController {
         }
 
         try {
-            const user = await Admin.findOne({ where: { email: email }});
+            const user = await Admin.findOne({ where: { email: email } });
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
@@ -153,7 +158,7 @@ class AuthorizationController {
                 verification_status: user.verification_status,
                 flag: user.flag,
             }
-       
+
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
 
