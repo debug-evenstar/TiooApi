@@ -79,7 +79,8 @@ const OpenRoutesGroup = (router) => {
     router.post('/admin/login', AuthorizationController.login);
 
 
-    router.post('/tio', TioController.setup);
+    router.post('/tio/setup', TioController.setup);
+    router.get('/tio/classes', TioController.classes);
 
 };
 
