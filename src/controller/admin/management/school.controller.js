@@ -33,7 +33,7 @@ class AdminSchoolController {
             }
 
             const accountData = await Promise.all(accountInstances.map(async (account) => {
-             
+
                 const schoolInstance = await account.getSchoolManagement();
 
                 let school = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residentialAddress };
@@ -88,7 +88,7 @@ class AdminSchoolController {
 
                 const classInstances = await schoolInstance.getClasses();
 
-                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: [ 'residentialAddress', 'passportNumber', 'dateOfBirth', 'parent', 'class', 'school',] }, include: Account });
+                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['residentialAddress', 'passportNumber', 'dateOfBirth', 'parent', 'class', 'school',] }, include: Account });
 
                 const subjectInstances = await schoolInstance.getSubjects();
 
@@ -104,7 +104,7 @@ class AdminSchoolController {
                     proof: 'undefined',
                 }
 
-                school = {...school, ...extraData};
+                school = { ...school, ...extraData };
 
                 payload.school = school;
                 payload.subjects = subjectInstances.length;
@@ -142,11 +142,11 @@ class AdminSchoolController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            
+
             const ClassInstances = await SchoolInstances.getClasses();
 
             const classsWithArmsCounts = await Promise.all(ClassInstances.map(async (instance) => {
-                const arms = await instance.getClassArms({attributes: { exclude: ['ClassId', 'id'] },});
+                const arms = await instance.getClassArms({ attributes: { exclude: ['ClassId', 'id'] }, });
 
                 const payload = {
                     ...instance.dataValues,
@@ -158,6 +158,47 @@ class AdminSchoolController {
             }));
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classsWithArmsCounts });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+    static async dashboardSubject(req, res) {
+
+        const data = req.query;
+
+        try {
+
+            const AccountInstance = await Account.findByPk(data.school_id, { include: [SchoolManagement] });
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+
+            const subjectInstance = await SchoolInstances.getSubjects();
+
+            const lessonsInstance = await Promise.all(subjectInstance.map(async (instance) => {
+
+                const lessons = await instance.getLessons({ attributes: { exclude: [] }, });
+
+                const payload = {
+                    ...instance.dataValues,
+                    lessons: lessons.length
+
+                }
+                return payload;
+
+            }));
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonsInstance });
 
         } catch (error) {
             console.log(error);

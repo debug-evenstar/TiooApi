@@ -229,7 +229,10 @@ const AdminRoutesGroup = (router) => {
 
     router.get('/admin/management/schools', AdminSchoolController.read);
     router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
+    
     router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
+    router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
+
 
 };
 
