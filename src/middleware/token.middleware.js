@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { Account } = require('../database/connection');
+const { Account, Admin } = require('../database/connection');
 const ResponseMessage = require('../config/message.config');
 
 class TokenMiddleware {
@@ -55,8 +55,10 @@ class TokenMiddleware {
             
             const decoded = jwt.verify(token, process.env.JWT_SECRETE);
             const id = decoded.userdata.id;
+
+            console.log(decoded.userdata);
             
-            Account.findOne({ where: { id: id } }).then((user) => {
+            Admin.findOne({ where: { id: id } }).then((user) => {
                 
                 if(!user){
                     return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.unauthorized });

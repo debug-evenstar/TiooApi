@@ -48,6 +48,10 @@ const ResponseMessage = {
         conflict: 409,
         server_error: 500,
 
+    },
+
+    tio: {
+        email: 'tio@gmail.com',
     }
 
 }
