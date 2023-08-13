@@ -1,0 +1,132 @@
+const AuthController = require('../../auth.controller');
+const { validationResult } = require('express-validator');
+const ResponseStatus = require("../../../config/message.config");
+const { Account, Authorization, Permission, Validation, Admin, SchoolManagement } = require('../../../database/connection');
+const { use } = require('chai');
+const AuthorizationSeed = require("../../../seeders/seed.authorization");
+const TokenMiddleware = require('../../../middleware/token.middleware');
+
+
+
+
+class AdminSchoolController {
+
+    /*----------------------------------| ALL SCHOOLS |----------------------------------*/
+
+
+    static async read(req, res) {
+
+        try {
+
+            const accountInstances = await Account.findAll({
+                attributes: { exclude: ['password'] },
+                where: {
+                    account_type: 'school',
+                },
+            });
+
+            if (!accountInstances) {
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: true, message:
+                        ResponseStatus.fail.no_user
+                });
+            }
+
+            const accountData = await Promise.all(accountInstances.map(async (account) => {
+             
+                const schoolInstance = await account.getSchoolManagement();
+
+                let school = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residentialAddress };
+
+                school.subscription = 'Active'; //This will be gotten from the subscription table
+
+                return school;
+
+            }));
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountData });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+
+    /*----------------------------------| ALL SCHOOLS |----------------------------------*/
+
+
+    static async readWithExtra(req, res) {
+
+        try {
+
+            const accountInstances = await Account.findAll({
+                attributes: { exclude: ['password'] },
+                where: {
+                    account_type: 'school',
+                },
+            });
+
+            if (!accountInstances) {
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: true, message:
+                        ResponseStatus.fail.no_user
+                });
+            }
+
+            const accountData = await Promise.all(accountInstances.map(async (account) => {
+                const payload = {};
+                const schoolInstance = await account.getSchoolManagement();
+
+                let school = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residentialAddress }
+
+                const teacherInstances = await schoolInstance.getTeachers({ attributes: { exclude: ['passportNumber', 'residentialAddress', 'nationality'] }, include: Account });
+
+                const hybridTeachers = await schoolInstance.getTeachers({ where: { teacher_type: 'subject' } }, { attributes: { exclude: ['passportNumber', 'residentialAddress', 'nationality'] }, include: Account });
+
+                const classInstances = await schoolInstance.getClasses();
+
+                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: [ 'residentialAddress', 'passportNumber', 'dateOfBirth', 'parent', 'class', 'school',] }, include: Account });
+
+                const subjectInstances = await schoolInstance.getSubjects();
+
+                const extraData = {
+                    gender: 'undefined',
+                    website: 'undefine',
+                    est_date: 'undefine',
+                    school_type: school.account_type,
+                    ownership_type: 'undefine',
+                    bank_name: 'undefine',
+                    account_number: 'undefine',
+                    valid_id: 'undefine',
+                    proof: 'undefined',
+                }
+
+                school = {...school, ...extraData};
+                
+                payload.school = school;
+                payload.subjects = subjectInstances.length;
+                payload.teachers = teacherInstances.length;
+                payload.hybrid_teachers = hybridTeachers.length;
+                payload.students = studentInstances.length;
+                payload.classes = classInstances.length;
+
+                return payload;
+
+            }));
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountData });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    };
+
+}
+
+
+module.exports = AdminSchoolController;

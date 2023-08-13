@@ -167,6 +167,32 @@ class AuthorizationController {
 
     }
 
+    /*-----------------------------------| READ ADMIN USER |-----------------------------------*/
+
+    static async readPermissions(req, res) {
+
+        try {
+
+            let permissions = await Permission.findAll();
+
+            if (permissions.length === 0) {
+                await AuthorizationSeed.permission();
+                permissions = await Permission.findAll();
+            }
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: permissions
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
 
 }
 
