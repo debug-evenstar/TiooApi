@@ -25,6 +25,9 @@ const AdminController = require('../controller/admin/school.controller');
 const HomeController = require('../controller/admin/home.controller');
 const PriceController = require('../controller/admin/pricing.controller');
 const CouponController = require('../controller/admin/coupon.controller');
+const TioController = require('../controller/tio.controller');
+const AdminSchoolController = require('../controller/admin/management/school.controller');
+
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -33,6 +36,7 @@ const StudentController = require('../controller/student.controller');
 const { InviteValidator, AcceptValidator } = require('./validators/StudentValidators');
 const UploadService = require('../services/upload.service');
 const AuthorizationController = require('../controller/admin/authorization.controller');
+const { Authorization } = require('../database/connection');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -75,6 +79,12 @@ const OpenRoutesGroup = (router) => {
     router.post('/invites/teacher/accept', InviteController.teacherAccept);
 
     router.post('/admin/login', AuthorizationController.login);
+
+
+    router.post('/tio/setup', TioController.setup);
+    router.get('/tio/classes', TioController.classes);
+    router.get('/tio/subjects', TioController.subjects);
+    router.get('/tio/subjectslessons', TioController.subjectsLessons);
 
 };
 
@@ -191,7 +201,7 @@ const AuthorizedRoutesGroup = (router) => {
 /*------------------------------| Admin ROUTES |------------------------------*/
 
 const AdminRoutesGroup = (router) => {
-    router.use(AuthenticationMiddleware.admin) //--use middleware--//
+    // router.use(AuthenticationMiddleware.admin) //--use middleware--//
 
     router.get('/admin/schools', AdminController.schools);
     router.get('/admin/home/dashboard', HomeController.dashboard);
@@ -204,16 +214,25 @@ const AdminRoutesGroup = (router) => {
     router.put('/admin/settings/pricing', PriceController.update);
     router.delete('/admin/settings/pricing/:id', PriceController.delete);
 
-    router.post('/admin/user', AuthorizationController.addAdminUser)
-    router.get('/admin/user', AuthorizationController.readAdminUser)
-
+    router.post('/admin/user', AuthorizationController.addAdminUser);
+    router.get('/admin/user', AuthorizationController.readAdminUser);
+    router.get('/admin/permissions', AuthorizationController.readPermissions);
 
     router.get('/admin/freelancer', AdminController.freeLancers);
     router.get('/admin/freelancer/:id', AdminController.freeLancersById);
 
     router.post('/admin/coupon', CouponController.create);
     router.get('/admin/coupon', CouponController.read);
+    router.delete('/admin/coupon', CouponController.delete);
+    router.put('/admin/coupon', CouponController.update);
     router.post('/admin/coupon/activate', CouponController.activate);
+
+    router.get('/admin/management/schools', AdminSchoolController.read);
+    router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
+    
+    router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
+    router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
+
 
 };
 

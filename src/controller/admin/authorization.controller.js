@@ -62,10 +62,7 @@ class AuthorizationController {
 
             console.log(password);
 
-
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
-
-            // TODO - Notify User of previlage
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
@@ -146,7 +143,9 @@ class AuthorizationController {
                 account_type: user.dataValues.account_type,
             };
 
-            const generatedToken = TokenMiddleware.generate(userData)
+            const generatedToken = TokenMiddleware.generate(userData);
+
+            const authorization = await user.getAuthorization();
 
             const payload = {
                 AccountId: user.id,
@@ -157,14 +156,40 @@ class AuthorizationController {
                 account_type: user.account_type,
                 verification_status: user.verification_status,
                 flag: user.flag,
+                authorization: JSON.parse(authorization.dataValues.permissions)
             }
-
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
 
 
         } catch (error) {
             console.log(error)
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+    /*-----------------------------------| READ ADMIN USER |-----------------------------------*/
+
+    static async readPermissions(req, res) {
+
+        try {
+
+            let permissions = await Permission.findAll();
+
+            if (permissions.length === 0) {
+                await AuthorizationSeed.permission();
+                permissions = await Permission.findAll();
+            }
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: permissions
+            });
+
+        } catch (error) {
+            console.log(error);
             res.status(500).json({ error: 'Server Error' });
         };
 

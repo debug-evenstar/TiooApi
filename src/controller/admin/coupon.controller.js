@@ -22,7 +22,7 @@ class CouponController {
 
         try {
 
-            const accountInstance = await Account.findAll({where:{id: data.users}});
+            const accountInstance = await Account.findAll({ where: { id: data.users } });
 
             const couponInstance = await Coupon.create(data);
 
@@ -52,7 +52,7 @@ class CouponController {
 
             const response = await Promise.all(couponInstances.map(async (coupon) => {
                 const data = await coupon.getAccounts({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
-                const payload = {...coupon.dataValues};
+                const payload = { ...coupon.dataValues };
                 payload.users = data.length;
                 return payload;
 
@@ -73,11 +73,11 @@ class CouponController {
 
 
 
-       /*-----------------------------------| ACTIVATE COUPONS |-----------------------------------*/
+    /*-----------------------------------| ACTIVATE COUPONS |-----------------------------------*/
 
-       static async activate(req, res) {
+    static async activate(req, res) {
 
-        
+
         const errors = validationResult(req);
 
         const data = req.body;
@@ -90,18 +90,79 @@ class CouponController {
 
             const couponInstances = await Coupon.findByPk(data.id);
 
-            if(!couponInstances){
-                return res.status(ResponseStatus.code.not_found).json({  error: true,
+            if (!couponInstances) {
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: true,
                     message: ResponseStatus.fail.not_found,
                     data: {}
-                 });
+                });
             }
 
-            const response = await couponInstances.update({status: data.activate === true? 'Activate': 'Inactive'});
-    
+            const response = await couponInstances.update({ status: data.activate === true ? 'Activate' : 'Inactive' });
+
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read,
+                data: response
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+    /*-----------------------------------| DELETE COUPON |-----------------------------------*/
+
+    static async delete(req, res) {
+
+        const { id } = req.query;
+
+        try {
+
+            const couponInstances = await Coupon.findByPk(id);
+
+            if (!couponInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            await couponInstances.destroy();
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.delete,
+                data: couponInstances
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+    /*-----------------------------------| UPDATE COUPON |-----------------------------------*/
+
+    static async update(req, res) {
+
+        const data = req.body;
+
+        try {
+
+            const couponInstances = await Coupon.findByPk(data.id);
+
+            if (!couponInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const response = await couponInstances.update(data);
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.delete,
                 data: response
             });
 
