@@ -6,6 +6,7 @@ const { use } = require('chai');
 const HashUtils = require('../../utils/hash.utilities');
 const AuthorizationSeed = require("../../seeders/seed.authorization");
 const TokenMiddleware = require('../../middleware/token.middleware');
+const Mailer = require('../../services/mailer');
 
 
 
@@ -31,7 +32,7 @@ class AuthorizationController {
             const adminInstance = await Admin.findOne({ where: { email: data.email } });
 
             if (adminInstance) {
-                return res.status(ResponseStatus.code.conflict).json({ error: true, message: "Already and admin user" });
+                return res.status(ResponseStatus.code.conflict).json({ error: true, message: "Already an admin user" });
             }
 
             data.password = password;
@@ -60,7 +61,8 @@ class AuthorizationController {
             authorization.setAdmin(registeredAdmin);
 
             console.log(password);
-            // TODO - Notify User of previlage
+
+            Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
