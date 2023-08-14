@@ -1,7 +1,7 @@
 const AuthController = require('../../auth.controller');
 const { validationResult } = require('express-validator');
 const ResponseStatus = require("../../../config/message.config");
-const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject } = require('../../../database/connection');
+const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson } = require('../../../database/connection');
 const { use } = require('chai');
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
 const TokenMiddleware = require('../../../middleware/token.middleware');
@@ -206,6 +206,76 @@ class AdminSchoolController {
         };
 
     }
+
+
+    
+    static async lessonsGroupedByClasses(req, res) {
+
+        const data = req.query;
+
+        try {
+
+            const AccountInstance = await Account.findByPk(data.school_id, { include: [SchoolManagement] });
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const ClassInstances = await SchoolInstances.getClasses({ attributes: { exclude: ['SchoolManagementId','type']}, include: [Lesson] });
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+        
+    static async lessons(req, res) {
+
+        const data = req.query;
+
+        try {
+
+            const AccountInstance = await Account.findByPk(data.school_id, { include: [SchoolManagement] });
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const ClassInstances = await SchoolInstances.getClasses({ include: [Lesson]});
+
+            // const classsWithArmsCounts = await Promise.all(ClassInstances.map(async (instance) => {
+            //     const arms = await instance.getClassArms({ attributes: { exclude: ['ClassId', 'id'] }, });
+
+            //     const payload = {
+            //         ...instance.dataValues,
+            //         arms: arms
+
+            //     }
+            //     return payload;
+
+            // }));
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
 
 }
 

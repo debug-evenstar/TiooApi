@@ -216,6 +216,7 @@ const AdminRoutesGroup = (router) => {
 
     router.post('/admin/user', AuthorizationController.addAdminUser);
     router.get('/admin/user', AuthorizationController.readAdminUser);
+    router.delete('/admin/user', AuthorizationController.deleteAdmin);
     router.get('/admin/permissions', AuthorizationController.readPermissions);
 
     router.get('/admin/freelancer', AdminController.freeLancers);
@@ -228,6 +229,7 @@ const AdminRoutesGroup = (router) => {
     router.post('/admin/coupon/activate', CouponController.activate);
 
     router.get('/admin/management/schools', AdminSchoolController.read);
+    router.get('/admin/management/lessons', AdminSchoolController.lessonsGroupedByClasses);
     router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
     
     router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
