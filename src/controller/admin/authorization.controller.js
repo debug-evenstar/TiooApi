@@ -87,6 +87,7 @@ class AuthorizationController {
                 const user = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
 
                 let payload = {};
+                payload.id = auth.id;
                 payload.fullname = user.name;
                 payload.email = user.email;
                 payload.status = auth.status;
@@ -192,6 +193,33 @@ class AuthorizationController {
         };
 
     }
+
+
+        /*-----------------------------------| DELETE ADMIN |-----------------------------------*/
+
+        static async deleteAdmin(req, res) {
+
+            const { admin_id } = req.query;
+       
+    
+            try {
+                const user = await Admin.findOne({ where: { id: admin_id } });
+    
+                if (!user) {
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                }
+
+                const deletedAdmin = await user.destroy();
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: deletedAdmin });
+    
+    
+            } catch (error) {
+                console.log(error)
+                res.status(500).json({ error: 'Server Error' });
+            };
+    
+        }
 
 
 }
