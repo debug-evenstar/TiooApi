@@ -208,7 +208,7 @@ class AdminSchoolController {
     }
 
 
-    
+
     static async lessonsGroupedByClasses(req, res) {
 
         const data = req.query;
@@ -224,7 +224,7 @@ class AdminSchoolController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const ClassInstances = await SchoolInstances.getClasses({ attributes: { exclude: ['SchoolManagementId','type']}, include: [Lesson] });
+            const ClassInstances = await SchoolInstances.getClasses({ attributes: { exclude: ['SchoolManagementId', 'type'] }, include: [Lesson] });
 
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
@@ -237,7 +237,7 @@ class AdminSchoolController {
     }
 
 
-        
+
     static async lessons(req, res) {
 
         const data = req.query;
@@ -253,21 +253,21 @@ class AdminSchoolController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const ClassInstances = await SchoolInstances.getClasses({ include: [Lesson]});
+            const classWithLessons = await SchoolInstances.getClasses();
 
-            // const classsWithArmsCounts = await Promise.all(ClassInstances.map(async (instance) => {
-            //     const arms = await instance.getClassArms({ attributes: { exclude: ['ClassId', 'id'] }, });
+            let lessonsInstances = []
 
-            //     const payload = {
-            //         ...instance.dataValues,
-            //         arms: arms
+            const allSchoolLessons = await Promise.all(classWithLessons.map(async (instance) => {
+                const lessons = await instance.getLessons();
+                return lessons;
 
-            //     }
-            //     return payload;
+            }));
 
-            // }));
+            for (let i = 0; i < allSchoolLessons.length; i++) {
+                lessonsInstances.push(...allSchoolLessons[i]);
+            }
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonsInstances });
 
         } catch (error) {
             console.log(error);

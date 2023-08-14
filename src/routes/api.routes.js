@@ -229,7 +229,8 @@ const AdminRoutesGroup = (router) => {
     router.post('/admin/coupon/activate', CouponController.activate);
 
     router.get('/admin/management/schools', AdminSchoolController.read);
-    router.get('/admin/management/lessons', AdminSchoolController.lessonsGroupedByClasses);
+    router.get('/admin/management/groupedLessons', AdminSchoolController.lessonsGroupedByClasses);
+    router.get('/admin/management/lessons', AdminSchoolController.lessons);
     router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
     
     router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
