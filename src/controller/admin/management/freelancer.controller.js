@@ -65,7 +65,7 @@ class AdminFreelancerController {
             const accountInstances = await Account.findAll({
                 attributes: { exclude: ['password'] },
                 where: {
-                    account_type: 'school',
+                    account_type: 'freelancer',
                 },
             });
 
@@ -91,20 +91,6 @@ class AdminFreelancerController {
                 const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['residentialAddress', 'passportNumber', 'dateOfBirth', 'parent', 'class', 'school',] }, include: Account });
 
                 const subjectInstances = await schoolInstance.getSubjects();
-
-                const extraData = {
-                    gender: 'undefined',
-                    website: 'undefine',
-                    est_date: 'undefine',
-                    school_type: school.account_type,
-                    ownership_type: 'undefine',
-                    bank_name: 'undefine',
-                    account_number: 'undefine',
-                    valid_id: 'undefine',
-                    proof: 'undefined',
-                }
-
-                school = { ...school, ...extraData };
 
                 payload.school = school;
                 payload.subjects = subjectInstances.length;
