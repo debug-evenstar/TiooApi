@@ -35,7 +35,7 @@ module.exports = (sequelize, Sequelize) => {
 
     Validation.prototype.compareExpiryDate = function () {
         const now = new Date(Date.now());
-        return   now > this.expires_at;
+        return now > this.expires_at;
     };
 
     Validation.prototype.compareOTP = function (providedCode) {
@@ -47,8 +47,6 @@ module.exports = (sequelize, Sequelize) => {
         const hash = MD5(this.accountId + this.expires_at).toString();
         return hash === token;
     };
-
-
 
     return Validation;
 };

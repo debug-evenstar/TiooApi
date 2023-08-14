@@ -98,7 +98,7 @@ class CouponController {
                 });
             }
 
-            const response = await couponInstances.update({ status: data.activate === true ? 'Activate' : 'Inactive' });
+            const response = await couponInstances.update({ status: data.activate === true ? 'Active' : 'Inactive' });
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
@@ -162,7 +162,7 @@ class CouponController {
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.delete,
+                message: ResponseStatus.pass.update,
                 data: response
             });
 
