@@ -27,6 +27,7 @@ const PriceController = require('../controller/admin/pricing.controller');
 const CouponController = require('../controller/admin/coupon.controller');
 const TioController = require('../controller/tio.controller');
 const AdminSchoolController = require('../controller/admin/management/school.controller');
+const AdminFreelancerController = require('../controller/admin/management/freelancer.controller');
 
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
@@ -232,6 +233,8 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/management/groupedLessons', AdminSchoolController.lessonsGroupedByClasses);
     router.get('/admin/management/lessons', AdminSchoolController.lessons);
     router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
+
+    router.get('/admin/management/freelancers', AdminFreelancerController.read);
     
     router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
     router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
