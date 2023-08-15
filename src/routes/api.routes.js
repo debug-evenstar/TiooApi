@@ -251,9 +251,10 @@ const AdminRoutesGroup = (router) => {
 
 };
 
-AdminRoutesGroup(router);
+
 OpenRoutesGroup(router);
 AuthorizedRoutesGroup(router);
+AdminRoutesGroup(router);
 
 module.exports = router;
 
