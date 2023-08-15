@@ -27,6 +27,7 @@ const PriceController = require('../controller/admin/pricing.controller');
 const CouponController = require('../controller/admin/coupon.controller');
 const TioController = require('../controller/tio.controller');
 const AdminSchoolController = require('../controller/admin/management/school.controller');
+const AdminFreelancerController = require('../controller/admin/management/freelancer.controller');
 
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
@@ -191,7 +192,9 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.get('/lesson/read', LessonController.nextWeeksLessons);
     router.get('/lesson/subjectlessons/:id', LessonController.subjectLessons);
-    router.post('/lesson/create', UploadService.upload.single('file'), LessonController.createLesson);
+
+    router.post('/lesson/create',   UploadService.upload.array('files'), LessonController.createLesson);
+    // router.post('/lesson/create',  UploadService.upload.single('file'), LessonController.createLesson);
 
     router.get('/chapter/subject/:id', ChapterController.read);
 
@@ -201,8 +204,8 @@ const AuthorizedRoutesGroup = (router) => {
 /*------------------------------| Admin ROUTES |------------------------------*/
 
 const AdminRoutesGroup = (router) => {
-    // router.use(AuthenticationMiddleware.admin) //--use middleware--//
 
+    router.use(AuthenticationMiddleware.admin) //--use middleware--//
     router.get('/admin/schools', AdminController.schools);
     router.get('/admin/home/dashboard', HomeController.dashboard);
     router.get('/admin/home/dashboard/activeusers', HomeController.activeUser);
@@ -216,6 +219,7 @@ const AdminRoutesGroup = (router) => {
 
     router.post('/admin/user', AuthorizationController.addAdminUser);
     router.get('/admin/user', AuthorizationController.readAdminUser);
+    router.delete('/admin/user', AuthorizationController.deleteAdmin);
     router.get('/admin/permissions', AuthorizationController.readPermissions);
 
     router.get('/admin/freelancer', AdminController.freeLancers);
@@ -228,7 +232,12 @@ const AdminRoutesGroup = (router) => {
     router.post('/admin/coupon/activate', CouponController.activate);
 
     router.get('/admin/management/schools', AdminSchoolController.read);
+    router.get('/admin/management/groupedLessons', AdminSchoolController.lessonsGroupedByClasses);
+    router.get('/admin/management/lessons', AdminSchoolController.lessons);
     router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
+
+    router.get('/admin/management/freelancers', AdminFreelancerController.read);
+    router.get('/admin/management/freelancers/extra', AdminFreelancerController.readWithExtra);
     
     router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
     router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
@@ -236,9 +245,9 @@ const AdminRoutesGroup = (router) => {
 
 };
 
+AdminRoutesGroup(router);
 OpenRoutesGroup(router);
 AuthorizedRoutesGroup(router);
-AdminRoutesGroup(router);
 
 module.exports = router;
 
