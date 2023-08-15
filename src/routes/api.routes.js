@@ -204,8 +204,8 @@ const AuthorizedRoutesGroup = (router) => {
 /*------------------------------| Admin ROUTES |------------------------------*/
 
 const AdminRoutesGroup = (router) => {
-    // router.use(AuthenticationMiddleware.admin) //--use middleware--//
 
+    router.use(AuthenticationMiddleware.admin) //--use middleware--//
     router.get('/admin/schools', AdminController.schools);
     router.get('/admin/home/dashboard', HomeController.dashboard);
     router.get('/admin/home/dashboard/activeusers', HomeController.activeUser);
@@ -245,9 +245,9 @@ const AdminRoutesGroup = (router) => {
 
 };
 
+AdminRoutesGroup(router);
 OpenRoutesGroup(router);
 AuthorizedRoutesGroup(router);
-AdminRoutesGroup(router);
 
 module.exports = router;
 
