@@ -247,8 +247,6 @@ const AdminRoutesGroup = (router) => {
 
     router.post('/admin/library',  UploadService.upload.single('file'), AdminLibraryController.create);
     router.get('/admin/library',  UploadService.upload.single('file'), AdminLibraryController.read);
-
-
 };
 
 
