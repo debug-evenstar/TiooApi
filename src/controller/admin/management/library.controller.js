@@ -32,7 +32,7 @@ class AdminLibraryController {
 
             const response = await classInstance.addLibrary(libraryInstance);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: response });
 
         } catch (error) {
             console.log(error);
@@ -42,26 +42,13 @@ class AdminLibraryController {
     }
 
 
-
-    static async lessonsGroupedByClasses(req, res) {
-
-        const data = req.query;
+    static async read(req, res) {
 
         try {
 
-            const AccountInstance = await Account.findByPk(data.school_id, { include: [SchoolManagement] });
-            if (!AccountInstance) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
-            }
-            const SchoolInstances = await AccountInstance.getSchoolManagement();
-            if (!SchoolInstances) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-            }
+            const libraryInstance = await Library.findAll();
 
-            const ClassInstances = await SchoolInstances.getClasses({ attributes: { exclude: ['SchoolManagementId', 'type'] }, include: [Lesson] });
-
-
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: libraryInstance });
 
         } catch (error) {
             console.log(error);

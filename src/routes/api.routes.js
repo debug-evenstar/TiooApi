@@ -246,6 +246,7 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
 
     router.post('/admin/library',  UploadService.upload.single('file'), AdminLibraryController.create);
+    router.get('/admin/library',  UploadService.upload.single('file'), AdminLibraryController.read);
 
 
 };
