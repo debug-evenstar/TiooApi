@@ -1,7 +1,7 @@
 const AuthController = require('../../auth.controller');
 const { validationResult } = require('express-validator');
 const ResponseStatus = require("../../../config/message.config");
-const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson } = require('../../../database/connection');
+const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class } = require('../../../database/connection');
 const { use } = require('chai');
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
 const TokenMiddleware = require('../../../middleware/token.middleware');
@@ -236,6 +236,81 @@ class AdminSchoolController {
 
     }
 
+    static async lessonsGroupedBySubjects(req, res) {
+
+        const data = req.query;
+
+        try {
+
+            const AccountInstance = await Account.findByPk(data.school_id, { include: [SchoolManagement] });
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const ClassInstances = await SchoolInstances.getSubjects({ attributes: { exclude: ['SchoolManagementId'] }, include: [Lesson] });
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
+
+
+    static async lessonsBySubjectId(req, res) {
+
+        /*---------------------------------------------------------------------------
+        THIS IS STILL IN PROGRESS AWAITING CLARITY.
+        LET IT BE KNOWN THAT WE DON'T ASSIGN MULTIPLE CLASSARMS ON LESSON UPLOAD
+        BUT WE DO UNDER SUBJECT CREATION.
+        ----------------------------------------------------------------------*/ 
+
+        const data = req.query;
+
+        try {
+
+            const AccountInstance = await Account.findByPk(data.school_id, { include: [SchoolManagement] });
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const subjectInstance = await SchoolInstances.getSubjects({ where: { id: data.subject_id }, include: [ClassArm, Lesson, Class] });
+
+            const response = await Promise.all(subjectInstance.map(async (instance) => {
+
+                const payload = {
+                    id: 2,
+                    naming: instance.naming,
+                    description: instance.description,
+                    arms:  instance.ClassArms.map(item => ({ naming: item.naming, ClassId: item.ClassId })),
+                    lessons: instance.Lessons
+
+                }
+                return payload;
+
+            }));
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
 
 
     static async lessons(req, res) {
