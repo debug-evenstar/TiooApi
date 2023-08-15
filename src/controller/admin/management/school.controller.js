@@ -236,7 +236,33 @@ class AdminSchoolController {
 
     }
 
+    static async lessonsGroupedBySubjects(req, res) {
 
+        const data = req.query;
+
+        try {
+
+            const AccountInstance = await Account.findByPk(data.school_id, { include: [SchoolManagement] });
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+            
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const ClassInstances = await SchoolInstances.getSubjects({ attributes: { exclude: ['SchoolManagementId'] }, include: [Lesson] });
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
 
     static async lessons(req, res) {
 
