@@ -28,6 +28,7 @@ const CouponController = require('../controller/admin/coupon.controller');
 const TioController = require('../controller/tio.controller');
 const AdminSchoolController = require('../controller/admin/management/school.controller');
 const AdminFreelancerController = require('../controller/admin/management/freelancer.controller');
+const AdminLibraryController = require('../controller/admin/management/library.controller');
 
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
@@ -233,6 +234,8 @@ const AdminRoutesGroup = (router) => {
 
     router.get('/admin/management/schools', AdminSchoolController.read);
     router.get('/admin/management/groupedLessons', AdminSchoolController.lessonsGroupedByClasses);
+    router.get('/admin/management/subjects/lessons', AdminSchoolController.lessonsGroupedBySubjects);
+    router.get('/admin/management/subject/lessons', AdminSchoolController.lessonsBySubjectId);   
     router.get('/admin/management/lessons', AdminSchoolController.lessons);
     router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
 
@@ -242,12 +245,14 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
     router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
 
-
+    router.post('/admin/library',  UploadService.upload.single('file'), AdminLibraryController.create);
+    router.get('/admin/library',  UploadService.upload.single('file'), AdminLibraryController.read);
 };
 
-AdminRoutesGroup(router);
+
 OpenRoutesGroup(router);
 AuthorizedRoutesGroup(router);
+AdminRoutesGroup(router);
 
 module.exports = router;
 
