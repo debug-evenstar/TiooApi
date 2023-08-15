@@ -10,16 +10,32 @@ class LessonController {
 
     static async createLesson(req, res) {
 
-        if (req.file) {
-            req.body.file = req.file.path;
+        let filePaths = [];
+        const today = new Date();
+        const threeDaysAhead = new Date();
+        threeDaysAhead.setDate(today.getDate() + 3);
+
+
+        if (req.files && req.files.length > 0) {
+            filePaths = req.files.map((file) => file.path);
+            req.body.files = filePaths;
+        }
+
+        if (!req.body.start_date) {
+            req.body.start_date = today;
+        }
+
+        if (!req.body.end_date) {
+            req.body.end_date = threeDaysAhead;
         }
 
         try {
+
             const lessonInstance = await Lesson.create(req.body);
             const subjectInstance = await Subject.findByPk(req.body.subject);
 
 
-            // await subjectInstance.addLesson(lessonInstance);
+             await subjectInstance.addLesson(lessonInstance);
 
             // Create a new chapter instance
             const chapter = new Chapter();
@@ -44,6 +60,7 @@ class LessonController {
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstance });
 
+
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: 'Server Error' });
@@ -59,14 +76,14 @@ class LessonController {
         const daysUntilNextMonday = (1 - today.getDay() + 7) % 7;
         const nextMonday = new Date(today);
         nextMonday.setDate(today.getDate() + daysUntilNextMonday);
-        
+
         const daysUntilNextSunday = (7 - nextMonday.getDay()) % 7;
         const nextSunday = new Date(nextMonday);
         nextSunday.setDate(nextMonday.getDate() + daysUntilNextSunday);
 
         try {
 
-            const allLessons = await Lesson.findAll({ attributes: ['topic', 'description', 'start_date', 'end_date'],});
+            const allLessons = await Lesson.findAll({ attributes: ['topic', 'description', 'start_date', 'end_date'], });
 
             const lessonsWithinNextWeek = allLessons.filter((lesson) => {
                 const lessonStartDate = new Date(lesson.start_date);
@@ -74,8 +91,10 @@ class LessonController {
                 return lessonStartDate >= nextMonday && lessonStartDate <= nextSunday;
             });
 
-            return res.status(ResponseStatus.code.success).json({ error: false, 
-                message: ResponseStatus.pass.read, data: lessonsWithinNextWeek });
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read, data: lessonsWithinNextWeek
+            });
 
 
         } catch (error) {
@@ -87,29 +106,31 @@ class LessonController {
 
 
 
-        /*-----------------------------------| FETCH SUBJECT LESSONS |-----------------------------------*/
+    /*-----------------------------------| FETCH SUBJECT LESSONS |-----------------------------------*/
 
-        static async subjectLessons(req, res) {
+    static async subjectLessons(req, res) {
 
-            const {id} = req.params;
+        const { id } = req.params;
 
-            try {
-    
-                const subjectInstance = await Subject.findByPk(id);
-                const lessons = await subjectInstance.getLessons({
-                    attributes: ['topic', 'description'],
-                });
-    
-                return res.status(ResponseStatus.code.success).json({ error: false, 
-                    message: ResponseStatus.pass.read, data: lessons });
-    
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'Server Error' });
-            };
-    
-        }
+        try {
+
+            const subjectInstance = await Subject.findByPk(id);
+            const lessons = await subjectInstance.getLessons({
+                attributes: ['topic', 'description'],
+            });
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read, data: lessons
+            });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
 
 }
 

@@ -4,7 +4,7 @@ module.exports = (sequelize, Sequelize) => {
   const Lesson = sequelize.define(
     'Lesson',
     {
-   
+
       topic: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -51,10 +51,15 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
         defaultValue: 'Locked',
       },
-      file: {
-        type: Sequelize.STRING,
-        allowNull: true,
+      files: {
+        type: Sequelize.JSON,
+        defaultValue: [],
+        get() {
+          const value = this.getDataValue('permissions');
+          return value ? JSON.parse(value) : [];
+        },
       },
+
     },
     { timestamps: true }
   );
