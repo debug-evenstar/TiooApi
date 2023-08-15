@@ -35,12 +35,12 @@ class LessonController {
             const subjectInstance = await Subject.findByPk(req.body.subject);
 
 
-             await subjectInstance.addLesson(lessonInstance);
+            await subjectInstance.addLesson(lessonInstance);
 
             // Create a new chapter instance
             const chapter = new Chapter();
-            chapter.name = req.body.chapter_name;
-            chapter.title = req.body.chapter_title;
+            chapter.name = "undefined";
+            chapter.title = "undefined";
 
             const chapterInstance = await chapter.save();
 
@@ -116,7 +116,7 @@ class LessonController {
 
             const subjectInstance = await Subject.findByPk(id);
             const lessons = await subjectInstance.getLessons({
-                attributes: ['topic', 'description'],
+                attributes: ['topic', 'description', 'files'],
             });
 
             return res.status(ResponseStatus.code.success).json({
