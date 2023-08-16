@@ -16,5 +16,5 @@ jobs:
      
           script: |
             cd "${{secrets.API_WORK_TREE}}"
-            git --work-tree="${{secrets.API_WORK_TREE}}" --git-dir={{secrets.API_GIT_DIR}} pull origin staging
+            git --work-tree="${{secrets.API_WORK_TREE}}" --git-dir="${{secrets.API_GIT_DIR}}" pull origin staging
             echo 'Deployment successful to server'
