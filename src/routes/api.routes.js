@@ -195,7 +195,6 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/lesson/subjectlessons/:id', LessonController.subjectLessons);
 
     router.post('/lesson/create',   UploadService.upload.array('files'), LessonController.createLesson);
-    // router.post('/lesson/create',  UploadService.upload.single('file'), LessonController.createLesson);
 
     router.get('/chapter/subject/:id', ChapterController.read);
 
