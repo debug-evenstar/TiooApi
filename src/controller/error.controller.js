@@ -1,11 +1,11 @@
 const { Error } = require("sequelize");
 const { ErrorLog } = require("../database/connection");
-
+const ResponseStatus = require("../config/message.config");
 class ErrorLogs {
 
     static async fetchErrors(req, res) {
         try {
-            const errordata = await ErrorLog.findall();
+            const errordata = await ErrorLog.findAll();
             if (errordata) {
                 return res.status(ResponseStatus.code.success).json({
                     error: false,
