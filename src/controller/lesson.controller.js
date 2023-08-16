@@ -114,14 +114,11 @@ class LessonController {
 
         try {
 
-            const subjectInstance = await Subject.findByPk(id);
-            const lessons = await subjectInstance.getLessons({
-                attributes: ['topic', 'description', 'files'],
-            });
+            const subjectInstance = await  Subject.findByPk(id, {include: [Lesson,] });
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.read, data: lessons
+                message: ResponseStatus.pass.read, data: subjectInstance
             });
 
 
