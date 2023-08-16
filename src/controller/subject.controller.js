@@ -161,6 +161,29 @@ class SubjectController {
     }
 
 
+    
+    /*-----------------------------------| SUBJECT CLASSES |-----------------------------------*/
+
+
+    static async subjectClasses(req, res) {
+
+        try {
+
+            const subjects = await Subject.findByPk(req.query.subject_id);
+            const classes = await subjects.getClasses();
+
+           const cutClasses = classes.map((item)=> ({id: item.id, naming: item.naming}));
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: cutClasses });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
+
     /*-----------------------------------| READ SUBJECT LESSONS |-----------------------------------*/
 
     static async subjectLessons(req, res) {
