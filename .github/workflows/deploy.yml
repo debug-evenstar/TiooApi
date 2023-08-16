@@ -15,6 +15,6 @@ jobs:
           username: ${{secrets.STAGING_USERNAME}} # User of the server you want to ssh into
      
           script: |
-            cd "${{API_WORK_TREE}}"
-            git --work-tree="${{API_WORK_TREE}}" --git-dir={{API_GIT_DIR}} pull origin staging
+            cd "${{secrets.API_WORK_TREE}}"
+            git --work-tree="${{secrets.API_WORK_TREE}}" --git-dir={{secrets.API_GIT_DIR}} pull origin staging
             echo 'Deployment successful to server'
