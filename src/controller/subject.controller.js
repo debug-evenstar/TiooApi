@@ -37,7 +37,7 @@ class SubjectController {
         try {
 
             const subjectInstance = await Subject.findAll({
-                include : IncludeManager.parseParamIncludes(req.query)
+                include: IncludeManager.parseParamIncludes(req.query)
             });
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectInstance });
         } catch (error) {
@@ -54,9 +54,9 @@ class SubjectController {
         const { id } = req.params;
 
         try {
-            const subjectInstance = await Subject.findAll({ 
+            const subjectInstance = await Subject.findAll({
                 where: { SchoolManagementId: id },
-                include : [ClassArm]
+                include: [ClassArm]
             });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
@@ -160,10 +160,7 @@ class SubjectController {
         };
     }
 
-
-    
     /*-----------------------------------| SUBJECT CLASSES |-----------------------------------*/
-
 
     static async subjectClasses(req, res) {
 
@@ -171,8 +168,7 @@ class SubjectController {
 
             const subjects = await Subject.findByPk(req.query.subject_id);
             const classes = await subjects.getClasses();
-
-           const cutClasses = classes.map((item)=> ({id: item.id, naming: item.naming}));
+            const cutClasses = classes.map((item) => ({ id: item.id, naming: item.naming }));
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: cutClasses });
 
@@ -181,8 +177,6 @@ class SubjectController {
             res.status(500).json({ error: 'Server Error' });
         };
     }
-
-
 
     /*-----------------------------------| READ SUBJECT LESSONS |-----------------------------------*/
 
@@ -322,20 +316,20 @@ class SubjectController {
 
             const classes = await subject.getClasses();
 
-            const students =  await classes[classes.length - 1].getStudents();
+            const students = await classes[classes.length - 1].getStudents();
 
             // const studentsPerClass = await Promise.all(classes.map(async (classObj) => {
             //     const students = await classObj.getStudents();
             //     return students;
             //   }));
 
-          const studentAccount = await Promise.all(students.map(async (profile) => {
+            const studentAccount = await Promise.all(students.map(async (profile) => {
                 const students = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
                 return students;
 
-              }));
+            }));
 
-              const payload = {subject: subject, students: studentAccount};
+            const payload = { subject: subject, students: studentAccount };
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 

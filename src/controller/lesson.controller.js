@@ -122,6 +122,7 @@ class LessonController {
                 description: subjectInstance.description,
                 SchoolManagementId: subjectInstance.SchoolManagementId,
                 classArms: subjectInstance.ClassArms.map(item => ({ id: item.id,  naming: item.naming, classId: item.ClassId })),
+                classes: subjectInstance.Classes.map(item => ({id: item.id,  naming: item.naming})),
                 lessons: subjectInstance.Lessons
             }
 
