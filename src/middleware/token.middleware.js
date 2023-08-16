@@ -19,7 +19,7 @@ class TokenMiddleware {
                 return res.status(401).json({ message: 'Authentication failed. Token missing.' });
             }
 
-            console.log([req, res])
+        
             const decoded = jwt.verify(token, process.env.JWT_SECRETE);
             const id = decoded.userdata.id;
 
@@ -37,7 +37,7 @@ class TokenMiddleware {
 
             }).catch((error) => {
                 
-                console.log([error, "here"]);
+             
             });
 
 
