@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 module.exports = (sequelize, Sequelize) => {
   const Admin = sequelize.define(
     'Admin',
-    {
+    {   
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,

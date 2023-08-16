@@ -39,11 +39,12 @@ const { InviteValidator, AcceptValidator } = require('./validators/StudentValida
 const UploadService = require('../services/upload.service');
 const AuthorizationController = require('../controller/admin/authorization.controller');
 const { Authorization } = require('../database/connection');
+const ErrorLogs = require('../controller/error.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
 const OpenRoutesGroup = (router) => {
-
+    router.get('/error/logs', ErrorLogs.fetchErrors);
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
@@ -235,13 +236,13 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/management/schools', AdminSchoolController.read);
     router.get('/admin/management/groupedLessons', AdminSchoolController.lessonsGroupedByClasses);
     router.get('/admin/management/subjects/lessons', AdminSchoolController.lessonsGroupedBySubjects);
-    router.get('/admin/management/subject/lessons', AdminSchoolController.lessonsBySubjectId);   
+    router.get('/admin/management/subject/lessons', AdminSchoolController.lessonsBySubjectId);
     router.get('/admin/management/lessons', AdminSchoolController.lessons);
     router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
 
     router.get('/admin/management/freelancers', AdminFreelancerController.read);
     router.get('/admin/management/freelancers/extra', AdminFreelancerController.readWithExtra);
-    
+
     router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
     router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
 

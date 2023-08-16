@@ -4,7 +4,6 @@ module.exports = (sequelize, DataTypes) => {
     const Student = sequelize.define(
         'Student',
         {
-
             //================= PERSONAL INFORMATION=========// 
 
             id: {
