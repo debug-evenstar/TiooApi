@@ -114,11 +114,25 @@ class LessonController {
 
         try {
 
-            const subjectInstance = await  Subject.findByPk(id, {include: [Lesson,] });
+            const subjectInstance = await Subject.findByPk(id, { include: [ClassArm, Lesson, Class] });
+
+            const payload = {
+                id: 2,
+                naming: subjectInstance.naming,
+                description: subjectInstance.description,
+                SchoolManagementId: subjectInstance.SchoolManagementId,
+                classArms: subjectInstance.ClassArms.map(item => ({ id: item.id,  naming: item.naming, classId: item.ClassId })),
+                classes: subjectInstance.Classes.map(item => ({id: item.id,  naming: item.naming})),
+                lessons: subjectInstance.Lessons
+            }
+
+            console.log(subjectInstance);
+
+  
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.read, data: subjectInstance
+                message: ResponseStatus.pass.read, data: payload
             });
 
 
