@@ -63,7 +63,7 @@ class LessonController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -99,7 +99,7 @@ class LessonController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -133,7 +133,7 @@ class LessonController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error', extra: error.message });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }

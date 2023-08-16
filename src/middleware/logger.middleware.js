@@ -20,7 +20,6 @@ class Logger {
             const query = JSON.stringify(req.query);;
             const method = req.method;
             const url = req.url;
-            const body = res.body;
             const originalUrl = req.url;
 
             const payload = { statusMessage, reqBody, responseBody, params, query, method, url, body: reqBody, originalUrl }
