@@ -24,11 +24,8 @@ class Logger {
             const body = res.body;
             const originalUrl = res.url;
 
-            const payload = { statusMessage, reqBody, responseBody, params, query, method, url, body, originalUrl }
-
             await TotalLog.create(payload);
             
-            console.log(payload);
 
             console.log(`ON RESPONSE [${new Date().toISOString()}] ${req.method} ${req.url} - Status: ${res.statusCode} - Duration: ${duration}ms`);
         });
