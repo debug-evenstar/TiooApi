@@ -106,10 +106,20 @@ class AuthorizationController {
                 data: authoorizedUsers
             });
 
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ error: 'Server Error' });
-        };
+        } catch (err) {
+            console.log(err)
+            var logError = await ErrorLog.create({
+                error_name: "Error at Verify Middleware",
+                error_description: err.toString(),
+                route: `${req.originalUrl}`,
+                method: `${req.method}`,
+                error_code: "500",
+            });
+
+            if (logError) {
+                return res.status(500).json({ error: 'Server Error' });
+            }
+        }
 
     }
 
@@ -197,31 +207,31 @@ class AuthorizationController {
     }
 
 
-        /*-----------------------------------| DELETE ADMIN |-----------------------------------*/
+    /*-----------------------------------| DELETE ADMIN |-----------------------------------*/
 
-        static async deleteAdmin(req, res) {
+    static async deleteAdmin(req, res) {
 
-            const { admin_id } = req.query;
-       
-    
-            try {
-                const user = await Admin.findOne({ where: { id: admin_id } });
-    
-                if (!user) {
-                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-                }
+        const { admin_id } = req.query;
 
-                const deletedAdmin = await user.destroy();
-    
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: deletedAdmin });
-    
-    
-            } catch (error) {
-                console.log(error)
-                res.status(500).json({ error: 'Server Error' });
-            };
-    
-        }
+
+        try {
+            const user = await Admin.findOne({ where: { id: admin_id } });
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const deletedAdmin = await user.destroy();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: deletedAdmin });
+
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: 'Server Error' });
+        };
+
+    }
 
 
 }
