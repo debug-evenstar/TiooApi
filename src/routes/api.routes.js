@@ -39,11 +39,12 @@ const { InviteValidator, AcceptValidator } = require('./validators/StudentValida
 const UploadService = require('../services/upload.service');
 const AuthorizationController = require('../controller/admin/authorization.controller');
 const { Authorization } = require('../database/connection');
+const ErrorLogs = require('../controller/error.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
 const OpenRoutesGroup = (router) => {
-
+    router.post('/error/logs', ErrorLogs.fetchErrors);
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
@@ -194,7 +195,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/lesson/read', LessonController.nextWeeksLessons);
     router.get('/lesson/subjectlessons/:id', LessonController.subjectLessons);
 
-    router.post('/lesson/create',   UploadService.upload.array('files'), LessonController.createLesson);
+    router.post('/lesson/create', UploadService.upload.array('files'), LessonController.createLesson);
     // router.post('/lesson/create',  UploadService.upload.single('file'), LessonController.createLesson);
 
     router.get('/chapter/subject/:id', ChapterController.read);
@@ -235,25 +236,26 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/management/schools', AdminSchoolController.read);
     router.get('/admin/management/groupedLessons', AdminSchoolController.lessonsGroupedByClasses);
     router.get('/admin/management/subjects/lessons', AdminSchoolController.lessonsGroupedBySubjects);
-    router.get('/admin/management/subject/lessons', AdminSchoolController.lessonsBySubjectId);   
+    router.get('/admin/management/subject/lessons', AdminSchoolController.lessonsBySubjectId);
     router.get('/admin/management/lessons', AdminSchoolController.lessons);
     router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
 
     router.get('/admin/management/freelancers', AdminFreelancerController.read);
     router.get('/admin/management/freelancers/extra', AdminFreelancerController.readWithExtra);
-    
+
     router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
     router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
 
-    router.post('/admin/library',  UploadService.upload.single('file'), AdminLibraryController.create);
-    router.get('/admin/library',  UploadService.upload.single('file'), AdminLibraryController.read);
+    router.post('/admin/library', UploadService.upload.single('file'), AdminLibraryController.create);
+    router.get('/admin/library', UploadService.upload.single('file'), AdminLibraryController.read);
 
 
 };
 
-AdminRoutesGroup(router);
+
 OpenRoutesGroup(router);
 AuthorizedRoutesGroup(router);
+AdminRoutesGroup(router);
 
 module.exports = router;
 

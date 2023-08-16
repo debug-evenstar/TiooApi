@@ -487,7 +487,9 @@ class ClassController {
     /* ---------------- GET  TEACHERS AND STUDENTS IN A CLASS --------------- */
 
     static async readStudentsTeachers(req, res) {
+
         const { id } = req.params;
+        
         try {
             const classInstance = await Class.findByPk(id, { include: [Teacher, Student] });
 

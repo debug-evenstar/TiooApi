@@ -42,7 +42,7 @@ const Authorization = db.roles = require("../authorization.model")(sequelize, Se
 const Permission = db.permissions = require("../permission.model")(sequelize, Sequelize);
 
 const Library = db.Libraries = require("../library.model")(sequelize, Sequelize);
-
+const ErrorLog = db.errors = require("../errorLog.model")(sequelize, Sequelize);
 const Coupon = db.coupons = require("../coupon.model")(sequelize, Sequelize);
 
 
@@ -71,5 +71,6 @@ module.exports = {
   Permission,
   Admin,
   Coupon,
-  Library
+  Library,
+  ErrorLog
 };
