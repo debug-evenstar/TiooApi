@@ -40,6 +40,7 @@ const UploadService = require('../services/upload.service');
 const AuthorizationController = require('../controller/admin/authorization.controller');
 const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
+const LoggingController = require('../controller/error.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -199,6 +200,10 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/lesson/create',   UploadService.upload.array('files'), LessonController.createLesson);
 
     router.get('/chapter/subject/:id', ChapterController.read);
+
+    router.get('/logging', LoggingController.read);
+    router.delete('/logging', LoggingController.clear);
+
 
 };
 

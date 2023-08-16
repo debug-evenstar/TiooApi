@@ -1,7 +1,7 @@
 const { Error } = require("sequelize");
-const { ErrorLog } = require("../database/connection");
+const { ErrorLog, TotalLog } = require("../database/connection");
 const ResponseStatus = require("../config/message.config");
-class ErrorLogs {
+class LoggingController {
 
     static async fetchErrors(req, res) {
         try {
@@ -27,5 +27,34 @@ class ErrorLogs {
 
         }
     }
+
+    static async read(req, res) {
+
+        try {
+            const logger = await TotalLog.findAll();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: logger });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
+    static async clear(req, res) {
+
+        try {
+
+             const logger = TotalLog.destroy({ truncate: true })
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: logger });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Server Error' });
+        };
+    }
+
+
+
 }
-module.exports = ErrorLogs;
+module.exports = LoggingController;

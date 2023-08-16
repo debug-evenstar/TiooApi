@@ -9,24 +9,30 @@ class Logger {
         console.log(`ON REEQUEST [${new Date().toISOString()}] ${req.method} ${req.url}`);
 
         res.on('finish', async () => {
-            const duration = Date.now() - start;
-
-            const statusMessage = res.statusMessage;
-            const reqBody = req.body;
-            if (reqBody.password) {
-                delete reqBody.password;
+            const duration = Date.now() - start; 
+            if ( req.body.password) {
+                delete  req.body.password;
             }
+            const statusMessage = res.statusMessage;
+            const reqBody =  JSON.stringify(req.body);;
             const responseBody = res._treblleResponsebody;
-            const params = res.params;
-            const query = res.query;
-            const method = res.method;
-            const url = res.url;
+            const params = JSON.stringify(req.params);
+            const query = JSON.stringify(req.query);;
+            const method = req.method;
+            const url = req.url;
             const body = res.body;
-            const originalUrl = res.url;
+            const originalUrl = req.url;
 
-            await TotalLog.create(payload);
+            const payload = { statusMessage, reqBody, responseBody, params, query, method, url, body: reqBody, originalUrl }
+
+            console.log(payload);
+
+            if(url !== '/logging'){
+                await TotalLog.create(payload);
+            }
+
+           
             
-
             console.log(`ON RESPONSE [${new Date().toISOString()}] ${req.method} ${req.url} - Status: ${res.statusCode} - Duration: ${duration}ms`);
         });
 
