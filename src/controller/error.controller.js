@@ -31,7 +31,7 @@ class LoggingController {
     static async read(req, res) {
 
         try {
-            const logger = await TotalLog.findAll();
+            const logger = await TotalLog.findAll({order: [['createdAt', 'DESC']]});
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: logger });
 

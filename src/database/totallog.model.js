@@ -24,6 +24,11 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
                 defaultValue: 'Undefined'
             },
+            statuscode: {
+                type: DataTypes.STRING,
+                allowNull: true,
+                defaultValue: 'Undefined'
+            },
             url: {
                 type: DataTypes.STRING,
                 allowNull: true,

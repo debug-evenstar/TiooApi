@@ -9,6 +9,7 @@ class Logger {
         // console.log(`ON REEQUEST [${new Date().toISOString()}] ${req.method} ${req.url}`);
 
         res.on('finish', async () => {
+
             const duration = Date.now() - start; 
             if ( req.body.password) {
                 delete  req.body.password;
@@ -21,6 +22,7 @@ class Logger {
             const method = req.method;
             const url = req.url;
             const originalUrl = req.url;
+            const statuscode = req.statuscode;
 
             const payload = { statusMessage, reqBody, responseBody, params, query, method, url, body: reqBody, originalUrl }
 

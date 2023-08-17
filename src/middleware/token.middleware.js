@@ -43,7 +43,7 @@ class TokenMiddleware {
 
             }).catch((error) => {
 
-                console.log([error, "here"]);
+               // console.log([error.message, "here"]);
             });
 
 
@@ -77,11 +77,7 @@ class TokenMiddleware {
             const decoded = jwt.verify(token, process.env.JWT_SECRETE);
             const email = decoded.userdata.email;
 
-            console.log(email)
-
             Admin.findOne({ where: { email: email } }).then((user) => {
-
-                console.log(user);
 
                 if (!user) {
                     return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.adminUnauthorized });
@@ -99,7 +95,7 @@ class TokenMiddleware {
                 next();
 
             }).catch((error) => {
-                console.log(error);
+              //  console.log(error);
             });
 
 
