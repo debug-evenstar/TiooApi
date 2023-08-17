@@ -17,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: [],
         get() {
             const value = this.getDataValue('permissions');
-            return value ? JSON.parse(value) : [];
+            // return value ? JSON.parse(value) : [];
+            return value ? value : [];
         },
     },
     }, {
