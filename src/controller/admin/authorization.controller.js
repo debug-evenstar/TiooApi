@@ -98,7 +98,6 @@ class AuthorizationController {
 
             }));
 
-
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read,
