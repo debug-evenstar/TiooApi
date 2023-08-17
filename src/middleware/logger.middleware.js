@@ -22,9 +22,7 @@ class Logger {
             const method = req.method;
             const url = req.url;
             const originalUrl = req.url;
-            const statuscode = req.statuscode;
-
-            const payload = { statusMessage, reqBody, responseBody, params, query, method, url, body: reqBody, originalUrl, statuscode }
+            const payload = { statusMessage, reqBody, responseBody, params, query, method, url, body: reqBody, originalUrl, statuscode: JSON.stringify(res.statusCode)}
 
             if(url !== '/logging'){
                 await TotalLog.create(payload);

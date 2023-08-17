@@ -33,6 +33,11 @@ class LessonController {
             const lessonInstance = await Lesson.create(req.body);
             const subjectInstance = await Subject.findByPk(req.body.subject);
 
+            if(!subjectInstance){
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
+
+            }
+
 
             await subjectInstance.addLesson(lessonInstance);
 
