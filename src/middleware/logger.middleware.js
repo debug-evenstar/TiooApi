@@ -24,7 +24,7 @@ class Logger {
             const originalUrl = req.url;
             const statuscode = req.statuscode;
 
-            const payload = { statusMessage, reqBody, responseBody, params, query, method, url, body: reqBody, originalUrl }
+            const payload = { statusMessage, reqBody, responseBody, params, query, method, url, body: reqBody, originalUrl, statuscode }
 
             if(url !== '/logging'){
                 await TotalLog.create(payload);

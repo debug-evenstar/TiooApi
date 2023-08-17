@@ -82,7 +82,11 @@ class LessonController {
 
             const subjectInstance = await Subject.findByPk(req.query.subject_id);
 
+
+            const whereClause = req.query.class_id ? { ref_cid: req.query.class_id } : {};
+
             const lessonInstances = await subjectInstance.getGroups({
+                where: whereClause,
                 include: [
                     {
                         model: ClassArm,
@@ -92,7 +96,6 @@ class LessonController {
             });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
-
 
         } catch (error) {
             console.log(error);
