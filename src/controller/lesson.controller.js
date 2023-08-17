@@ -1,6 +1,6 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult, param } = require('express-validator');
-const { Lesson, Subject, Chapter, Class, ClassArm } = require("../database/connection");
+const { Lesson, Subject, Chapter, Class, ClassArm, Group } = require("../database/connection");
 
 
 class LessonController {
@@ -14,7 +14,6 @@ class LessonController {
         const today = new Date();
         const threeDaysAhead = new Date();
         threeDaysAhead.setDate(today.getDate() + 3);
-
 
         if (req.files && req.files.length > 0) {
             filePaths = req.files.map((file) => file.path);
@@ -46,7 +45,7 @@ class LessonController {
 
             const classInstance = await Class.findByPk(req.body.class);
 
-            const classarmInstance = await ClassArm.findByPk(req.body.class_arms);
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...JSON.parse(req.body.class_arms)] } });
 
             await subjectInstance.addChapter(chapterInstance);
 
@@ -54,18 +53,57 @@ class LessonController {
 
             await subjectInstance.addLesson(lessonInstance);
 
-            await classarmInstance.addLesson(lessonInstance);
+            const instance1 = await lessonInstance.addClassArms(classarmInstances);
 
-            await classInstance.addLesson(lessonInstance)
+            await classInstance.addLesson(lessonInstance);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstance });
+            const groupInstance = await Group.create({
+                naming: classInstance.naming,
+                ref_cid: classInstance.id
+            });
+
+            await groupInstance.addLesson(lessonInstance);
+            const instance2 = await groupInstance.addClassArms(classarmInstances);
+            const subjejctGroup = await subjectInstance.addGroup(groupInstance);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {} });
 
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
+
+
+    static async subjectGroupedLessons(req, res) {
+
+        try {
+
+            const subjectInstance = await Subject.findByPk(req.query.subject_id);
+
+            const lessonInstances = await subjectInstance.getGroups({
+                include: [
+                    {
+                        model: ClassArm,
+                        attributes: ['id', 'naming'],
+                        through: { attributes: [] },
+                    }, Lesson]
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+
+
+
 
 
     /*-----------------------------------| NEXT WEEKS LESSON |-----------------------------------*/
@@ -99,7 +137,7 @@ class LessonController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -116,15 +154,15 @@ class LessonController {
 
             const subjectInstance = await Subject.findByPk(id, { include: [ClassArm, Lesson, Class] });
 
-             const payload = {
+            const payload = {
                 id: 2,
                 naming: subjectInstance.naming,
                 description: subjectInstance.description,
                 SchoolManagementId: subjectInstance.SchoolManagementId,
-                classArms: subjectInstance.ClassArms.map(item => ({ id: item.id,  naming: item.naming, classId: item.ClassId })),
-                classes: subjectInstance.Classes.map(item => ({id: item.id,  naming: item.naming})),
+                classArms: subjectInstance.ClassArms.map(item => ({ id: item.id, naming: item.naming, classId: item.ClassId })),
+                classes: subjectInstance.Classes.map(item => ({ id: item.id, naming: item.naming })),
                 lessons: subjectInstance.Lessons
-            }  
+            }
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
@@ -133,7 +171,7 @@ class LessonController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }

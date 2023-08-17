@@ -6,7 +6,7 @@ class Logger {
 
         const start = Date.now();
 
-        console.log(`ON REEQUEST [${new Date().toISOString()}] ${req.method} ${req.url}`);
+        // console.log(`ON REEQUEST [${new Date().toISOString()}] ${req.method} ${req.url}`);
 
         res.on('finish', async () => {
             const duration = Date.now() - start; 
@@ -24,19 +24,15 @@ class Logger {
 
             const payload = { statusMessage, reqBody, responseBody, params, query, method, url, body: reqBody, originalUrl }
 
-            console.log(payload);
-
             if(url !== '/logging'){
                 await TotalLog.create(payload);
-            }
-
-           
+            }           
             
-            console.log(`ON RESPONSE [${new Date().toISOString()}] ${req.method} ${req.url} - Status: ${res.statusCode} - Duration: ${duration}ms`);
+            // console.log(`ON RESPONSE [${new Date().toISOString()}] ${req.method} ${req.url} - Status: ${res.statusCode} - Duration: ${duration}ms`);
         });
 
         res.on('error', (err) => {
-            console.error(`ON ERROR [${new Date().toISOString()}] ${req.method} ${req.url} - Error: ${err.message}`);
+            // console.error(`ON ERROR [${new Date().toISOString()}] ${req.method} ${req.url} - Error: ${err.message}`);
         });
 
         next();

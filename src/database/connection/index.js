@@ -46,11 +46,12 @@ const ErrorLog = db.errors = require("../errorLog.model")(sequelize, Sequelize);
 const Coupon = db.coupons = require("../coupon.model")(sequelize, Sequelize);
 
 const TotalLog = db.totallogs = require("../totallog.model")(sequelize, Sequelize);
+const Group = db.groups = require("../groups.model")(sequelize, Sequelize);
 
 
 
 
-const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library]
+const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group]
 
 Relationships.group(...models);
 
@@ -75,5 +76,6 @@ module.exports = {
   Coupon,
   Library,
   ErrorLog,
-  TotalLog
+  TotalLog,
+  Group
 };
