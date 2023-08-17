@@ -16,7 +16,7 @@ class Logger {
             }
             const statusMessage = res.statusMessage;
             const reqBody =  JSON.stringify(req.body);;
-            const responseBody = res._treblleResponsebody;
+            const responseBody = ''; //res._treblleResponsebody;
             const params = JSON.stringify(req.params);
             const query = JSON.stringify(req.query);;
             const method = req.method;
