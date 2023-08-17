@@ -86,12 +86,11 @@ class AuthorizationController {
             const authorization = await Authorization.findAll();
 
             const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
-                const user = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
-
+                const userdata = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'] } });
                 let payload = {};
                 payload.id = auth.id;
-                payload.fullname = user.name;
-                payload.email = user.email;
+                payload.fullname = userdata.dataValues.name;
+                payload.email = userdata.dataValues.email;
                 payload.status = auth.status;
                 payload.role = auth.role;
                 payload.permissions = auth.permissions
