@@ -16,7 +16,7 @@ class Logger {
             }
             const statusMessage = res.statusMessage;
             const reqBody =  JSON.stringify(req.body);;
-            const responseBody = ''; //res._treblleResponsebody;
+            const responseBody = res._treblleResponsebody;
             const params = JSON.stringify(req.params);
             const query = JSON.stringify(req.query);;
             const method = req.method;
@@ -25,9 +25,13 @@ class Logger {
             const payload = { statusMessage, reqBody, responseBody, params, query, method, url, body: reqBody, originalUrl, statuscode: JSON.stringify(res.statusCode)}
 
             if(url !== '/logging'){
+               try{
                 await TotalLog.create(payload);
+               }catch(err){
+                //
+               }
             }           
-            
+
             // console.log(`ON RESPONSE [${new Date().toISOString()}] ${req.method} ${req.url} - Status: ${res.statusCode} - Duration: ${duration}ms`);
         });
 
