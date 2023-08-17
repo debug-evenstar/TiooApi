@@ -10,7 +10,6 @@ class TokenMiddleware {
 
     static verify = async (req, res, next) => {
 
-        
 
         try {
 
@@ -19,14 +18,21 @@ class TokenMiddleware {
                 return res.status(401).json({ message: 'Authentication failed. Token missing.' });
             }
 
-            console.log([req, res])
             const decoded = jwt.verify(token, process.env.JWT_SECRETE);
-            const id = decoded.userdata.id;
+            const email = decoded.userdata.email;
 
-            Account.findOne({ where: { id: id } }).then((user) => {
+            Account.findOne({ where: { email: email } }).then(async (user) => {
 
                 if (!user) {
-                    return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.unauthorized });
+
+                    const isAdmin = await Admin.findOne({ where: { email: email } });
+
+                    if (isAdmin) {
+                        next();
+                    } else {
+                        return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.unauthorized });
+                    }
+
                 }
                 const encryptedData = decoded.userData;
                 const fetchedData = user.dataValues;
@@ -36,14 +42,13 @@ class TokenMiddleware {
                 next();
 
             }).catch((error) => {
-                
-                console.log([error, "here"]);
+
+               // console.log([error.message, "here"]);
             });
 
 
 
         } catch (err) {
-            console.log(err)
             var logError = await ErrorLog.create({
                 error_name: "Error at Verify Middleware",
                 error_description: err.toString(),
@@ -70,18 +75,16 @@ class TokenMiddleware {
         try {
 
             const decoded = jwt.verify(token, process.env.JWT_SECRETE);
-            const id = decoded.userdata.id;
+            const email = decoded.userdata.email;
 
-            console.log(decoded.userdata);
-
-            Admin.findOne({ where: { id: id } }).then((user) => {
+            Admin.findOne({ where: { email: email } }).then((user) => {
 
                 if (!user) {
-                    return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.unauthorized });
+                    return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.adminUnauthorized });
                 }
 
                 if (user.account_type !== 'admin') {
-                    return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.unauthorized });
+                    return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.adminUnauthorized });
                 }
 
                 const encryptedData = decoded.userData;
@@ -92,7 +95,7 @@ class TokenMiddleware {
                 next();
 
             }).catch((error) => {
-                console.log(error);
+              //  console.log(error);
             });
 
 

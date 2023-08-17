@@ -29,15 +29,18 @@ const TioController = require('../controller/tio.controller');
 const AdminSchoolController = require('../controller/admin/management/school.controller');
 const AdminFreelancerController = require('../controller/admin/management/freelancer.controller');
 const AdminLibraryController = require('../controller/admin/management/library.controller');
+const ActionController = require('../controller/action.controller');
+const StudentController = require('../controller/student.controller');
+const AuthorizationController = require('../controller/admin/authorization.controller');
+const LoggingController = require('../controller/error.controller');
+
 
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
 const AuthenticationMiddleware = require('../middleware/token.middleware');
-const StudentController = require('../controller/student.controller');
 const { InviteValidator, AcceptValidator } = require('./validators/StudentValidators');
 const UploadService = require('../services/upload.service');
-const AuthorizationController = require('../controller/admin/authorization.controller');
 const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
 
@@ -59,7 +62,6 @@ const OpenRoutesGroup = (router) => {
 
     router.post('/school/setup', SchoolSetupValidator, SchoolManagementController.setup);
     router.post('/freelancer/setup', SchoolSetupValidator, FreelancerController.setup);
-
 
     router.post('/teacher/invite/accept', TeacherController.acceptInvite);
     router.get('/teacher/invited/:id', TeacherController.fetchInvitedTeacher);
@@ -83,11 +85,13 @@ const OpenRoutesGroup = (router) => {
 
     router.post('/admin/login', AuthorizationController.login);
 
-
     router.post('/tio/setup', TioController.setup);
     router.get('/tio/classes', TioController.classes);
     router.get('/tio/subjects', TioController.subjects);
     router.get('/tio/subjectslessons', TioController.subjectsLessons);
+
+    router.post('/actions/superadmin', ActionController.superAdmin);
+    router.post('/actions/sync', ActionController.syncDB);
 
 };
 
@@ -96,6 +100,7 @@ const OpenRoutesGroup = (router) => {
 
 const AuthorizedRoutesGroup = (router) => {
     /* --------------------------------- ACCOUNT -------------------------------- */
+    
     router.use(AuthenticationMiddleware.verify) //--use middleware--//
     router.get('/account/read_all', AuthenicationController.accounts);
     router.get('/account/read', AuthenicationController.accountProfile);
@@ -195,10 +200,15 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.get('/lesson/read', LessonController.nextWeeksLessons);
     router.get('/lesson/subjectlessons/:id', LessonController.subjectLessons);
+    router.get('/lesson/check', LessonController.subjectGroupedLessons);
 
     router.post('/lesson/create',   UploadService.upload.array('files'), LessonController.createLesson);
 
     router.get('/chapter/subject/:id', ChapterController.read);
+
+    router.get('/logging', LoggingController.read);
+    router.delete('/logging', LoggingController.clear);
+
 
 };
 
@@ -208,6 +218,7 @@ const AuthorizedRoutesGroup = (router) => {
 const AdminRoutesGroup = (router) => {
 
     router.use(AuthenticationMiddleware.admin) //--use middleware--//
+
     router.get('/admin/schools', AdminController.schools);
     router.get('/admin/home/dashboard', HomeController.dashboard);
     router.get('/admin/home/dashboard/activeusers', HomeController.activeUser);

@@ -78,7 +78,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -135,7 +135,7 @@ class AuthController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -167,7 +167,7 @@ class AuthController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -238,7 +238,7 @@ class AuthController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -343,7 +343,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error)
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -359,7 +359,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: users });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -405,7 +405,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -447,7 +447,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -471,7 +471,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: true });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -534,7 +534,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -566,7 +566,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -598,7 +598,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -630,7 +630,7 @@ class AuthController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -659,7 +659,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: {} });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -839,7 +839,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
 
 
@@ -891,7 +891,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 
@@ -951,7 +951,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.send_otp });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 

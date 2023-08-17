@@ -69,7 +69,7 @@ class SchoolManagementController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     };
@@ -89,7 +89,7 @@ class SchoolManagementController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: allSchools });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -110,7 +110,7 @@ class SchoolManagementController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -131,7 +131,7 @@ class SchoolManagementController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -156,7 +156,7 @@ class SchoolManagementController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -198,7 +198,7 @@ class SchoolManagementController {
     
             } catch (error) {
                 console.log(error);
-                res.status(500).json({ error: 'Server Error' });
+                res.status(500).json({ error: 'server error' ,  extra: error.message });
             };
         }
     
@@ -225,7 +225,7 @@ class SchoolManagementController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -250,7 +250,7 @@ class SchoolManagementController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -280,7 +280,7 @@ class SchoolManagementController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -306,7 +306,7 @@ class SchoolManagementController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountInstance });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }

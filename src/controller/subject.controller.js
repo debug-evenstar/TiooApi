@@ -26,7 +26,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -42,7 +42,7 @@ class SubjectController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectInstance });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -63,7 +63,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -87,7 +87,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -113,7 +113,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -137,7 +137,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -156,7 +156,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -174,7 +174,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -198,7 +198,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -217,7 +217,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -234,7 +234,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -261,7 +261,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -295,7 +295,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -337,7 +337,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -361,7 +361,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
