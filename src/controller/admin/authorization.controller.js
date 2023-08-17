@@ -156,7 +156,7 @@ class AuthorizationController {
                 account_type: user.account_type,
                 verification_status: user.verification_status,
                 flag: user.flag,
-                authorization: JSON.parse(authorization.dataValues.permissions)
+                authorization: authorization.dataValues.permissions
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
