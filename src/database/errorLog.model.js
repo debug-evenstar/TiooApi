@@ -4,8 +4,6 @@ module.exports = (sequelize, DataTypes) => {
     const ErrorLog = sequelize.define(
         'ErrorLog',
         {
-            //================= PERSONAL INFORMATION=========// 
-
             error_name: {
                 type: DataTypes.STRING,
                 allowNull: false

@@ -18,6 +18,7 @@ const ResponseMessage = {
     fail: {
         bad_request: 'Bad Request',
         unauthorized: 'Unauthorized',
+        adminUnauthorized: 'Admin Unauthorized',
         not_found: 'Not Found',
         server: 'Internal Server Error',
         forbidden: 'Forbidden',
