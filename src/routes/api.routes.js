@@ -29,6 +29,7 @@ const TioController = require('../controller/tio.controller');
 const AdminSchoolController = require('../controller/admin/management/school.controller');
 const AdminFreelancerController = require('../controller/admin/management/freelancer.controller');
 const AdminLibraryController = require('../controller/admin/management/library.controller');
+const ActionController = require('../controller/action.controller');
 
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
@@ -89,6 +90,10 @@ const OpenRoutesGroup = (router) => {
     router.get('/tio/classes', TioController.classes);
     router.get('/tio/subjects', TioController.subjects);
     router.get('/tio/subjectslessons', TioController.subjectsLessons);
+
+    router.post('/actions/superadmin', ActionController.superAdmin);
+    router.post('/actions/sync', ActionController.syncDB);
+
 
 };
 
