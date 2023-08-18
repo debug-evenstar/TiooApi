@@ -91,7 +91,9 @@ class AuthorizationController {
                 payload.email = userdata.dataValues.email;
                 payload.status = auth.status;
                 payload.role = auth.role;
-                payload.permissions = auth.permissions
+                payload.permissions = auth.permissions;
+                payload.authorizationId = auth.id;
+                payload.adminId = userdata.dataValues.id;
                 return payload;
 
             }));
