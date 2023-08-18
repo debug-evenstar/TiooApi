@@ -33,7 +33,7 @@ class LessonController {
             const lessonInstance = await Lesson.create(req.body);
             const subjectInstance = await Subject.findByPk(req.body.subject);
 
-            if(!subjectInstance){
+            if (!subjectInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
 
             }
@@ -110,7 +110,100 @@ class LessonController {
 
 
 
+    static async addLesson(req, res) {
 
+        let filePaths = [];
+        const today = new Date();
+        const threeDaysAhead = new Date();
+        threeDaysAhead.setDate(today.getDate() + 3);
+
+        if (req.files && req.files.length > 0) {
+            filePaths = req.files.map((file) => file.path);
+            req.body.files = filePaths;
+        }
+
+        if (!req.body.start_date) {
+            req.body.start_date = today;
+        }
+
+        if (!req.body.end_date) {
+            req.body.end_date = threeDaysAhead;
+        }
+
+        try {
+
+            const selectedGroup = await Group.findByPk(req.query.group_id, { include: [ClassArm] });
+
+            const classarms = selectedGroup.ClassArms.map((element) => element.id);
+
+            const body = {
+                topic: req.body.topic,
+                duration: "45 Minutes",
+                curriculum: "",
+                subject: selectedGroup.SubjectId,
+                start_date: req.body.start_date,
+                end_date: req.body.end_date,
+                objective: "",
+                additioinal_instruction: "",
+                week: "Week 3",
+                status: "locked",
+                term: 1,
+                class: selectedGroup.ref_cid,
+                class_arms: classarms,
+                files: req.body.files
+            }
+
+            const lessonInstance = await Lesson.create(body);
+
+            const subjectInstance = await Subject.findByPk(body.subject);
+
+            if(!subjectInstance){
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
+
+            }
+
+
+            await subjectInstance.addLesson(lessonInstance);
+
+            // Create a new chapter instance
+            const chapter = new Chapter();
+            chapter.name = "undefined";
+            chapter.title = "undefined";
+
+            const chapterInstance = await chapter.save();
+
+            const classInstance = await Class.findByPk(body.class);
+
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...body.class_arms] } });
+
+            await subjectInstance.addChapter(chapterInstance);
+
+            await chapterInstance.setLessons(lessonInstance);
+
+            await subjectInstance.addLesson(lessonInstance);
+
+            const instance1 = await lessonInstance.addClassArms(classarmInstances);
+
+            await classInstance.addLesson(lessonInstance);
+
+            // const groupInstance = await Group.create({
+            //     naming: classInstance.naming,
+            //     ref_cid: classInstance.id
+            // });
+
+            await selectedGroup.addLesson(lessonInstance);
+            // const instance2 = await selectedGroup.addClassArms(classarmInstances);
+            // const subjejctGroup = await subjectInstance.addGroup(groupInstance);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: body });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
 
 
 
