@@ -81,7 +81,7 @@ class LessonController {
     }
 
 
-    static async updateLessonTimeline(req, res) {
+    static async updateLesson(req, res) {
 
         try {
 
@@ -91,11 +91,7 @@ class LessonController {
                 res.status(400).json({error : "Lesson not found" });
             }
 
-            const lessonUpdate = await Lesson.update({
-                week : req.body.week,
-                start : req.body.start,
-                end : req.body.end
-            },{ where : {id : req.params.id} });
+            const lessonUpdate = await Lesson.update(req.body,{ where : {id : req.params.id} });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: lessonUpdate });
 
