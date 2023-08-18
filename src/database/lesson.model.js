@@ -52,7 +52,7 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: 'Locked',
       },
       published: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },
