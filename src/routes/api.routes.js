@@ -92,6 +92,7 @@ const OpenRoutesGroup = (router) => {
 
     router.post('/actions/superadmin', ActionController.superAdmin);
     router.post('/actions/sync', ActionController.syncDB);
+    router.delete('/actions/superadmin', ActionController.cleanAdmin);
 
 };
 
@@ -203,6 +204,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/lesson/check', LessonController.subjectGroupedLessons);
 
     router.post('/lesson/create',   UploadService.upload.array('files'), LessonController.createLesson);
+    router.post('/lesson/add',   UploadService.upload.array('files'), LessonController.addLesson);
 
     router.get('/chapter/subject/:id', ChapterController.read);
 
