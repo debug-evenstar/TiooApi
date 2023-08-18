@@ -1,4 +1,4 @@
-const { Subject, Class, Teacher, Account, Lesson, ClassArm } = require('../database/connection/');
+const { Subject, Class, Teacher, Account, Lesson, ClassArm, SchoolManagement } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 const Sequelize = require('sequelize');
 const IncludeManager = require('./helper/includes');
@@ -243,8 +243,9 @@ class SubjectController {
     static async subjectsWithLessonCount(req, res) {
 
         try {
-
+            const schoolManagement = await SchoolManagement.findOne({where  : {AccountId : req.userData.id}});
             const subjectsLessons = await Subject.findAll({
+                where: { SchoolManagementId: schoolManagement.id },
                 include: [
                     {
                         model: Lesson,
