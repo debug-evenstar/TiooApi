@@ -60,8 +60,6 @@ class AuthorizationController {
 
             authorization.setAdmin(registeredAdmin);
 
-            console.log(password);
-
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
 
             return res.status(ResponseStatus.code.success).json({
@@ -88,7 +86,7 @@ class AuthorizationController {
             const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
                 const userdata = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'] } });
                 let payload = {};
-                payload.id = auth.id;
+                payload.id = userdata.dataValues.id;
                 payload.fullname = userdata.dataValues.name;
                 payload.email = userdata.dataValues.email;
                 payload.status = auth.status;
@@ -193,6 +191,7 @@ class AuthorizationController {
         };
 
     }
+    
 
 
         /*-----------------------------------| DELETE ADMIN |-----------------------------------*/
@@ -200,15 +199,21 @@ class AuthorizationController {
         static async deleteAdmin(req, res) {
 
             const { admin_id } = req.query;
+
+            console.log(admin_id);
        
     
             try {
                 const user = await Admin.findOne({ where: { id: admin_id } });
+
+                console.log(user);
     
                 if (!user) {
                     return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
                 }
 
+                const authorization = await user.getAuthorization();
+                const deletedAuthorization = await authorization.destroy();
                 const deletedAdmin = await user.destroy();
     
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: deletedAdmin });
