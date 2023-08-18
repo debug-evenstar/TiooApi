@@ -71,7 +71,7 @@ class LessonController {
             const instance2 = await groupInstance.addClassArms(classarmInstances);
             const subjejctGroup = await subjectInstance.addGroup(groupInstance);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {} });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: lessonInstance });
 
 
         } catch (error) {
