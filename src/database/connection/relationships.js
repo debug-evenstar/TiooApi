@@ -8,22 +8,22 @@ class Relationships {
         Account.hasOne(Validation, { foreignKey: 'accountId', as: 'validation' });
         Validation.belongsTo(Account, { foreignKey: 'accountId', as: 'account' });
 
-        Account.hasOne(SchoolManagement, { allowNull: true });
+        Account.hasOne(SchoolManagement, { allowNull: true, onDelete: 'CASCADE'});
         SchoolManagement.belongsTo(Account, { allowNull: true });
 
-        Account.hasOne(Teacher, { allowNull: true });
+        Account.hasOne(Teacher, { allowNull: true, onDelete: 'CASCADE'});
         Teacher.belongsTo(Account, { allowNull: true });
 
-        Account.hasOne(Student, { allowNull: true });
+        Account.hasOne(Student, { allowNull: true, onDelete: 'CASCADE'});
         Student.belongsTo(Account, { allowNull: true });
 
-        Account.hasOne(Authorization, { allowNull: true });
+        Account.hasOne(Authorization, { allowNull: true, onDelete: 'CASCADE'});
         Authorization.belongsTo(Account, { allowNull: true });
 
         Admin.hasOne(Validation, { allowNull: true });
         Validation.belongsTo(Admin, { allowNull: true });
 
-        Admin.hasOne(Authorization, { allowNull: true });
+        Admin.hasOne(Authorization, { allowNull: true, onDelete: 'CASCADE'});
         Authorization.belongsTo(Admin, { allowNull: true });
 
         Library.hasOne(Class, { allowNull: true });
