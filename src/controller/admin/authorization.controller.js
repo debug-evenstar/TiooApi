@@ -85,6 +85,8 @@ class AuthorizationController {
 
             const authorization = await Authorization.findAll();
 
+            console.log(authorization);
+
             const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
                 const userdata = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'] } });
                 let payload = {};
@@ -209,6 +211,8 @@ class AuthorizationController {
                     return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
                 }
 
+                const authorization = await user.getAuthorization();
+                const deletedAuthorization = await authorization.destroy();
                 const deletedAdmin = await user.destroy();
     
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: deletedAdmin });
