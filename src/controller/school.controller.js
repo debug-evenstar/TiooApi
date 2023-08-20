@@ -311,6 +311,42 @@ class SchoolManagementController {
 
     }
 
+
+    static async kyc(req, res) {
+
+        let proves_path = [];
+
+        if (req.proves && req.proves.length > 0) {
+            proves_path = req.proves.map((file) => file.path);
+            req.body.proves = proves_path;
+        }
+        
+        let ids_path = [];
+
+        if (req.ids && req.ids.length > 0) {
+            proves_path = req.ids.map((file) => file.path);
+            req.body.ids = ids_path;
+        }
+
+        try {
+
+            const accountInstance = await Account.findByPk(req.body.account_id);
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            
+            const schoolInstance = await accountInstance.getSchoolManagement();
+
+           const response = await schoolInstance.update(req.body);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountInstance });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+
+    }
 }
 
 
