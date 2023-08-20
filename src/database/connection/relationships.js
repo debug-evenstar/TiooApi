@@ -64,6 +64,9 @@ class Relationships {
         ClassArm.hasMany(Student);
         Student.belongsTo(ClassArm);
 
+        Subject.hasMany(Lesson);  // Might be commented
+        Lesson.belongsTo(Subject); // might be commented
+
         Class.hasMany(Lesson);
         Lesson.belongsTo(Class);
 
