@@ -18,7 +18,6 @@ module.exports = (sequelize, Sequelize) => {
       },
       email: {
         type: Sequelize.STRING,
-        unique: true,
       },
       phone: {
         type: Sequelize.STRING,
@@ -45,6 +44,9 @@ module.exports = (sequelize, Sequelize) => {
       },
     },
     {
+      indexes:[
+        { unique : true, fields: ['email'] }
+      ],
       timestamps: true,
       defaultScope: {
         attributes: {

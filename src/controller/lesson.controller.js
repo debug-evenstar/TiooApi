@@ -1,7 +1,6 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult, param } = require('express-validator');
-const { Lesson, Subject, Chapter, Class, ClassArm, Group } = require("../database/connection");
-const FormData = require('form-data');
+const { Lesson, Subject, Chapter, Class, ClassArm, Group, LessonSlide } = require("../database/connection");
 
 
 class LessonController {
@@ -127,11 +126,14 @@ class LessonController {
 
 
 
-    static async addClassArmToGroup(req, res) {
+    static async editGroupArms(req, res) {
         try {
 
             const groupInstance = await Group.findByPk(req.params.id);
-            await groupInstance.getSubject();
+
+            const classArms = await groupInstance.getClassArms();
+
+            await groupInstance.removeClassArms(classArms);
 
             const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.class_arms] } });
 
@@ -392,28 +394,33 @@ class LessonController {
 
     }
 
-    static async uploadLessonTemplate(req, res) {
+
+    static async removeLessonFromGroup(req, res) {
+
+        const { id } = req.params;
 
         try {
-            let filePath = "";
-            if (req.file) {
-                filePath = req.file.path;
-            } else {
-                res.status(400).json({ error: 'No uploaded file'});
+
+            const groupInstance = await Group.findByPk(id);
+
+            const lessonInstance = await Lesson.findByPk(req.params.lesson);
+
+            if(!lessonInstance){
+                res.status(400).json({error : "Lesson not found" });
             }
-            
-            const form = new FormData();
-            form.append('template', fs.createReadStream(filePath));
-            form.append('name', "Random string");
 
-            const response = await axios.post(url, form);
+            await groupInstance.removeLesson(lessonInstance);
 
-            console.log(response);
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.removed
+            });
+
 
         } catch (error) {
-            console.log(error);
             res.status(500).json({ error: 'server error', extra: error.message });
         };
+
     }
 
 }
