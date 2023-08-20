@@ -81,6 +81,72 @@ class LessonController {
     }
 
 
+    static async addLessonToGroup(req, res) {
+
+        let filePaths = [];
+
+        if (req.files && req.files.length > 0) {
+            filePaths = req.files.map((file) => file.path);
+            req.body.files = filePaths;
+        }
+
+        try {
+
+            const lessonInstance = await Lesson.create(req.body);
+            const groupInstance = await Group.findByPk(req.params.id);
+            await groupInstance.getSubject();
+            const subjectInstance = groupInstance.Subject;
+
+            // Create a new chapter instance
+            const chapter = new Chapter();
+            chapter.name = "undefined";
+            chapter.title = "undefined";
+
+            const chapterInstance = await chapter.save();
+
+            const classInstance = await Class.findByPk(groupInstance.ref_cid);
+
+            await subjectInstance.addChapter(chapterInstance);
+
+            await chapterInstance.setLessons(lessonInstance);
+
+            await subjectInstance.addLesson(lessonInstance);
+
+            await groupInstance.addLesson(lessonInstance);
+
+            await subjectInstance.addGroup(groupInstance);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+
+    static async addClassArmToGroup(req, res) {
+        try {
+
+            const groupInstance = await Group.findByPk(req.params.id);
+            await groupInstance.getSubject();
+
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.class_arms] } });
+
+            await groupInstance.addClassArms(classarmInstances);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
     static async updateLesson(req, res) {
 
         try {
