@@ -210,13 +210,12 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.post('/lesson/create',   UploadService.uploadLesson.array('files'), LessonController.createLesson);
     router.post('/lesson/add',   UploadService.uploadLesson.array('files'), LessonController.addLesson);
-    router.post('/lesson/template',   UploadService.uploadLessonTemplate.single('template'), LessonController.uploadLessonTemplate);
+    // router.post('/lesson/template',   UploadService.uploadLessonTemplate.single('template'), LessonController.uploadLessonTemplate);
 
     router.get('/chapter/subject/:id', ChapterController.read);
 
     router.get('/logging', LoggingController.read);
     router.delete('/logging', LoggingController.clear);
-
 
 };
 

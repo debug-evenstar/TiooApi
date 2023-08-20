@@ -1,6 +1,7 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult, param } = require('express-validator');
 const { Lesson, Subject, Chapter, Class, ClassArm, Group } = require("../database/connection");
+const FormData = require('form-data');
 
 
 class LessonController {
@@ -94,8 +95,7 @@ class LessonController {
 
             const lessonInstance = await Lesson.create(req.body);
             const groupInstance = await Group.findByPk(req.params.id);
-            await groupInstance.getSubject();
-            const subjectInstance = groupInstance.Subject;
+            const subjectInstance = await Subject.findByPk(groupInstance.SubjectId);
 
             // Create a new chapter instance
             const chapter = new Chapter();
@@ -390,6 +390,30 @@ class LessonController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
 
+    }
+
+    static async uploadLessonTemplate(req, res) {
+
+        try {
+            let filePath = "";
+            if (req.file) {
+                filePath = req.file.path;
+            } else {
+                res.status(400).json({ error: 'No uploaded file'});
+            }
+            
+            const form = new FormData();
+            form.append('template', fs.createReadStream(filePath));
+            form.append('name', "Random string");
+
+            const response = await axios.post(url, form);
+
+            console.log(response);
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
     }
 
 }
