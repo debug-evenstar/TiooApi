@@ -1,4 +1,4 @@
-const { Subject, Class, Teacher, Account, Lesson, ClassArm } = require('../database/connection/');
+const { Subject, Class, Teacher, Account, Lesson, ClassArm, SchoolManagement } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 const Sequelize = require('sequelize');
 const IncludeManager = require('./helper/includes');
@@ -150,47 +150,9 @@ class SubjectController {
 
         try {
 
-            const subjectClasses = await Subject.findOne({ include: [
-                {
-                    model: ClassArm,
-                    attributes: ['id', 'naming', 'ClassId'],
-                    through: { attributes: [] },
-                },
+            const subjectClasses = await Subject.findOne({ include: [Class, ClassArm], where: { id } });
 
-                {
-                    model: Class,
-                    attributes: ['id', 'type', 'naming'],
-                    through: { attributes: [] },
-                },
-
-            ], where: { id } });
-
-            let alteredClasses = [];
-
-            for(var i = 0; i < subjectClasses.Classes.length; i++){
-
-                const itemClass = subjectClasses.Classes[i];
-
-                const arms = subjectClasses.ClassArms.filter((element)=> element.ClassId === itemClass.id);
-
-                const response = {
-                    ...itemClass.dataValues, arms: arms
-                }
-
-                console.log(subjectClasses);
-
-                alteredClasses.push(response)
-            }
-
-
-            const report = {
-                id: subjectClasses.id,
-                naming: subjectClasses.naming,
-                description: subjectClasses.description,
-                classes: alteredClasses
-            }
-
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: report });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectClasses });
 
         } catch (error) {
             console.log(error);
@@ -281,8 +243,9 @@ class SubjectController {
     static async subjectsWithLessonCount(req, res) {
 
         try {
-
+            const schoolManagement = await SchoolManagement.findOne({where  : {AccountId : req.userData.id}});
             const subjectsLessons = await Subject.findAll({
+                where: { SchoolManagementId: schoolManagement.id },
                 include: [
                     {
                         model: Lesson,

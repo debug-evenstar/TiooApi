@@ -5,6 +5,7 @@ const { Account, Authorization, Permission, Validation, Admin, SchoolManagement,
 const { use } = require('chai');
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
 const TokenMiddleware = require('../../../middleware/token.middleware');
+const LessonTemplateProvider = require("../../../providers/AI/lesson.template");
 
 
 
@@ -349,6 +350,64 @@ class AdminSchoolController {
             res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
+    }
+
+
+    static async uploadLessonTemplate(req, res) {
+
+        try {
+            let filePath = "";
+            if (req.file) {
+                filePath = req.file.path;
+            } else {
+                res.status(400).json({ error: 'No uploaded file'});
+            }
+
+            const { id } = req.params;
+
+            const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath);
+
+            const parseSlides = [];
+
+            const lessonInstance = await Lesson.findByPk(id);
+
+            const previousSlides = await lessonInstance.getLessonSlides({
+                orderBy : {slide_index : "asc"}
+            });
+            
+
+            if(previousSlides && previousSlides.length > 0 && previousSlides.length > slides.data.length) {
+                for (let i = slides.data.length; i < previousSlides.length; i++) {
+                    const slide = previousSlides[i];
+                    await slide.destroy();
+                }
+            }
+
+            for (let index = 0; index < slides.data.length; index++) {
+                const slide = slides.data[index];
+                if( previousSlides && previousSlides.length > index){
+                    const updated = previousSlides[index];
+                    updated.slide_data = slide;
+                    updated.save();
+                }else{
+                    const created = await LessonSlide.create({
+                        slide_index : index,
+                        slide_data : slide
+                    });
+                    parseSlides.push(created);
+                }
+            };
+
+            await lessonInstance.addLessonSlides(parseSlides);
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.added
+            });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
     }
 
 

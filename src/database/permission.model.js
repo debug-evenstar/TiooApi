@@ -5,14 +5,17 @@ module.exports = (sequelize, DataTypes) => {
         name: {
           type: DataTypes.STRING,
           allowNull: false,
-          unique: true,
         },
         code: {
             type: DataTypes.STRING,
             allowNull: false,
           },
-      }, {
-      timestamps: false,
+      }, 
+      {
+        indexes:[
+          { unique : true, fields: ['name'] }
+        ],
+        timestamps: false,
     });
   
     return Permission;

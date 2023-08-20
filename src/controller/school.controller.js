@@ -312,25 +312,13 @@ class SchoolManagementController {
     }
 
 
-    static async kyc(req, res) {
+    static async schoolTerms(req, res) {
 
-        let proves_path = [];
-
-        if (req.proves && req.proves.length > 0) {
-            proves_path = req.proves.map((file) => file.path);
-            req.body.proves = proves_path;
-        }
-        
-        let ids_path = [];
-
-        if (req.ids && req.ids.length > 0) {
-            proves_path = req.ids.map((file) => file.path);
-            req.body.ids = ids_path;
-        }
+        const { id } = req.userData;
 
         try {
 
-            const accountInstance = await Account.findByPk(req.body.account_id);
+            const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
 
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -338,15 +326,36 @@ class SchoolManagementController {
             
             const schoolInstance = await accountInstance.getSchoolManagement();
 
-           const response = await schoolInstance.update(req.body);
+            // Check for configured school terms
+            // OR
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountInstance });
+            const defaultTerms = SchoolManagementController.bootstrapTerms();
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: defaultTerms });
 
         } catch (error) {
             res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
+
+
+    static bootstrapTerms() {
+        return [
+            {
+                id : 1,
+                label : "1st Term/Semester"
+            },
+            {
+                id : 2,
+                label : "2nd Term/Semester"
+            },
+            {
+                id : 3,
+                label : "3rd Term/Semester"
+            }
+        ];
+    }
+
 }
 
 

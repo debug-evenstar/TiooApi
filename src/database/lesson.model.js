@@ -51,6 +51,11 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
         defaultValue: 'Locked',
       },
+      published: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       term: {
         type: Sequelize.INTEGER,
         allowNull: true,
@@ -59,17 +64,7 @@ module.exports = (sequelize, Sequelize) => {
       files: {
         type: Sequelize.JSON,
         defaultValue: [],
-        // get() {
-        //   const value = this.getDataValue('files');
-        //   try {
-        //     return value ? JSON.parse(value) : [];
-        //   } catch (error) {
-        //     console.error('Error parsing JSON for "files" field:', error);
-        //     return [];
-        //   }
-        // },
       },
-
     },
     { timestamps: true }
   );
