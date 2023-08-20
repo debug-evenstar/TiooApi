@@ -203,13 +203,14 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/lesson/read', LessonController.nextWeeksLessons);
     router.get('/lesson/subjectlessons/:id', LessonController.subjectLessons);
     router.get('/lesson/groups', LessonController.subjectGroups);
-    router.post('/lesson/groups/:id/add', UploadService.upload.array('files'), LessonController.addLessonToGroup);
+    router.post('/lesson/groups/:id/add', UploadService.uploadLesson.array('files'), LessonController.addLessonToGroup);
     router.post('/lesson/groups/:id/addclass', LessonController.addClassArmToGroup);
     router.put('/lesson/:id', LessonController.updateLesson);
     router.get('/lesson/check', LessonController.subjectGroupedLessons);
 
-    router.post('/lesson/create',   UploadService.upload.array('files'), LessonController.createLesson);
-    router.post('/lesson/add',   UploadService.upload.array('files'), LessonController.addLesson);
+    router.post('/lesson/create',   UploadService.uploadLesson.array('files'), LessonController.createLesson);
+    router.post('/lesson/add',   UploadService.uploadLesson.array('files'), LessonController.addLesson);
+    router.post('/lesson/template',   UploadService.uploadLessonTemplate.single('template'), LessonController.uploadLessonTemplate);
 
     router.get('/chapter/subject/:id', ChapterController.read);
 
@@ -264,8 +265,8 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
     router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
 
-    router.post('/admin/library',  UploadService.upload.single('file'), AdminLibraryController.create);
-    router.get('/admin/library',  UploadService.upload.single('file'), AdminLibraryController.read);
+    router.post('/admin/library',  UploadService.uploadLesson.single('file'), AdminLibraryController.create);
+    router.get('/admin/library',  UploadService.uploadLesson.single('file'), AdminLibraryController.read);
 };
 
 
