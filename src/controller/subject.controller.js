@@ -1,4 +1,4 @@
-const { Subject, Class, Teacher, Account, Lesson, ClassArm, SchoolManagement } = require('../database/connection/');
+const { Subject, Class, Teacher, Account, Lesson, ClassArm, SchoolManagement, LessonSlide } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 const Sequelize = require('sequelize');
 const IncludeManager = require('./helper/includes');
@@ -312,7 +312,9 @@ class SubjectController {
                 include : [ClassArm, Class]
             });
 
-            let classArmLessons = await studentInstance.ClassArm.getLessons();
+            let classArmLessons = await studentInstance.ClassArm.getLessons({
+                include : [ LessonSlide ]
+            });
 
             classArmLessons = classArmLessons.filter( lesson => lesson.SubjectId == req.params.id );
 
