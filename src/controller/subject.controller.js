@@ -1,4 +1,4 @@
-const { Subject, Class, Teacher, Account, Lesson, ClassArm, SchoolManagement } = require('../database/connection/');
+const { Subject, Class, Teacher, Account, Lesson, ClassArm, SchoolManagement, LessonSlide } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 const Sequelize = require('sequelize');
 const IncludeManager = require('./helper/includes');
@@ -74,13 +74,10 @@ class SubjectController {
         const { id } = req.params;
 
         try {
-
             const subjectInstance = await Subject.findByPk(id);
 
             if (!subjectInstance) {
-
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
@@ -296,6 +293,31 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+    }
+
+    static async studentLessons(req, res) {
+
+        const { id } = req.userData;
+
+        try {
+
+            const studentAccount = await Account.findByPk(id);
+
+            const studentInstance = await studentAccount.getStudent({
+                include : [ClassArm, Class]
+            });
+
+            let classArmLessons = await studentInstance.ClassArm.getLessons({
+                include : [ LessonSlide ]
+            });
+
+            classArmLessons = classArmLessons.filter( lesson => lesson.SubjectId == req.params.id );
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classArmLessons });
+
+        } catch (error) {
             res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }

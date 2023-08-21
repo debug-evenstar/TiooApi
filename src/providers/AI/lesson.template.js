@@ -43,7 +43,8 @@ class LessonTemplateProvider {
         const body = new FormData();
 
         body.append('template', fs.createReadStream(file));
-        body.append('name', "Random");
+        body.append('subject', "Subject here");
+        body.append('grade', "Grade here");
         
         const path = "lesson/template/read";
         let errorResponse = {};
