@@ -377,9 +377,7 @@ class AdminSchoolController {
                 orderBy : {slide_index : "asc"}
             });
 
-
-            console.log("loading", previousSlides, id);
-
+            
             if(previousSlides && previousSlides.length > 0 && previousSlides.length > slides.data.length) {
                 for (let i = slides.data.length; i < previousSlides.length; i++) {
                     const slide = previousSlides[i];
