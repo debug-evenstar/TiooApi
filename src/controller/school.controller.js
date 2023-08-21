@@ -356,6 +356,37 @@ class SchoolManagementController {
         ];
     }
 
+
+    
+    static async kyc(req, res) {
+
+        let filePaths = [];
+
+        if (req.files && req.files.length > 0) {
+            filePaths = req.files.map((file) => file.path);
+            req.body.files = filePaths;
+        }
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const registeredSchoolManagement = await registeredAccount.SchoolManagement.update(req.body);
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: registeredSchoolManagement });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+
+    };
+
 }
 
 
