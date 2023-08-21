@@ -200,6 +200,30 @@ class LessonController {
 
 
 
+    static async studentLessons(req, res) {
+        try {
+            const studentAccount = req.userData;
+            const student = await Subject.findByPk(req.query.subject_id);
+            const whereClause = req.query.class_id ? { ref_cid: req.query.class_id } : {};
+            const lessonInstances = await subjectInstance.getGroups({
+                where: whereClause,
+                include: [
+                    {
+                        model: ClassArm,
+                        attributes: ['id', 'naming'],
+                        through: { attributes: [] },
+                    }, Lesson]
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
     static async addLesson(req, res) {
 
         let filePaths = [];

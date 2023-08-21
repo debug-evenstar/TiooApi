@@ -171,6 +171,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/subjects/lessons/', SubjectController.subjectsWithLessons);
     router.get('/subjects/lessons/count', SubjectController.subjectsWithLessonCount);
     router.get('/subjects/lessons/:subjectId', SubjectController.subjectLessons);
+    router.get('/subjects/:id/student/lessons', SubjectController.studentLessons);
     router.delete('/subjects/delete/:id', SubjectController.delete);
 
     /* --------------------------------- TEACHERS -------------------------------- */

@@ -300,6 +300,29 @@ class SubjectController {
         };
     }
 
+    static async studentLessons(req, res) {
+
+        const { id } = req.userData;
+
+        try {
+
+            const studentAccount = await Account.findByPk(id);
+
+            const studentInstance = await studentAccount.getStudent({
+                include : [ClassArm, Class]
+            });
+
+            let classArmLessons = await studentInstance.ClassArm.getLessons();
+
+            classArmLessons = classArmLessons.filter( lesson => lesson.SubjectId == req.params.id );
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classArmLessons });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+    }
+
 
     static async subjectStudents(req, res) {
 
