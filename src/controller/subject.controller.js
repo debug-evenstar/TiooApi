@@ -74,13 +74,10 @@ class SubjectController {
         const { id } = req.params;
 
         try {
-
             const subjectInstance = await Subject.findByPk(id);
 
             if (!subjectInstance) {
-
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
