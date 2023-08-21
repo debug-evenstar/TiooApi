@@ -367,6 +367,8 @@ class AdminSchoolController {
 
             const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath);
 
+            console.log('this is the slide response', slides);
+
             const parseSlides = [];
 
             const lessonInstance = await Lesson.findByPk(id);
@@ -374,7 +376,9 @@ class AdminSchoolController {
             const previousSlides = await lessonInstance.getLessonSlides({
                 orderBy : {slide_index : "asc"}
             });
-            
+
+
+            console.log("loading", previousSlides, id);
 
             if(previousSlides && previousSlides.length > 0 && previousSlides.length > slides.data.length) {
                 for (let i = slides.data.length; i < previousSlides.length; i++) {
@@ -406,6 +410,29 @@ class AdminSchoolController {
             });
 
         } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+    static async updateLessonStatus(req, res) {
+
+        try {
+
+            const lesson = await Lesson.findByPk(req.params.id);
+
+            if(!lesson) {
+                res.status(400).json({error : "Lesson not found" });
+            }
+
+            const lessonUpdate = await Lesson.update(req.body,{ where : {id : req.params.id} });
+
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: lessonUpdate });
+
+        } catch (error) {
+            console.log(error);
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }

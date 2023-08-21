@@ -106,11 +106,11 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             },
             account_number: {
-                type: DataTypes.NUMBER,
+                type: DataTypes.INTEGER,
                 allowNull: true,
             },
             means_of_identification: {
-                type: DataTypes.NUMBER,
+                type: DataTypes.INTEGER,
                 allowNull: true,
             },
 

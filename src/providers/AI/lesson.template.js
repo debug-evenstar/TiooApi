@@ -12,6 +12,8 @@ class LessonTemplateProvider {
             //     'Authorization': `Bearer ${TOKEN}` No headers for now
             // }
         });
+
+        console.log(BASE_URL);
     }
 
     requestBody (data) {
