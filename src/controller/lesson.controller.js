@@ -1,6 +1,6 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult, param } = require('express-validator');
-const { Lesson, Subject, Chapter, Class, ClassArm, Group } = require("../database/connection");
+const { Lesson, Subject, Chapter, Class, ClassArm, Group, LessonSlide } = require("../database/connection");
 
 
 class LessonController {
@@ -71,7 +71,7 @@ class LessonController {
             const instance2 = await groupInstance.addClassArms(classarmInstances);
             const subjejctGroup = await subjectInstance.addGroup(groupInstance);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {} });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
 
 
         } catch (error) {
@@ -79,6 +79,96 @@ class LessonController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
+
+
+    static async addLessonToGroup(req, res) {
+
+        let filePaths = [];
+
+        if (req.files && req.files.length > 0) {
+            filePaths = req.files.map((file) => file.path);
+            req.body.files = filePaths;
+        }
+
+        try {
+
+            const lessonInstance = await Lesson.create(req.body);
+            const groupInstance = await Group.findByPk(req.params.id);
+            const subjectInstance = await Subject.findByPk(groupInstance.SubjectId);
+
+            // Create a new chapter instance
+            const chapter = new Chapter();
+            chapter.name = "undefined";
+            chapter.title = "undefined";
+
+            const chapterInstance = await chapter.save();
+
+            const classInstance = await Class.findByPk(groupInstance.ref_cid);
+
+            await subjectInstance.addChapter(chapterInstance);
+
+            await chapterInstance.setLessons(lessonInstance);
+
+            await subjectInstance.addLesson(lessonInstance);
+
+            await groupInstance.addLesson(lessonInstance);
+
+            await subjectInstance.addGroup(groupInstance);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+
+    static async editGroupArms(req, res) {
+        try {
+
+            const groupInstance = await Group.findByPk(req.params.id);
+
+            const classArms = await groupInstance.getClassArms();
+
+            await groupInstance.removeClassArms(classArms);
+
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.class_arms] } });
+
+            await groupInstance.addClassArms(classarmInstances);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+    static async updateLesson(req, res) {
+
+        try {
+
+            const lesson = await Lesson.findByPk(req.params.id);
+
+            if(!lesson) {
+                res.status(400).json({error : "Lesson not found" });
+            }
+
+            const lessonUpdate = await Lesson.update(req.body,{ where : {id : req.params.id} });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: lessonUpdate });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
 
 
     static async subjectGroupedLessons(req, res) {
@@ -205,6 +295,33 @@ class LessonController {
 
     }
 
+    static async subjectGroups(req, res) {
+
+        try {
+
+            const subjectInstance = await Subject.findByPk(req.query.subject_id);
+
+            const lessonInstances = await subjectInstance.getGroups({
+                include: [
+                    {
+                        model: ClassArm,
+                        attributes: ['id', 'naming'],
+                        through: { attributes: [] },
+                    }]
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+
+
+
 
 
     /*-----------------------------------| NEXT WEEKS LESSON |-----------------------------------*/
@@ -268,6 +385,35 @@ class LessonController {
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read, data: payload
+            });
+
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+    static async removeLessonFromGroup(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const groupInstance = await Group.findByPk(id);
+
+            const lessonInstance = await Lesson.findByPk(req.params.lesson);
+
+            if(!lessonInstance){
+                res.status(400).json({error : "Lesson not found" });
+            }
+
+            await groupInstance.removeLesson(lessonInstance);
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.removed
             });
 
 

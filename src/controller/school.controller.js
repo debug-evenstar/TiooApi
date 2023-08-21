@@ -311,6 +311,82 @@ class SchoolManagementController {
 
     }
 
+
+    static async schoolTerms(req, res) {
+
+        const { id } = req.userData;
+
+        try {
+
+            const accountInstance = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            
+            const schoolInstance = await accountInstance.getSchoolManagement();
+
+            // Check for configured school terms
+            // OR
+
+            const defaultTerms = SchoolManagementController.bootstrapTerms();
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: defaultTerms });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+
+    }
+
+
+    static bootstrapTerms() {
+        return [
+            {
+                id : 1,
+                label : "1st Term/Semester"
+            },
+            {
+                id : 2,
+                label : "2nd Term/Semester"
+            },
+            {
+                id : 3,
+                label : "3rd Term/Semester"
+            }
+        ];
+    }
+
+
+    
+    static async kyc(req, res) {
+
+        let filePaths = [];
+
+        if (req.files && req.files.length > 0) {
+            filePaths = req.files.map((file) => file.path);
+            req.body.files = filePaths;
+        }
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const registeredSchoolManagement = await registeredAccount.SchoolManagement.update(req.body);
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: registeredSchoolManagement });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+
+    };
+
 }
 
 
