@@ -450,6 +450,30 @@ class LessonController {
 
     }
 
+    static async togglePublishLesson(req, res){
+
+        const {id} = req.params;
+
+        try {
+            
+        const lessonInstance = await Lesson.findByPk(id);
+
+         const response = await lessonInstance.update({published: lessonInstance.published === 1 ? 0 : 1});
+
+        return res.status(ResponseStatus.code.success).json({
+            error: false,
+            message: ResponseStatus.pass.read,
+            data: response
+        });
+
+
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
 }
 
 module.exports = LessonController;
