@@ -12,9 +12,6 @@ const AuthorizationSeed = require("../seeders/seed.authorization");
 const Logger = require("../middleware/logger.middleware");
 
 
-
-
-
 class Server {
 
     static boot() {
@@ -36,6 +33,8 @@ class Server {
                 projectId: process.env.TREBLLE_PROJECT_ID,
             })
         );
+
+        // app.use("/images", express.static("../public/lesson"));
 
         //=============== INITIALIZE DATABASE ================//
         //{force : true}

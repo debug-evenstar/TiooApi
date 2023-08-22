@@ -456,7 +456,9 @@ class AdminSchoolController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No files associated with this lesson' });
             }
 
-            const absoluteFilesDirectory = path.resolve(__dirname, '..', '..', '..', '..', 'public', 'lessons');
+            // const absoluteFilesDirectory = path.resolve(__dirname, '..', '..', '..', '..', 'public', 'lessons');
+
+            const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`)
 
             let filePath;
             if(!docs_index){
@@ -468,6 +470,8 @@ class AdminSchoolController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No document with this index' });
             }
 
+            console.log(`${appRoot}\\public\\lessons`);
+
             res.download(
                 filePath,
                 path.basename(filePath),
@@ -475,14 +479,14 @@ class AdminSchoolController {
                     if (err) {
                         res.send({
                             error: err,
-                            msg: `Problem downloading the file ${filePath}`
+                            msg: "Problem downloading the file"
                         })
                     }
                 });
         
         } catch (error) {
             console.error(error);
-            res.status(500).json({ error: 'server error', extra: error.message, path: filePath });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
     }
 
