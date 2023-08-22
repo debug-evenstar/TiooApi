@@ -435,7 +435,7 @@ class LessonController {
                     { 
                         model : LessonSlide,
                         orderBy : {slide_index : "asc"}
-                    }
+                    }, Subject
                 ]
             });
 
