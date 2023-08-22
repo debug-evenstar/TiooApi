@@ -37,7 +37,7 @@ class CouponController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -66,7 +66,7 @@ class CouponController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -98,7 +98,7 @@ class CouponController {
                 });
             }
 
-            const response = await couponInstances.update({ status: data.activate === true ? 'Activate' : 'Inactive' });
+            const response = await couponInstances.update({ status: data.activate === true ? 'Active' : 'Inactive' });
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
@@ -108,7 +108,7 @@ class CouponController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -138,7 +138,7 @@ class CouponController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -162,13 +162,13 @@ class CouponController {
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.delete,
+                message: ResponseStatus.pass.update,
                 data: response
             });
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }

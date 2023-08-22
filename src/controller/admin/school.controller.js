@@ -54,7 +54,7 @@ class AdminController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     };
@@ -95,7 +95,7 @@ class AdminController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountData });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 
@@ -134,7 +134,7 @@ class AdminController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountData });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 
@@ -181,7 +181,7 @@ class AdminController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountData });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 

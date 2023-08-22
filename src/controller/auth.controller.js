@@ -78,7 +78,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -135,7 +135,7 @@ class AuthController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -167,7 +167,7 @@ class AuthController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -238,7 +238,7 @@ class AuthController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -320,9 +320,11 @@ class AuthController {
                     const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
                     const studentSchoolAccount = await studentSchool.getAccount();
                     const classData = await profile.getClass();
+                    const classArmData = await profile.getClassArm();
                     const studentSubject = await classData.getSubjects();
                     payload.schoolName = studentSchoolAccount.name;
                     payload.studentClass =  classData.naming;
+                    payload.studentClassArm =  classArmData.naming;
                     payload.subjectsCount = studentSubject.length;
                     payload.schoolStudent = true;
                 }else{
@@ -343,7 +345,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error)
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -359,7 +361,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: users });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -391,10 +393,12 @@ class AuthController {
                 const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
                 const studentSchoolAccount = await studentSchool.getAccount();
                 const classData = await profile.getClass();
+                const classArmData = await profile.getClassArm();
                 const studentSubject = await classData.getSubjects();
 
                 payload.schoolName = studentSchoolAccount.name;
                 payload.studentClass = classData.naming;
+                payload.studentClassArm =  classArmData.naming;
                 payload.subjectsCount = studentSubject.length;
                 payload.term = "undefined";
 
@@ -405,7 +409,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -433,10 +437,12 @@ class AuthController {
                 const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
                 const studentSchoolAccount = await studentSchool.getAccount();
                 const classData = await profile.getClass();
+                const classArmData = await profile.getClassArm();
                 const studentSubject = await classData.getSubjects();
 
                 payload.schoolName = studentSchoolAccount.name;
                 payload.studentClass = classData.naming;
+                payload.studentClassArm =  classArmData.naming;
                 payload.subjectsCount = studentSubject.length;
                 payload.term = "undefined";
 
@@ -447,7 +453,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -471,7 +477,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: true });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -516,9 +522,11 @@ class AuthController {
                     const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
                     const studentSchoolAccount = await studentSchool.getAccount();
                     const classData = await profile.getClass();
+                    const classArmData = await profile.getClassArm();
                     const studentSubject = await classData.getSubjects();
                     payload.schoolName = studentSchoolAccount.name;
                     payload.studentClass =  classData.naming;
+                    payload.studentClassArm =  classArmData.naming;
                     payload.subjectsCount = studentSubject.length;
                     payload.schoolStudent = true;
                 }else{
@@ -534,7 +542,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -566,7 +574,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -598,7 +606,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -630,7 +638,7 @@ class AuthController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -659,7 +667,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: {} });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -839,7 +847,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
 
 
@@ -891,7 +899,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 
@@ -951,7 +959,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.send_otp });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 

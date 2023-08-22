@@ -9,9 +9,7 @@ const treblle = require('@treblle/express');
 const UploadService = require('../services/upload.service');
 const AutoMigrate = require("../migrations/automigrate");
 const AuthorizationSeed = require("../seeders/seed.authorization");
-
-
-
+const Logger = require("../middleware/logger.middleware");
 
 
 class Server {
@@ -36,6 +34,8 @@ class Server {
             })
         );
 
+        // app.use("/images", express.static("../public/lesson"));
+
         //=============== INITIALIZE DATABASE ================//
         //{force : true}
         db.sequelize.sync()
@@ -47,6 +47,9 @@ class Server {
             .catch((err) => {
                 console.log("Failed to sync db: " + err.message);
             });
+
+
+        app.use(Logger.monitor);
 
         //=============== REGISTERED ROUTE ================//
 

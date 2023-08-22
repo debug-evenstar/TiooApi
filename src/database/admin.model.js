@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 module.exports = (sequelize, Sequelize) => {
   const Admin = sequelize.define(
     'Admin',
-    {
+    {   
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -14,9 +14,7 @@ module.exports = (sequelize, Sequelize) => {
       },
       email: {
         type: Sequelize.STRING,
-        unique: true,
       },
-
       account_type: {
         type: Sequelize.STRING,
         defaultValue: 'admin',
@@ -39,6 +37,9 @@ module.exports = (sequelize, Sequelize) => {
       },
     },
     {
+      indexes:[
+        { unique : true, fields: ['email'] }
+      ],
       timestamps: true,
       defaultScope: {
         attributes: {

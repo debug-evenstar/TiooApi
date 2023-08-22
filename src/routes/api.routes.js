@@ -29,21 +29,25 @@ const TioController = require('../controller/tio.controller');
 const AdminSchoolController = require('../controller/admin/management/school.controller');
 const AdminFreelancerController = require('../controller/admin/management/freelancer.controller');
 const AdminLibraryController = require('../controller/admin/management/library.controller');
+const ActionController = require('../controller/action.controller');
+const StudentController = require('../controller/student.controller');
+const AuthorizationController = require('../controller/admin/authorization.controller');
+const LoggingController = require('../controller/error.controller');
+
 
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
 const AuthenticationMiddleware = require('../middleware/token.middleware');
-const StudentController = require('../controller/student.controller');
 const { InviteValidator, AcceptValidator } = require('./validators/StudentValidators');
 const UploadService = require('../services/upload.service');
-const AuthorizationController = require('../controller/admin/authorization.controller');
 const { Authorization } = require('../database/connection');
+const ErrorLogs = require('../controller/error.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
 const OpenRoutesGroup = (router) => {
-
+    router.get('/error/logs', ErrorLogs.fetchErrors);
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
@@ -58,7 +62,6 @@ const OpenRoutesGroup = (router) => {
 
     router.post('/school/setup', SchoolSetupValidator, SchoolManagementController.setup);
     router.post('/freelancer/setup', SchoolSetupValidator, FreelancerController.setup);
-
 
     router.post('/teacher/invite/accept', TeacherController.acceptInvite);
     router.get('/teacher/invited/:id', TeacherController.fetchInvitedTeacher);
@@ -82,11 +85,14 @@ const OpenRoutesGroup = (router) => {
 
     router.post('/admin/login', AuthorizationController.login);
 
-
     router.post('/tio/setup', TioController.setup);
     router.get('/tio/classes', TioController.classes);
     router.get('/tio/subjects', TioController.subjects);
     router.get('/tio/subjectslessons', TioController.subjectsLessons);
+
+    router.post('/actions/superadmin', ActionController.superAdmin);
+    router.post('/actions/sync', ActionController.syncDB);
+    router.delete('/actions/superadmin', ActionController.cleanAdmin);
 
 };
 
@@ -95,6 +101,7 @@ const OpenRoutesGroup = (router) => {
 
 const AuthorizedRoutesGroup = (router) => {
     /* --------------------------------- ACCOUNT -------------------------------- */
+    
     router.use(AuthenticationMiddleware.verify) //--use middleware--//
     router.get('/account/read_all', AuthenicationController.accounts);
     router.get('/account/read', AuthenicationController.accountProfile);
@@ -117,6 +124,8 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/school/class/read', SchoolManagementController.getClassBySidANDCid);
     router.get('/school/teachers/', SchoolManagementController.authSchoolTeachers);
     router.get('/school/teachers/:id', SchoolManagementController.schoolTeachers);
+    router.get('/school/:id/terms', SchoolManagementController.schoolTerms);
+    router.post('/school/kyc', UploadService.uploadLesson.array('files'), SchoolManagementController.kyc);
     /* ---------------------------------- CLASS --------------------------------- */
     router.post('/class/create', ClassController.create);
     router.post('/class/create_bulk', ClassController.bulkCreate);
@@ -144,6 +153,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/class/arms/students/:id', ClassArmsController.classArmStudents);
     router.get('/class/arms/:id/subjects', ClassArmsController.classArmSubjects); // This is the a better route format /entity/:entityId/relationship
     router.put('/class/arms/update/:id', ClassArmsController.updateById);
+    router.get('/class/classarms', ClassArmsController.classArmsByClass)
     router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
 
     /* -------------------------------- SUBJECTS -------------------------------- */
@@ -152,6 +162,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/subjects/read', SubjectController.readAll);
     router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
     router.get('/subjects/school/lessons/:id', SubjectController.schoolSubjectLessons);
+    router.get('/subjects/classes', SubjectController.subjectClasses);
     router.get('/subjects/classes/read/:id', SubjectController.readSubjectWithClasses);
     router.post('/subjects/classes/add', SubjectController.addClassesToSubjects);
     router.get('/subjects/teachers/read/:id', SubjectController.subjectTeachers);
@@ -161,6 +172,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/subjects/lessons/', SubjectController.subjectsWithLessons);
     router.get('/subjects/lessons/count', SubjectController.subjectsWithLessonCount);
     router.get('/subjects/lessons/:subjectId', SubjectController.subjectLessons);
+    router.get('/subjects/:id/student/lessons', SubjectController.studentLessons);
     router.delete('/subjects/delete/:id', SubjectController.delete);
 
     /* --------------------------------- TEACHERS -------------------------------- */
@@ -191,13 +203,24 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/classarmsmates', StudentController.studentArmsMates);
     router.get('/student/:id', StudentController.fetchStudent);
 
-    router.get('/lesson/read', LessonController.nextWeeksLessons);
+    router.get('/lesson/read', LessonController.upcomingNextWeeksLessons);
+    router.get('/lesson/student/read', LessonController.studentUpcomingNextWeeksLessons);
     router.get('/lesson/subjectlessons/:id', LessonController.subjectLessons);
-
-    router.post('/lesson/create',   UploadService.upload.array('files'), LessonController.createLesson);
-    // router.post('/lesson/create',  UploadService.upload.single('file'), LessonController.createLesson);
+    router.get('/lesson/groups', LessonController.subjectGroups);
+    router.post('/lesson/groups/:id/add', UploadService.uploadLesson.array('files'), LessonController.addLessonToGroup);
+    router.post('/lesson/groups/:id/editarms', LessonController.editGroupArms);
+    router.delete('/lesson/groups/:id/lesson/:lesson', LessonController.removeLessonFromGroup);
+    router.put('/lesson/:id', LessonController.updateLesson);
+    router.get('/lesson/:id/template', LessonController.lessonTemplate);
+    router.put('/lesson/:id/status', LessonController.updateLessonStatus);
+    router.get('/lesson/check', LessonController.subjectGroupedLessons);
+    router.post('/lesson/create',   UploadService.uploadLesson.array('files'), LessonController.createLesson);
+    router.post('/lesson/add',   UploadService.uploadLesson.array('files'), LessonController.addLesson);
 
     router.get('/chapter/subject/:id', ChapterController.read);
+
+    router.get('/logging', LoggingController.read);
+    router.delete('/logging', LoggingController.clear);
 
 };
 
@@ -207,6 +230,7 @@ const AuthorizedRoutesGroup = (router) => {
 const AdminRoutesGroup = (router) => {
 
     router.use(AuthenticationMiddleware.admin) //--use middleware--//
+
     router.get('/admin/schools', AdminController.schools);
     router.get('/admin/home/dashboard', HomeController.dashboard);
     router.get('/admin/home/dashboard/activeusers', HomeController.activeUser);
@@ -235,18 +259,20 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/management/schools', AdminSchoolController.read);
     router.get('/admin/management/groupedLessons', AdminSchoolController.lessonsGroupedByClasses);
     router.get('/admin/management/subjects/lessons', AdminSchoolController.lessonsGroupedBySubjects);
-    router.get('/admin/management/subject/lessons', AdminSchoolController.lessonsBySubjectId);   
+    router.get('/admin/management/subject/lessons', AdminSchoolController.lessonsBySubjectId);
     router.get('/admin/management/lessons', AdminSchoolController.lessons);
     router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
+    router.post('/admin/management/lessons/:id/template',   UploadService.uploadLessonTemplate.single('template'), AdminSchoolController.uploadLessonTemplate);
+    router.get('/admin/management/lesson/:id/download', AdminSchoolController.downloadLessons)
 
     router.get('/admin/management/freelancers', AdminFreelancerController.read);
     router.get('/admin/management/freelancers/extra', AdminFreelancerController.readWithExtra);
-    
+
     router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
     router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
 
-    router.post('/admin/library',  UploadService.upload.single('file'), AdminLibraryController.create);
-    router.get('/admin/library',  UploadService.upload.single('file'), AdminLibraryController.read);
+    router.post('/admin/library',  UploadService.uploadLesson.single('file'), AdminLibraryController.create);
+    router.get('/admin/library',  UploadService.uploadLesson.single('file'), AdminLibraryController.read);
 };
 
 

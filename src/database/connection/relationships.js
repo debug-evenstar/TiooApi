@@ -1,29 +1,29 @@
 
 class Relationships {
 
-    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library) {
+    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group, LessonSlide) {
 
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
         Account.hasOne(Validation, { foreignKey: 'accountId', as: 'validation' });
         Validation.belongsTo(Account, { foreignKey: 'accountId', as: 'account' });
 
-        Account.hasOne(SchoolManagement, { allowNull: true });
+        Account.hasOne(SchoolManagement, { allowNull: true, onDelete: 'CASCADE'});
         SchoolManagement.belongsTo(Account, { allowNull: true });
 
-        Account.hasOne(Teacher, { allowNull: true });
+        Account.hasOne(Teacher, { allowNull: true, onDelete: 'CASCADE'});
         Teacher.belongsTo(Account, { allowNull: true });
 
-        Account.hasOne(Student, { allowNull: true });
+        Account.hasOne(Student, { allowNull: true, onDelete: 'CASCADE'});
         Student.belongsTo(Account, { allowNull: true });
 
-        Account.hasOne(Authorization, { allowNull: true });
+        Account.hasOne(Authorization, { allowNull: true, onDelete: 'CASCADE'});
         Authorization.belongsTo(Account, { allowNull: true });
 
         Admin.hasOne(Validation, { allowNull: true });
         Validation.belongsTo(Admin, { allowNull: true });
 
-        Admin.hasOne(Authorization, { allowNull: true });
+        Admin.hasOne(Authorization, { allowNull: true, onDelete: 'CASCADE'});
         Authorization.belongsTo(Admin, { allowNull: true });
 
         Library.hasOne(Class, { allowNull: true });
@@ -38,7 +38,7 @@ class Relationships {
         SchoolManagement.hasMany(Teacher);
         Teacher.belongsTo(SchoolManagement); -
 
-            SchoolManagement.hasMany(Student);
+        SchoolManagement.hasMany(Student);
         Student.belongsTo(SchoolManagement);
 
         SchoolManagement.hasMany(Subject);
@@ -46,6 +46,12 @@ class Relationships {
 
         SchoolManagement.hasMany(Class);
         Class.belongsTo(SchoolManagement);
+
+        Subject.hasMany(Group);
+        Group.belongsTo(Subject);
+        
+        Group.hasMany(Lesson);
+        Lesson.belongsTo(Group);
 
         //---------/ ONE-TO-MANY - CLASS -*- STUDENTS /--------------------
 
@@ -64,14 +70,14 @@ class Relationships {
         Class.hasMany(Lesson);
         Lesson.belongsTo(Class);
 
-        ClassArm.hasMany(Lesson);
-        Lesson.belongsTo(ClassArm);
-
         Subject.hasMany(Chapter);
         Chapter.belongsTo(Subject);
 
         Chapter.hasMany(Lesson);
         Lesson.belongsTo(Chapter);
+
+        Lesson.hasMany(LessonSlide);
+        LessonSlide.belongsTo(Lesson);
 
         //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 
@@ -93,7 +99,11 @@ class Relationships {
         Teacher.belongsToMany(ClassArm, { through: 'TeacherClassArms' });
         ClassArm.belongsToMany(Teacher, { through: 'TeacherClassArms' });
 
+        ClassArm.belongsToMany(Group, { through: 'ClassArmGroups' });
+        Group.belongsToMany(ClassArm, { through: 'ClassArmGroups' });
 
+        Lesson.belongsToMany(ClassArm, { through: 'ClassArmLessons' });
+        ClassArm.belongsToMany(Lesson, { through: 'ClassArmLessons' });
     }
 
 }

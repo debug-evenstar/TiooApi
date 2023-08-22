@@ -42,13 +42,17 @@ const Authorization = db.roles = require("../authorization.model")(sequelize, Se
 const Permission = db.permissions = require("../permission.model")(sequelize, Sequelize);
 
 const Library = db.Libraries = require("../library.model")(sequelize, Sequelize);
-
+const ErrorLog = db.errors = require("../errorLog.model")(sequelize, Sequelize);
 const Coupon = db.coupons = require("../coupon.model")(sequelize, Sequelize);
 
+const TotalLog = db.totallogs = require("../totallog.model")(sequelize, Sequelize);
+const Group = db.groups = require("../groups.model")(sequelize, Sequelize);
+const LessonSlide = db.lessonslides = require("../lesson.slides.model")(sequelize, Sequelize);
 
 
 
-const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library]
+
+const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group, LessonSlide]
 
 Relationships.group(...models);
 
@@ -71,5 +75,9 @@ module.exports = {
   Permission,
   Admin,
   Coupon,
-  Library
+  Library,
+  ErrorLog,
+  TotalLog,
+  Group,
+  LessonSlide
 };

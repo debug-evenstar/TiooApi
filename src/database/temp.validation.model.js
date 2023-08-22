@@ -7,7 +7,6 @@ module.exports = (sequelize, Sequelize) => {
         },
         email: {
             type: Sequelize.STRING,
-            unique: true,
             validate: {
                 isEmail: { msg: "Must be a valid Email" },
             }
@@ -27,7 +26,12 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: () => new Date(Date.now() + 3 * 60 * 1000), // Set default expiration to 3 minutes from now
         },
     },
-        { timestamps: false },
+        { 
+            indexes:[
+                { unique : true, fields: ['email'] }
+            ],
+            timestamps: false 
+        },
     );
 
     TempValidation.beforeSave(async (validation, options) => {

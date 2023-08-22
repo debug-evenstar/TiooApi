@@ -60,8 +60,6 @@ class AuthorizationController {
 
             authorization.setAdmin(registeredAdmin);
 
-            console.log(password);
-
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
 
             return res.status(ResponseStatus.code.success).json({
@@ -71,7 +69,7 @@ class AuthorizationController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -86,19 +84,19 @@ class AuthorizationController {
             const authorization = await Authorization.findAll();
 
             const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
-                const user = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
-
+                const userdata = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'] } });
                 let payload = {};
-                payload.id = auth.id;
-                payload.fullname = user.name;
-                payload.email = user.email;
+                payload.id = userdata.dataValues.id;
+                payload.fullname = userdata.dataValues.name;
+                payload.email = userdata.dataValues.email;
                 payload.status = auth.status;
                 payload.role = auth.role;
-                payload.permissions = auth.permissions
+                payload.permissions = auth.permissions;
+                payload.authorizationId = auth.id;
+                payload.adminId = userdata.dataValues.id;
                 return payload;
 
             }));
-
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
@@ -108,7 +106,7 @@ class AuthorizationController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -157,7 +155,7 @@ class AuthorizationController {
                 account_type: user.account_type,
                 verification_status: user.verification_status,
                 flag: user.flag,
-                authorization: JSON.parse(authorization.dataValues.permissions)
+                authorization: authorization.dataValues.permissions
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
@@ -165,7 +163,7 @@ class AuthorizationController {
 
         } catch (error) {
             console.log(error)
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -191,10 +189,11 @@ class AuthorizationController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
+    
 
 
         /*-----------------------------------| DELETE ADMIN |-----------------------------------*/
@@ -202,15 +201,21 @@ class AuthorizationController {
         static async deleteAdmin(req, res) {
 
             const { admin_id } = req.query;
+
+            console.log(admin_id);
        
     
             try {
                 const user = await Admin.findOne({ where: { id: admin_id } });
+
+                console.log(user);
     
                 if (!user) {
                     return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
                 }
 
+                const authorization = await user.getAuthorization();
+                const deletedAuthorization = await authorization.destroy();
                 const deletedAdmin = await user.destroy();
     
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: deletedAdmin });
@@ -218,7 +223,7 @@ class AuthorizationController {
     
             } catch (error) {
                 console.log(error)
-                res.status(500).json({ error: 'Server Error' });
+                res.status(500).json({ error: 'server error' ,  extra: error.message });
             };
     
         }

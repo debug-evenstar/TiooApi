@@ -33,7 +33,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     };
 
@@ -66,7 +66,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     };
@@ -91,7 +91,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -119,7 +119,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -146,7 +146,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -168,7 +168,7 @@ class ClassController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: singleClass });
 
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -195,7 +195,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -222,7 +222,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
 
     }
@@ -241,7 +241,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -268,7 +268,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -295,7 +295,7 @@ class ClassController {
     
             } catch (error) {
                 console.log(error);
-                res.status(500).json({ error: 'Server Error' });
+                res.status(500).json({ error: 'server error' ,  extra: error.message });
             };
         }
 
@@ -337,7 +337,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -357,7 +357,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         };
     }
 
@@ -397,7 +397,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
 
     }
@@ -438,7 +438,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
 
     }
@@ -480,14 +480,16 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 
     /* ---------------- GET  TEACHERS AND STUDENTS IN A CLASS --------------- */
 
     static async readStudentsTeachers(req, res) {
+
         const { id } = req.params;
+        
         try {
             const classInstance = await Class.findByPk(id, { include: [Teacher, Student] });
 
@@ -513,7 +515,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 

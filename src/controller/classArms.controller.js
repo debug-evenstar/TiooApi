@@ -28,7 +28,7 @@ class classArms {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classWithArms });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 
@@ -57,7 +57,7 @@ class classArms {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classWithArms });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 
@@ -79,7 +79,7 @@ class classArms {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 
@@ -111,7 +111,7 @@ class classArms {
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: armsResult });
         } catch (error) {
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 
@@ -127,7 +127,7 @@ class classArms {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 
@@ -152,7 +152,7 @@ class classArms {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 
@@ -176,7 +176,7 @@ class classArms {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
         }
     }
 
@@ -205,7 +205,7 @@ class classArms {
     
             } catch (error) {
                 console.log(error);
-                res.status(500).json({ error: 'Server Error' });
+                res.status(500).json({ error: 'server error' ,  extra: error.message });
             }
         }
 
@@ -230,9 +230,24 @@ class classArms {
     
             } catch (error) {
                 console.log(error);
-                res.status(500).json({ error: 'Server Error' });
+                res.status(500).json({ error: 'server error' ,  extra: error.message });
             }
         }
+
+            /* ---------------------------- READ BY CLASS ID ---------------------------- */
+
+    static async classArmsByClass(req, res) {
+
+        try {
+            const classInstance = await Class.findByPk(req.query.class_id);
+
+            const classArms = await classInstance.getClassArms();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classArms });
+        } catch (error) {
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        }
+    }
 
 }
 

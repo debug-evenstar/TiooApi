@@ -1,10 +1,13 @@
 const AuthController = require('../../auth.controller');
 const { validationResult } = require('express-validator');
 const ResponseStatus = require("../../../config/message.config");
-const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class } = require('../../../database/connection');
+const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class, LessonSlide } = require('../../../database/connection');
 const { use } = require('chai');
+const path = require('path');
+const fs = require('fs');
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
 const TokenMiddleware = require('../../../middleware/token.middleware');
+const LessonTemplateProvider = require("../../../providers/AI/lesson.template");
 
 
 
@@ -48,7 +51,7 @@ class AdminSchoolController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -121,7 +124,7 @@ class AdminSchoolController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     };
@@ -161,7 +164,7 @@ class AdminSchoolController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -202,7 +205,7 @@ class AdminSchoolController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -231,7 +234,7 @@ class AdminSchoolController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -259,7 +262,7 @@ class AdminSchoolController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -271,7 +274,7 @@ class AdminSchoolController {
         THIS IS STILL IN PROGRESS AWAITING CLARITY.
         LET IT BE KNOWN THAT WE DON'T ASSIGN MULTIPLE CLASSARMS ON LESSON UPLOAD
         BUT WE DO UNDER SUBJECT CREATION.
-        ----------------------------------------------------------------------*/ 
+        ----------------------------------------------------------------------*/
 
         const data = req.query;
 
@@ -295,7 +298,7 @@ class AdminSchoolController {
                     id: 2,
                     naming: instance.naming,
                     description: instance.description,
-                    arms:  instance.ClassArms.map(item => ({ naming: item.naming, ClassId: item.ClassId })),
+                    arms: instance.ClassArms.map(item => ({ naming: item.naming, ClassId: item.ClassId })),
                     lessons: instance.Lessons
 
                 }
@@ -307,7 +310,7 @@ class AdminSchoolController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -346,10 +349,148 @@ class AdminSchoolController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'Server Error' });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
+
+
+    static async uploadLessonTemplate(req, res) {
+
+        try {
+            let filePath = "";
+            if (req.file) {
+                filePath = req.file.path;
+            } else {
+                res.status(400).json({ error: 'No uploaded file' });
+            }
+
+            const { id } = req.params;
+
+            const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath);
+
+            console.log('this is the slide response', slides);
+
+            const parseSlides = [];
+
+            const lessonInstance = await Lesson.findByPk(id);
+
+            const previousSlides = await lessonInstance.getLessonSlides({
+                orderBy: { slide_index: "asc" }
+            });
+
+
+            if (previousSlides && previousSlides.length > 0 && previousSlides.length > slides.data.length) {
+                for (let i = slides.data.length; i < previousSlides.length; i++) {
+                    const slide = previousSlides[i];
+                    await slide.destroy();
+                }
+            }
+
+            for (let index = 0; index < slides.data.length; index++) {
+                const slide = slides.data[index];
+                if (previousSlides && previousSlides.length > index) {
+                    const updated = previousSlides[index];
+                    updated.slide_data = slide;
+                    updated.save();
+                } else {
+                    const created = await LessonSlide.create({
+                        slide_index: index,
+                        slide_data: slide
+                    });
+                    parseSlides.push(created);
+                }
+            };
+
+            await lessonInstance.addLessonSlides(parseSlides);
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.added
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+    static async updateLessonStatus(req, res) {
+
+        try {
+
+            const lesson = await Lesson.findByPk(req.params.id);
+
+            if (!lesson) {
+                res.status(400).json({ error: "Lesson not found" });
+            }
+
+            const lessonUpdate = await Lesson.update(req.body, { where: { id: req.params.id } });
+
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: lessonUpdate });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+
+    static async downloadLessons(req, res) {
+        try {
+            const id = req.params.id;
+            const {docs_index} = req.query;
+
+            const lessonInstance = await Lesson.findByPk(id);
+
+            if (!lessonInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'Lesson not found' });
+            }
+
+            const parsedPathArray = JSON.parse(lessonInstance.files);
+
+            if (parsedPathArray.length === 0) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No files associated with this lesson' });
+            }
+
+            // const absoluteFilesDirectory = path.resolve(__dirname, '..', '..', '..', '..', 'public', 'lessons');
+
+            const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`)
+
+            let filePath;
+            if(!docs_index){
+                filePath =  path.join(absoluteFilesDirectory, '', path.basename(parsedPathArray[0]));
+            }else if(parsedPathArray.length > parseInt(docs_index)){
+                console.log(parsedPathArray.length,  parseInt(docs_index))
+                filePath =  path.join(absoluteFilesDirectory, '', path.basename(parsedPathArray[docs_index]));
+            }else{
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No document with this index' });
+            }
+
+            console.log(`${appRoot}\\public\\lessons`);
+
+            res.download(
+                filePath,
+                path.basename(filePath),
+                (err) => {
+                    if (err) {
+                        res.send({
+                            error: err,
+                            msg: "Problem downloading the file"
+                        })
+                    }
+                });
+        
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        }
+    }
+
+
 
 
 }
