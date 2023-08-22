@@ -365,15 +365,23 @@ class AdminSchoolController {
                 res.status(400).json({ error: 'No uploaded file' });
             }
 
-            const { id } = req.params;
+            // const { id } = req.params;
 
-            const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath);
+            const lessonInstance = await Lesson.findByPk(req.body.lesson_id);
+
+            const subjectInstance = await lessonInstance.getSubject();
+
+            const grade = lessonInstance.ClassId;
+
+            const subject = subjectInstance.naming;
+
+            console.log(grade, subject);
+
+             const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath, grade, subject);
 
             console.log('this is the slide response', slides);
 
             const parseSlides = [];
-
-            const lessonInstance = await Lesson.findByPk(id);
 
             const previousSlides = await lessonInstance.getLessonSlides({
                 orderBy: { slide_index: "asc" }
@@ -451,7 +459,15 @@ class AdminSchoolController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'Lesson not found' });
             }
 
-            const parsedPathArray = JSON.parse(lessonInstance.files);
+            let parsedPathArray 
+
+            if(process.env.ENVIRONMENT){
+                parsedPathArray = JSON.parse(lessonInstance.files);
+            }else{
+                parsedPathArray = lessonInstance.files;
+            }
+
+          
 
             console.log('testing this', lessonInstance.files[0]);
 
@@ -515,6 +531,32 @@ class AdminSchoolController {
     }
 
 
+    static async subjectGroupedLessons(req, res) {
+
+        try {
+
+            const subjectInstance = await Subject.findByPk(req.query.subject_id);
+
+
+            const whereClause = req.query.class_id ? { ref_cid: req.query.class_id } : {};
+
+            const lessonInstances = await subjectInstance.getGroups({
+                where: whereClause,
+                include: [
+                    {
+                        model: ClassArm,
+                        attributes: ['id', 'naming'],
+                        through: { attributes: [] },
+                    }, Lesson]
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
 
 
 }
