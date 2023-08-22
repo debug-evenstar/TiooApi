@@ -203,7 +203,8 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/classarmsmates', StudentController.studentArmsMates);
     router.get('/student/:id', StudentController.fetchStudent);
 
-    router.get('/lesson/read', LessonController.nextWeeksLessons);
+    router.get('/lesson/read', LessonController.upcomingNextWeeksLessons);
+    router.get('/lesson/student/read', LessonController.studentUpcomingNextWeeksLessons);
     router.get('/lesson/subjectlessons/:id', LessonController.subjectLessons);
     router.get('/lesson/groups', LessonController.subjectGroups);
     router.post('/lesson/groups/:id/add', UploadService.uploadLesson.array('files'), LessonController.addLessonToGroup);
@@ -211,7 +212,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.delete('/lesson/groups/:id/lesson/:lesson', LessonController.removeLessonFromGroup);
     router.put('/lesson/:id', LessonController.updateLesson);
     router.get('/lesson/:id/template', LessonController.lessonTemplate);
-    router.put('/lesson/:id/publish/toggle', LessonController.togglePublishLesson);
+    router.put('/lesson/:id/status', LessonController.updateLessonStatus);
     router.get('/lesson/check', LessonController.subjectGroupedLessons);
 
     router.post('/lesson/create',   UploadService.uploadLesson.array('files'), LessonController.createLesson);
@@ -263,6 +264,7 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/management/lessons', AdminSchoolController.lessons);
     router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
     router.post('/admin/management/lessons/:id/template',   UploadService.uploadLessonTemplate.single('template'), AdminSchoolController.uploadLessonTemplate);
+    router.get('/admin/management/lesson/:id/download', AdminSchoolController.downloadLessons)
 
     router.get('/admin/management/freelancers', AdminFreelancerController.read);
     router.get('/admin/management/freelancers/extra', AdminFreelancerController.readWithExtra);
