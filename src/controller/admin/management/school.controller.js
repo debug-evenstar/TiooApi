@@ -453,6 +453,8 @@ class AdminSchoolController {
 
             const parsedPathArray = JSON.parse(lessonInstance.files);
 
+            console.log('testing this', lessonInstance.files[0]);
+
             if (parsedPathArray.length === 0) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No files associated with this lesson' });
             }
@@ -486,6 +488,30 @@ class AdminSchoolController {
             console.error(error);
             res.status(500).json({ error: 'server error', extra: error.message });
         }
+    }
+
+
+        static async subjectGroups(req, res) {
+
+        try {
+
+            const subjectInstance = await Subject.findByPk(req.query.subject_id);
+
+            const lessonInstances = await subjectInstance.getGroups({
+                include: [
+                    {
+                        model: ClassArm,
+                        attributes: ['id', 'naming'],
+                        through: { attributes: [] },
+                    }]
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
     }
 
 

@@ -264,6 +264,7 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
     router.post('/admin/management/lessons/:id/template',   UploadService.uploadLessonTemplate.single('template'), AdminSchoolController.uploadLessonTemplate);
     router.get('/admin/management/lesson/:id/download', AdminSchoolController.downloadLessons)
+    router.get('/admin/management/subject/groups', AdminSchoolController.subjectGroups)
 
     router.get('/admin/management/freelancers', AdminFreelancerController.read);
     router.get('/admin/management/freelancers/extra', AdminFreelancerController.readWithExtra);
