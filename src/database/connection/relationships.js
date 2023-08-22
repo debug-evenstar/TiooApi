@@ -23,17 +23,14 @@ class Relationships {
         Admin.hasOne(Validation, { allowNull: true });
         Validation.belongsTo(Admin, { allowNull: true });
 
+        Library.hasOne(Subject, { allowNull: true });
+        Subject.belongsTo(Library, { allowNull: true });
+
         Admin.hasOne(Authorization, { allowNull: true, onDelete: 'CASCADE'});
         Authorization.belongsTo(Admin, { allowNull: true });
 
-        Library.hasOne(Class, { allowNull: true });
-        Class.belongsTo(Library, { allowNull: true });
-
 
         //---------/ ONE-TO-MANY - SCHOOL -*- CLASS | TEACHERS | STUDENT | SUBJECT /--------------------
-
-        Class.hasMany(Library, {allowNull: true});
-        Library.belongsTo(Class,  {allowNull: true});
 
         SchoolManagement.hasMany(Teacher);
         Teacher.belongsTo(SchoolManagement); -
