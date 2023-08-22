@@ -468,9 +468,6 @@ class AdminSchoolController {
             }
 
           
-
-            console.log('testing this', lessonInstance.files[0]);
-
             if (parsedPathArray.length === 0) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No files associated with this lesson' });
             }
@@ -557,6 +554,33 @@ class AdminSchoolController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
+
+
+    static async adminUpdateLessonStatus(req, res){
+        
+        const {id} = req.params;
+        const data = req.query;
+
+        try {
+            
+        const lessonInstance = await Lesson.findByPk(id);
+
+         const response = await lessonInstance.update({admin_status: data.status});
+
+        return res.status(ResponseStatus.code.success).json({
+            error: false,
+            message: ResponseStatus.pass.read,
+            data: response
+        });
+
+
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
 
 
 }
