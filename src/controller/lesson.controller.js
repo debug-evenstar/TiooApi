@@ -1,6 +1,6 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult, param } = require('express-validator');
-const { Lesson, Subject, Chapter, Class, ClassArm, Group, LessonSlide } = require("../database/connection");
+const { Lesson, Subject, Chapter, Class, ClassArm, Group, LessonSlide, Account } = require("../database/connection");
 
 
 class LessonController {
@@ -326,7 +326,7 @@ class LessonController {
 
     /*-----------------------------------| NEXT WEEKS LESSON |-----------------------------------*/
 
-    static async nextWeeksLessons(req, res) {
+    static async upcomingNextWeeksLessons(req, res) {
 
         const today = new Date();
         const daysUntilNextMonday = (1 - today.getDay() + 7) % 7;
@@ -359,6 +359,50 @@ class LessonController {
         };
 
     }
+
+        /*-----------------------------------| NEXT WEEKS LESSON |-----------------------------------*/
+
+        static async studentUpcomingNextWeeksLessons(req, res) {
+
+            const today = new Date();
+            const daysUntilNextMonday = (1 - today.getDay() + 7) % 7;
+            const nextMonday = new Date(today);
+            nextMonday.setDate(today.getDate() + daysUntilNextMonday);
+    
+            const daysUntilNextSunday = (7 - nextMonday.getDay()) % 7;
+            const nextSunday = new Date(nextMonday);
+            nextSunday.setDate(nextMonday.getDate() + daysUntilNextSunday);
+    
+            try {
+
+                const{id} = req.userData;
+
+                const accountInstance  = await Account.findByPk(id);
+
+                const studentInstance = await accountInstance.getStudent();
+
+                const classInstance = await studentInstance.getClass();
+    
+                const allLessons = await classInstance.getLessons({ attributes: ['topic', 'description', 'start_date', 'end_date'], });
+    
+                const lessonsWithinNextWeek = allLessons.filter((lesson) => {
+                    const lessonStartDate = new Date(lesson.start_date);
+                    const lessonEndDate = new Date(lesson.end_date);
+                    return lessonStartDate >= nextMonday && lessonStartDate <= nextSunday;
+                });
+    
+                return res.status(ResponseStatus.code.success).json({
+                    error: false,
+                    message: ResponseStatus.pass.read, data: lessonsWithinNextWeek
+                });
+    
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'server error', extra: error.message });
+            };
+    
+        }
 
 
 
