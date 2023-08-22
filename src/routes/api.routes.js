@@ -211,7 +211,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.delete('/lesson/groups/:id/lesson/:lesson', LessonController.removeLessonFromGroup);
     router.put('/lesson/:id', LessonController.updateLesson);
     router.get('/lesson/:id/template', LessonController.lessonTemplate);
-    router.put('/lesson/:id/publish/toggle', LessonController.togglePublishLesson);
+    router.put('/lesson/:id/publish/toggle', LessonController.togglePublishLesson); //Not needed
     router.get('/lesson/check', LessonController.subjectGroupedLessons);
 
     router.post('/lesson/create',   UploadService.uploadLesson.array('files'), LessonController.createLesson);

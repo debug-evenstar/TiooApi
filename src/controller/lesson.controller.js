@@ -428,21 +428,22 @@ class LessonController {
 
         const {id} = req.params;
 
-        try {
-            
-        const lessonInstance = await Lesson.findByPk(id);
+            try {
+                
+            const lessonInstance = await Lesson.findByPk(id, {
+                include : [
+                    { 
+                        model : LessonSlide,
+                        orderBy : {slide_index : "asc"}
+                    }
+                ]
+            });
 
-        const slideInstance = await lessonInstance.getLessonSlides({
-            orderBy : {slide_index : "asc"}
-        });
-
-        return res.status(ResponseStatus.code.success).json({
-            error: false,
-            message: ResponseStatus.pass.read,
-            data: slideInstance
-        });
-
-
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: lessonInstance
+            });
 
         } catch (error) {
             res.status(500).json({ error: 'server error', extra: error.message });
