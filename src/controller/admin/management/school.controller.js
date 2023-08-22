@@ -442,7 +442,9 @@ class AdminSchoolController {
     static async downloadLessons(req, res) {
         try {
             const id = req.params.id;
-            const lessonInstance = await Lesson.findByPk(1);
+            const {docs_index} = req.query;
+
+            const lessonInstance = await Lesson.findByPk(id);
 
             if (!lessonInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'Lesson not found' });
@@ -454,18 +456,21 @@ class AdminSchoolController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No files associated with this lesson' });
             }
 
-            const filePath = path.join(__dirname, '', parsedPathArray[0]);
+            const absoluteFilesDirectory = path.resolve(__dirname, '..', '..', '..', '..', 'public', 'lessons');
 
-            const filePath2 = __dirname + "/public/assets/" + path.basename(filePath);
-
-            console.log(parsedPathArray);
-            console.log(path.basename(filePath));
-            console.log(filePath);
-            console.log('xyz', filePath2);
+            let filePath;
+            if(!docs_index){
+                filePath =  path.join(absoluteFilesDirectory, '', path.basename(parsedPathArray[0]));
+            }else if(parsedPathArray.length > parseInt(docs_index)){
+                console.log(parsedPathArray.length,  parseInt(docs_index))
+                filePath =  path.join(absoluteFilesDirectory, '', path.basename(parsedPathArray[docs_index]));
+            }else{
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No document with this index' });
+            }
 
             res.download(
-                "C:/Users/Betta/Documents/node/Nimo/public/lessons/1692651459944-301973992.docx",
-                '1692651459944-301973992.docx', // Remember to include file extension
+                filePath,
+                path.basename(filePath), // Remember to include file extension
                 (err) => {
                     if (err) {
                         res.send({
