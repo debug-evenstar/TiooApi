@@ -440,6 +440,7 @@ class AdminSchoolController {
 
 
     static async downloadLessons(req, res) {
+        
         try {
             const id = req.params.id;
             const {docs_index} = req.query;
@@ -457,7 +458,6 @@ class AdminSchoolController {
             }
 
             // const absoluteFilesDirectory = path.resolve(__dirname, '..', '..', '..', '..', 'public', 'lessons');
-
             const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`)
 
             let filePath;
@@ -469,8 +469,6 @@ class AdminSchoolController {
             }else{
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No document with this index' });
             }
-
-            console.log(`${appRoot}\\public\\lessons`);
 
             res.download(
                 filePath,
