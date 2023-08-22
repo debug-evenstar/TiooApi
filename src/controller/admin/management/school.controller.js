@@ -470,19 +470,19 @@ class AdminSchoolController {
 
             res.download(
                 filePath,
-                path.basename(filePath), // Remember to include file extension
+                path.basename(filePath),
                 (err) => {
                     if (err) {
                         res.send({
                             error: err,
-                            msg: "Problem downloading the file"
+                            msg: `Problem downloading the file ${filePath}`
                         })
                     }
                 });
         
         } catch (error) {
             console.error(error);
-            res.status(500).send('Server error');
+            res.status(500).json({ error: 'server error', extra: error.message, path: filePath });
         }
     }
 
