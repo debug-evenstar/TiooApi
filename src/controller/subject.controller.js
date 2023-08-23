@@ -30,6 +30,7 @@ class SubjectController {
         };
 
     }
+    
     /*-----------------------------------| READ ALL SUBJECTS |-----------------------------------*/
 
     static async readAll(req, res) {

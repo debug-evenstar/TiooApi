@@ -70,6 +70,14 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.JSON,
         defaultValue: [],
       },
+      age: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      library: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
     },
     { timestamps: true }
   );
