@@ -63,27 +63,31 @@ class AdminLibraryController {
 
             // --------------------------------------------------------- subject
 
-            const classInstance = await Class.findByPk(data.class[0]);
-
-            if (!classInstance) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-            }
-
             const accountInstance = await Account.findOne({where: {email: ResponseStatus.tio.email}});
+
             const schoolInstance = await accountInstance.getSchoolManagement();
 
-            const classarmInstances = await classInstance.getClassArms();
-            const subjectInstance = await Subject.create(req.body);
+            const subjectInstance = await schoolInstance.getSubjects(
+                {where: {library: true},  joinTableAttributes: [],
+                include: [
+                    {
+                        model: Lesson,
+                        attributes: { exclude: ['LibraryId'] },
+                    },
+                ],}
+                );
 
-            await schoolInstance.addSubjects(subjectInstance);
-
-            const newItems = await subjectInstance.addClasses(classInstance);
-
-            const subjectArms = await subjectInstance.addClassArms(classarmInstances);
+    
+            const subjectsWithLessonCount = subjectInstance.map(subject => {
+                const subjectObj = { ...subject.toJSON(), lessonCount: subject.Lessons.length };
+                delete subjectObj.Lessons;
+                return subjectObj;
+              });
+              
 
             // ------------------------------------------
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {}});
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectsWithLessonCount });
 
         } catch (error) {
             console.log(error);
