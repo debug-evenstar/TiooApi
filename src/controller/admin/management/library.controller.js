@@ -134,7 +134,7 @@ class AdminLibraryController {
         const today = new Date();
         const threeDaysAhead = new Date();
         threeDaysAhead.setDate(today.getDate() + 3);
-      
+
         if (req.file) {
             req.body.files = [req.file.path];
 
@@ -177,6 +177,40 @@ class AdminLibraryController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
+
+    static async subjectGroupedLessons(req, res) {
+
+        try {
+
+            const subjectInstance = await Subject.findByPk(req.query.subject_id);
+
+            if (!subjectInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: 'No subject found', data: {} });
+            }
+
+            const whereClause = req.query.class_id ? { ClassId: req.query.class_id } : {};
+
+            const lessonInstances = await subjectInstance.getLessons({
+                where: whereClause,
+                include: [
+                    {
+                        model: ClassArm,
+                        attributes: ['id', 'naming'],
+                        through: { attributes: [] },
+                    }, Class ]
+            });
+
+
+            const classes = await subjectInstance.getClasses();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
 
 
 
