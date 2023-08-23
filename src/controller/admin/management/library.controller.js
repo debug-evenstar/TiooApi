@@ -12,6 +12,93 @@ const TokenMiddleware = require('../../../middleware/token.middleware');
 class AdminLibraryController {
 
 
+
+    static async libraryMaterial(req, res) {
+
+        const data = req.body;
+
+        data.library = true;
+
+        try {
+
+            // --------------------------------------------------------- subject
+
+            const classInstance = await Class.findByPk(data.class[0]);
+
+            if (!classInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
+            const schoolInstance = await accountInstance.getSchoolManagement();
+
+            const classarmInstances = await classInstance.getClassArms();
+            const subjectInstance = await Subject.create(req.body);
+
+            await schoolInstance.addSubjects(subjectInstance);
+
+            const newItems = await subjectInstance.addClasses(classInstance);
+
+            const subjectArms = await subjectInstance.addClassArms(classarmInstances);
+
+            // ------------------------------------------
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {} });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+    static async readLibraryMaterial(req, res) {
+
+        const data = req.body;
+
+        data.library = true;
+
+        try {
+
+            // --------------------------------------------------------- subject
+
+            const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
+
+            const schoolInstance = await accountInstance.getSchoolManagement();
+
+            const subjectInstance = await schoolInstance.getSubjects(
+                {
+                    where: { library: true }, joinTableAttributes: [],
+                    include: [
+                        {
+                            model: Lesson,
+                            attributes: { exclude: ['LibraryId'] },
+                        },
+                    ],
+                }
+            );
+
+
+            const subjectsWithLessonCount = subjectInstance.map(subject => {
+                const subjectObj = { ...subject.toJSON(), lessonCount: subject.Lessons.length };
+                delete subjectObj.Lessons;
+                return subjectObj;
+            });
+
+
+            // ------------------------------------------
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectsWithLessonCount });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
     static async create(req, res) {
 
         const data = req.body;
@@ -30,16 +117,101 @@ class AdminLibraryController {
 
             const libraryInstance = await Library.create(req.body);
 
-            const response = await classInstance.addLibrary(libraryInstance);
+            // const response = await classInstance.addLibrary(libraryInstance);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: response });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {} });
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
+
+
+    static async createLibraryLesson(req, res) {
+
+        const today = new Date();
+        const threeDaysAhead = new Date();
+        threeDaysAhead.setDate(today.getDate() + 3);
+
+        if (req.file) {
+            req.body.files = [req.file.path];
+
+            console.log(req.body.files);
+        }
+
+        req.body.start_date = today;
+        req.body.end_date = threeDaysAhead;
+
+
+
+        try {
+
+            const lessonInstance = await Lesson.create(req.body);
+
+            const subjectInstance = await Subject.findByPk(req.body.subject);
+
+            if (!subjectInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
+
+            }
+
+
+            await subjectInstance.addLesson(lessonInstance);
+
+
+            const classInstance = await Class.findByPk(req.body.class);
+
+            const classarmInstances = await classInstance.getClassArms();
+
+            const instance1 = await lessonInstance.addClassArms(classarmInstances);
+
+            await classInstance.addLesson(lessonInstance);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: lessonInstance });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+    static async subjectGroupedLessons(req, res) {
+
+        try {
+
+            const subjectInstance = await Subject.findByPk(req.query.subject_id);
+
+            if (!subjectInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: 'No subject found', data: {} });
+            }
+
+            const whereClause = req.query.class_id ? { ClassId: req.query.class_id } : {};
+
+            const lessonInstances = await subjectInstance.getLessons({
+                where: whereClause,
+                include: [
+                    {
+                        model: ClassArm,
+                        attributes: ['id', 'naming'],
+                        through: { attributes: [] },
+                    }, Class ]
+            });
+
+
+            const classes = await subjectInstance.getClasses();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
 
 
     static async read(req, res) {
@@ -52,7 +224,7 @@ class AdminLibraryController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
