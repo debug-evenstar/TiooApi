@@ -12,6 +12,87 @@ const TokenMiddleware = require('../../../middleware/token.middleware');
 class AdminLibraryController {
 
 
+    
+    static async libraryMaterial(req, res) {
+
+        const data = req.body;
+
+        data.library = true;
+
+        try {
+
+            // --------------------------------------------------------- subject
+
+            const classInstance = await Class.findByPk(data.class[0]);
+
+            if (!classInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const accountInstance = await Account.findOne({where: {email: ResponseStatus.tio.email}});
+            const schoolInstance = await accountInstance.getSchoolManagement();
+
+            const classarmInstances = await classInstance.getClassArms();
+            const subjectInstance = await Subject.create(req.body);
+
+            await schoolInstance.addSubjects(subjectInstance);
+
+            const newItems = await subjectInstance.addClasses(classInstance);
+
+            const subjectArms = await subjectInstance.addClassArms(classarmInstances);
+
+            // ------------------------------------------
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {}});
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+
+    }
+
+
+    static async readLibraryMaterial(req, res) {
+
+        const data = req.body;
+
+        data.library = true;
+
+        try {
+
+            // --------------------------------------------------------- subject
+
+            const classInstance = await Class.findByPk(data.class[0]);
+
+            if (!classInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const accountInstance = await Account.findOne({where: {email: ResponseStatus.tio.email}});
+            const schoolInstance = await accountInstance.getSchoolManagement();
+
+            const classarmInstances = await classInstance.getClassArms();
+            const subjectInstance = await Subject.create(req.body);
+
+            await schoolInstance.addSubjects(subjectInstance);
+
+            const newItems = await subjectInstance.addClasses(classInstance);
+
+            const subjectArms = await subjectInstance.addClassArms(classarmInstances);
+
+            // ------------------------------------------
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {}});
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+
+    }
+
+
     static async create(req, res) {
 
         const data = req.body;
@@ -30,9 +111,9 @@ class AdminLibraryController {
 
             const libraryInstance = await Library.create(req.body);
 
-            const response = await classInstance.addLibrary(libraryInstance);
+            // const response = await classInstance.addLibrary(libraryInstance);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: response });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {} });
 
         } catch (error) {
             console.log(error);
@@ -40,6 +121,9 @@ class AdminLibraryController {
         };
 
     }
+
+
+    
 
 
     static async read(req, res) {
