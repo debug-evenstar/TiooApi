@@ -43,6 +43,7 @@ const { InviteValidator, AcceptValidator } = require('./validators/StudentValida
 const UploadService = require('../services/upload.service');
 const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
+const PreferenceController = require('../controller/preference.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -222,6 +223,10 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/logging', LoggingController.read);
     router.delete('/logging', LoggingController.clear);
 
+    router.post('/settings/preference', PreferenceController.create);
+    router.put('/settings/preference', PreferenceController.update);
+    router.get('/settings/preference', PreferenceController.read);
+
 };
 
 
@@ -279,6 +284,7 @@ const AdminRoutesGroup = (router) => {
 
     router.post('/admin/library',  UploadService.uploadLesson.single('file'), AdminLibraryController.create);
     router.get('/admin/library',  UploadService.uploadLesson.single('file'), AdminLibraryController.read);
+    router.delete('/admin/library/:id',  AdminLibraryController.deleteLibrary);
     router.post('/admin/library/subject',  AdminLibraryController.libraryMaterial);
     router.post('/admin/library/lesson',  UploadService.uploadLesson.single('file'), AdminLibraryController.createLibraryLesson);
     router.get('/admin/library/lesson/check', AdminLibraryController.subjectGroupedLessons);

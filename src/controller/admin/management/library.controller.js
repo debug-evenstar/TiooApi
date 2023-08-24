@@ -212,6 +212,31 @@ class AdminLibraryController {
     }
 
 
+    static async deleteLibrary(req, res) {
+
+        const {id} = req.params;
+        
+        try {
+
+            const libraryInstance = await Library.findByPk(id);
+
+            if (!libraryInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const response = await libraryInstance.destroy();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+
 
 
     static async read(req, res) {
