@@ -1,7 +1,7 @@
 const AuthController = require('../../auth.controller');
 const { validationResult } = require('express-validator');
 const ResponseStatus = require("../../../config/message.config");
-const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class, LessonSlide } = require('../../../database/connection');
+const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class, LessonSlide, Student, Teacher } = require('../../../database/connection');
 const { use } = require('chai');
 const path = require('path');
 const fs = require('fs');
@@ -365,9 +365,13 @@ class AdminSchoolController {
                 res.status(400).json({ error: 'No uploaded file' });
             }
 
-            // const { id } = req.params;
+            const { id } = req.params;
 
-            const lessonInstance = await Lesson.findByPk(req.body.lesson_id);
+            const lessonInstance = await Lesson.findByPk(id);
+
+            if (!lessonInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'Lesson not found' });
+            }
 
             const subjectInstance = await lessonInstance.getSubject();
 
@@ -377,7 +381,7 @@ class AdminSchoolController {
 
             console.log(grade, subject);
 
-             const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath, grade, subject);
+            const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath, grade, subject);
 
             console.log('this is the slide response', slides);
 
@@ -448,10 +452,10 @@ class AdminSchoolController {
 
 
     static async downloadLessons(req, res) {
-        
+
         try {
             const id = req.params.id;
-            const {docs_index} = req.query;
+            const { docs_index } = req.query;
 
             const lessonInstance = await Lesson.findByPk(id);
 
@@ -459,15 +463,15 @@ class AdminSchoolController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'Lesson not found' });
             }
 
-            let parsedPathArray 
+            let parsedPathArray
 
-            if(process.env.ENVIRONMENT){
+            if (process.env.ENVIRONMENT) {
                 parsedPathArray = JSON.parse(lessonInstance.files);
-            }else{
+            } else {
                 parsedPathArray = lessonInstance.files;
             }
 
-          
+
             if (parsedPathArray.length === 0) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No files associated with this lesson' });
             }
@@ -476,12 +480,12 @@ class AdminSchoolController {
             const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`)
 
             let filePath;
-            if(!docs_index){
-                filePath =  path.join(absoluteFilesDirectory, '', path.basename(parsedPathArray[0]));
-            }else if(parsedPathArray.length > parseInt(docs_index)){
-                console.log(parsedPathArray.length,  parseInt(docs_index))
-                filePath =  path.join(absoluteFilesDirectory, '', path.basename(parsedPathArray[docs_index]));
-            }else{
+            if (!docs_index) {
+                filePath = path.join(absoluteFilesDirectory, '', path.basename(parsedPathArray[0]));
+            } else if (parsedPathArray.length > parseInt(docs_index)) {
+                console.log(parsedPathArray.length, parseInt(docs_index))
+                filePath = path.join(absoluteFilesDirectory, '', path.basename(parsedPathArray[docs_index]));
+            } else {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No document with this index' });
             }
 
@@ -496,7 +500,7 @@ class AdminSchoolController {
                         })
                     }
                 });
-        
+
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'server error', extra: error.message });
@@ -504,7 +508,7 @@ class AdminSchoolController {
     }
 
 
-        static async subjectGroups(req, res) {
+    static async subjectGroups(req, res) {
 
         try {
 
@@ -556,26 +560,77 @@ class AdminSchoolController {
     }
 
 
-    static async adminUpdateLessonStatus(req, res){
-        
-        const {id} = req.params;
+    static async adminUpdateLessonStatus(req, res) {
+
+        const { id } = req.params;
         const data = req.query;
 
         try {
-            
-        const lessonInstance = await Lesson.findByPk(id);
 
-         const response = await lessonInstance.update({admin_status: data.status});
+            const lessonInstance = await Lesson.findByPk(id);
 
-        return res.status(ResponseStatus.code.success).json({
-            error: false,
-            message: ResponseStatus.pass.read,
-            data: response
-        });
+            const response = await lessonInstance.update({ admin_status: data.status });
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: response
+            });
 
 
 
         } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+    /* ---------------------------- READ BY CLASS ID ---------------------------- */
+
+    static async readAllByClass(req, res) {
+
+        try {
+            const classArms = await ClassArm.findAll({
+                where: { ClassId: req.params.id },
+                include: [
+                    { model: Subject },
+                    { model: Student, include: [Account] },
+                    { model: Teacher, include: [Account] },
+                ]
+            });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classArms });
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        }
+    }
+
+    /*-----------------------------------| FETCH ALL CLASS WITH CLASS ARMS |-----------------------------------*/
+
+    static async readAllWithArms(req, res) {
+
+        const account_id = req.query.account_id;
+
+        try {
+
+            const AccountInstance = await Account.findByPk(account_id, { include: [SchoolManagement] });
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+            const ClassInstances = await SchoolInstances.getClasses({
+                include: [
+                    { model: ClassArm, include: [Subject] }
+                ]
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
+
+        } catch (error) {
+            console.log(error);
             res.status(500).json({ error: 'server error', extra: error.message });
         };
 
