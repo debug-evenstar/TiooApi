@@ -43,6 +43,7 @@ const { InviteValidator, AcceptValidator } = require('./validators/StudentValida
 const UploadService = require('../services/upload.service');
 const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
+const PreferenceController = require('../controller/preference.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -221,6 +222,10 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.get('/logging', LoggingController.read);
     router.delete('/logging', LoggingController.clear);
+
+    router.post('/settings/preference', PreferenceController.create);
+    router.put('/settings/preference', PreferenceController.update);
+    router.get('/settings/preference', PreferenceController.read);
 
 };
 
