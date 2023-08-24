@@ -43,6 +43,7 @@ const { InviteValidator, AcceptValidator } = require('./validators/StudentValida
 const UploadService = require('../services/upload.service');
 const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
+const PreferenceController = require('../controller/preference.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -222,6 +223,10 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/logging', LoggingController.read);
     router.delete('/logging', LoggingController.clear);
 
+    router.post('/settings/preference', PreferenceController.create);
+    router.put('/settings/preference', PreferenceController.update);
+    router.get('/settings/preference', PreferenceController.read);
+
 };
 
 
@@ -258,12 +263,18 @@ const AdminRoutesGroup = (router) => {
 
     router.get('/admin/management/schools', AdminSchoolController.read);
     router.get('/admin/management/groupedLessons', AdminSchoolController.lessonsGroupedByClasses);
-    router.get('/admin/management/subjects/lessons', AdminSchoolController.lessonsGroupedBySubjects);
-    router.get('/admin/management/subject/lessons', AdminSchoolController.lessonsBySubjectId);
     router.get('/admin/management/lessons', AdminSchoolController.lessons);
     router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
     router.post('/admin/management/lessons/:id/template',   UploadService.uploadLessonTemplate.single('template'), AdminSchoolController.uploadLessonTemplate);
     router.get('/admin/management/lesson/:id/download', AdminSchoolController.downloadLessons)
+    router.get('/admin/management/subject/groups', AdminSchoolController.subjectGroups)
+    router.get('/admin/management/lesson/check', AdminSchoolController.subjectGroupedLessons);
+    router.put('/admin/management/lesson/:id/status', AdminSchoolController.adminUpdateLessonStatus);
+
+    router.get('/admin/management/subjects/lessons', AdminSchoolController.lessonsGroupedBySubjects);
+    router.get('/admin/management/subject/lessons', AdminSchoolController.lessonsBySubjectId);
+    router.get('/admin/management/subjects/lessons/count', AdminLibraryController.readLibraryMaterial);
+
 
     router.get('/admin/management/freelancers', AdminFreelancerController.read);
     router.get('/admin/management/freelancers/extra', AdminFreelancerController.readWithExtra);
@@ -273,6 +284,12 @@ const AdminRoutesGroup = (router) => {
 
     router.post('/admin/library',  UploadService.uploadLesson.single('file'), AdminLibraryController.create);
     router.get('/admin/library',  UploadService.uploadLesson.single('file'), AdminLibraryController.read);
+    router.delete('/admin/library/:id',  AdminLibraryController.deleteLibrary);
+    router.post('/admin/library/subject',  AdminLibraryController.libraryMaterial);
+    router.post('/admin/library/lesson',  UploadService.uploadLesson.single('file'), AdminLibraryController.createLibraryLesson);
+    router.get('/admin/library/lesson/check', AdminLibraryController.subjectGroupedLessons);
+
+
 };
 
 

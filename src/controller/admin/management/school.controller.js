@@ -365,15 +365,23 @@ class AdminSchoolController {
                 res.status(400).json({ error: 'No uploaded file' });
             }
 
-            const { id } = req.params;
+            // const { id } = req.params;
 
-            const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath);
+            const lessonInstance = await Lesson.findByPk(req.body.lesson_id);
+
+            const subjectInstance = await lessonInstance.getSubject();
+
+            const grade = lessonInstance.ClassId;
+
+            const subject = subjectInstance.naming;
+
+            console.log(grade, subject);
+
+             const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath, grade, subject);
 
             console.log('this is the slide response', slides);
 
             const parseSlides = [];
-
-            const lessonInstance = await Lesson.findByPk(id);
 
             const previousSlides = await lessonInstance.getLessonSlides({
                 orderBy: { slide_index: "asc" }
@@ -440,6 +448,7 @@ class AdminSchoolController {
 
 
     static async downloadLessons(req, res) {
+        
         try {
             const id = req.params.id;
             const {docs_index} = req.query;
@@ -450,14 +459,20 @@ class AdminSchoolController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'Lesson not found' });
             }
 
-            const parsedPathArray = JSON.parse(lessonInstance.files);
+            let parsedPathArray 
 
+            if(process.env.ENVIRONMENT){
+                parsedPathArray = JSON.parse(lessonInstance.files);
+            }else{
+                parsedPathArray = lessonInstance.files;
+            }
+
+          
             if (parsedPathArray.length === 0) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No files associated with this lesson' });
             }
 
             // const absoluteFilesDirectory = path.resolve(__dirname, '..', '..', '..', '..', 'public', 'lessons');
-
             const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`)
 
             let filePath;
@@ -469,8 +484,6 @@ class AdminSchoolController {
             }else{
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No document with this index' });
             }
-
-            console.log(`${appRoot}\\public\\lessons`);
 
             res.download(
                 filePath,
@@ -490,6 +503,83 @@ class AdminSchoolController {
         }
     }
 
+
+        static async subjectGroups(req, res) {
+
+        try {
+
+            const subjectInstance = await Subject.findByPk(req.query.subject_id);
+
+            const lessonInstances = await subjectInstance.getGroups({
+                include: [
+                    {
+                        model: ClassArm,
+                        attributes: ['id', 'naming'],
+                        through: { attributes: [] },
+                    }]
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+    static async subjectGroupedLessons(req, res) {
+
+        try {
+
+            const subjectInstance = await Subject.findByPk(req.query.subject_id);
+
+
+            const whereClause = req.query.class_id ? { ref_cid: req.query.class_id } : {};
+
+            const lessonInstances = await subjectInstance.getGroups({
+                where: whereClause,
+                include: [
+                    {
+                        model: ClassArm,
+                        attributes: ['id', 'naming'],
+                        through: { attributes: [] },
+                    }, Lesson]
+            });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+    static async adminUpdateLessonStatus(req, res){
+        
+        const {id} = req.params;
+        const data = req.query;
+
+        try {
+            
+        const lessonInstance = await Lesson.findByPk(id);
+
+         const response = await lessonInstance.update({admin_status: data.status});
+
+        return res.status(ResponseStatus.code.success).json({
+            error: false,
+            message: ResponseStatus.pass.read,
+            data: response
+        });
+
+
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
 
 
 

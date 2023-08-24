@@ -38,13 +38,13 @@ class LessonTemplateProvider {
         return response?.data ?? errorResponse.data;
     }
 
-    async loadLessonSlidesFromTemplate(file) {
+    async loadLessonSlidesFromTemplate(file, grade, subject) {
 
         const body = new FormData();
 
         body.append('template', fs.createReadStream(file));
-        body.append('subject', "Subject here");
-        body.append('grade', "Grade here");
+        body.append('subject', subject);
+        body.append('grade', grade);
         
         const path = "lesson/template/read";
         let errorResponse = {};
