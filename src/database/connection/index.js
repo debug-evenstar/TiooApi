@@ -50,11 +50,12 @@ const Group = db.groups = require("../groups.model")(sequelize, Sequelize);
 const LessonSlide = db.lessonslides = require("../lesson.slides.model")(sequelize, Sequelize);
 
 const Preference = db.preferences = require("../preference.model")(sequelize, Sequelize);
+const Billing = db.billings = require("../billing.model")(sequelize, Sequelize);
 
 
 
 
-const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group, LessonSlide, Preference]
+const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group, LessonSlide, Preference, Billing]
 
 Relationships.group(...models);
 
@@ -82,5 +83,6 @@ module.exports = {
   TotalLog,
   Group,
   LessonSlide,
-  Preference
+  Preference,
+  Billing
 };
