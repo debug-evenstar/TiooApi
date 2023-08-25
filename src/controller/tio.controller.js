@@ -13,7 +13,7 @@ class TioController {
 
         const data = {
             name: "Tio Academy",
-            email:  ResponseStatus.tio.email,
+            email: ResponseStatus.tio.email,
             admin: "Developer",
             phone: "09083674873",
             school: "Tio Academy",
@@ -25,16 +25,22 @@ class TioController {
         }
 
         const tioData = {
-            email:  ResponseStatus.tio.email,
+            email: ResponseStatus.tio.email,
             school_types: ["Level"],
             naming_types: "C",
             class_namings: [
-                { "type": "custome", "naming": "Level 1" },
-                { "type": "custome", "naming": "Level 2" },
-                { "type": "custome", "naming": "Level 3" },
-                { "type": "custome", "naming": "Level 4" },
-                { "type": "custome", "naming": "Level 5" },
-                { "type": "custome", "naming": "Level 6" }
+                { "type": "custome", "naming": "Grade 1" },
+                { "type": "custome", "naming": "Grade 2" },
+                { "type": "custome", "naming": "Grade 3" },
+                { "type": "custome", "naming": "Grade 4" },
+                { "type": "custome", "naming": "Grade 5" },
+                { "type": "custome", "naming": "Grade 6" },
+                { "type": "custome", "naming": "Grade 7" },
+                { "type": "custome", "naming": "Grade 8" },
+                { "type": "custome", "naming": "Grade 9" },
+                { "type": "custome", "naming": "Grade 10" },
+                { "type": "custome", "naming": "Grade 11" },
+                { "type": "custome", "naming": "Grade 12" },
             ]
         }
 
@@ -93,7 +99,7 @@ class TioController {
 
             if (updatedTioSchool) {
 
-                 // GENERATE CLASSES ARMS FOR EACH CLASSESS
+                // GENERATE CLASSES ARMS FOR EACH CLASSESS
 
                 const classes = updatedTioSchool.Classes;
                 let generatedClassArms = [];
@@ -111,7 +117,7 @@ class TioController {
 
                 }
 
-                 // GENERATE SUBJECTS
+                // GENERATE SUBJECTS
 
                 for (let index = 0; index < tioSubjeects.length; index++) {
 
@@ -136,7 +142,7 @@ class TioController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     };
@@ -164,7 +170,7 @@ class TioController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -177,7 +183,7 @@ class TioController {
 
         try {
 
-            const AccountInstance = await Account.findOne({ where: { email:  ResponseStatus.tio.email } });
+            const AccountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
             if (!AccountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -187,25 +193,25 @@ class TioController {
             if (!SchoolInstances) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
-            const subjectInstance = await SchoolInstances.getSubjects({ attributes: { exclude: ['SchoolManagementId'] }});
+            const subjectInstance = await SchoolInstances.getSubjects({ attributes: { exclude: ['SchoolManagementId'] } });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectInstance });
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
 
 
-      /*-----------------------------------| TIO AVAILABLE SUBJECTS |-----------------------------------*/
+    /*-----------------------------------| TIO AVAILABLE SUBJECTS |-----------------------------------*/
 
-      static async subjectsLessons(req, res) {
+    static async subjectsLessons(req, res) {
 
         try {
 
-            const AccountInstance = await Account.findOne({ where: { email:  ResponseStatus.tio.email } });
+            const AccountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
             if (!AccountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -215,13 +221,13 @@ class TioController {
             if (!SchoolInstances) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
-            const subjectInstance = await SchoolInstances.getSubjects({ attributes: { exclude: ['SchoolManagementId'] }, include: [Lesson]});
+            const subjectInstance = await SchoolInstances.getSubjects({ attributes: { exclude: ['SchoolManagementId'] }, include: [Lesson] });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectInstance });
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }

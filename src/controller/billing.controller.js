@@ -97,9 +97,9 @@ class BillingController {
 
             const billingInstance = await Billing.create(req.body);
 
-            await accountInstance.addBilling(billingInstance);
+            const response = await accountInstance.addBillings(billingInstance);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: pricing });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
 
         } catch (error) {
             console.log(error);

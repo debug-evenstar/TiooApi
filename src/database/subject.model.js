@@ -17,9 +17,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
-            age: {
-                type: DataTypes.INTEGER,
+            ages: {
+                type: DataTypes.JSON,
                 allowNull: true,
+                defaultValue: [],
             },
             library: {
                 type: DataTypes.BOOLEAN,
