@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
             status: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                defaultValue: 'completed',
+                defaultValue: 'pending',
             },
 
             billing_id: {

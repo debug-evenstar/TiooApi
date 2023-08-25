@@ -9,7 +9,6 @@ class BillingController {
 
         const account_id = req.query.account_id ? req.query.account_id : id;
 
-
         try {
 
             let pricing;
@@ -90,6 +89,18 @@ class BillingController {
 
 
     static async generateBill(req, res) {
+
+        const today = new Date();
+        const studentDaysAhead = new Date();
+        const teacherDaysAhead = new Date();
+        studentDaysAhead.setDate(today.getDate() + req.body.student_month_convered);
+        teacherDaysAhead.setDate(today.getDate() + req.body.teachers_month_convered);
+
+        req.body.student_expiry = teacherDaysAhead;
+        req.body.teacher_expiry = studentDaysAhead;
+
+        console.log(req.body.student_expiry);
+        console.log(req.body.teacher_expiry);
 
         try {
 
