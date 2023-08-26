@@ -714,6 +714,98 @@ class StudentController {
             };
         }
 
+    
+    
+    /*-----------------------------------| READ KYC DATA |-----------------------------------*/
+
+    static async personalInformation(req, res) {
+
+        const { id } = req.userData
+
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
+        try {
+
+            const accountInstance = await Account.findByPk(parseInt(account_id));
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const studentInstance = await accountInstance.getStudent({include: [SchoolManagement, Class]});
+
+            if (!studentInstance) {
+                return res.status(ResponseStatus.code.unauthorized).json({error: true, message: ResponseStatus.fail.unauthorized });
+            }
+
+            const payload = {
+                account_id: accountInstance.id,
+                fullname: accountInstance.name,
+                phone: accountInstance.phone,
+                school: studentInstance.SchoolManagement.school_name,
+                class: studentInstance.Class.naming,
+                age: studentInstance.age !== null ? studentInstance.age : 0,
+                address: studentInstance.residentialAddress,
+                gender: studentInstance.gender,
+                country: studentInstance.country,
+                nationality: studentInstance.nationality
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+    }
+
+
+        /*-----------------------------------| READ PERSONAL INFORMATION |-----------------------------------*/
+
+        static async updatePersonalInformation(req, res) {
+
+            const { id } = req.userData
+    
+            const account_id = req.query.account_id ? req.query.account_id : id;
+    
+            try {
+    
+                const accountInstance = await Account.findByPk(parseInt(account_id));
+    
+                if (!accountInstance) {
+                    return res.status(ResponseStatus.code.not_found).json({error: true, message: ResponseStatus.fail.not_found });
+                }
+    
+                const studentInstance = await accountInstance.getStudent({include: [SchoolManagement, Class]});
+    
+                if (!studentInstance) {
+                    return res.status(ResponseStatus.code.unauthorized).json({error: true, message: ResponseStatus.fail.unauthorized });
+                }
+
+                await accountInstance.update(req.body);
+                await studentInstance.update(req.body);
+    
+                const payload = {
+                    account_id: accountInstance.id,
+                    fullname: accountInstance.name,
+                    phone: accountInstance.phone,
+                    school: studentInstance.SchoolManagement.school_name,
+                    class: studentInstance.Class.naming,
+                    age: studentInstance.age !== null ? studentInstance.age : 0,
+                    address: studentInstance.residentialAddress,
+                    gender: studentInstance.gender,
+                    country: studentInstance.country,
+                    nationality: studentInstance.nationality
+                }
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'server error' ,  extra: error.message });
+            };
+        }
+
 }
 
 module.exports = StudentController;
