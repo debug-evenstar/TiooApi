@@ -225,7 +225,7 @@ class BillingController {
 
             const response = await accountInstance.addBillings(billingInstance);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: billingInstance });
 
         } catch (error) {
             console.log(error);
