@@ -96,6 +96,8 @@ const OpenRoutesGroup = (router) => {
     router.post('/actions/sync', ActionController.syncDB);
     router.delete('/actions/superadmin', ActionController.cleanAdmin);
 
+    router.post('/coupon/apply', CouponController.apply);
+
 };
 
 
