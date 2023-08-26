@@ -549,20 +549,27 @@ class StudentController {
 
     static async studentMates(req, res) {
 
-        const { id } = req.userData;
+        const { id } = req.userData
+
+        const account_id = req.query.account_id ? req.query.account_id : id;
 
         try {
 
-            const classStudents = await Student.findByPk(id);
+            const studentAccountInstance = await Account.findByPk(account_id);
+
+            const classStudents = await studentAccountInstance.getStudent();
 
             const studentClass = await classStudents.getClass();
 
             const classMates = await studentClass.getStudents();
 
-            const classMatesAccount = await Promise.all(classMates.map(async (profile) => {
-                const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
-                return teachers;
+            const filterclassMates = classMates.filter((element)=> element.id != classStudents.id)
 
+            const classMatesAccount = await Promise.all(filterclassMates.map(async (profile) => {
+
+                    const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                    return teachers;
+              
             }));
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classMatesAccount });
