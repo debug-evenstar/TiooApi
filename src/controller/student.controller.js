@@ -521,9 +521,18 @@ class StudentController {
 
         const { id } = req.userData;
 
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
         try {
 
-            const classStudents = await Student.findByPk(id);
+
+            const studentAccountInstance = await Account.findByPk(account_id);
+
+            const classStudents = await studentAccountInstance.getStudent();
+            
+            if (!classStudents) {
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.unauthorized });
+            }
 
             const studentClass = await classStudents.getClass();
 
@@ -558,6 +567,10 @@ class StudentController {
             const studentAccountInstance = await Account.findByPk(account_id);
 
             const classStudents = await studentAccountInstance.getStudent();
+
+            if (!classStudents) {
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.unauthorized });
+            }
 
             const studentClass = await classStudents.getClass();
 
