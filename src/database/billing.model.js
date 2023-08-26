@@ -27,6 +27,11 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 defaultValue: 'paystack',
             },
+            coupon: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                defaultValue: 'none',
+            },
             type: {
                 type: DataTypes.STRING,
                 allowNull: false,
@@ -39,11 +44,11 @@ module.exports = (sequelize, DataTypes) => {
             },
             student_convered: {
                 type: DataTypes.INTEGER,
-                defaultValue: 1,
+                defaultValue: 0,
             },
             teachers_convered: {
                 type: DataTypes.INTEGER,
-                defaultValue: 1,
+                defaultValue: 0,
             },
             student_month_convered: {
                 type: DataTypes.INTEGER,
