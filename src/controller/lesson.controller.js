@@ -104,6 +104,7 @@ class LessonController {
             const chapterInstance = await chapter.save();
 
             const classInstance = await Class.findByPk(groupInstance.ref_cid);
+            const classArms = await groupInstance.getClassArms();
 
             await subjectInstance.addChapter(chapterInstance);
 
@@ -114,6 +115,8 @@ class LessonController {
             await groupInstance.addLesson(lessonInstance);
 
             await subjectInstance.addGroup(groupInstance);
+
+            await lessonInstance.addClassArms(classArms);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
 
