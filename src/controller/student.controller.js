@@ -521,9 +521,18 @@ class StudentController {
 
         const { id } = req.userData;
 
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
         try {
 
-            const classStudents = await Student.findByPk(id);
+
+            const studentAccountInstance = await Account.findByPk(account_id);
+
+            const classStudents = await studentAccountInstance.getStudent();
+            
+            if (!classStudents) {
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.unauthorized });
+            }
 
             const studentClass = await classStudents.getClass();
 
@@ -549,20 +558,31 @@ class StudentController {
 
     static async studentMates(req, res) {
 
-        const { id } = req.userData;
+        const { id } = req.userData
+
+        const account_id = req.query.account_id ? req.query.account_id : id;
 
         try {
 
-            const classStudents = await Student.findByPk(id);
+            const studentAccountInstance = await Account.findByPk(account_id);
+
+            const classStudents = await studentAccountInstance.getStudent();
+
+            if (!classStudents) {
+                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.unauthorized });
+            }
 
             const studentClass = await classStudents.getClass();
 
             const classMates = await studentClass.getStudents();
 
-            const classMatesAccount = await Promise.all(classMates.map(async (profile) => {
-                const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
-                return teachers;
+            const filterclassMates = classMates.filter((element)=> element.id != classStudents.id)
 
+            const classMatesAccount = await Promise.all(filterclassMates.map(async (profile) => {
+
+                    const teachers = await profile.getAccount({ attributes: { exclude: ['password', 'createdAt'], include: '' } });
+                    return teachers;
+              
             }));
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classMatesAccount });
@@ -707,6 +727,98 @@ class StudentController {
                 }
     
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: { token: generatedToken } });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'server error' ,  extra: error.message });
+            };
+        }
+
+    
+    
+    /*-----------------------------------| READ KYC DATA |-----------------------------------*/
+
+    static async personalInformation(req, res) {
+
+        const { id } = req.userData
+
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
+        try {
+
+            const accountInstance = await Account.findByPk(parseInt(account_id));
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const studentInstance = await accountInstance.getStudent({include: [SchoolManagement, Class]});
+
+            if (!studentInstance) {
+                return res.status(ResponseStatus.code.unauthorized).json({error: true, message: ResponseStatus.fail.unauthorized });
+            }
+
+            const payload = {
+                account_id: accountInstance.id,
+                fullname: accountInstance.name,
+                phone: accountInstance.phone,
+                school: studentInstance.SchoolManagement.school_name,
+                class: studentInstance.Class.naming,
+                age: studentInstance.age !== null ? studentInstance.age : 0,
+                address: studentInstance.residentialAddress,
+                gender: studentInstance.gender,
+                country: studentInstance.country,
+                nationality: studentInstance.nationality
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+    }
+
+
+        /*-----------------------------------| READ PERSONAL INFORMATION |-----------------------------------*/
+
+        static async updatePersonalInformation(req, res) {
+
+            const { id } = req.userData
+    
+            const account_id = req.query.account_id ? req.query.account_id : id;
+    
+            try {
+    
+                const accountInstance = await Account.findByPk(parseInt(account_id));
+    
+                if (!accountInstance) {
+                    return res.status(ResponseStatus.code.not_found).json({error: true, message: ResponseStatus.fail.not_found });
+                }
+    
+                const studentInstance = await accountInstance.getStudent({include: [SchoolManagement, Class]});
+    
+                if (!studentInstance) {
+                    return res.status(ResponseStatus.code.unauthorized).json({error: true, message: ResponseStatus.fail.unauthorized });
+                }
+
+                await accountInstance.update(req.body);
+                await studentInstance.update(req.body);
+    
+                const payload = {
+                    account_id: accountInstance.id,
+                    fullname: accountInstance.name,
+                    phone: accountInstance.phone,
+                    school: studentInstance.SchoolManagement.school_name,
+                    class: studentInstance.Class.naming,
+                    age: studentInstance.age !== null ? studentInstance.age : 0,
+                    address: studentInstance.residentialAddress,
+                    gender: studentInstance.gender,
+                    country: studentInstance.country,
+                    nationality: studentInstance.nationality
+                }
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
     
             } catch (error) {
                 console.log(error);

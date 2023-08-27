@@ -37,7 +37,7 @@ class CouponController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -66,7 +66,7 @@ class CouponController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -108,7 +108,7 @@ class CouponController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -138,7 +138,7 @@ class CouponController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -168,7 +168,53 @@ class CouponController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+    /*-----------------------------------| UPDATE COUPON |-----------------------------------*/
+
+    static async apply(req, res) {
+
+        const data = req.body;
+
+        try {
+
+            const couponInstances = await Coupon.findOne({ where: { code: req.body.code }, include: [Account] });
+
+            if (!couponInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            if (couponInstances.status != 'Active') {
+                return res.status(ResponseStatus.code.forbidden).json({ error: true, message: 'Token is not active' });
+            }
+
+            const accessibilty = couponInstances.Accounts.filter((element) => element.id == req.body.account);
+
+
+            if (accessibilty.length == 0) {
+                return res.status(ResponseStatus.code.forbidden).json({ error: true, message: 'This user is not covered by this coupon' });
+            }
+
+            const response = {
+                "campaign": couponInstances.campaign,
+                "code": couponInstances.code,
+                "status": couponInstances.status,
+                "amount": couponInstances.amount,
+            }
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: response
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }

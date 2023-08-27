@@ -11,11 +11,15 @@ module.exports = (sequelize, DataTypes) => {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            dateOfBirth: {
-                type: DataTypes.DATE,
+            residentialAddress: {
+                type: DataTypes.STRING,
                 allowNull: true,
             },
             gender: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            country: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
@@ -23,10 +27,11 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
-            residentialAddress: {
-                type: DataTypes.STRING,
+
+            age: {
+                type: DataTypes.INTEGER,
                 allowNull: true,
-            },
+            }, 
 
             parent: {
                 type: DataTypes.STRING,
@@ -40,16 +45,8 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
-            age: {
-                type: DataTypes.INTEGER,
-                allowNull: true,
-            },
-        
-            //=========== IDENTIFICATION DOCUMENT =========// 
-            passportNumber: {
-                type: DataTypes.STRING,
-                allowNull: true,
-            },
+   
+      
         }, {
         timestamps: false,
     });
