@@ -711,6 +711,43 @@ class AuthController {
 
     }
 
+
+    
+    /*-----------------------------------| ACCOUNT CHANGE PASSWORD |-----------------------------------*/
+
+    static async accountChangePassword(req, res) {
+
+        const { id } = req.userData;
+
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
+        try {
+
+            const studentAccountInstance = await Account.findByPk(account_id);
+
+            if (!studentAccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const isValidPassword = await studentAccountInstance.comparePassword(req.body.current_password)
+
+            if (!isValidPassword) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Current Password is incorrect"});
+            }
+
+            const hashPassword = await studentAccountInstance.hashPassword(req.body.new_password);
+
+            const response = await studentAccountInstance.update({ password: hashPassword });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
     /*-----------------------------------| SEND TEMP. OTP |-----------------------------------*/
 
     static async sendTempOTP(req, res) {
