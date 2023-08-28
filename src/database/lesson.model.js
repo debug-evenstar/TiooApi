@@ -49,13 +49,13 @@ module.exports = (sequelize, Sequelize) => {
       status: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: 'active',
+        defaultValue: 'unlocked',
         get() {
           const start = this.getDataValue('start_date');
           const end = this.getDataValue('end_date');
           const currentDate = new Date();
           if (start <= currentDate && currentDate <= end) {
-            return 'active';
+            return 'unlocked';
           }
           return this.getDataValue('status');
       },
