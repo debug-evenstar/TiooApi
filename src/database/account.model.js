@@ -26,6 +26,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         defaultValue: 'school',
       },
+      display_image: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: ""
+      },
       verification_status: {
         type: Sequelize.INTEGER,
         defaultValue: 0,
@@ -44,8 +49,8 @@ module.exports = (sequelize, Sequelize) => {
       },
     },
     {
-      indexes:[
-        { unique : true, fields: ['email'] }
+      indexes: [
+        { unique: true, fields: ['email'] }
       ],
       timestamps: true,
       defaultScope: {

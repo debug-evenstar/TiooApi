@@ -10,6 +10,7 @@ const UploadService = require('../services/upload.service');
 const AutoMigrate = require("../migrations/automigrate");
 const AuthorizationSeed = require("../seeders/seed.authorization");
 const Logger = require("../middleware/logger.middleware");
+const path = require("path");
 
 
 class Server {
@@ -48,6 +49,8 @@ class Server {
                 console.log("Failed to sync db: " + err.message);
             });
 
+        app.use(express.static(path.join(__dirname, '../../public')));
+        
 
         app.use(Logger.monitor);
 
