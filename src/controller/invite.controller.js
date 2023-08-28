@@ -133,21 +133,20 @@ class InviteController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const linkedClassArms = JSON.parse(inviteInstance.classes);
+            let invitedClassArms;
 
-            const classArmsInstance = await ClassArm.findByPk(linkedClassArms[0], {
-                attributes: { exclude: ['ClassId'] }
-            });
-
+            if (process.env.ENVIRONMENT) {
+                 invitedClassArms = JSON.parse(inviteInstance.classarms);
+            } else {
+                 invitedClassArms = inviteInstance.classarms;
+            }
 
             const payload = {
                 "name": "",
                 "email": "",
                 "schoolId": inviteInstance.schoolId,
-                "arm": classArmsInstance
+                "arm": invitedClassArms[0]
             }
-
-            console.log(inviteInstance);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
