@@ -48,15 +48,26 @@ class InviteController {
 
         try {
 
+            const armInstance = await ClassArm.findByPk(req.body.arm);
+
+            if (!armInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'Invalid class arms Id' });
+            }
+
+            const classInstance  = await armInstance.getClass(); 
+
+            if (!classInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No class attached to this arms' });
+            }
+
             const body = {
                 "account_type": "student",
-                "classes": [req.body.arm],
+                "classes": [classInstance.id],
+                "classarms": [armInstance.id],
                 "subjects": [],
                 "schoolId": req.body.schoolId,
                 "code": InviteController.generateReferralCode(8)
             }
-
-            console.log(body);
 
             const inviteInstance = await Invite.create(body);
 
@@ -163,13 +174,16 @@ class InviteController {
 
             const invitedClasses = JSON.parse(inviteInstance.classes);
             const invitedClassArms = JSON.parse(inviteInstance.classarms);
+
+            console.log(inviteInstance);
+
             const subjects = await Subject.findAll({where: {id: [...inviteInstance.subjects]}, attributes :{exclude: ["SchoolManagementId"]}});
 
             const classes = await Class.findAll({where: {id: [...invitedClasses]}, attributes: {exclude: ["SchoolManagementId"]}});
             
             const classArms = await ClassArm.findAll({where: {id: [...invitedClassArms]}, attributes: {exclude: ["SchoolManagementId"]}});
 
-            console.log(inviteInstance.classes)
+            console.log(inviteInstance)
               
 
             let payload;
