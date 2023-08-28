@@ -116,6 +116,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
     router.get('/account/exist/:email', AuthenicationController.accountExist);
+    router.post('/account/profile/upload', UploadService.uploadDisplayPicture.single('file'), AuthenicationController.uploadDisplayPicture);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
 
     /* --------------------------------- SCHOOL --------------------------------- */
@@ -204,6 +205,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/subjects', StudentController.studentSubjects);
     router.get('/student/classteacher', StudentController.studentClassTeacher);
     router.get('/student/classmates', StudentController.studentMates);
+    router.get('/student/classteachersandmates', StudentController.studentClassTeachersAndMates);
     router.get('/student/classarmsmates', StudentController.studentArmsMates);
     router.get('/student/personalinfo', StudentController.personalInformation);
     router.put('/student/personalinfo', StudentController.updatePersonalInformation);
@@ -233,11 +235,15 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/settings/preference', PreferenceController.create);
     router.put('/settings/preference', PreferenceController.update);
     router.get('/settings/preference', PreferenceController.read);
+    router.post('/settings/student/preference', PreferenceController.setStudentPreference);
     router.get('/settings/billing/school', BillingController.school);
     router.get('/settings/billing/freelancer', BillingController.freelancer);
     router.get('/settings/billing/student', BillingController.student);
     router.post('/settings/billing/generate', BillingController.generateBill);
+    router.post('/settings/account/changepassword', AuthenicationController.accountChangePassword);
 
+    router.get('/settings/school/profile', SchoolManagementController.readProfile);
+    router.put('/settings/school/profile', SchoolManagementController.updateProfile);
 };
 
 
