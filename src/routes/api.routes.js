@@ -239,6 +239,9 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/settings/billing/student', BillingController.student);
     router.post('/settings/billing/generate', BillingController.generateBill);
     router.post('/settings/account/changepassword', AuthenicationController.accountChangePassword);
+
+    router.get('/settings/school/profile', SchoolManagementController.readProfile);
+    router.put('/settings/school/profile', SchoolManagementController.updateProfile);
 };
 
 
