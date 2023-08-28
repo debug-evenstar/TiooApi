@@ -205,6 +205,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/subjects', StudentController.studentSubjects);
     router.get('/student/classteacher', StudentController.studentClassTeacher);
     router.get('/student/classmates', StudentController.studentMates);
+    router.get('/student/classteachersandmates', StudentController.studentClassTeachersAndMates);
     router.get('/student/classarmsmates', StudentController.studentArmsMates);
     router.get('/student/personalinfo', StudentController.personalInformation);
     router.put('/student/personalinfo', StudentController.updatePersonalInformation);
