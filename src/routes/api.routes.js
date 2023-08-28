@@ -116,6 +116,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
     router.get('/account/exist/:email', AuthenicationController.accountExist);
+    router.post('/account/profile/upload', UploadService.uploadDisplayPicture.single('file'), AuthenicationController.uploadDisplayPicture);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
 
     /* --------------------------------- SCHOOL --------------------------------- */

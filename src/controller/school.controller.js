@@ -4,6 +4,8 @@ const { Account, Validation, SchoolManagement, Student, Class, ClassArm, Subject
 const AuthController = require('../controller/auth.controller');
 const ClassSeeds = require('../utils/class.utilities');
 const SchoolUtils = require('./helper/assignClass.helper');
+const path = require('path');
+
 
 class SchoolManagementController {
 
@@ -409,13 +411,15 @@ class SchoolManagementController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
 
+            const filePath = path.join(process.env.DEV, '', path.basename(accountInstance.display_image));   
+
             const payload = {
                 id: accountInstance.id,
                 name: accountInstance.name,
                 phone: accountInstance.phone,
                 email: accountInstance.email,
                 website: schoolInstance.website,
-                profile_picture: accountInstance.display_image ?? "https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png"
+                profile_picture: accountInstance.display_image ? filePath : "https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png"
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: payload });

@@ -5,6 +5,8 @@ const TokenMiddleware = require('../middleware/token.middleware');
 const Mailer = require('../services/mailer');
 require('dotenv').config();
 const { scryptSync, randomBytes, } = require('crypto');
+const path = require('path');
+
 
 const crypto = require('crypto');
 const { link } = require('fs');
@@ -1027,6 +1029,45 @@ class AuthController {
 
         Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { link }).send();
     }
+
+
+    static async uploadDisplayPicture(req, res) {
+
+        if (req.file) {
+            req.body.display_image = req.file.path;
+        }
+
+        const { id } = req.userData
+
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
+        try {
+
+            const accountInstance = await Account.findByPk(account_id);
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+           accountInstance.display_image  = req.body.display_image;
+
+           const response = await accountInstance.save()
+
+           const filePath = path.join(process.env.DEV, '', path.basename(response.display_image));   
+
+          const payload = {
+            image: filePath
+           }
+
+        return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: payload });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
 
 
 }
