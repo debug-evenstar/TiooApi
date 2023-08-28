@@ -328,6 +328,9 @@ class LessonController {
 
     static async upcomingNextWeeksLessons(req, res) {
 
+        const { id } = req.userData
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
         const today = new Date();
         const daysUntilNextMonday = (1 - today.getDay() + 7) % 7;
         const nextMonday = new Date(today);
@@ -339,7 +342,13 @@ class LessonController {
 
         try {
 
-            const allLessons = await Lesson.findAll({ attributes: ['topic', 'description', 'start_date', 'end_date'], });
+            const accountInstance = await Account.findByPk(account_id);
+
+            const studentInstance = await accountInstance.getStudent();
+
+            const classInstance = await studentInstance.getClass();
+
+            const allLessons = await  classInstance.getLessons({ attributes: ['topic', 'description', 'start_date', 'end_date'], });
 
             const lessonsWithinNextWeek = allLessons.filter((lesson) => {
                 const lessonStartDate = new Date(lesson.start_date);
