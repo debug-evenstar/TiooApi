@@ -132,6 +132,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/school/:id/terms', SchoolManagementController.schoolTerms);
     router.post('/school/kyc', UploadService.uploadLesson.array('files'), SchoolManagementController.kyc);
     router.post('/school/admin', SchoolManagementController.addSchoolAdminUser);
+    router.get('/school/admin/roles', SchoolManagementController.readSchoolRoles);
 
     /* ---------------------------------- CLASS --------------------------------- */
     router.post('/class/create', ClassController.create);

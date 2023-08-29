@@ -7,6 +7,8 @@ const SchoolUtils = require('./helper/assignClass.helper');
 const path = require('path');
 const AuthorizationSeed = require('../seeders/seed.authorization');
 const HashUtils = require('../utils/hash.utilities');
+const Mailer = require('../services/mailer');
+
 
 
 
@@ -474,6 +476,35 @@ class SchoolManagementController {
             console.log(error);
             res.status(500).json({ error: 'server error', extra: error.message });
         };
+
+    }
+
+    static async readSchoolRoles(req, res){
+        
+        try {
+
+        let permissions = await Permission.findAll({ where: { account: 'school' } });
+
+        if (permissions.length === 0 ) {
+
+          const respose = await AuthorizationSeed.schoolPermission();
+             
+           const data = await Permission.findAll({ where: { account: 'school' } });
+
+           permissions = data;
+
+        }
+
+        return res.status(ResponseStatus.code.success).json({
+            error: false,
+            message: ResponseStatus.pass.added,
+            data: permissions
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'server error', extra: error.message });
+    };
 
     }
 

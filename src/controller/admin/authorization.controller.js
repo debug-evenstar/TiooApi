@@ -181,10 +181,14 @@ class AuthorizationController {
                 permissions = await Permission.findAll();
             }
 
+            const filteredPermissions = permissions.filter(permission => {
+                return permission.account !== 'school'; // Not equal to 'school'
+            });
+
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read,
-                data: permissions
+                data: filteredPermissions
             });
 
         } catch (error) {
