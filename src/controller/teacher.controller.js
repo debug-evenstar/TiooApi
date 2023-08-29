@@ -59,7 +59,7 @@ class TeacherController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: "School is not tied to account" });
             }
 
-            Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteTeacher", { name: data.name, school: schoolInstance.name, Link: link }).send();
+            Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteTeacher", { name: data.name, school: schoolInstance.school_name, Link: link }).send();
 
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.create, response: ResponseStatus.pass.send_invite,
@@ -227,7 +227,7 @@ class TeacherController {
 
             const schoolAccount = await school.getAccount({ joinTableAttributes: [] });
 
-            Mailer().to(accountInstance.email).from(process.env.MAIL_FROM, "Praxeum").subject("Thank You").template("emails.welcomeStudent", { name: data.name, school: schoolAccount.dataValues.name, Link: link }).send();
+            Mailer().to(accountInstance.email).from(process.env.MAIL_FROM, "Praxeum").subject("Thank You").template("emails.welcomeStudent", { name: data.name, school: school.school_name, Link: link }).send();
 
             //TODO: Send Invite Email with this response id or email;
             return res.status(ResponseStatus.code.success).json({
