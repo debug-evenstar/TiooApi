@@ -604,6 +604,9 @@ class SchoolManagementController {
             const admins = await schoolInstance.getAuthorizations({include: Account });
 
             const response = await Promise.all(admins.map( async (element)=>{
+
+
+
                 
                 const data = {
                     id: element.id,
@@ -632,6 +635,83 @@ class SchoolManagementController {
         };
 
     }
+
+
+    
+    /*-----------------------------------| DE ACTIVATE ADMIN |-----------------------------------*/
+
+    static async deactivateAdmin(req, res) {
+
+      const {id} = req.params;
+
+        try {
+
+            const user = await Account.findByPk(id);
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            if (user.account_type != 'Admin') {
+                return res.status(ResponseStatus.code.forbidden).json({ error: true, message: ResponseStatus.fail.forbidden });
+            }
+
+            const response = await user.update({ status: user.status == 'active' ? 'inactive': 'active' });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: {status: response.status} });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+
+    }
+
+
+        /*-----------------------------------| REMOVE ADMIN |-----------------------------------*/
+
+        static async removeAdmin(req, res) {
+
+            const {id} = req.params;
+      
+              try {
+      
+                  const user = await Account.findByPk(id);
+
+               
+      
+                  if (!user) {
+                      return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+                  }
+      
+                  if (user.account_type != 'Admin') {
+                      return res.status(ResponseStatus.code.forbidden).json({ error: true, message: ResponseStatus.fail.forbidden });
+                  }
+
+                  const authorization = await user.getAuthorization();
+
+
+                  if (!authorization) {
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Admin has no authorizatioin" });
+                }
+    
+      
+                const data =  await user.destroy();
+
+                const auth = await authorization.destroy();
+
+                const pass = {
+                    user: data,
+                    auth: auth
+                };
+      
+                  return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed, data: {}});
+      
+              } catch (error) {
+                  res.status(500).json({ error: 'server error' ,  extra: error.message });
+              };
+      
+          }
+
 }
 
 
