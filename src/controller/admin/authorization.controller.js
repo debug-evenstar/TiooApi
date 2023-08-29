@@ -58,7 +58,7 @@ class AuthorizationController {
 
             const authorization = await Authorization.create(authorizationData);
 
-            authorization.setAdmin(registeredAdmin);
+            await authorization.setAdmin(registeredAdmin);
 
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
 

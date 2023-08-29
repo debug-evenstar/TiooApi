@@ -63,7 +63,7 @@ module.exports = (sequelize, Sequelize) => {
       admin_status: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: 'active',
+        defaultValue: 'locked',
       },
       published: {
         type: Sequelize.INTEGER,

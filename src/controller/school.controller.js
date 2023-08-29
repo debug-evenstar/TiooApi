@@ -1,10 +1,13 @@
 const { validationResult, body } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Student, Class, ClassArm, Subject } = require('../database/connection');
+const { Account, Validation, SchoolManagement, Student, Class, ClassArm, Subject, Permission, Authorization } = require('../database/connection');
 const AuthController = require('../controller/auth.controller');
 const ClassSeeds = require('../utils/class.utilities');
 const SchoolUtils = require('./helper/assignClass.helper');
 const path = require('path');
+const AuthorizationSeed = require('../seeders/seed.authorization');
+const HashUtils = require('../utils/hash.utilities');
+
 
 
 class SchoolManagementController {
@@ -411,7 +414,7 @@ class SchoolManagementController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
 
-            const filePath = path.join(process.env.DEV, '', path.basename(accountInstance.display_image));   
+            const filePath = path.join(process.env.DEV, '', path.basename(accountInstance.display_image));
 
             const payload = {
                 id: accountInstance.id,
@@ -454,7 +457,7 @@ class SchoolManagementController {
             schoolInstance.school_name = req.body.name;
 
             const account = await accountInstance.save();
-            const school =  await schoolInstance.save();
+            const school = await schoolInstance.save();
 
             const payload = {
                 id: account.id,
@@ -466,6 +469,81 @@ class SchoolManagementController {
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+    static async addSchoolAdminUser(req, res) {
+
+        const otp = Math.floor(Math.random() * 900000) + 100000;
+        const data = req.body;
+        const errors = validationResult(req);
+
+        const password = HashUtils.generateRandomPassword(6)
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const adminAccount = await Account.findOne({ where: { email: data.email } });
+
+            if (adminAccount) {
+                return res.status(ResponseStatus.code.conflict).json({ error: true, message: "Already an admin user" });
+            }
+
+            data.password = password;
+            data.account_type = 'Admin';
+            data.flag = 'active';
+            data.status = 'active';
+            data.verification_status = 1;
+
+            const registeredAdmin = await Account.create(data);
+            const newValidation = await Validation.create({ otp });
+            await registeredAdmin.setValidation(newValidation);
+
+            let seededPermissions = await Permission.findAll();
+
+            let permissions = await Permission.findAll({ where: { id: data.roles } });
+
+            if (seededPermissions.length === 0) {
+                await AuthorizationSeed.permission();
+                permissions = await Permission.findAll({ where: { id: data.roles } });
+            }
+
+            const permission_code = permissions.map((permission) => permission.code);
+
+            const authorizationData = {
+                position: 'school-admin',
+                role: 'admin',
+                permissions: permission_code
+            };
+
+            const authorization = await Authorization.create(authorizationData);
+
+            const schoolAccount = await Account.findByPk(data.school);
+
+            const schoolInstance = await schoolAccount.getSchoolManagement();
+
+           const response =  await schoolInstance.addAuthorization(authorization);
+
+           await authorization.setAccount(registeredAdmin);
+
+            console.log("this is the new admin password", password)
+
+           Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.added,
+                data: response
+            });
 
         } catch (error) {
             console.log(error);
