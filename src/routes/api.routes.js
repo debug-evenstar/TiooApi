@@ -131,6 +131,12 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/school/teachers/:id', SchoolManagementController.schoolTeachers);
     router.get('/school/:id/terms', SchoolManagementController.schoolTerms);
     router.post('/school/kyc', UploadService.uploadLesson.array('files'), SchoolManagementController.kyc);
+    router.post('/school/admin', SchoolManagementController.addSchoolAdminUser);
+    router.delete('/school/admin/:id', SchoolManagementController.removeAdmin);
+    router.get('/school/admin', SchoolManagementController.readSchoolAdmins);
+    router.get('/school/admin/roles', SchoolManagementController.readSchoolRoles);
+    router.post('/school/admin/:id/deactivate', SchoolManagementController.deactivateAdmin);
+
     /* ---------------------------------- CLASS --------------------------------- */
     router.post('/class/create', ClassController.create);
     router.post('/class/create_bulk', ClassController.bulkCreate);

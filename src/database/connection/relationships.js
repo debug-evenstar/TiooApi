@@ -44,6 +44,10 @@ class Relationships {
         SchoolManagement.hasMany(Class);
         Class.belongsTo(SchoolManagement);
 
+        
+        SchoolManagement.hasMany(Authorization);
+        Authorization.belongsTo(SchoolManagement);
+
         Subject.hasMany(Group);
         Group.belongsTo(Subject);
         
