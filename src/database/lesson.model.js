@@ -49,13 +49,13 @@ module.exports = (sequelize, Sequelize) => {
       status: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: 'unlocked',
+        defaultValue: 'Unlocked',
         get() {
           const start = this.getDataValue('start_date');
           const end = this.getDataValue('end_date');
           const currentDate = new Date();
           if (start <= currentDate && currentDate <= end) {
-            return 'unlocked';
+            return 'Unlocked';
           }
           return this.getDataValue('status');
       },
@@ -63,7 +63,7 @@ module.exports = (sequelize, Sequelize) => {
       admin_status: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: 'locked',
+        defaultValue: 'Locked',
       },
       published: {
         type: Sequelize.INTEGER,
