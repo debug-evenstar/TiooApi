@@ -582,6 +582,56 @@ class SchoolManagementController {
         };
 
     }
+
+
+
+    static async readSchoolAdmins(req, res) {
+
+        const { id } = req.userData
+
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
+        try {
+
+            const schoolAccount = await Account.findByPk(account_id);
+
+            if (!schoolAccount) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found});
+            }
+
+            const schoolInstance = await schoolAccount.getSchoolManagement();
+
+            const admins = await schoolInstance.getAuthorizations({include: Account });
+
+            const response = await Promise.all(admins.map( async (element)=>{
+                
+                const data = {
+                    id: element.id,
+                    account_id: element.Account.dataValues.id,
+                    name:  element.Account.dataValues.name,
+                    email:  element.Account.dataValues.email,
+                    image:  element.Account.dataValues.display_image,
+                    status:  element.Account.dataValues.status,
+                    roles: element.permissions
+                };
+
+                return data
+            }))
+
+
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.added,
+                data: response
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
 }
 
 

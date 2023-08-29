@@ -81,7 +81,9 @@ class AuthorizationController {
 
         try {
 
-            const authorization = await Authorization.findAll();
+            const authorization = await Authorization.findAll({where: {AccountId: null}});
+
+            console.log(authorization);
 
             const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
                 const userdata = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'] } });
