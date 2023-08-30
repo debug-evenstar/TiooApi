@@ -6,6 +6,8 @@ const fs = require('fs-extra');
 const path = require('path');
 const Docxtemplater = require('docxtemplater');
 const docx = require('docx');
+const Sequelize = require('sequelize');
+
 
 
 class LessonController {
@@ -539,7 +541,15 @@ class LessonController {
 
         try {
 
-            const lessonInstance = await Lesson.findAll();
+            // const lessonInstance = await Lesson.findAll();
+
+            const lessonInstance = await Lesson.findAll({
+                where: {
+                  ClassId: {
+                    [Sequelize.Op.not]: null
+                  }
+                }
+              });
 
             const loads = await Promise.all(lessonInstance.map(async (lesson) => {
 
