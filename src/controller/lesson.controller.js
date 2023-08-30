@@ -2,6 +2,11 @@ const ResponseStatus = require("../config/message.config");
 const { validationResult, param } = require('express-validator');
 const { Lesson, Subject, Chapter, Class, ClassArm, Group, LessonSlide, Account } = require("../database/connection");
 
+const fs = require('fs-extra');
+const path = require('path');
+const Docxtemplater = require('docxtemplater');
+const docx = require('docx');
+
 
 class LessonController {
 
@@ -158,11 +163,11 @@ class LessonController {
 
             const lesson = await Lesson.findByPk(req.params.id);
 
-            if(!lesson) {
-                res.status(400).json({error : "Lesson not found" });
+            if (!lesson) {
+                res.status(400).json({ error: "Lesson not found" });
             }
 
-            const lessonUpdate = await Lesson.update(req.body,{ where : {id : req.params.id} });
+            const lessonUpdate = await Lesson.update(req.body, { where: { id: req.params.id } });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: lessonUpdate });
 
@@ -250,7 +255,7 @@ class LessonController {
 
             const subjectInstance = await Subject.findByPk(body.subject);
 
-            if(!subjectInstance){
+            if (!subjectInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
 
             }
@@ -351,7 +356,7 @@ class LessonController {
 
             const classInstance = await studentInstance.getClass();
 
-            const allLessons = await  classInstance.getLessons({ attributes: ['topic', 'description', 'start_date', 'end_date'], });
+            const allLessons = await classInstance.getLessons({ attributes: ['topic', 'description', 'start_date', 'end_date'], });
 
             const lessonsWithinNextWeek = allLessons.filter((lesson) => {
                 const lessonStartDate = new Date(lesson.start_date);
@@ -372,49 +377,49 @@ class LessonController {
 
     }
 
-        /*-----------------------------------| NEXT WEEKS LESSON |-----------------------------------*/
+    /*-----------------------------------| NEXT WEEKS LESSON |-----------------------------------*/
 
-        static async studentUpcomingNextWeeksLessons(req, res) {
+    static async studentUpcomingNextWeeksLessons(req, res) {
 
-            const today = new Date();
-            const daysUntilNextMonday = (1 - today.getDay() + 7) % 7;
-            const nextMonday = new Date(today);
-            nextMonday.setDate(today.getDate() + daysUntilNextMonday);
-    
-            const daysUntilNextSunday = (7 - nextMonday.getDay()) % 7;
-            const nextSunday = new Date(nextMonday);
-            nextSunday.setDate(nextMonday.getDate() + daysUntilNextSunday);
-    
-            try {
+        const today = new Date();
+        const daysUntilNextMonday = (1 - today.getDay() + 7) % 7;
+        const nextMonday = new Date(today);
+        nextMonday.setDate(today.getDate() + daysUntilNextMonday);
 
-                const{id} = req.userData;
+        const daysUntilNextSunday = (7 - nextMonday.getDay()) % 7;
+        const nextSunday = new Date(nextMonday);
+        nextSunday.setDate(nextMonday.getDate() + daysUntilNextSunday);
 
-                const accountInstance  = await Account.findByPk(id);
+        try {
 
-                const studentInstance = await accountInstance.getStudent();
+            const { id } = req.userData;
 
-                const classInstance = await studentInstance.getClass();
-    
-                const allLessons = await classInstance.getLessons({ attributes: ['topic', 'description', 'start_date', 'end_date'], });
-    
-                const lessonsWithinNextWeek = allLessons.filter((lesson) => {
-                    const lessonStartDate = new Date(lesson.start_date);
-                    const lessonEndDate = new Date(lesson.end_date);
-                    return lessonStartDate >= nextMonday && lessonStartDate <= nextSunday;
-                });
-    
-                return res.status(ResponseStatus.code.success).json({
-                    error: false,
-                    message: ResponseStatus.pass.read, data: lessonsWithinNextWeek
-                });
-    
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'server error', extra: error.message });
-            };
-    
-        }
+            const accountInstance = await Account.findByPk(id);
+
+            const studentInstance = await accountInstance.getStudent();
+
+            const classInstance = await studentInstance.getClass();
+
+            const allLessons = await classInstance.getLessons({ attributes: ['topic', 'description', 'start_date', 'end_date'], });
+
+            const lessonsWithinNextWeek = allLessons.filter((lesson) => {
+                const lessonStartDate = new Date(lesson.start_date);
+                const lessonEndDate = new Date(lesson.end_date);
+                return lessonStartDate >= nextMonday && lessonStartDate <= nextSunday;
+            });
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read, data: lessonsWithinNextWeek
+            });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
 
 
 
@@ -461,8 +466,8 @@ class LessonController {
 
             const lessonInstance = await Lesson.findByPk(req.params.lesson);
 
-            if(!lessonInstance){
-                res.status(400).json({error : "Lesson not found" });
+            if (!lessonInstance) {
+                res.status(400).json({ error: "Lesson not found" });
             }
 
             await groupInstance.removeLesson(lessonInstance);
@@ -480,17 +485,17 @@ class LessonController {
     }
 
 
-    static async lessonTemplate(req, res){
+    static async lessonTemplate(req, res) {
 
-        const {id} = req.params;
+        const { id } = req.params;
 
-            try {
-                
+        try {
+
             const lessonInstance = await Lesson.findByPk(id, {
-                include : [
-                    { 
-                        model : LessonSlide,
-                        orderBy : {slide_index : "asc"}
+                include: [
+                    {
+                        model: LessonSlide,
+                        orderBy: { slide_index: "asc" }
                     }, Subject
                 ]
             });
@@ -507,22 +512,22 @@ class LessonController {
 
     }
 
-    static async updateLessonStatus(req, res){
+    static async updateLessonStatus(req, res) {
 
-        const {id} = req.params;
+        const { id } = req.params;
         const data = req.query;
 
         try {
-            
-        const lessonInstance = await Lesson.findByPk(id);
 
-         const response = await lessonInstance.update({status: data.status});
+            const lessonInstance = await Lesson.findByPk(id);
 
-        return res.status(ResponseStatus.code.success).json({
-            error: false,
-            message: ResponseStatus.pass.read,
-            data: response
-        });
+            const response = await lessonInstance.update({ status: data.status });
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: response
+            });
 
 
 
@@ -530,6 +535,111 @@ class LessonController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
 
+    }
+
+
+    /*-----------------------------------| UPLOAD LESSON |-----------------------------------*/
+
+
+
+    static async generateLesson(req, res) {
+
+        let filePaths = [];
+        const today = new Date();
+        const threeDaysAhead = new Date();
+        threeDaysAhead.setDate(today.getDate() + 3);
+
+        if (req.body.objective != '') {
+
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            const fileName = `generated_${uniqueSuffix}.docx`;
+            const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
+
+            const doc = new docx.Document({
+                sections: [
+                    {
+                        properties: {},
+                        children: [
+                            new docx.Paragraph({
+                                children: [
+                                    new docx.TextRun({
+                                        text: `${req.body.objective}`,
+                                        bold: false,
+                                    }),
+                                    
+                                    new docx.TextRun({
+                                        text: `${req.body.additioinal_instruction}`,
+                                        bold: false,
+                                    }),
+                                    
+                                ],
+                            }),
+                        ],
+                    },
+                ],
+            });
+
+            req.body.files = [`public/lessons/${fileName}`];
+
+            console.log(absoluteFilesDirectory);
+            docx.Packer.toBuffer(doc).then((buffer) => { fs.writeFileSync(absoluteFilesDirectory, buffer); });
+
+        }
+
+        req.body.start_date = today;
+        req.body.end_date = threeDaysAhead;
+
+
+        try {
+
+            const lessonInstance = await Lesson.create(req.body);
+            const subjectInstance = await Subject.findByPk(req.body.subject);
+
+            if (!subjectInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
+
+            }
+
+
+            await subjectInstance.addLesson(lessonInstance);
+
+            // Create a new chapter instance
+            const chapter = new Chapter();
+            chapter.name = "undefined";
+            chapter.title = "undefined";
+
+            const chapterInstance = await chapter.save();
+
+            const classInstance = await Class.findByPk(req.body.class);
+
+            const classarmInstances = await ClassArm.findAll({ where: { id: req.body.class_arms } });
+
+            await subjectInstance.addChapter(chapterInstance);
+
+            await chapterInstance.setLessons(lessonInstance);
+
+            await subjectInstance.addLesson(lessonInstance);
+
+            const instance1 = await lessonInstance.addClassArms(classarmInstances);
+
+            await classInstance.addLesson(lessonInstance);
+
+            const groupInstance = await Group.create({
+                naming: classInstance.naming,
+                ref_cid: classInstance.id
+            });
+
+            await groupInstance.addLesson(lessonInstance);
+            const instance2 = await groupInstance.addClassArms(classarmInstances);
+            const subjejctGroup = await subjectInstance.addGroup(groupInstance);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
     }
 
 }
