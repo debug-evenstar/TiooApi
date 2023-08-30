@@ -219,6 +219,7 @@ const AuthorizedRoutesGroup = (router) => {
 
     /* --------------------------------- LESSON -------------------------------- */
 
+    router.get('/lesson/alllessons', LessonController.allLessons);
     router.get('/lesson/read', LessonController.upcomingNextWeeksLessons);
     router.get('/lesson/student/read', LessonController.studentUpcomingNextWeeksLessons);
     router.get('/lesson/subjectlessons/:id', LessonController.subjectLessons);
