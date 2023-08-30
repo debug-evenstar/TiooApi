@@ -107,7 +107,7 @@ class SubjectController {
 
             const deletedInstance = await subjectInstance.destroy();
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: deletedInstance });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: deletedInstance });
 
         } catch (error) {
             console.log(error);
