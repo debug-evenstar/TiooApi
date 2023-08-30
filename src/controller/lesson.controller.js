@@ -538,6 +538,44 @@ class LessonController {
     }
 
 
+    static async allLessons(req, res) {
+
+        try {
+
+            const lessonInstance = await Lesson.findAll();
+
+            const loads = await Promise.all(lessonInstance.map(async (lesson) => {
+
+            const classInstance = await lesson.getClass();
+
+            const studentInstances = await classInstance.getStudents({include: Account});
+            
+
+            const data = {
+                lesson: lesson,
+                student: studentInstances.map((item)=> ({account: item.Account.id, email: item.Account.email }))
+            }
+
+                return data;
+
+            }));
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: loads
+            });
+
+
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+
     /*-----------------------------------| UPLOAD LESSON |-----------------------------------*/
 
 
@@ -566,12 +604,12 @@ class LessonController {
                                         text: `${req.body.objective}`,
                                         bold: false,
                                     }),
-                                    
+
                                     new docx.TextRun({
                                         text: `${req.body.additioinal_instruction}`,
                                         bold: false,
                                     }),
-                                    
+
                                 ],
                             }),
                         ],
