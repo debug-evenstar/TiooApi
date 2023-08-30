@@ -24,11 +24,13 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: 'none',
       },
       objective: {
-        type: Sequelize.STRING,
+        type: Sequelize.JSON,
+        defaultValue: '',
         allowNull: true,
       },
       additional_instruction: {
-        type: Sequelize.STRING,
+        type: Sequelize.JSON,
+        defaultValue: '',
         allowNull: true,
       },
       week: {

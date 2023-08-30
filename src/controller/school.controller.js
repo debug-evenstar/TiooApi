@@ -605,8 +605,13 @@ class SchoolManagementController {
 
             const response = await Promise.all(admins.map( async (element)=>{
 
+                const items = JSON.parse(element.permissions);
 
+                let permissions = await Permission.findAll({ where: { code: items } });
 
+                const roles =  permissions.map((permission) => ({code: permission.code, name: permission.name }));
+
+                console.log(permissions);
                 
                 const data = {
                     id: element.id,
@@ -615,7 +620,7 @@ class SchoolManagementController {
                     email:  element.Account.dataValues.email,
                     image:  element.Account.dataValues.display_image,
                     status:  element.Account.dataValues.status,
-                    roles: element.permissions
+                    roles: roles
                 };
 
                 return data
