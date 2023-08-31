@@ -234,7 +234,8 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/lesson/generate', LessonController.generateLesson);
     router.post('/lesson/create', UploadService.uploadLesson.array('files'), LessonController.createLesson);
     router.post('/lesson/add', UploadService.uploadLesson.array('files'), LessonController.addLesson);
-
+    router.put('/lesson/template/:id', LessonController.updateLessonTemplate);
+    
     router.get('/chapter/subject/:id', ChapterController.read);
 
     router.get('/logging', LoggingController.read);

@@ -36,7 +36,7 @@ module.exports = (sequelize, Sequelize) => {
       week: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: 'Week 1',
+        defaultValue: '',
       },
       start_date: {
         type: Sequelize.DATE,
