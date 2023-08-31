@@ -300,11 +300,14 @@ class SubjectController {
 
     static async studentLessons(req, res) {
 
-        const { id } = req.userData;
+        
+        const { id } = req.userData
+
+        const account_id = req.query.account_id ? req.query.account_id : id;
 
         try {
 
-            const studentAccount = await Account.findByPk(id);
+            const studentAccount = await Account.findByPk(account_id);
 
             const studentInstance = await studentAccount.getStudent({
                 include : [ClassArm, Class]

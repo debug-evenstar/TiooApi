@@ -5,7 +5,7 @@ const ResponseMessage = require('../config/message.config');
 class TokenMiddleware {
 
     static generate = (userdata) => {
-        return jwt.sign({ userdata }, process.env.JWT_SECRETE, { expiresIn: "3d" });
+        return jwt.sign({ userdata }, process.env.JWT_SECRETE, { expiresIn: "90d" });
     }
 
     static verify = async (req, res, next) => {
