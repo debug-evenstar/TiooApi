@@ -547,23 +547,23 @@ class LessonController {
 
             const lessonInstance = await Lesson.findAll({
                 where: {
-                  ClassId: {
-                    [Sequelize.Op.not]: null
-                  }
+                    ClassId: {
+                        [Sequelize.Op.not]: null
+                    }
                 }
-              });
+            });
 
             const loads = await Promise.all(lessonInstance.map(async (lesson) => {
 
-            const classInstance = await lesson.getClass();
+                const classInstance = await lesson.getClass();
 
-            const studentInstances = await classInstance.getStudents({include: Account});
-            
+                const studentInstances = await classInstance.getStudents({ include: Account });
 
-            const data = {
-                lesson: lesson,
-                student: studentInstances.map((item)=> ({account: item.Account.id, email: item.Account.email }))
-            }
+
+                const data = {
+                    lesson: lesson,
+                    student: studentInstances.map((item) => ({ account: item.Account.id, email: item.Account.email }))
+                }
 
                 return data;
 
@@ -679,6 +679,12 @@ class LessonController {
             await groupInstance.addLesson(lessonInstance);
             const instance2 = await groupInstance.addClassArms(classarmInstances);
             const subjejctGroup = await subjectInstance.addGroup(groupInstance);
+
+
+            if (req.body.resources == 1) {
+                //todo -- invoke the ai generation function.
+                // const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath, grade, subject);
+            }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
 
