@@ -360,7 +360,9 @@ class LessonController {
             const lessonsWithinNextWeek = allLessons.filter((lesson) => {
                 const lessonStartDate = new Date(lesson.start_date);
                 const lessonEndDate = new Date(lesson.end_date);
-                return lessonStartDate >= nextMonday && lessonStartDate <= nextSunday;
+                // return lessonStartDate >= nextMonday && lessonStartDate <= nextSunday;
+
+                return lessonStartDate > today
             });
 
             return res.status(ResponseStatus.code.success).json({
