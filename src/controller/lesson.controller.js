@@ -715,6 +715,8 @@ class LessonController {
 
                 await lessonInstance.save();
 
+                response.id = lessonInstance.id;
+
                 return res.status(ResponseStatus.code.success).json(response);
 
             }
