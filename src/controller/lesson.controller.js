@@ -169,19 +169,19 @@ class LessonController {
             }
 
             const subjectSubject = await lesson.getSubject();
-            
+
             const armInstance = await lesson.getClassArms();
 
             const oldClassInstance = await lesson.getClass();
 
             const classInstance = await armInstance[0].getClass()
 
-            if(oldClassInstance){
+            if (oldClassInstance) {
                 //pass
-            }else{
+            } else {
                 await classInstance.addLesson(lesson);
             }
-  
+
             const lessonUpdate = await lesson.update(req.body);
 
             const newInstance = await Lesson.findByPk(req.params.id);
@@ -614,7 +614,7 @@ class LessonController {
         const threeDaysAhead = new Date();
         threeDaysAhead.setDate(today.getDate() + 3);
 
-        if (req.body.objective != '') {
+        if (req.body.objective == 4) {
 
             const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
             const fileName = `generated_${uniqueSuffix}.docx`;
@@ -702,14 +702,18 @@ class LessonController {
             if (req.body.resources == 1) {
 
                 const body = {
-                    "topic" : req.body.topic,
-                    "grade" : classInstance.naming,
-                    "objectives" : req.body.objective,
-                    "duration" : req.body.duration,
-                    "extra" : req.body.additional_instruction
+                    "topic": req.body.topic,
+                    "grade": classInstance.naming,
+                    "objectives": req.body.objective,
+                    "duration": req.body.duration,
+                    "extra": req.body.additional_instruction
                 }
-                
+
                 const response = await LessonTemplateProvider.getenerateLesson(body);
+
+                lessonInstance.generated = response.data;
+
+                await lessonInstance.save();
 
                 return res.status(ResponseStatus.code.success).json(response);
 
@@ -723,6 +727,30 @@ class LessonController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
+
+    static async readGeneratedLesson(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const lessonInstance = await Lesson.findByPk(id);
+
+            
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: lessonInstance
+            });
+
+
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
 
 
     static async updateLessonTemplate(req, res) {
