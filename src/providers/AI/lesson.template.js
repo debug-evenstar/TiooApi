@@ -53,6 +53,15 @@ class LessonTemplateProvider {
     }
 
 
+    async getenerateLesson(body) {
+        const path = "lesson/v1/generate";
+        let errorResponse = {};
+        const response = await this.request( "POST", path, { body });
+        return response ?? errorResponse;
+    }
+
+
+
 }
 
 module.exports = (new LessonTemplateProvider())
