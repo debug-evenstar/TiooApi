@@ -81,6 +81,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.JSON,
         defaultValue: [],
       },
+      generated: {
+        type: Sequelize.JSON,
+        allowNull: true,
+        defaultValue: '',
+      },
       age: {
         type: Sequelize.INTEGER,
         allowNull: true,
