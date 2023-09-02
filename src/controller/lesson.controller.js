@@ -7,6 +7,8 @@ const path = require('path');
 const Docxtemplater = require('docxtemplater');
 const docx = require('docx');
 const Sequelize = require('sequelize');
+const LessonTemplateProvider = require("../providers/AI/lesson.template");
+
 
 
 
@@ -166,9 +168,25 @@ class LessonController {
                 res.status(400).json({ error: "Lesson not found" });
             }
 
-            const lessonUpdate = await Lesson.update(req.body, { where: { id: req.params.id } });
+            const subjectSubject = await lesson.getSubject();
+            
+            const armInstance = await lesson.getClassArms();
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: lessonUpdate });
+            const oldClassInstance = await lesson.getClass();
+
+            const classInstance = await armInstance[0].getClass()
+
+            if(oldClassInstance){
+                //pass
+            }else{
+                await classInstance.addLesson(lesson);
+            }
+  
+            const lessonUpdate = await lesson.update(req.body);
+
+            const newInstance = await Lesson.findByPk(req.params.id);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: newInstance });
 
         } catch (error) {
             console.log(error);
@@ -682,8 +700,19 @@ class LessonController {
 
 
             if (req.body.resources == 1) {
-                //todo -- invoke the ai generation function.
-                // const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath, grade, subject);
+
+                const body = {
+                    "topic" : req.body.topic,
+                    "grade" : classInstance.naming,
+                    "objectives" : req.body.objective,
+                    "duration" : req.body.duration,
+                    "extra" : req.body.additional_instruction
+                }
+                
+                const response = await LessonTemplateProvider.getenerateLesson(body);
+
+                return res.status(ResponseStatus.code.success).json(response);
+
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
