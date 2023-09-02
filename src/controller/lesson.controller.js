@@ -177,7 +177,7 @@ class LessonController {
             const classInstance = await armInstance[0].getClass()
 
             if(oldClassInstance){
-                console.log('has a class')
+                //pass
             }else{
                 await classInstance.addLesson(lesson);
             }
