@@ -738,7 +738,7 @@ class LessonController {
 
             const lessonInstance = await Lesson.findByPk(id);
 
-            
+
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read,
@@ -752,6 +752,63 @@ class LessonController {
         };
 
     }
+
+
+
+    static async updateGeneratedLesson(req, res) {
+
+        const { id } = req.params;
+
+        if (req.body.generated != '') {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            const fileName = `generated_${uniqueSuffix}.docx`;
+            const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
+
+            const doc = new docx.Document({
+                sections: [
+                    {
+                        properties: {},
+                        children: [
+                            new docx.Paragraph({
+                                children: [
+                                    new docx.TextRun({
+                                        text: `${req.body.generated}`,
+                                        bold: false,
+                                    }),
+
+                                ],
+                            }),
+                        ],
+                    },
+                ],
+            });
+
+            req.body.files = [`public/lessons/${fileName}`];
+            console.log(absoluteFilesDirectory);
+            docx.Packer.toBuffer(doc).then((buffer) => { fs.writeFileSync(absoluteFilesDirectory, buffer); });
+
+        }
+
+        try {
+
+            const lessonInstance = await Lesson.findByPk(id);
+
+            const response = await lessonInstance.update(req.body);
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: response
+            });
+
+
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
 
 
 
