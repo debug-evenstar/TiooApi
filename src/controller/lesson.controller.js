@@ -158,6 +158,104 @@ class LessonController {
     }
 
 
+    static async generateLessonWithGroup(req, res) {
+        
+        const groupID = req.params.id;
+        const groupInstance = await Group.findByPk(groupID);
+        if (!groupInstance) {
+            return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
+
+        }
+        let filePaths = [];
+        const today = new Date();
+        const threeDaysAhead = new Date();
+        threeDaysAhead.setDate(today.getDate() + 3);
+
+        if (req.body.objective == 4) {
+
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            const fileName = `generated_${uniqueSuffix}.docx`;
+            const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
+
+            const doc = new docx.Document({
+                sections: [
+                    {
+                        properties: {},
+                        children: [
+                            new docx.Paragraph({
+                                children: [
+                                    new docx.TextRun({
+                                        text: `${req.body.objective}`,
+                                        bold: false,
+                                    }),
+
+                                    new docx.TextRun({
+                                        text: `${req.body.additioinal_instruction}`,
+                                        bold: false,
+                                    }),
+
+                                ],
+                            }),
+                        ],
+                    },
+                ],
+            });
+
+            req.body.files = [`public/lessons/${fileName}`];
+
+            console.log(absoluteFilesDirectory);
+            docx.Packer.toBuffer(doc).then((buffer) => { fs.writeFileSync(absoluteFilesDirectory, buffer); });
+
+        }
+
+        req.body.start_date = today;
+        req.body.end_date = threeDaysAhead;
+        const classarmID = req.body.class_arms;
+        const data = req.body;
+        try {
+            //CREATES A NEW LESSSON
+            const lessonInstance = await Lesson.create(req.body);
+            const subjectInstance = await Subject.findByPk(groupInstance.SubjectId)
+            // Create a new chapter instance
+            const chapter = new Chapter();
+            chapter.name = "undefined";
+            chapter.title = "undefined";
+            const chapterInstance = await chapter.save();
+            const classInstance = await Class.findByPk(groupInstance.ref_cid);
+            const classarmInstances = await ClassArm.findAll({ where: { id: classarmID } });
+            await subjectInstance.addChapter(chapterInstance);
+            await chapterInstance.setLessons(lessonInstance);
+            await subjectInstance.addLesson(lessonInstance);
+            await lessonInstance.addClassArms(classarmInstances);
+            await groupInstance.addLesson(lessonInstance);
+            await subjectInstance.addGroup(groupInstance);
+            await classInstance.addLesson(lessonInstance);
+            await groupInstance.addClassArms(classarmInstances);
+            await subjectInstance.addGroup(groupInstance);
+
+            if (data.resources == 1) {
+                const body = {
+                    "topic": data.topic,
+                    "grade": classInstance.naming,
+                    "objectives": data.objective,
+                    "duration": data.duration,
+                    "extra": data.additional_instruction
+                }                
+                const response = await LessonTemplateProvider.getenerateLesson(body);
+                lessonInstance.generated = response.data;
+                await lessonInstance.save();
+                response.id = lessonInstance.id;
+                return res.status(ResponseStatus.code.success).json(response);
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        }
+    }
+
     static async updateLesson(req, res) {
 
         try {

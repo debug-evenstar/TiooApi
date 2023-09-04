@@ -225,6 +225,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/lesson/subjectlessons/:id', LessonController.subjectLessons);
     router.get('/lesson/groups', LessonController.subjectGroups);
     router.post('/lesson/groups/:id/add', UploadService.uploadLesson.array('files'), LessonController.addLessonToGroup);
+    router.post('/lesson/generate/groups/:id/add', UploadService.uploadLesson.array('files'), LessonController.generateLessonWithGroup);
     router.post('/lesson/groups/:id/editarms', LessonController.editGroupArms);
     router.delete('/lesson/groups/:id/lesson/:lesson', LessonController.removeLessonFromGroup);
     router.put('/lesson/:id', LessonController.updateLesson);
@@ -237,7 +238,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/lesson/create', UploadService.uploadLesson.array('files'), LessonController.createLesson);
     router.post('/lesson/add', UploadService.uploadLesson.array('files'), LessonController.addLesson);
     router.put('/lesson/template/:id', LessonController.updateLessonTemplate);
-    
+
     router.get('/chapter/subject/:id', ChapterController.read);
 
     router.get('/logging', LoggingController.read);
