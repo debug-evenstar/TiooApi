@@ -71,6 +71,8 @@ class Relationships {
         Class.hasMany(Lesson);
         Lesson.belongsTo(Class);
 
+        Group.belongsTo(Class, {foreignKey : "ref_cid"});
+
         Subject.hasMany(Chapter);
         Chapter.belongsTo(Subject);
 
