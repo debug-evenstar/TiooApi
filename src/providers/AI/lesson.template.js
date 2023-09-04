@@ -35,6 +35,9 @@ class LessonTemplateProvider {
                 errorResponse = error.response;
             }
         })
+
+        console.log(`this is response and base_ur ${response} ${BASE_URL}/${path}`);
+
         return response?.data ?? errorResponse.data;
     }
 

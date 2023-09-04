@@ -171,43 +171,6 @@ class LessonController {
         const threeDaysAhead = new Date();
         threeDaysAhead.setDate(today.getDate() + 3);
 
-        if (req.body.objective == 4) {
-
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-            const fileName = `generated_${uniqueSuffix}.docx`;
-            const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
-
-            const doc = new docx.Document({
-                sections: [
-                    {
-                        properties: {},
-                        children: [
-                            new docx.Paragraph({
-                                children: [
-                                    new docx.TextRun({
-                                        text: `${req.body.objective}`,
-                                        bold: false,
-                                    }),
-
-                                    new docx.TextRun({
-                                        text: `${req.body.additioinal_instruction}`,
-                                        bold: false,
-                                    }),
-
-                                ],
-                            }),
-                        ],
-                    },
-                ],
-            });
-
-            req.body.files = [`public/lessons/${fileName}`];
-
-            console.log(absoluteFilesDirectory);
-            docx.Packer.toBuffer(doc).then((buffer) => { fs.writeFileSync(absoluteFilesDirectory, buffer); });
-
-        }
-
         req.body.start_date = today;
         req.body.end_date = threeDaysAhead;
 
@@ -736,43 +699,6 @@ class LessonController {
         const threeDaysAhead = new Date();
         threeDaysAhead.setDate(today.getDate() + 3);
 
-        if (req.body.objective == 4) {
-
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-            const fileName = `generated_${uniqueSuffix}.docx`;
-            const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
-
-            const doc = new docx.Document({
-                sections: [
-                    {
-                        properties: {},
-                        children: [
-                            new docx.Paragraph({
-                                children: [
-                                    new docx.TextRun({
-                                        text: `${req.body.objective}`,
-                                        bold: false,
-                                    }),
-
-                                    new docx.TextRun({
-                                        text: `${req.body.additioinal_instruction}`,
-                                        bold: false,
-                                    }),
-
-                                ],
-                            }),
-                        ],
-                    },
-                ],
-            });
-
-            req.body.files = [`public/lessons/${fileName}`];
-
-            console.log(absoluteFilesDirectory);
-            docx.Packer.toBuffer(doc).then((buffer) => { fs.writeFileSync(absoluteFilesDirectory, buffer); });
-
-        }
-
         req.body.start_date = today;
         req.body.end_date = threeDaysAhead;
 
@@ -811,10 +737,53 @@ class LessonController {
 
             await classInstance.addLesson(lessonInstance);
 
-            const groupInstance = await Group.create({
-                naming: classInstance.naming,
-                ref_cid: classInstance.id
-            });
+
+            const group = await Group.findAll({ include: [ClassArm] });
+
+
+            let groupInstance;
+            let groupId;
+
+            const arms = req.body.class_arms;
+
+            for (let i = 0; i < group.length; i++) {
+
+                const data = group[i].ClassArms.map((element) => element.id);
+
+                if (arms.length == 1) {
+
+                    if (arms[0] == data) {
+                        console.log('single found', arms, data, group[i].id);
+                        groupId = group[i].id;
+                    } else {
+                        console.log('single not found', arms, data);
+                    }
+
+                } else {
+
+                    if (arms.every((arm) => data.includes(arm))) {
+                        console.log('found', arms, data, group[i].id);
+                        groupId = group[i].id;
+                    } else {
+                        console.log('not found', arms, data);
+                    }
+
+                }
+            }
+
+
+            if (groupId) {
+                groupInstance = await Group.findByPk(groupId);
+            } else {
+
+                 groupInstance = await Group.create({
+                    naming: classInstance.naming,
+                    ref_cid: classInstance.id
+                });
+            }
+
+            console.log(groupId)
+
 
             await groupInstance.addLesson(lessonInstance);
             const instance2 = await groupInstance.addClassArms(classarmInstances);
@@ -860,11 +829,10 @@ class LessonController {
 
             const lessonInstance = await Lesson.findByPk(id);
 
-
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read,
-                data: lessonInstance
+                data: lessonInstance,
             });
 
 
