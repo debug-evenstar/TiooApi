@@ -327,7 +327,6 @@ class LessonController {
 
             const subjectInstance = await Subject.findByPk(req.query.subject_id);
 
-
             const whereClause = req.query.class_id ? { ref_cid: req.query.class_id } : {};
 
             const lessonInstances = await subjectInstance.getGroups({
