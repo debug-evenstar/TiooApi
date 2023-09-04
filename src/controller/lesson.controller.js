@@ -457,7 +457,7 @@ class LessonController {
                         model: ClassArm,
                         attributes: ['id', 'naming'],
                         through: { attributes: [] },
-                    }]
+                    }, Class]
             });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
