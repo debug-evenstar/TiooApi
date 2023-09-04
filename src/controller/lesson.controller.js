@@ -193,7 +193,7 @@ class LessonController {
             }
 
             const lessonInstance = await Lesson.create(body);
-            const subjectInstance = await Subject.findByPk(req.body.subject);
+            const subjectInstance = await Subject.findByPk(selectedGroup.SubjectId);
 
             if (!subjectInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
