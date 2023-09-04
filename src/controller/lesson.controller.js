@@ -177,7 +177,6 @@ class LessonController {
                     }
                     // Delete current group
                     await group.destroy();
-                    break;
                 }
             }
 
