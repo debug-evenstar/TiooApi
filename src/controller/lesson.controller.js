@@ -232,7 +232,14 @@ class LessonController {
 
                 response.id = lessonInstance.id;
 
-                return res.status(ResponseStatus.code.success).json(response);
+                const fulldata = {
+                    status: "success",
+                    data: response.data.result,
+                    session_id: response.data.session_id,
+                    id: lessonInstance.id
+                }
+    
+                return res.status(ResponseStatus.code.success).json(fulldata);
 
             }
 
@@ -812,7 +819,7 @@ class LessonController {
                 response.id = lessonInstance.id;
 
                 const fulldata = {
-                    status: true,
+                    status: "success",
                     data: response.data.result,
                     session_id: response.data.session_id,
                     id: lessonInstance.id
@@ -868,7 +875,7 @@ class LessonController {
             response.id = lessonInstance.id;
 
             const fulldata = {
-                status: true,
+                status: "success",
                 data: response.data.result,
                 session_id: response.data.session_id,
                 id: lessonInstance.id
