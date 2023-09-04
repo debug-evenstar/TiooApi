@@ -76,10 +76,6 @@ class StudentController {
                 ...data
             })
 
-            // const newValidation = await Validation.create({ otp });
-
-            // await registeredStudent.setValidation(newValidation);
-
             /* -------------------- CREATES AND BIND STUDENT PROFILE -------------------- */
 
             const studentInstance = await Student.create(data);

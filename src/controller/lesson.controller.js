@@ -225,7 +225,8 @@ class LessonController {
 
                 const response = await LessonTemplateProvider.getenerateLesson(body);
 
-                lessonInstance.generated = response.data;
+                lessonInstance.generated = response.data.result;
+                lessonInstance.session_id = response.data.session_id;
 
                 await lessonInstance.save();
 
@@ -776,7 +777,7 @@ class LessonController {
                 groupInstance = await Group.findByPk(groupId);
             } else {
 
-                 groupInstance = await Group.create({
+                groupInstance = await Group.create({
                     naming: classInstance.naming,
                     ref_cid: classInstance.id
                 });
@@ -802,13 +803,22 @@ class LessonController {
 
                 const response = await LessonTemplateProvider.getenerateLesson(body);
 
-                lessonInstance.generated = response.data;
+                lessonInstance.generated = response.data.result;
+
+                lessonInstance.session_id = response.data.session_id;
 
                 await lessonInstance.save();
 
                 response.id = lessonInstance.id;
 
-                return res.status(ResponseStatus.code.success).json(response);
+                const fulldata = {
+                    status: true,
+                    data: response.data.result,
+                    session_id: response.data.session_id,
+                    id: lessonInstance.id
+                }
+    
+                return res.status(ResponseStatus.code.success).json(fulldata);
 
             }
 
@@ -820,6 +830,60 @@ class LessonController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
+
+
+
+
+
+
+
+    static async generateLessonWithExtra(req, res) {
+
+        const { id } = req.params;
+
+
+        try {
+
+            const lessonInstance = await Lesson.findByPk(id);
+
+            if (!lessonInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
+
+            }
+
+            const body = {
+                "query": req.body.query,
+                "session_id": req.body.session_id
+            }
+
+            const response = await LessonTemplateProvider.getenerateLessonWithExtra(body);
+
+
+            lessonInstance.generated = response.data.result;
+
+            lessonInstance.session_id = response.data.session_id;
+
+            await lessonInstance.save();
+
+            response.id = lessonInstance.id;
+
+            const fulldata = {
+                status: true,
+                data: response.data.result,
+                session_id: response.data.session_id,
+                id: lessonInstance.id
+            }
+
+            return res.status(ResponseStatus.code.success).json(fulldata);
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
 
     static async readGeneratedLesson(req, res) {
 
