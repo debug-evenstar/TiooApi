@@ -8,6 +8,7 @@ const Docxtemplater = require('docxtemplater');
 const docx = require('docx');
 const Sequelize = require('sequelize');
 const LessonTemplateProvider = require("../providers/AI/lesson.template");
+const { equal } = require("../utils/array");
 
 
 
@@ -150,6 +151,34 @@ class LessonController {
             const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.class_arms] } });
 
             await groupInstance.addClassArms(classarmInstances);
+
+            // Merge class groups if similar groups exist
+            const groupArmIds = groupInstance.ClassArms.map(arm => arm.id);
+            const groupSubject = await groupInstance.getSubject();
+            const subjectGroups = await groupSubject.getGroups({
+                include : [ClassArm]
+            });
+
+            for (let index = 0; index < subjectGroups.length; index++) {
+                const group = subjectGroups[index];
+                const armsIds = group.ClassArms.map(arm => arm.id);
+                if( 
+                    armsIds.length == groupArmIds.length && 
+                    equal(armsIds,groupArmIds) &&
+                    group.id !== groupInstance.id
+                ){
+                    // Move all lessons to this group
+                    const groupLessons = await groupInstance.getLessons();
+                    groupLessons.forEach(async (lesson) => {
+                        await lesson.update({
+                            GroupId : group.id
+                        });
+                    });
+                    // Delete current group
+                    await groupInstance.destroy();
+                    break;
+                }
+            }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
 
