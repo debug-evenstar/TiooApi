@@ -161,12 +161,6 @@ class LessonController {
     static async generateLessonWithGroup(req, res) {
 
         const groupID = req.params.id;
-        const groupInstance = await Group.findByPk(groupID);
-        if (!groupInstance) {
-            return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
-
-        }
-        let filePaths = [];
         const today = new Date();
         const threeDaysAhead = new Date();
         threeDaysAhead.setDate(today.getDate() + 3);
@@ -176,27 +170,48 @@ class LessonController {
 
         try {
 
-            const lessonInstance = await Lesson.create(req.body);
+      
+
+            const selectedGroup = await Group.findByPk(groupID, { include: [ClassArm] });
+
+            const classarmsArray = selectedGroup.ClassArms.map((element) => element.id);
+
+            const body = {
+                topic: req.body.topic,
+                duration: req.body.duration ?? "45 Minutes",
+                curriculum: req.body.curriculum ?? "",
+                subject: selectedGroup.SubjectId,
+                start_date: req.body.start_date,
+                end_date: req.body.end_date,
+                objective: req.body.objective,
+                week: "Week 3",
+                status: "locked",
+                term: 1,
+                class: selectedGroup.ref_cid,
+                class_arms: classarmsArray,
+                additional_instruction: req.body.additional_instruction
+            }
+
+            const lessonInstance = await Lesson.create(body);
             const subjectInstance = await Subject.findByPk(req.body.subject);
 
             if (!subjectInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
-
             }
+
 
 
             await subjectInstance.addLesson(lessonInstance);
 
-            // Create a new chapter instance
             const chapter = new Chapter();
             chapter.name = "undefined";
             chapter.title = "undefined";
 
             const chapterInstance = await chapter.save();
 
-            const classInstance = await Class.findByPk(req.body.class);
+            const classInstance = await Class.findByPk(selectedGroup.ref_cid);
 
-            const classarmInstances = await ClassArm.findAll({ where: { id: req.body.class_arms } });
+            const classarmInstances = await ClassArm.findAll({ where: { id: classarmsArray } });
 
             await subjectInstance.addChapter(chapterInstance);
 
@@ -208,9 +223,9 @@ class LessonController {
 
             await classInstance.addLesson(lessonInstance);
 
-            await groupInstance.addLesson(lessonInstance);
-            const instance2 = await groupInstance.addClassArms(classarmInstances);
-            const subjejctGroup = await subjectInstance.addGroup(groupInstance);
+            await selectedGroup.addLesson(lessonInstance);
+            const instance2 = await selectedGroup.addClassArms(classarmInstances);
+            const subjejctGroup = await subjectInstance.addGroup(selectedGroup);
 
 
             if (req.body.resources == 1) {
