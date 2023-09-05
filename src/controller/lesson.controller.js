@@ -945,22 +945,24 @@ class LessonController {
                 const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
                 const fileName = `generated_${uniqueSuffix}.docx`;
                 const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
-        
+
                 const docxBuffer = await HtmlToDocx(req.body.generated);
-    
+
                 fs.writeFileSync(absoluteFilesDirectory, docxBuffer);
-    
+
                 req.body.files = [`public/lessons/${fileName}`];
-    
+
                 const oldfile = lessonInstance.files[0];
 
-                fs.unlink(oldfile, (err) => {
-                    if (err) {
-                        console.error('Error deleting file:', err);
-                    } else {
-                        console.log('File deleted successfully.');
-                    }
-                })
+                if (oldfile) {
+                    fs.unlink(oldfile, (err) => {
+                        if (err) {
+                            console.error('Error deleting file:', err);
+                        } else {
+                            console.log('File deleted successfully.');
+                        }
+                    })
+                }
             }
 
             const response = await lessonInstance.update(req.body);
