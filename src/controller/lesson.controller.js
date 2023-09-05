@@ -6,6 +6,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const Docxtemplater = require('docxtemplater');
 const docx = require('docx');
+const HtmlToDocx = require('html-to-docx');
 const Sequelize = require('sequelize');
 const LessonTemplateProvider = require("../providers/AI/lesson.template");
 const { equal } = require("../utils/array");
@@ -202,7 +203,7 @@ class LessonController {
 
         try {
 
-      
+
 
             const selectedGroup = await Group.findByPk(groupID, { include: [ClassArm] });
 
@@ -285,7 +286,7 @@ class LessonController {
                     session_id: response.data.session_id,
                     id: lessonInstance.id
                 }
-    
+
                 return res.status(ResponseStatus.code.success).json(fulldata);
 
             }
@@ -870,7 +871,7 @@ class LessonController {
                     session_id: response.data.session_id,
                     id: lessonInstance.id
                 }
-    
+
                 return res.status(ResponseStatus.code.success).json(fulldata);
 
             }
@@ -966,39 +967,34 @@ class LessonController {
 
         const { id } = req.params;
 
-        if (req.body.generated != '') {
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-            const fileName = `generated_${uniqueSuffix}.docx`;
-            const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
-
-            const doc = new docx.Document({
-                sections: [
-                    {
-                        properties: {},
-                        children: [
-                            new docx.Paragraph({
-                                children: [
-                                    new docx.TextRun({
-                                        text: `${req.body.generated}`,
-                                        bold: false,
-                                    }),
-
-                                ],
-                            }),
-                        ],
-                    },
-                ],
-            });
-
-            req.body.files = [`public/lessons/${fileName}`];
-            console.log(absoluteFilesDirectory);
-            docx.Packer.toBuffer(doc).then((buffer) => { fs.writeFileSync(absoluteFilesDirectory, buffer); });
-
-        }
-
         try {
 
             const lessonInstance = await Lesson.findByPk(id);
+
+
+            if (req.body.generated != '') {
+                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+                const fileName = `generated_${uniqueSuffix}.docx`;
+                const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
+
+                const docxBuffer = await HtmlToDocx(req.body.generated);
+
+                fs.writeFileSync(absoluteFilesDirectory, docxBuffer);
+
+                req.body.files = [`public/lessons/${fileName}`];
+
+                const oldfile = lessonInstance.files[0];
+
+                if (oldfile) {
+                    fs.unlink(oldfile, (err) => {
+                        if (err) {
+                            console.error('Error deleting file:', err);
+                        } else {
+                            console.log('File deleted successfully.');
+                        }
+                    })
+                }
+            }
 
             const response = await lessonInstance.update(req.body);
 
