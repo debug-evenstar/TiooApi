@@ -945,10 +945,8 @@ class LessonController {
                 const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
                 const fileName = `generated_${uniqueSuffix}.docx`;
                 const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
-    
-                const htmlContent = '<p>This is a sample HTML content.</p>';
-    
-                const docxBuffer = await HtmlToDocx(htmlContent);
+        
+                const docxBuffer = await HtmlToDocx(req.body.generated);
     
                 fs.writeFileSync(absoluteFilesDirectory, docxBuffer);
     
