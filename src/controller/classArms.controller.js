@@ -23,6 +23,15 @@ class classArms {
 
             const classWithArms = await Class.findByPk(classId, { include: [ClassArm] });
 
+            const subjectInstances = await classInstance.getSubjects();
+
+            await Promise.all(subjectInstances.map(async (subjectInstance) => {
+                
+               const response =  await subjectInstance.addClassArm(classArmInstance);
+
+                return true;
+            }));
+
             //------- class.
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classWithArms });
@@ -46,11 +55,25 @@ class classArms {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
+            const subjectInstances = await classInstance.getSubjects();
+
+
             for (let index = 0; index < arms.length; index++) {
                 const arm = arms[index];
                 const classArmInstance = await ClassArm.create({ naming: arm });
                 await classInstance.addClassArm(classArmInstance);
+
+                await Promise.all(subjectInstances.map(async (subjectInstance) => {
+                    const response =  await subjectInstance.addClassArm(classArmInstance);
+                     return true;
+                 }));
+                 
             }
+
+           
+
+
+
 
             const classWithArms = await Class.findByPk(classId, { include: [ClassArm] });
 
