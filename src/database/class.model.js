@@ -17,6 +17,12 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 defaultValue: 'Primary 1',
             },
+            equivalent: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                defaultValue: 0,
+              },
+
         }, {
         timestamps: false,
     });

@@ -141,11 +141,17 @@ class InviteController {
                  invitedClassArms = inviteInstance.classarms;
             }
 
+            const classArmInstance = await ClassArm.findByPk(invitedClassArms[0]);
+
+            const classInstance = await classArmInstance.getClass();
+
+
             const payload = {
                 "name": "",
                 "email": "",
                 "schoolId": inviteInstance.schoolId,
-                "arm": invitedClassArms[0]
+                "arm": invitedClassArms[0],
+                "class": classInstance
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
@@ -181,6 +187,8 @@ class InviteController {
                  invitedClasses = inviteInstance.classes;
                  invitedClassArms = inviteInstance.classarms;
             }
+
+            console.log(inviteInstance)
 
             const subjects = await Subject.findAll({ where: { id: [...inviteInstance.subjects] }, attributes: { exclude: ["SchoolManagementId"] } });
 
