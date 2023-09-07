@@ -9,6 +9,7 @@ const docx = require('docx');
 const HtmlToDocx = require('html-to-docx');
 const Sequelize = require('sequelize');
 const LessonTemplateProvider = require("../providers/AI/lesson.template");
+const { equal } = require("../utils/array");
 
 
 
@@ -114,6 +115,7 @@ class LessonController {
             const chapterInstance = await chapter.save();
 
             const classInstance = await Class.findByPk(groupInstance.ref_cid);
+            const classArms = await groupInstance.getClassArms();
 
             await subjectInstance.addChapter(chapterInstance);
 
@@ -124,6 +126,8 @@ class LessonController {
             await groupInstance.addLesson(lessonInstance);
 
             await subjectInstance.addGroup(groupInstance);
+
+            await lessonInstance.addClassArms(classArms);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
 
@@ -148,6 +152,34 @@ class LessonController {
             const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.class_arms] } });
 
             await groupInstance.addClassArms(classarmInstances);
+
+            // Merge class groups if similar groups exist
+            const groupArmIds = classarmInstances.map(arm => arm.id);
+            const groupSubject = await groupInstance.getSubject();
+            const subjectGroups = await groupSubject.getGroups({
+                include : [ClassArm]
+            });
+
+            for (let index = 0; index < subjectGroups.length; index++) {
+                const group = subjectGroups[index];
+                const armsIds = group.ClassArms.map(arm => arm.id);
+                if( 
+                    armsIds.length == groupArmIds.length && 
+                    equal(armsIds,groupArmIds) &&
+                    group.id !== groupInstance.id
+                ){
+                    // Move all lessons to this group
+                    const groupLessons = await group.getLessons();
+                    for (let i = 0; i < groupLessons.length; i++) {
+                        const lesson = groupLessons[i];
+                        await lesson.update({
+                            GroupId : groupInstance.id
+                        });
+                    }
+                    // Delete current group
+                    await group.destroy();
+                }
+            }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
 
@@ -311,7 +343,6 @@ class LessonController {
 
             const subjectInstance = await Subject.findByPk(req.query.subject_id);
 
-
             const whereClause = req.query.class_id ? { ref_cid: req.query.class_id } : {};
 
             const lessonInstances = await subjectInstance.getGroups({
@@ -321,7 +352,7 @@ class LessonController {
                         model: ClassArm,
                         attributes: ['id', 'naming'],
                         through: { attributes: [] },
-                    }, Lesson]
+                    }, Lesson, Class]
             });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
@@ -441,7 +472,7 @@ class LessonController {
                         model: ClassArm,
                         attributes: ['id', 'naming'],
                         through: { attributes: [] },
-                    }]
+                    }, Class]
             });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
