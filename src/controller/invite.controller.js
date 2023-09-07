@@ -151,7 +151,7 @@ class InviteController {
                 "email": "",
                 "schoolId": inviteInstance.schoolId,
                 "arm": invitedClassArms[0],
-                "class": classInstance
+                "naming": classInstance.naming
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
@@ -192,9 +192,9 @@ class InviteController {
 
             const subjects = await Subject.findAll({ where: { id: [...inviteInstance.subjects] }, attributes: { exclude: ["SchoolManagementId"] } });
 
-            //const classes = await Class.findAll({where: {id: [...invitedClasses]}, attributes: {exclude: ["SchoolManagementId"]}});
+            const classes = await Class.findAll({where: {id: [...invitedClasses]}, attributes: {exclude: ["SchoolManagementId"]}});
 
-            // const classArms = await ClassArm.findAll({where: {id: [...invitedClassArms]}, attributes: {exclude: ["SchoolManagementId"]}});
+            const classArms = await ClassArm.findAll({where: {id: [...invitedClassArms]}, attributes: {exclude: ["SchoolManagementId"]}});
 
 
             let payload;
@@ -206,6 +206,8 @@ class InviteController {
                 "flag": "invited",
                 "classes": invitedClasses,
                 "classarms": invitedClassArms,
+                "class_naming": classes.map(data => ({'naming': data.naming})),
+                "arms_naming": classArms.map(data => ({'naming': data.naming})),
                 "Subjects": subjects,
                 "schoolId": inviteInstance.schoolId
             }
@@ -278,6 +280,9 @@ class InviteController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
+            req.body.status = "active",
+            req.body.flag = "active",
+            req.body.verification_status = 1;
 
             const registeredAccount = await Account.create(req.body);
             const newValidation = await Validation.create({ otp });

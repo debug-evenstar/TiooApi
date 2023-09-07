@@ -324,7 +324,10 @@ class AuthController {
                     const classData = await profile.getClass();
                     const classArmData = await profile.getClassArm();
                     const studentSubject = await classData.getSubjects();
-                    payload.schoolName = studentSchool.school_name;
+                    const classSubject = await classData.getSubjects();
+
+                    payload.schoolName = studentSchoolAccount.name;
+
                     payload.studentClass =  classData.naming;
                     payload.studentClassArm =  classArmData.naming;
                     payload.subjectsCount = studentSubject.length;
