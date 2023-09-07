@@ -192,9 +192,9 @@ class InviteController {
 
             const subjects = await Subject.findAll({ where: { id: [...inviteInstance.subjects] }, attributes: { exclude: ["SchoolManagementId"] } });
 
-            //const classes = await Class.findAll({where: {id: [...invitedClasses]}, attributes: {exclude: ["SchoolManagementId"]}});
+            const classes = await Class.findAll({where: {id: [...invitedClasses]}, attributes: {exclude: ["SchoolManagementId"]}});
 
-            // const classArms = await ClassArm.findAll({where: {id: [...invitedClassArms]}, attributes: {exclude: ["SchoolManagementId"]}});
+            const classArms = await ClassArm.findAll({where: {id: [...invitedClassArms]}, attributes: {exclude: ["SchoolManagementId"]}});
 
 
             let payload;
@@ -206,6 +206,8 @@ class InviteController {
                 "flag": "invited",
                 "classes": invitedClasses,
                 "classarms": invitedClassArms,
+                "class_naming": classes.map(data => ({'naming': data.naming})),
+                "arms_naming": classArms.map(data => ({'naming': data.naming})),
                 "Subjects": subjects,
                 "schoolId": inviteInstance.schoolId
             }
