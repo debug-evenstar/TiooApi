@@ -249,7 +249,6 @@ class StudentController {
         }
 
         try {
-
             const decryptHash = HashUtils.decrypt(data.accountId)
             const accountInstance = await Account.findByPk(Number(decryptHash))
 

@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, TempValidation, Teacher, SchoolManagement, Student } = require('../database/connection');
+const { Account, Validation, TempValidation, Teacher, SchoolManagement, Student, Keypairs } = require('../database/connection');
 const TokenMiddleware = require('../middleware/token.middleware');
 const Mailer = require('../services/mailer');
 require('dotenv').config();
@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const { link } = require('fs');
 const { MD5 } = require('crypto-js');
 const { log } = require('console');
+const HashUtils = require('../utils/hash.utilities');
 
 class AuthController {
 
@@ -44,10 +45,15 @@ class AuthController {
 
             // Create school record if account type is school
             if (req.body.account_type === "school") {
+
                 const registeredSchoolManagement = await SchoolManagement.create({
                     school_name: req.body.school
                 });
-
+                const createKeypairs = await Keypairs.create({
+                    public_key: HashUtils.generateKeys(25),
+                    private_key: HashUtils.generateKeys(25)
+                });
+                await registeredSchoolManagement.setKeypair(createKeypairs);
                 await registeredAccount.setSchoolManagement(registeredSchoolManagement);
             }
 
@@ -80,11 +86,22 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
 
+    /* ------------------- CREATE STUDENT FROM EXTERNAL SCHOOL ------------------ */
+    static async registerExternalStudent(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+        const data = req.body
+
+        
+        console.log(data)
+    }
     /*-----------------------------------| VERIFY ACCOUNT |-----------------------------------*/
 
     static async verifyAccount(req, res) {
@@ -106,9 +123,9 @@ class AuthController {
                 });
             }
 
-            const registerdAccount = await Account.findOne({ 
-                where: { id: validation.accountId } ,
-                include : [SchoolManagement, Teacher, Student],
+            const registerdAccount = await Account.findOne({
+                where: { id: validation.accountId },
+                include: [SchoolManagement, Teacher, Student],
                 attributes: { exclude: ['password'] }
             });
 
@@ -137,7 +154,7 @@ class AuthController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -169,7 +186,7 @@ class AuthController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -240,7 +257,7 @@ class AuthController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -302,7 +319,7 @@ class AuthController {
                 payload.redirect = "https://dashboard.hellotioo.com/auth";
             }
 
-            if(user.account_type === "freelancer"){
+            if (user.account_type === "freelancer") {
                 payload.school = user.SchoolManagement.school_name;
                 payload.redirect = "https://dashboard.hellotioo.com/auth";
             }
@@ -318,26 +335,26 @@ class AuthController {
 
                 const profile = await user.getStudent();
                 const schoolManagementId = profile.SchoolManagementId;
-                if(schoolManagementId) {
+                if (schoolManagementId) {
                     const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
                     const studentSchoolAccount = await studentSchool.getAccount();
                     const classData = await profile.getClass();
                     const classArmData = await profile.getClassArm();
                     const studentSubject = await classData.getSubjects();
                     payload.schoolName = studentSchoolAccount.name;
-                    payload.studentClass =  classData.naming;
-                    payload.studentClassArm =  classArmData.naming;
+                    payload.studentClass = classData.naming;
+                    payload.studentClassArm = classArmData.naming;
                     payload.subjectsCount = studentSubject.length;
                     payload.schoolStudent = true;
-                }else{
+                } else {
                     payload.schoolStudent = false;
                     payload.schoolName = profile.school;
-                    payload.studentClass = profile.class; 
+                    payload.studentClass = profile.class;
                 }
                 payload.term = "undefined";
                 payload.redirect = "https://student.hellotioo.com/auth";
 
-              }else{
+            } else {
 
                 payload.admin = user.admin;
             }
@@ -347,7 +364,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error)
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -363,7 +380,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: users });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -400,7 +417,7 @@ class AuthController {
 
                 payload.schoolName = studentSchoolAccount.name;
                 payload.studentClass = classData.naming;
-                payload.studentClassArm =  classArmData.naming;
+                payload.studentClassArm = classArmData.naming;
                 payload.subjectsCount = studentSubject.length;
                 payload.term = "undefined";
 
@@ -411,7 +428,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -444,7 +461,7 @@ class AuthController {
 
                 payload.schoolName = studentSchoolAccount.name;
                 payload.studentClass = classData.naming;
-                payload.studentClassArm =  classArmData.naming;
+                payload.studentClassArm = classArmData.naming;
                 payload.subjectsCount = studentSubject.length;
                 payload.term = "undefined";
 
@@ -455,7 +472,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -479,7 +496,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: true });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -492,7 +509,7 @@ class AuthController {
 
         try {
 
-            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' }, include : [SchoolManagement] });
+            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' }, include: [SchoolManagement] });
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -500,11 +517,11 @@ class AuthController {
 
             const payload = { ...user.dataValues };
 
-            if(payload.account_type === "school"){
+            if (payload.account_type === "school") {
                 payload.school = user.SchoolManagement.school_name;
             }
 
-            if(payload.account_type === "freelancer"){
+            if (payload.account_type === "freelancer") {
                 payload.school = user.SchoolManagement.school_name;
             }
 
@@ -517,24 +534,24 @@ class AuthController {
                 payload.school = schoolManagement.school_name;
             }
 
-            if(payload.account_type === 'student'){
-                const profile  = await user.getStudent(); 
+            if (payload.account_type === 'student') {
+                const profile = await user.getStudent();
                 const schoolManagementId = profile.SchoolManagementId;
-                if(schoolManagementId) {
+                if (schoolManagementId) {
                     const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
                     const studentSchoolAccount = await studentSchool.getAccount();
                     const classData = await profile.getClass();
                     const classArmData = await profile.getClassArm();
                     const studentSubject = await classData.getSubjects();
                     payload.schoolName = studentSchoolAccount.name;
-                    payload.studentClass =  classData.naming;
-                    payload.studentClassArm =  classArmData.naming;
+                    payload.studentClass = classData.naming;
+                    payload.studentClassArm = classArmData.naming;
                     payload.subjectsCount = studentSubject.length;
                     payload.schoolStudent = true;
-                }else{
+                } else {
                     payload.schoolStudent = false;
                     payload.schoolName = profile.school;
-                    payload.studentClass = profile.class; 
+                    payload.studentClass = profile.class;
                 }
                 payload.term = "undefined";
                 payload.status = payload.flag === 'active' ? "On Track" : "??";
@@ -544,7 +561,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -576,7 +593,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -608,7 +625,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -627,11 +644,11 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
             // Temp fix for Cascading relationships -- to be removed
-            if(user.account_type == "student"){
-                (await Student.findOne({ where : {AccountId : id}})).destroy();
+            if (user.account_type == "student") {
+                (await Student.findOne({ where: { AccountId: id } })).destroy();
             }
-            if(user.account_type == "teacher"){
-                (await Teacher.findOne({ where : {AccountId : id}})).destroy();
+            if (user.account_type == "teacher") {
+                (await Teacher.findOne({ where: { AccountId: id } })).destroy();
             }
 
             const response = await user.destroy();
@@ -640,7 +657,7 @@ class AuthController {
 
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -669,7 +686,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: {} });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -714,7 +731,7 @@ class AuthController {
     }
 
 
-    
+
     /*-----------------------------------| ACCOUNT CHANGE PASSWORD |-----------------------------------*/
 
     static async accountChangePassword(req, res) {
@@ -734,7 +751,7 @@ class AuthController {
             const isValidPassword = await studentAccountInstance.comparePassword(req.body.current_password)
 
             if (!isValidPassword) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Current Password is incorrect"});
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Current Password is incorrect" });
             }
 
             const hashPassword = await studentAccountInstance.hashPassword(req.body.new_password);
@@ -886,7 +903,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
 
 
@@ -938,7 +955,7 @@ class AuthController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
     }
 
@@ -976,7 +993,7 @@ class AuthController {
 
     }
 
-    static async resendVerification(req, res){
+    static async resendVerification(req, res) {
 
         const { email } = req.body;
         const errors = validationResult(req);
@@ -987,7 +1004,7 @@ class AuthController {
 
         try {
 
-            const account = await Account.findOne({ where : {email : email}});
+            const account = await Account.findOne({ where: { email: email } });
 
             if (!account) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
@@ -998,7 +1015,7 @@ class AuthController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.send_otp });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -1014,7 +1031,7 @@ class AuthController {
             validate.token = hash
             validate.expires_at = expiry;
             await validate.save();
-        }else{
+        } else {
             tokenRecord.token = hash;
             tokenRecord.expires_at = expiry;
             await tokenRecord.save();
@@ -1048,17 +1065,17 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-           accountInstance.display_image  = req.body.display_image;
+            accountInstance.display_image = req.body.display_image;
 
-           const response = await accountInstance.save()
+            const response = await accountInstance.save()
 
-           const filePath = path.join(process.env.DEV, '', path.basename(response.display_image));   
+            const filePath = path.join(process.env.DEV, '', path.basename(response.display_image));
 
-          const payload = {
-            image: filePath
-           }
+            const payload = {
+                image: filePath
+            }
 
-        return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: payload });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: payload });
 
         } catch (error) {
             console.log(error);

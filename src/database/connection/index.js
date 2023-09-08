@@ -51,11 +51,12 @@ const LessonSlide = db.lessonslides = require("../lesson.slides.model")(sequeliz
 
 const Preference = db.preferences = require("../preference.model")(sequelize, Sequelize);
 const Billing = db.billings = require("../billing.model")(sequelize, Sequelize);
+const Keypairs = db.keypairs = require("../keypairs.model")(sequelize, Sequelize);
 
 
 
 
-const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group, LessonSlide, Preference, Billing]
+const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group, LessonSlide, Preference, Billing, Keypairs]
 
 Relationships.group(...models);
 
@@ -84,5 +85,6 @@ module.exports = {
   Group,
   LessonSlide,
   Preference,
-  Billing
+  Billing,
+  Keypairs
 };

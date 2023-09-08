@@ -46,7 +46,7 @@ class HashUtils {
     }
 
     static generateKeys(length) {
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?';
+        const characters = 'abcdefghijklmnopqrstuvwxyz!#$&123456789@=';
         let randomString = '';
 
         for (let i = 0; i < length; i++) {
@@ -55,6 +55,14 @@ class HashUtils {
         }
 
         return randomString;
+    }
+
+    static generateKeyPair() {
+        return crypto.generateKeyPairSync('rsa', {
+            modulusLength: 2048, // Adjust the key length as needed
+            publicKeyEncoding: { type: 'spki', format: 'pem' },
+            privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+        });
     }
 
 
