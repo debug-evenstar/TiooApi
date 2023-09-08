@@ -41,7 +41,7 @@ class Server {
         //{force : true}
         db.sequelize.sync()
             .then(async () => {
-                AutoMigrate.validateModelsIntegrity();
+                // AutoMigrate.validateModelsIntegrity();
                 // AuthorizationSeed.permission();
                 console.log("Synced db.");
             })
@@ -50,7 +50,7 @@ class Server {
             });
 
         app.use(express.static(path.join(__dirname, '../../public')));
-        
+
 
         app.use(Logger.monitor);
 

@@ -1004,7 +1004,6 @@ class AuthController {
 
 
     static async sendVerificationEmail(account) {
-
         const expiry = (new Date(Date.now() + 30 * 60 * 1000));
         const hash = MD5(account.id + expiry).toString();
         const tokenRecord = await Validation.findOne({ where: { accountId: account.id } });

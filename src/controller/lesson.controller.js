@@ -11,7 +11,6 @@ const LessonTemplateProvider = require("../providers/AI/lesson.template");
 
 
 
-
 class LessonController {
 
 
