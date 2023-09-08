@@ -151,7 +151,7 @@ class InviteController {
                 "email": "",
                 "schoolId": inviteInstance.schoolId,
                 "arm": invitedClassArms[0],
-                "naming": classInstance.naming
+                "naming": classArmInstance.naming
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
