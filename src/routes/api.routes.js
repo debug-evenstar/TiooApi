@@ -45,6 +45,7 @@ const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
 const PreferenceController = require('../controller/preference.controller');
 const BillingController = require('../controller/billing.controller');
+const NotificationController = require('../controller/notification.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -257,6 +258,11 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.get('/settings/school/profile', SchoolManagementController.readProfile);
     router.put('/settings/school/profile', SchoolManagementController.updateProfile);
+
+    router.get('/settings/notification', NotificationController.subscription);
+    router.put('/settings/notification', NotificationController.update);
+
+
 };
 
 
