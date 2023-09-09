@@ -1,12 +1,12 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, TempValidation, Teacher, SchoolManagement, Student, Keypairs } = require('../database/connection');
+const { Account, Validation, TempValidation, Teacher, SchoolManagement, Student, Keypairs, } = require('../database/connection');
 const TokenMiddleware = require('../middleware/token.middleware');
 const Mailer = require('../services/mailer');
 require('dotenv').config();
 const { scryptSync, randomBytes, } = require('crypto');
 const path = require('path');
-
+const jwt = require('jsonwebtoken');
 
 const crypto = require('crypto');
 const { link } = require('fs');
@@ -49,9 +49,10 @@ class AuthController {
                 const registeredSchoolManagement = await SchoolManagement.create({
                     school_name: req.body.school
                 });
+                const { publicKey, privateKey } = HashUtils.generateKeyPair();
                 const createKeypairs = await Keypairs.create({
-                    public_key: HashUtils.generateKeys(25),
-                    private_key: HashUtils.generateKeys(25)
+                    public_key: crypto.randomBytes(20).toString('base64'),
+                    private_key: crypto.randomBytes(20).toString('base64'),
                 });
                 await registeredSchoolManagement.setKeypair(createKeypairs);
                 await registeredAccount.setSchoolManagement(registeredSchoolManagement);
@@ -97,10 +98,59 @@ class AuthController {
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
-        const data = req.body
+        try {
+            const data = req.body
+            const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
 
-        
-        console.log(data)
+            if (!jwtRegex.test(data.payload)) {
+                return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
+            }
+
+            const Schoolkey = await Keypairs.findOne({
+                where: {
+                    public_key: data.public_key
+                }
+            });
+
+            if (!Schoolkey) {
+                return res.status(ResponseStatus.code.not_found).json({ message: ResponseStatus.fail.school });
+            }
+            const privateKey = Schoolkey.private_key;
+            const school = await Schoolkey.getSchoolManagement();
+            const decoded = jwt.verify(data.payload, privateKey);
+            if (!decoded) {
+                return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
+            }
+            const emailExist = await AuthController.validateEmail(decoded.userdata.email);
+            if (emailExist.pass) {
+                return res.status(ResponseStatus.code.conflict).json({
+                    error: true, message:
+                        ResponseStatus.fail.account_conflict
+                });
+            }
+
+            console.log(decoded.userdata.first_name + " " + decoded.userdata.last_name)
+
+            const account = Account.create({
+                name: decoded.userdata.first_name + " " + decoded.userdata.last_name,
+                email: decoded.userdata.email,
+                phone: "",
+                account_type: "student",
+                verification_status: 1,
+                status: "active",
+                flag: "active",
+                password: decoded.userdata.password,
+            })
+
+            if (account) {
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+
+        }
+
+
     }
     /*-----------------------------------| VERIFY ACCOUNT |-----------------------------------*/
 
@@ -1039,7 +1089,7 @@ class AuthController {
 
 
 
-        const link = `${process.env.WEB_URL}/account/verify/${hash}`;
+        const link = `${process.env.CICD_WEB_URL}/confirmation`;
 
         console.log(link);
 

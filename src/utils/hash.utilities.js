@@ -5,6 +5,7 @@ class HashUtils {
 
     static encrypt = (plainText) => {
         try {
+            jwtString
             const iv = crypto.randomBytes(16);
             const key = crypto.createHash('sha256').update("secret123456").digest('base64').substr(0, 32);
             const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
@@ -45,6 +46,10 @@ class HashUtils {
         return password;
     }
 
+    static encryptUser = (userdata, key) => {
+        return jwt.sign({ userdata }, key, { expiresIn: "90d" });
+    }
+
     static generateKeys(length) {
         const characters = 'abcdefghijklmnopqrstuvwxyz!#$&123456789@=';
         let randomString = '';
@@ -59,7 +64,7 @@ class HashUtils {
 
     static generateKeyPair() {
         return crypto.generateKeyPairSync('rsa', {
-            modulusLength: 2048, // Adjust the key length as needed
+            modulusLength: 512, // Adjust the key length as needed
             publicKeyEncoding: { type: 'spki', format: 'pem' },
             privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
         });

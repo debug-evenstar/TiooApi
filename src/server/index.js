@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require('dotenv').config();
+const crypto = require("crypto");
 const app = express();
 const { db } = require("../database/connection");
 const PORT = process.env.PORT || 8080;
@@ -57,8 +58,11 @@ class Server {
         //=============== REGISTERED ROUTE ================//
 
         IndexRoute(app).register();
-
+        const jwt = require('jsonwebtoken');
         const server = app.listen(PORT, () => {
+
+            //  console.log([randomPrivateKey, randomPublicKey, token]);
+
             console.log(`NIMO SERVER RUNNING @ http://127.0.0.1:${PORT}/api`);
 
         });

@@ -23,7 +23,7 @@ module.exports = {
     ],
     RegisterExternalStudentValidator: [
         body('public_key').notEmpty().withMessage("Public_key is required"),
-        body('payload').notEmpty().withMessage("Payload is required"),
+        body('payload').notEmpty().withMessage("Payload is required")
     ],
 
     SendOTPValidator: [
