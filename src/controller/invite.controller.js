@@ -145,7 +145,6 @@ class InviteController {
 
             const classInstance = await classArmInstance.getClass();
 
-
             const payload = {
                 "name": "",
                 "email": "",
