@@ -51,9 +51,7 @@ class NotificationController {
 
             let subscriptionInstances = await accountInstance.getSubscriptions();
 
-            const body = req.body.subscriptions.filter((element)=>({status: element.status, device_id: req.body.device_id }));
-
-            const ids = req.body.subscriptions.filter((element)=> element);
+            const body = req.body.subscriptions.map((element)=>({status: element.status, device_id: req.body.device_id }));
 
             for(var i = 0; i < subscriptionInstances.length; i++){
 
