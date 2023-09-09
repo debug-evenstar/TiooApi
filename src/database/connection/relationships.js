@@ -1,7 +1,7 @@
 
 class Relationships {
 
-    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group, LessonSlide, Preference, Billing) {
+    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group, LessonSlide, Preference, Billing, Notification, Subscription) {
 
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -30,10 +30,20 @@ class Relationships {
         Preference.belongsTo(Account, { allowNull: true });
 
 
+        Account.hasOne(Preference, { allowNull: true, onDelete: 'CASCADE'});
+        Preference.belongsTo(Account, { allowNull: true });
+
+
         //---------/ ONE-TO-MANY - SCHOOL -*- CLASS | TEACHERS | STUDENT | SUBJECT /--------------------
 
         SchoolManagement.hasMany(Teacher);
-        Teacher.belongsTo(SchoolManagement); -
+        Teacher.belongsTo(SchoolManagement);
+
+        Notification.hasMany(Subscription);
+        Subscription.belongsTo(Notification);
+
+        Account.hasMany(Subscription);
+        Subscription.belongsTo(Account);
 
         SchoolManagement.hasMany(Student);
         Student.belongsTo(SchoolManagement);
