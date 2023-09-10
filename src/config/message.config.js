@@ -28,6 +28,7 @@ const ResponseMessage = {
         no_user: "User does not exist",
         teacher: "Teachers Account Not Found",
         student: "Student Account Not Found",
+        school: "School Account Not Found",
         login: "Username or Password don't match",
         verify: "Account Not Verified",
         school_setup: "Can't setup a school with this account type",
