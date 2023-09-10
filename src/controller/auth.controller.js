@@ -1095,7 +1095,7 @@ class AuthController {
 
 
 
-        const link = `${process.env.CICD_WEB_URL}/confirmation`;
+        const link = `${process.env.WEB_URL}/account/verify/${hash}`;
 
         console.log(link);
 
