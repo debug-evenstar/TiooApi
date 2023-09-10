@@ -5,7 +5,7 @@ class HashUtils {
 
     static encrypt = (plainText) => {
         try {
-            jwtString
+            // jwtString
             const iv = crypto.randomBytes(16);
             const key = crypto.createHash('sha256').update("secret123456").digest('base64').substr(0, 32);
             const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);

@@ -86,7 +86,7 @@ module.exports = {
   LessonSlide,
   Preference,
   Billing,
-  Keypairs
+  Keypairs,
   Notification,
   Subscription
 };
