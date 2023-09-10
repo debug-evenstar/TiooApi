@@ -108,7 +108,7 @@ class SchoolManagementController {
 
         try {
             const response = await SchoolManagement.findByPk(id);
-            
+
             if (!response) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
@@ -120,6 +120,7 @@ class SchoolManagementController {
                     publicKey: "null",
                     privateKey: "null"
                 }
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
             }
 
             response.dataValues.keys = {
