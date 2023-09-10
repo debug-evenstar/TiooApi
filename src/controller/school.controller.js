@@ -107,13 +107,26 @@ class SchoolManagementController {
         const { id } = req.params;
 
         try {
-
             const response = await SchoolManagement.findByPk(id);
 
             if (!response) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
+            const { private_key, public_key } = await response.getKeypair();
+
+            if (!private_key && !public_key) {
+                response.dataValues.keys = {
+                    publicKey: "null",
+                    privateKey: "null"
+                }
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
+            }
+
+            response.dataValues.keys = {
+                publicKey: public_key,
+                privateKey: private_key,
+            }
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
 
         } catch (error) {
@@ -479,32 +492,32 @@ class SchoolManagementController {
 
     }
 
-    static async readSchoolRoles(req, res){
-        
+    static async readSchoolRoles(req, res) {
+
         try {
 
-        let permissions = await Permission.findAll({ where: { account: 'school' } });
+            let permissions = await Permission.findAll({ where: { account: 'school' } });
 
-        if (permissions.length === 0 ) {
+            if (permissions.length === 0) {
 
-          const respose = await AuthorizationSeed.schoolPermission();
-             
-           const data = await Permission.findAll({ where: { account: 'school' } });
+                const respose = await AuthorizationSeed.schoolPermission();
 
-           permissions = data;
+                const data = await Permission.findAll({ where: { account: 'school' } });
 
-        }
+                permissions = data;
 
-        return res.status(ResponseStatus.code.success).json({
-            error: false,
-            message: ResponseStatus.pass.added,
-            data: permissions
-        });
+            }
 
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: 'server error', extra: error.message });
-    };
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.added,
+                data: permissions
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
 
     }
 
@@ -562,13 +575,13 @@ class SchoolManagementController {
 
             const schoolInstance = await schoolAccount.getSchoolManagement();
 
-           const response =  await schoolInstance.addAuthorization(authorization);
+            const response = await schoolInstance.addAuthorization(authorization);
 
-           await authorization.setAccount(registeredAdmin);
+            await authorization.setAccount(registeredAdmin);
 
             console.log("this is the new admin password", password)
 
-           Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
+            Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
@@ -596,30 +609,30 @@ class SchoolManagementController {
             const schoolAccount = await Account.findByPk(account_id);
 
             if (!schoolAccount) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found});
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
             const schoolInstance = await schoolAccount.getSchoolManagement();
 
-            const admins = await schoolInstance.getAuthorizations({include: Account });
+            const admins = await schoolInstance.getAuthorizations({ include: Account });
 
-            const response = await Promise.all(admins.map( async (element)=>{
+            const response = await Promise.all(admins.map(async (element) => {
 
                 const items = JSON.parse(element.permissions);
 
                 let permissions = await Permission.findAll({ where: { code: items } });
 
-                const roles =  permissions.map((permission) => ({code: permission.code, name: permission.name }));
+                const roles = permissions.map((permission) => ({ code: permission.code, name: permission.name }));
 
                 console.log(permissions);
-                
+
                 const data = {
                     id: element.id,
                     account_id: element.Account.dataValues.id,
-                    name:  element.Account.dataValues.name,
-                    email:  element.Account.dataValues.email,
-                    image:  element.Account.dataValues.display_image,
-                    status:  element.Account.dataValues.status,
+                    name: element.Account.dataValues.name,
+                    email: element.Account.dataValues.email,
+                    image: element.Account.dataValues.display_image,
+                    status: element.Account.dataValues.status,
                     roles: roles
                 };
 
@@ -642,12 +655,12 @@ class SchoolManagementController {
     }
 
 
-    
+
     /*-----------------------------------| DE ACTIVATE ADMIN |-----------------------------------*/
 
     static async deactivateAdmin(req, res) {
 
-      const {id} = req.params;
+        const { id } = req.params;
 
         try {
 
@@ -661,61 +674,61 @@ class SchoolManagementController {
                 return res.status(ResponseStatus.code.forbidden).json({ error: true, message: ResponseStatus.fail.forbidden });
             }
 
-            const response = await user.update({ status: user.status == 'active' ? 'inactive': 'active' });
+            const response = await user.update({ status: user.status == 'active' ? 'inactive' : 'active' });
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: {status: response.status} });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: { status: response.status } });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
 
 
-        /*-----------------------------------| REMOVE ADMIN |-----------------------------------*/
+    /*-----------------------------------| REMOVE ADMIN |-----------------------------------*/
 
-        static async removeAdmin(req, res) {
+    static async removeAdmin(req, res) {
 
-            const {id} = req.params;
-      
-              try {
-      
-                  const user = await Account.findByPk(id);
+        const { id } = req.params;
 
-               
-      
-                  if (!user) {
-                      return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
-                  }
-      
-                  if (user.account_type != 'Admin') {
-                      return res.status(ResponseStatus.code.forbidden).json({ error: true, message: ResponseStatus.fail.forbidden });
-                  }
+        try {
 
-                  const authorization = await user.getAuthorization();
+            const user = await Account.findByPk(id);
 
 
-                  if (!authorization) {
-                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Admin has no authorizatioin" });
-                }
-    
-      
-                const data =  await user.destroy();
 
-                const auth = await authorization.destroy();
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
 
-                const pass = {
-                    user: data,
-                    auth: auth
-                };
-      
-                  return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed, data: {}});
-      
-              } catch (error) {
-                  res.status(500).json({ error: 'server error' ,  extra: error.message });
-              };
-      
-          }
+            if (user.account_type != 'Admin') {
+                return res.status(ResponseStatus.code.forbidden).json({ error: true, message: ResponseStatus.fail.forbidden });
+            }
+
+            const authorization = await user.getAuthorization();
+
+
+            if (!authorization) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Admin has no authorizatioin" });
+            }
+
+
+            const data = await user.destroy();
+
+            const auth = await authorization.destroy();
+
+            const pass = {
+                user: data,
+                auth: auth
+            };
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed, data: {} });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
 
 }
 

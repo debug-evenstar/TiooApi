@@ -3,7 +3,7 @@ router = express.Router();
 
 /* -------------------------------| Validators |------------------------------- */
 
-const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator } = require("./validators/AuthValidators")
+const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator, RegisterExternalStudentValidator } = require("./validators/AuthValidators")
 
 /*-----------------------------------| HOME |-----------------------------------*/
 
@@ -45,6 +45,7 @@ const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
 const PreferenceController = require('../controller/preference.controller');
 const BillingController = require('../controller/billing.controller');
+const NotificationController = require('../controller/notification.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -53,6 +54,7 @@ const OpenRoutesGroup = (router) => {
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
+    router.post('/account/student/external', RegisterExternalStudentValidator, AuthenicationController.registerExternalStudent);
     router.post('/account/send_otp', SendOTPValidator, AuthenicationController.requestVerificationOTP);
     router.post('/account/verify/resend', SendOTPValidator, AuthenicationController.resendVerification);
     router.put('/account/change_password', ChangePasswordValidator, AuthenicationController.changePassword);
@@ -257,6 +259,11 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.get('/settings/school/profile', SchoolManagementController.readProfile);
     router.put('/settings/school/profile', SchoolManagementController.updateProfile);
+
+    router.get('/settings/notification', NotificationController.subscription);
+    router.put('/settings/notification', NotificationController.update);
+
+
 };
 
 
