@@ -45,6 +45,7 @@ const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
 const PreferenceController = require('../controller/preference.controller');
 const BillingController = require('../controller/billing.controller');
+const NotificationController = require('../controller/notification.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -234,6 +235,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.put('/lesson/:id/status', LessonController.updateLessonStatus);
     router.get('/lesson/check', LessonController.subjectGroupedLessons);
     router.post('/lesson/generate', LessonController.generateLesson);
+    router.post('/lesson/:id/generate/extra', LessonController.generateLessonWithExtra);
     router.get('/lesson/generated/:id', LessonController.readGeneratedLesson);
     router.put('/lesson/generated/:id', LessonController.updateGeneratedLesson);
     router.post('/lesson/create', UploadService.uploadLesson.array('files'), LessonController.createLesson);
@@ -257,6 +259,11 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.get('/settings/school/profile', SchoolManagementController.readProfile);
     router.put('/settings/school/profile', SchoolManagementController.updateProfile);
+
+    router.get('/settings/notification', NotificationController.subscription);
+    router.put('/settings/notification', NotificationController.update);
+
+
 };
 
 

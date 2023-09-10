@@ -391,9 +391,13 @@ class AuthController {
                     const classData = await profile.getClass();
                     const classArmData = await profile.getClassArm();
                     const studentSubject = await classData.getSubjects();
+                    const classSubject = await classData.getSubjects();
+
                     payload.schoolName = studentSchoolAccount.name;
-                    payload.studentClass = classData.naming;
-                    payload.studentClassArm = classArmData.naming;
+
+                    payload.studentClass =  classData.naming;
+                    payload.studentClassArm =  classArmData.naming;
+
                     payload.subjectsCount = studentSubject.length;
                     payload.schoolStudent = true;
                 } else {
@@ -465,7 +469,7 @@ class AuthController {
                 const classArmData = await profile.getClassArm();
                 const studentSubject = await classData.getSubjects();
 
-                payload.schoolName = studentSchoolAccount.name;
+                payload.schoolName = studentSchool.school_name;
                 payload.studentClass = classData.naming;
                 payload.studentClassArm = classArmData.naming;
                 payload.subjectsCount = studentSubject.length;
@@ -509,7 +513,7 @@ class AuthController {
                 const classArmData = await profile.getClassArm();
                 const studentSubject = await classData.getSubjects();
 
-                payload.schoolName = studentSchoolAccount.name;
+                payload.schoolName = studentSchool.school_name;
                 payload.studentClass = classData.naming;
                 payload.studentClassArm = classArmData.naming;
                 payload.subjectsCount = studentSubject.length;
@@ -593,9 +597,11 @@ class AuthController {
                     const classData = await profile.getClass();
                     const classArmData = await profile.getClassArm();
                     const studentSubject = await classData.getSubjects();
-                    payload.schoolName = studentSchoolAccount.name;
-                    payload.studentClass = classData.naming;
-                    payload.studentClassArm = classArmData.naming;
+
+                    payload.schoolName = studentSchool.school_name;
+                    payload.studentClass =  classData.naming;
+                    payload.studentClassArm =  classArmData.naming;
+
                     payload.subjectsCount = studentSubject.length;
                     payload.schoolStudent = true;
                 } else {

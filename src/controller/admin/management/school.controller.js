@@ -375,11 +375,11 @@ class AdminSchoolController {
 
             const subjectInstance = await lessonInstance.getSubject();
 
-            const grade = lessonInstance.ClassId;
+            const classInstance = lessonInstance.getClass();
+
+            const grade = `{reference:${classInstance.id},name:"${classInstance.naming}"}`;
 
             const subject = subjectInstance.naming;
-
-            console.log(grade, subject);
 
             const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath, grade, subject);
 
