@@ -24,17 +24,19 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: 'none',
       },
       objective: {
-        type: Sequelize.STRING,
+        type: Sequelize.JSON,
+        defaultValue: '',
         allowNull: true,
       },
       additional_instruction: {
-        type: Sequelize.STRING,
+        type: Sequelize.JSON,
+        defaultValue: '',
         allowNull: true,
       },
       week: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: 'Week 1',
+        defaultValue: '',
       },
       start_date: {
         type: Sequelize.DATE,
@@ -49,7 +51,16 @@ module.exports = (sequelize, Sequelize) => {
       status: {
         type: Sequelize.STRING,
         allowNull: true,
-        defaultValue: 'Locked',
+        defaultValue: 'Unlocked',
+        get() {
+          const start = this.getDataValue('start_date');
+          const end = this.getDataValue('end_date');
+          const currentDate = new Date();
+          if (start <= currentDate && currentDate <= end) {
+            return 'Unlocked';
+          }
+          return this.getDataValue('status');
+      },
       },
       admin_status: {
         type: Sequelize.STRING,
@@ -69,6 +80,16 @@ module.exports = (sequelize, Sequelize) => {
       files: {
         type: Sequelize.JSON,
         defaultValue: [],
+      },
+      generated: {
+        type: Sequelize.JSON,
+        allowNull: true,
+        defaultValue: '',
+      },
+      session_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
       },
       age: {
         type: Sequelize.INTEGER,

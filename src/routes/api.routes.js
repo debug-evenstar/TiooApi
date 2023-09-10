@@ -3,7 +3,7 @@ router = express.Router();
 
 /* -------------------------------| Validators |------------------------------- */
 
-const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator } = require("./validators/AuthValidators")
+const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator, RegisterExternalStudentValidator } = require("./validators/AuthValidators")
 
 /*-----------------------------------| HOME |-----------------------------------*/
 
@@ -45,6 +45,7 @@ const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
 const PreferenceController = require('../controller/preference.controller');
 const BillingController = require('../controller/billing.controller');
+const NotificationController = require('../controller/notification.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -53,6 +54,7 @@ const OpenRoutesGroup = (router) => {
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
+    router.post('/account/student/external', RegisterExternalStudentValidator, AuthenicationController.registerExternalStudent);
     router.post('/account/send_otp', SendOTPValidator, AuthenicationController.requestVerificationOTP);
     router.post('/account/verify/resend', SendOTPValidator, AuthenicationController.resendVerification);
     router.put('/account/change_password', ChangePasswordValidator, AuthenicationController.changePassword);
@@ -116,6 +118,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.put('/account/update/:id', AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
     router.get('/account/exist/:email', AuthenicationController.accountExist);
+    router.post('/account/profile/upload', UploadService.uploadDisplayPicture.single('file'), AuthenicationController.uploadDisplayPicture);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
 
     /* --------------------------------- SCHOOL --------------------------------- */
@@ -130,6 +133,12 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/school/teachers/:id', SchoolManagementController.schoolTeachers);
     router.get('/school/:id/terms', SchoolManagementController.schoolTerms);
     router.post('/school/kyc', UploadService.uploadLesson.array('files'), SchoolManagementController.kyc);
+    router.post('/school/admin', SchoolManagementController.addSchoolAdminUser);
+    router.delete('/school/admin/:id', SchoolManagementController.removeAdmin);
+    router.get('/school/admin', SchoolManagementController.readSchoolAdmins);
+    router.get('/school/admin/roles', SchoolManagementController.readSchoolRoles);
+    router.post('/school/admin/:id/deactivate', SchoolManagementController.deactivateAdmin);
+
     /* ---------------------------------- CLASS --------------------------------- */
     router.post('/class/create', ClassController.create);
     router.post('/class/create_bulk', ClassController.bulkCreate);
@@ -204,6 +213,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/subjects', StudentController.studentSubjects);
     router.get('/student/classteacher', StudentController.studentClassTeacher);
     router.get('/student/classmates', StudentController.studentMates);
+    router.get('/student/classteachersandmates', StudentController.studentClassTeachersAndMates);
     router.get('/student/classarmsmates', StudentController.studentArmsMates);
     router.get('/student/personalinfo', StudentController.personalInformation);
     router.put('/student/personalinfo', StudentController.updatePersonalInformation);
@@ -211,19 +221,26 @@ const AuthorizedRoutesGroup = (router) => {
 
     /* --------------------------------- LESSON -------------------------------- */
 
+    router.get('/lesson/alllessons', LessonController.allLessons);
     router.get('/lesson/read', LessonController.upcomingNextWeeksLessons);
     router.get('/lesson/student/read', LessonController.studentUpcomingNextWeeksLessons);
     router.get('/lesson/subjectlessons/:id', LessonController.subjectLessons);
     router.get('/lesson/groups', LessonController.subjectGroups);
     router.post('/lesson/groups/:id/add', UploadService.uploadLesson.array('files'), LessonController.addLessonToGroup);
+    router.post('/lesson/generate/groups/:id', LessonController.generateLessonWithGroup);
     router.post('/lesson/groups/:id/editarms', LessonController.editGroupArms);
     router.delete('/lesson/groups/:id/lesson/:lesson', LessonController.removeLessonFromGroup);
     router.put('/lesson/:id', LessonController.updateLesson);
     router.get('/lesson/:id/template', LessonController.lessonTemplate);
     router.put('/lesson/:id/status', LessonController.updateLessonStatus);
     router.get('/lesson/check', LessonController.subjectGroupedLessons);
+    router.post('/lesson/generate', LessonController.generateLesson);
+    router.post('/lesson/:id/generate/extra', LessonController.generateLessonWithExtra);
+    router.get('/lesson/generated/:id', LessonController.readGeneratedLesson);
+    router.put('/lesson/generated/:id', LessonController.updateGeneratedLesson);
     router.post('/lesson/create', UploadService.uploadLesson.array('files'), LessonController.createLesson);
     router.post('/lesson/add', UploadService.uploadLesson.array('files'), LessonController.addLesson);
+    router.put('/lesson/template/:id', LessonController.updateLessonTemplate);
 
     router.get('/chapter/subject/:id', ChapterController.read);
 
@@ -233,10 +250,19 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/settings/preference', PreferenceController.create);
     router.put('/settings/preference', PreferenceController.update);
     router.get('/settings/preference', PreferenceController.read);
+    router.post('/settings/student/preference', PreferenceController.setStudentPreference);
     router.get('/settings/billing/school', BillingController.school);
     router.get('/settings/billing/freelancer', BillingController.freelancer);
     router.get('/settings/billing/student', BillingController.student);
     router.post('/settings/billing/generate', BillingController.generateBill);
+    router.post('/settings/account/changepassword', AuthenicationController.accountChangePassword);
+
+    router.get('/settings/school/profile', SchoolManagementController.readProfile);
+    router.put('/settings/school/profile', SchoolManagementController.updateProfile);
+
+    router.get('/settings/notification', NotificationController.subscription);
+    router.put('/settings/notification', NotificationController.update);
+
 
 };
 

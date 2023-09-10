@@ -1,9 +1,16 @@
 const { validationResult, body } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Student, Class, ClassArm, Subject } = require('../database/connection');
+const { Account, Validation, SchoolManagement, Student, Class, ClassArm, Subject, Permission, Authorization } = require('../database/connection');
 const AuthController = require('../controller/auth.controller');
 const ClassSeeds = require('../utils/class.utilities');
 const SchoolUtils = require('./helper/assignClass.helper');
+const path = require('path');
+const AuthorizationSeed = require('../seeders/seed.authorization');
+const HashUtils = require('../utils/hash.utilities');
+const Mailer = require('../services/mailer');
+
+
+
 
 class SchoolManagementController {
 
@@ -69,7 +76,7 @@ class SchoolManagementController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     };
@@ -89,7 +96,7 @@ class SchoolManagementController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: allSchools });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -100,17 +107,30 @@ class SchoolManagementController {
         const { id } = req.params;
 
         try {
-
             const response = await SchoolManagement.findByPk(id);
 
             if (!response) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
+            const { private_key, public_key } = await response.getKeypair();
+
+            if (!private_key && !public_key) {
+                response.dataValues.keys = {
+                    publicKey: "null",
+                    privateKey: "null"
+                }
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
+            }
+
+            response.dataValues.keys = {
+                publicKey: public_key,
+                privateKey: private_key,
+            }
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -131,7 +151,7 @@ class SchoolManagementController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -150,58 +170,58 @@ class SchoolManagementController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const schoolTeachersProfile = await schoolInstance.getTeachers({ include : [Account, Subject, Class, ClassArm]});
+            const schoolTeachersProfile = await schoolInstance.getTeachers({ include: [Account, Subject, Class, ClassArm] });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: schoolTeachersProfile });
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
 
 
-        /*----------------------------------| FETCH AUTH SCHOOLS TEACHERS |----------------------------------*/
+    /*----------------------------------| FETCH AUTH SCHOOLS TEACHERS |----------------------------------*/
 
-        static async authSchoolTeachers(req, res) {
+    static async authSchoolTeachers(req, res) {
 
-            try {
-    
-                const AccountInstance = await Account.findByPk(req.userData.id, { include: [SchoolManagement] });
-                if (!AccountInstance) {
-                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
-                }
-                const SchoolInstances = await AccountInstance.getSchoolManagement();
-                if (!SchoolInstances) {
-                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-                }
-    
-                const schoolInstance = await SchoolManagement.findByPk(SchoolInstances.id);
-    
-                if (!schoolInstance) {
-                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-                }
-    
-                const schoolTeachersProfile = await schoolInstance.getTeachers();
-    
-                const teacherAccountIds = schoolTeachersProfile.map(teacher => teacher.AccountId);
-    
-                let teachersAccount = [];
-    
-                if (teacherAccountIds.length !== 0) {
-                    teachersAccount = await Account.findAll({ where: { id: [...teacherAccountIds] }, attributes: { exclude: ['password'] } });
-                }
-        
-    
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'server error' ,  extra: error.message });
-            };
-        }
-    
+        try {
+
+            const AccountInstance = await Account.findByPk(req.userData.id, { include: [SchoolManagement] });
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const schoolInstance = await SchoolManagement.findByPk(SchoolInstances.id);
+
+            if (!schoolInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const schoolTeachersProfile = await schoolInstance.getTeachers();
+
+            const teacherAccountIds = schoolTeachersProfile.map(teacher => teacher.AccountId);
+
+            let teachersAccount = [];
+
+            if (teacherAccountIds.length !== 0) {
+                teachersAccount = await Account.findAll({ where: { id: [...teacherAccountIds] }, attributes: { exclude: ['password'] } });
+            }
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: teachersAccount });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
 
     /*----------------------------------| FETCH CLASSES BY SCHOOL ID |----------------------------------*/
 
@@ -225,7 +245,7 @@ class SchoolManagementController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -250,7 +270,7 @@ class SchoolManagementController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -280,7 +300,7 @@ class SchoolManagementController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -298,7 +318,7 @@ class SchoolManagementController {
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
-            
+
             const schoolInstance = await accountInstance.getSchoolManagement();
 
             accountInstance.dataValues.schoolManagementId = schoolInstance.id;
@@ -306,7 +326,7 @@ class SchoolManagementController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountInstance });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -323,7 +343,7 @@ class SchoolManagementController {
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
-            
+
             const schoolInstance = await accountInstance.getSchoolManagement();
 
             // Check for configured school terms
@@ -333,7 +353,7 @@ class SchoolManagementController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: defaultTerms });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -342,22 +362,22 @@ class SchoolManagementController {
     static bootstrapTerms() {
         return [
             {
-                id : 1,
-                label : "1st Term/Semester"
+                id: 1,
+                label: "1st Term/Semester"
             },
             {
-                id : 2,
-                label : "2nd Term/Semester"
+                id: 2,
+                label: "2nd Term/Semester"
             },
             {
-                id : 3,
-                label : "3rd Term/Semester"
+                id: 3,
+                label: "3rd Term/Semester"
             }
         ];
     }
 
 
-    
+
     static async kyc(req, res) {
 
         let filePaths = [];
@@ -382,10 +402,333 @@ class SchoolManagementController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     };
+
+
+    /*-----------------------------------| READ PROFILE |-----------------------------------*/
+
+    static async readProfile(req, res) {
+
+        const { id } = req.userData;
+        delete req.body.email;
+
+        try {
+
+            const accountInstance = await Account.findByPk(id);
+
+            const schoolInstance = await accountInstance.getSchoolManagement();
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            if (!schoolInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            const filePath = path.join(process.env.DEV, '', path.basename(accountInstance.display_image));
+
+            const payload = {
+                id: accountInstance.id,
+                name: accountInstance.name,
+                phone: accountInstance.phone,
+                email: accountInstance.email,
+                website: schoolInstance.website,
+                profile_picture: accountInstance.display_image ? filePath : "https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png"
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: payload });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+    /*-----------------------------------| UPDATE PROFILE |-----------------------------------*/
+
+    static async updateProfile(req, res) {
+
+        const { id } = req.userData;
+        delete req.body.email;
+
+        try {
+
+            const accountInstance = await Account.findByPk(id);
+
+            const schoolInstance = await accountInstance.getSchoolManagement();
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            accountInstance.name = req.body.name;
+            accountInstance.phone = req.body.phone;
+            schoolInstance.website = req.body.website;
+            schoolInstance.school_name = req.body.name;
+
+            const account = await accountInstance.save();
+            const school = await schoolInstance.save();
+
+            const payload = {
+                id: account.id,
+                name: account.name,
+                phone: account.phone,
+                email: account.email,
+                profile_picture: account.display_image ?? "https://i.pinimg.com/originals/a6/58/32/a65832155622ac173337874f02b218fb.png",
+                website: school.website,
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+    static async readSchoolRoles(req, res) {
+
+        try {
+
+            let permissions = await Permission.findAll({ where: { account: 'school' } });
+
+            if (permissions.length === 0) {
+
+                const respose = await AuthorizationSeed.schoolPermission();
+
+                const data = await Permission.findAll({ where: { account: 'school' } });
+
+                permissions = data;
+
+            }
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.added,
+                data: permissions
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+    static async addSchoolAdminUser(req, res) {
+
+        const otp = Math.floor(Math.random() * 900000) + 100000;
+        const data = req.body;
+        const errors = validationResult(req);
+
+        const password = HashUtils.generateRandomPassword(6)
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const adminAccount = await Account.findOne({ where: { email: data.email } });
+
+            if (adminAccount) {
+                return res.status(ResponseStatus.code.conflict).json({ error: true, message: "Already an admin user" });
+            }
+
+            data.password = password;
+            data.account_type = 'Admin';
+            data.flag = 'active';
+            data.status = 'active';
+            data.verification_status = 1;
+
+            const registeredAdmin = await Account.create(data);
+            const newValidation = await Validation.create({ otp });
+            await registeredAdmin.setValidation(newValidation);
+
+            let seededPermissions = await Permission.findAll();
+
+            let permissions = await Permission.findAll({ where: { id: data.roles } });
+
+            if (seededPermissions.length === 0) {
+                await AuthorizationSeed.permission();
+                permissions = await Permission.findAll({ where: { id: data.roles } });
+            }
+
+            const permission_code = permissions.map((permission) => permission.code);
+
+            const authorizationData = {
+                position: 'school-admin',
+                role: 'admin',
+                permissions: permission_code
+            };
+
+            const authorization = await Authorization.create(authorizationData);
+
+            const schoolAccount = await Account.findByPk(data.school);
+
+            const schoolInstance = await schoolAccount.getSchoolManagement();
+
+            const response = await schoolInstance.addAuthorization(authorization);
+
+            await authorization.setAccount(registeredAdmin);
+
+            console.log("this is the new admin password", password)
+
+            Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.added,
+                data: response
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+
+    static async readSchoolAdmins(req, res) {
+
+        const { id } = req.userData
+
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
+        try {
+
+            const schoolAccount = await Account.findByPk(account_id);
+
+            if (!schoolAccount) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const schoolInstance = await schoolAccount.getSchoolManagement();
+
+            const admins = await schoolInstance.getAuthorizations({ include: Account });
+
+            const response = await Promise.all(admins.map(async (element) => {
+
+                const items = JSON.parse(element.permissions);
+
+                let permissions = await Permission.findAll({ where: { code: items } });
+
+                const roles = permissions.map((permission) => ({ code: permission.code, name: permission.name }));
+
+                console.log(permissions);
+
+                const data = {
+                    id: element.id,
+                    account_id: element.Account.dataValues.id,
+                    name: element.Account.dataValues.name,
+                    email: element.Account.dataValues.email,
+                    image: element.Account.dataValues.display_image,
+                    status: element.Account.dataValues.status,
+                    roles: roles
+                };
+
+                return data
+            }))
+
+
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.added,
+                data: response
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+
+    /*-----------------------------------| DE ACTIVATE ADMIN |-----------------------------------*/
+
+    static async deactivateAdmin(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const user = await Account.findByPk(id);
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            if (user.account_type != 'Admin') {
+                return res.status(ResponseStatus.code.forbidden).json({ error: true, message: ResponseStatus.fail.forbidden });
+            }
+
+            const response = await user.update({ status: user.status == 'active' ? 'inactive' : 'active' });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: { status: response.status } });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+    /*-----------------------------------| REMOVE ADMIN |-----------------------------------*/
+
+    static async removeAdmin(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const user = await Account.findByPk(id);
+
+
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+
+            if (user.account_type != 'Admin') {
+                return res.status(ResponseStatus.code.forbidden).json({ error: true, message: ResponseStatus.fail.forbidden });
+            }
+
+            const authorization = await user.getAuthorization();
+
+
+            if (!authorization) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Admin has no authorizatioin" });
+            }
+
+
+            const data = await user.destroy();
+
+            const auth = await authorization.destroy();
+
+            const pass = {
+                user: data,
+                auth: auth
+            };
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed, data: {} });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
 
 }
 

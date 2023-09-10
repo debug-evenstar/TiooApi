@@ -58,7 +58,7 @@ class AuthorizationController {
 
             const authorization = await Authorization.create(authorizationData);
 
-            authorization.setAdmin(registeredAdmin);
+            await authorization.setAdmin(registeredAdmin);
 
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
 
@@ -81,7 +81,9 @@ class AuthorizationController {
 
         try {
 
-            const authorization = await Authorization.findAll();
+            const authorization = await Authorization.findAll({where: {AccountId: null}});
+
+            console.log(authorization);
 
             const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
                 const userdata = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'] } });
@@ -181,10 +183,14 @@ class AuthorizationController {
                 permissions = await Permission.findAll();
             }
 
+            const filteredPermissions = permissions.filter(permission => {
+                return permission.account !== 'school'; // Not equal to 'school'
+            });
+
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read,
-                data: permissions
+                data: filteredPermissions
             });
 
         } catch (error) {

@@ -216,7 +216,7 @@ class AdminLibraryController {
         
         try {
 
-            const libraryInstance = await Library.findByPk(id);
+            const libraryInstance = await Subject.findByPk(id, {where: {library: true}});
 
             if (!libraryInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
