@@ -248,6 +248,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.delete('/logging', LoggingController.clear);
 
     router.post('/settings/preference', PreferenceController.create);
+    router.post('/settings/teacher/preference', PreferenceController.teachearCreate);
     router.put('/settings/preference', PreferenceController.update);
     router.get('/settings/preference', PreferenceController.read);
     router.post('/settings/student/preference', PreferenceController.setStudentPreference);
