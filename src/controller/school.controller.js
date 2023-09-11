@@ -113,6 +113,24 @@ class SchoolManagementController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+    static async readKeysById(req, res) {
+
+        const { id } = req.params;
+
+        try {
+            const response = await SchoolManagement.findByPk(id);
+
+            if (!response) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
             const { private_key, public_key } = await response.getKeypair();
 
             if (!private_key && !public_key) {
@@ -123,17 +141,17 @@ class SchoolManagementController {
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
             }
 
-            response.dataValues.keys = {
-                publicKey: public_key,
-                privateKey: private_key,
-            }
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
+            return res.status(ResponseStatus.code.success).json({
+                error: false, message: ResponseStatus.pass.read, keys: {
+                    publicKey: private_key,
+                    privateKey: public_key
+                }
+            });
 
         } catch (error) {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
-
     /*----------------------------------| FETCH SCHOOLS BY ID WITH CLASSES |----------------------------------*/
 
     static async readByIdWithClasses(req, res) {
