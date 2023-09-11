@@ -101,9 +101,9 @@ class TeacherController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const classInstance = await teacherInstance.getClasses({ joinTableAttributes: [] });
-            const subjectInstance = await teacherInstance.getSubjects({ joinTableAttributes: [] });
-            const armsInstance = await teacherInstance.getClassArms({ joinTableAttributes: [] });
+            const classInstance = await accountInstance.Teacher.getClasses({ joinTableAttributes: [] });
+            const subjectInstance = await accountInstance.Teacher.getSubjects({ joinTableAttributes: [] });
+            const armsInstance = await accountInstance.Teacher.getClassArms({ joinTableAttributes: [] });
 
 
             const payload = {
