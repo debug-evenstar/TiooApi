@@ -218,7 +218,7 @@ class LessonController {
                 objective: req.body.objective,
                 week: "Week 3",
                 status: "locked",
-                term: 1,
+                term: req.body.term,
                 class: selectedGroup.ref_cid,
                 class_arms: classarmsArray,
                 additional_instruction: req.body.additional_instruction
