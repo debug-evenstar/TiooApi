@@ -29,6 +29,11 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.JSON,
                 defaultValue: { "starts": DataTypes.NOW, "ends": DataTypes.NOW },
             },
+            academic_duration: {
+                type: DataTypes.JSON,
+                allowNull: true,
+                defaultValue: { "starts": DataTypes.NOW, "ends": DataTypes.NOW },
+            }
         }, {
         timestamps: true,
     });
