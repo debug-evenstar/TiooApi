@@ -86,6 +86,11 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
         defaultValue: '',
       },
+      session_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0,
+      },
       age: {
         type: Sequelize.INTEGER,
         allowNull: true,

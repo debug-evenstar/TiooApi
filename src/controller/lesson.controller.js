@@ -6,9 +6,10 @@ const fs = require('fs-extra');
 const path = require('path');
 const Docxtemplater = require('docxtemplater');
 const docx = require('docx');
+const HtmlToDocx = require('html-to-docx');
 const Sequelize = require('sequelize');
 const LessonTemplateProvider = require("../providers/AI/lesson.template");
-
+const { equal } = require("../utils/array");
 
 
 
@@ -113,6 +114,7 @@ class LessonController {
             const chapterInstance = await chapter.save();
 
             const classInstance = await Class.findByPk(groupInstance.ref_cid);
+            const classArms = await groupInstance.getClassArms();
 
             await subjectInstance.addChapter(chapterInstance);
 
@@ -123,6 +125,8 @@ class LessonController {
             await groupInstance.addLesson(lessonInstance);
 
             await subjectInstance.addGroup(groupInstance);
+
+            await lessonInstance.addClassArms(classArms);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
 
@@ -148,6 +152,34 @@ class LessonController {
 
             await groupInstance.addClassArms(classarmInstances);
 
+            // Merge class groups if similar groups exist
+            const groupArmIds = classarmInstances.map(arm => arm.id);
+            const groupSubject = await groupInstance.getSubject();
+            const subjectGroups = await groupSubject.getGroups({
+                include : [ClassArm]
+            });
+
+            for (let index = 0; index < subjectGroups.length; index++) {
+                const group = subjectGroups[index];
+                const armsIds = group.ClassArms.map(arm => arm.id);
+                if( 
+                    armsIds.length == groupArmIds.length && 
+                    equal(armsIds,groupArmIds) &&
+                    group.id !== groupInstance.id
+                ){
+                    // Move all lessons to this group
+                    const groupLessons = await group.getLessons();
+                    for (let i = 0; i < groupLessons.length; i++) {
+                        const lesson = groupLessons[i];
+                        await lesson.update({
+                            GroupId : groupInstance.id
+                        });
+                    }
+                    // Delete current group
+                    await group.destroy();
+                }
+            }
+
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
 
 
@@ -157,6 +189,114 @@ class LessonController {
         };
     }
 
+
+    static async generateLessonWithGroup(req, res) {
+
+        const groupID = req.params.id;
+        const today = new Date();
+        const threeDaysAhead = new Date();
+        threeDaysAhead.setDate(today.getDate() + 3);
+
+        req.body.start_date = today;
+        req.body.end_date = threeDaysAhead;
+
+        try {
+
+
+
+            const selectedGroup = await Group.findByPk(groupID, { include: [ClassArm] });
+
+            const classarmsArray = selectedGroup.ClassArms.map((element) => element.id);
+
+            const body = {
+                topic: req.body.topic,
+                duration: req.body.duration ?? "45 Minutes",
+                curriculum: req.body.curriculum ?? "",
+                subject: selectedGroup.SubjectId,
+                start_date: req.body.start_date,
+                end_date: req.body.end_date,
+                objective: req.body.objective,
+                week: "Week 3",
+                status: "locked",
+                term: 1,
+                class: selectedGroup.ref_cid,
+                class_arms: classarmsArray,
+                additional_instruction: req.body.additional_instruction
+            }
+
+            const lessonInstance = await Lesson.create(body);
+            const subjectInstance = await Subject.findByPk(selectedGroup.SubjectId);
+
+            if (!subjectInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
+            }
+
+
+
+            await subjectInstance.addLesson(lessonInstance);
+
+            const chapter = new Chapter();
+            chapter.name = "undefined";
+            chapter.title = "undefined";
+
+            const chapterInstance = await chapter.save();
+
+            const classInstance = await Class.findByPk(selectedGroup.ref_cid);
+
+            const classarmInstances = await ClassArm.findAll({ where: { id: classarmsArray } });
+
+            await subjectInstance.addChapter(chapterInstance);
+
+            await chapterInstance.setLessons(lessonInstance);
+
+            await subjectInstance.addLesson(lessonInstance);
+
+            const instance1 = await lessonInstance.addClassArms(classarmInstances);
+
+            await classInstance.addLesson(lessonInstance);
+
+            await selectedGroup.addLesson(lessonInstance);
+            const instance2 = await selectedGroup.addClassArms(classarmInstances);
+            const subjejctGroup = await subjectInstance.addGroup(selectedGroup);
+
+
+            if (req.body.resources == 1) {
+
+                const body = {
+                    "topic": req.body.topic,
+                    "grade": classInstance.naming,
+                    "objectives": req.body.objective,
+                    "duration": req.body.duration,
+                    "extra": req.body.additional_instruction
+                }
+
+                const response = await LessonTemplateProvider.getenerateLesson(body);
+
+                lessonInstance.generated = response.data.result;
+                lessonInstance.session_id = response.data.session_id;
+
+                await lessonInstance.save();
+
+                response.id = lessonInstance.id;
+
+                const fulldata = {
+                    status: "success",
+                    data: response.data.result,
+                    session_id: response.data.session_id,
+                    id: lessonInstance.id
+                }
+
+                return res.status(ResponseStatus.code.success).json(fulldata);
+
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        }
+    }
 
     static async updateLesson(req, res) {
 
@@ -202,7 +342,6 @@ class LessonController {
 
             const subjectInstance = await Subject.findByPk(req.query.subject_id);
 
-
             const whereClause = req.query.class_id ? { ref_cid: req.query.class_id } : {};
 
             const lessonInstances = await subjectInstance.getGroups({
@@ -212,7 +351,7 @@ class LessonController {
                         model: ClassArm,
                         attributes: ['id', 'naming'],
                         through: { attributes: [] },
-                    }, Lesson]
+                    }, Lesson, Class]
             });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
@@ -262,7 +401,7 @@ class LessonController {
                 additioinal_instruction: "",
                 week: "Week 3",
                 status: "locked",
-                term: 1,
+                term: req.body.term,
                 class: selectedGroup.ref_cid,
                 class_arms: classarms,
                 files: req.body.files
@@ -332,7 +471,7 @@ class LessonController {
                         model: ClassArm,
                         attributes: ['id', 'naming'],
                         through: { attributes: [] },
-                    }]
+                    }, Class]
             });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
@@ -614,43 +753,6 @@ class LessonController {
         const threeDaysAhead = new Date();
         threeDaysAhead.setDate(today.getDate() + 3);
 
-        if (req.body.objective == 4) {
-
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-            const fileName = `generated_${uniqueSuffix}.docx`;
-            const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
-
-            const doc = new docx.Document({
-                sections: [
-                    {
-                        properties: {},
-                        children: [
-                            new docx.Paragraph({
-                                children: [
-                                    new docx.TextRun({
-                                        text: `${req.body.objective}`,
-                                        bold: false,
-                                    }),
-
-                                    new docx.TextRun({
-                                        text: `${req.body.additioinal_instruction}`,
-                                        bold: false,
-                                    }),
-
-                                ],
-                            }),
-                        ],
-                    },
-                ],
-            });
-
-            req.body.files = [`public/lessons/${fileName}`];
-
-            console.log(absoluteFilesDirectory);
-            docx.Packer.toBuffer(doc).then((buffer) => { fs.writeFileSync(absoluteFilesDirectory, buffer); });
-
-        }
-
         req.body.start_date = today;
         req.body.end_date = threeDaysAhead;
 
@@ -689,10 +791,53 @@ class LessonController {
 
             await classInstance.addLesson(lessonInstance);
 
-            const groupInstance = await Group.create({
-                naming: classInstance.naming,
-                ref_cid: classInstance.id
-            });
+
+            const group = await Group.findAll({ include: [ClassArm] });
+
+
+            let groupInstance;
+            let groupId;
+
+            const arms = req.body.class_arms;
+
+            for (let i = 0; i < group.length; i++) {
+
+                const data = group[i].ClassArms.map((element) => element.id);
+
+                if (arms.length == 1) {
+
+                    if (arms[0] == data) {
+                        console.log('single found', arms, data, group[i].id);
+                        groupId = group[i].id;
+                    } else {
+                        console.log('single not found', arms, data);
+                    }
+
+                } else {
+
+                    if (arms.every((arm) => data.includes(arm))) {
+                        console.log('found', arms, data, group[i].id);
+                        groupId = group[i].id;
+                    } else {
+                        console.log('not found', arms, data);
+                    }
+
+                }
+            }
+
+
+            if (groupId) {
+                groupInstance = await Group.findByPk(groupId);
+            } else {
+
+                groupInstance = await Group.create({
+                    naming: classInstance.naming,
+                    ref_cid: classInstance.id
+                });
+            }
+
+            console.log(groupId)
+
 
             await groupInstance.addLesson(lessonInstance);
             const instance2 = await groupInstance.addClassArms(classarmInstances);
@@ -711,13 +856,22 @@ class LessonController {
 
                 const response = await LessonTemplateProvider.getenerateLesson(body);
 
-                lessonInstance.generated = response.data;
+                lessonInstance.generated = response.data.result;
+
+                lessonInstance.session_id = response.data.session_id;
 
                 await lessonInstance.save();
 
                 response.id = lessonInstance.id;
 
-                return res.status(ResponseStatus.code.success).json(response);
+                const fulldata = {
+                    status: "success",
+                    data: response.data.result,
+                    session_id: response.data.session_id,
+                    id: lessonInstance.id
+                }
+
+                return res.status(ResponseStatus.code.success).json(fulldata);
 
             }
 
@@ -730,6 +884,60 @@ class LessonController {
         };
     }
 
+
+
+
+
+
+
+    static async generateLessonWithExtra(req, res) {
+
+        const { id } = req.params;
+
+
+        try {
+
+            const lessonInstance = await Lesson.findByPk(id);
+
+            if (!lessonInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
+
+            }
+
+            const body = {
+                "query": req.body.query,
+                "session_id": req.body.session_id
+            }
+
+            const response = await LessonTemplateProvider.getenerateLessonWithExtra(body);
+
+
+            lessonInstance.generated = response.data.result;
+
+            lessonInstance.session_id = response.data.session_id;
+
+            await lessonInstance.save();
+
+            response.id = lessonInstance.id;
+
+            const fulldata = {
+                status: "success",
+                data: response.data.result,
+                session_id: response.data.session_id,
+                id: lessonInstance.id
+            }
+
+            return res.status(ResponseStatus.code.success).json(fulldata);
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+
     static async readGeneratedLesson(req, res) {
 
         const { id } = req.params;
@@ -738,11 +946,10 @@ class LessonController {
 
             const lessonInstance = await Lesson.findByPk(id);
 
-
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read,
-                data: lessonInstance
+                data: lessonInstance,
             });
 
 
@@ -759,39 +966,34 @@ class LessonController {
 
         const { id } = req.params;
 
-        if (req.body.generated != '') {
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-            const fileName = `generated_${uniqueSuffix}.docx`;
-            const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
-
-            const doc = new docx.Document({
-                sections: [
-                    {
-                        properties: {},
-                        children: [
-                            new docx.Paragraph({
-                                children: [
-                                    new docx.TextRun({
-                                        text: `${req.body.generated}`,
-                                        bold: false,
-                                    }),
-
-                                ],
-                            }),
-                        ],
-                    },
-                ],
-            });
-
-            req.body.files = [`public/lessons/${fileName}`];
-            console.log(absoluteFilesDirectory);
-            docx.Packer.toBuffer(doc).then((buffer) => { fs.writeFileSync(absoluteFilesDirectory, buffer); });
-
-        }
-
         try {
 
             const lessonInstance = await Lesson.findByPk(id);
+
+
+            if (req.body.generated != '') {
+                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+                const fileName = `generated_${uniqueSuffix}.docx`;
+                const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
+
+                const docxBuffer = await HtmlToDocx(req.body.generated);
+
+                fs.writeFileSync(absoluteFilesDirectory, docxBuffer);
+
+                req.body.files = [`public/lessons/${fileName}`];
+
+                const oldfile = lessonInstance.files[0];
+
+                if (oldfile) {
+                    fs.unlink(oldfile, (err) => {
+                        if (err) {
+                            console.error('Error deleting file:', err);
+                        } else {
+                            console.log('File deleted successfully.');
+                        }
+                    })
+                }
+            }
 
             const response = await lessonInstance.update(req.body);
 
