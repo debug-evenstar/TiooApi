@@ -401,7 +401,7 @@ class LessonController {
                 additioinal_instruction: "",
                 week: "Week 3",
                 status: "locked",
-                term: 1,
+                term: req.body.term,
                 class: selectedGroup.ref_cid,
                 class_arms: classarms,
                 files: req.body.files
