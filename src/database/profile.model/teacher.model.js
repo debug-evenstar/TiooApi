@@ -15,29 +15,66 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.DATE,
                 allowNull: true,
             },
+            owerner_name: {
+                type: DataTypes.STRING,
+                allowNull: true,
+                defaultValue: '',
+            },
             gender: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
-            teacher_type: {
+            email: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: 'subject',
+            },
+            phone: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            website: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            country: {
+                type: DataTypes.STRING,
+                allowNull: true,
             },
             nationality: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
-            residentialAddress: {
+            address: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
-
-            //=========== IDENTIFICATION DOCUMENT =========// 
-
-            passportNumber: {
+            institution_type: {
                 type: DataTypes.STRING,
                 allowNull: true,
+                defaultValue: 'teacher',
+            },
+            
+            //=========== BANK INFORMATION =========// 
+
+            bank_name: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            account_name: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            account_number: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            },
+            means_of_identification: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            },
+            ids: {
+                type: DataTypes.JSON,
+                defaultValue: [],
             },
         }, {
         timestamps: false,
