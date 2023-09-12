@@ -77,6 +77,85 @@ class TeacherController {
     }
 
 
+    /*-----------------------------------| UPDATE TEACHERS KYC |-----------------------------------*/
+    
+    static async kyc(req, res) {
+
+        const { id } = req.userData
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
+        const registeredAccount = await Account.findByPk(account_id);
+
+        let filePaths = [];
+
+        if (req.files && req.files.length > 0) {
+            filePaths = req.files.map((file) => file.path);
+            req.body.ids = filePaths;
+        }
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const TeachersManagementInstance = await registeredAccount.getTeacher()
+
+            const response = await TeachersManagementInstance.update(req.body);
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    };
+
+        /*-----------------------------------| READ TEACHERS KYC |-----------------------------------*/
+    
+        static async readTeacherKYC(req, res) {
+
+            const { id } = req.userData
+            const account_id = req.query.account_id ? req.query.account_id : id;
+    
+            const registeredAccount = await Account.findByPk(account_id);
+    
+            let filePaths = [];
+    
+            if (req.files && req.files.length > 0) {
+                filePaths = req.files.map((file) => file.path);
+                req.body.ids = filePaths;
+            }
+    
+            const errors = validationResult(req);
+    
+            if (!errors.isEmpty()) {
+                return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+            }
+    
+            try {
+    
+                const TeachersManagementInstance = await registeredAccount.getTeacher()
+
+
+                const payload = {...registeredAccount.dataValues, ...TeachersManagementInstance.dataValues};
+    
+    
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'server error', extra: error.message });
+            };
+    
+        };
+
+
     /*-----------------------------------| READ CLASS WITH ALL ASSIGNED TEACHERS |-----------------------------------*/
 
 

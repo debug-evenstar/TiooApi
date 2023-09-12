@@ -12,7 +12,7 @@ class PreferenceController {
 
         const { id } = req.userData
 
-        const account_id = req.query.school_id ? req.query.school_id : id;
+        const account_id = req.query.account_id ? req.query.account_id : id;
 
         try {
 
@@ -46,7 +46,7 @@ class PreferenceController {
 
         const { id } = req.userData
 
-        const account_id = req.query.school_id ? req.query.school_id : id;
+        const account_id = req.query.account_id ? req.query.account_id : id;
 
         try {
 
@@ -78,7 +78,7 @@ class PreferenceController {
 
         const { id } = req.userData
 
-        const account_id = req.query.school_id ? req.query.school_id : id;
+        const account_id = req.query.account_id ? req.query.account_id : id;
 
         try {
 
@@ -114,7 +114,7 @@ class PreferenceController {
 
         const { id } = req.userData
 
-        const account_id = req.query.school_id ? req.query.school_id : id;
+        const account_id = req.query.account_id ? req.query.account_id : id;
 
         try {
 
@@ -154,7 +154,7 @@ class PreferenceController {
 
         const { id } = req.userData
 
-        const account_id = req.query.school_id ? req.query.school_id : id;
+        const account_id = req.query.account_id ? req.query.account_id : id;
 
         try {
 
@@ -188,7 +188,7 @@ class PreferenceController {
 
         const { id } = req.userData
 
-        const account_id = req.query.school_id ? req.query.school_id : id;
+        const account_id = req.query.account_id ? req.query.account_id : id;
 
         try {
 
