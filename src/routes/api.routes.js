@@ -251,6 +251,7 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.post('/settings/teacher/preference', PreferenceController.teachearCreate);
     router.get('/settings/teacher/preference', PreferenceController.teacherRead);
+    router.put('/settings/teacher/preference', PreferenceController.update);
 
     router.put('/settings/preference', PreferenceController.update);
     router.get('/settings/preference', PreferenceController.read);
