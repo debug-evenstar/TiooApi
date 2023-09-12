@@ -52,6 +52,7 @@ class SchoolUtils {
         try {
             const classes = seedClass.map((classData) => ({
                 ...classData,
+                equivalent : Number.parseInt(classData.equivalent),
                 SchoolManagementId: schoolId,
             }));
 
