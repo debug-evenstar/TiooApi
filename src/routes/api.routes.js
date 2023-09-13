@@ -262,6 +262,8 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/settings/billing/school', BillingController.school);
     router.get('/settings/billing/freelancer', BillingController.freelancer);
     router.get('/settings/billing/student', BillingController.student);
+    router.post('/settings/billing/teacher/generate', BillingController.generateIndependentTeachersBill);
+    router.get('/settings/billing/teacher', BillingController.independentTeacher);
     router.post('/settings/billing/generate', BillingController.generateBill);
     router.post('/settings/account/changepassword', AuthenicationController.accountChangePassword);
 
