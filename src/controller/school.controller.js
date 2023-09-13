@@ -396,13 +396,18 @@ class SchoolManagementController {
 
 
 
-    static async kyc(req, res) {
+    static async updateKyc(req, res) {
+
+        const { id } = req.userData
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
+        const registeredAccount = await Account.findByPk(account_id);
 
         let filePaths = [];
 
         if (req.files && req.files.length > 0) {
             filePaths = req.files.map((file) => file.path);
-            req.body.files = filePaths;
+            req.body.ids = filePaths;
         }
 
         const errors = validationResult(req);
@@ -413,10 +418,12 @@ class SchoolManagementController {
 
         try {
 
-            const registeredSchoolManagement = await registeredAccount.SchoolManagement.update(req.body);
+            const registeredSchoolManagement = await registeredAccount.getSchoolManagement()
+
+            const response = await registeredSchoolManagement.dxeupdate(req.body);
 
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: registeredSchoolManagement });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: response });
 
         } catch (error) {
             console.log(error);

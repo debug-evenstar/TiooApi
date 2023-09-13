@@ -111,7 +111,7 @@ class classArms {
     static async readAllByClass(req, res) {
 
         try {
-            const classArms = await ClassArm.findAll({
+            let armsResult = await ClassArm.findAll({
                 where : { ClassId : req.params.id},
                 include : [
                     { model : Subject },
@@ -119,7 +119,20 @@ class classArms {
                     { model : Teacher, include : [Account]},
                 ]
             });
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classArms });
+
+            if (req.userData.account_type == "teacher") {
+                const teacherInstance  =  await Teacher.findOne({
+                    where : {AccountId : req.userData.id},
+                    include : [ClassArm]
+                });
+
+                armsResult = armsResult.filter((arm) => {
+                    const teacherArmIds = teacherInstance.ClassArms.map(item => item.id);
+                    return teacherArmIds.includes(arm.id);
+                });
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: armsResult });
         } catch (error) {
             res.status(500).json({ error: 'server error' ,  extra: error.message });
         }

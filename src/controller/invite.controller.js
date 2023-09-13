@@ -290,10 +290,20 @@ class InviteController {
             const teacherInstance = await Teacher.create(req.body);
             await registeredAccount.setTeacher(teacherInstance);
 
-            const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
+            const classArmsInstance = await ClassArm.findAll({ where: { id: [...req.body.classes] } , include : [Class]});
             const subjectInstance = await Subject.findAll({ where: { id: [...req.body.subjects] } });
 
+            let getClasses = classArmsInstance.map((arm) =>
+                arm.Class
+            );
+
+            const classInstance = getClasses.filter((armclass, index) => {
+                const classIds = getClasses.map((item)=> item.id);
+                return classIds.indexOf(armclass.id) == index;
+            });
+
             await schoolInstance.addTeacher(teacherInstance)
+            await teacherInstance.addClassArms(classArmsInstance);
             await teacherInstance.addClasses(classInstance);
             await teacherInstance.addSubjects(subjectInstance);
 

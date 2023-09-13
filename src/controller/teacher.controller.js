@@ -59,6 +59,8 @@ class TeacherController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: "School is not tied to account" });
             }
 
+            console.log(hashedUser);
+
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteTeacher", { name: data.name, school: schoolInstance.school_name, Link: link }).send();
 
             return res.status(ResponseStatus.code.success).json({
@@ -75,6 +77,85 @@ class TeacherController {
     }
 
 
+    /*-----------------------------------| UPDATE TEACHERS KYC |-----------------------------------*/
+    
+    static async kyc(req, res) {
+
+        const { id } = req.userData
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
+        const registeredAccount = await Account.findByPk(account_id);
+
+        let filePaths = [];
+
+        if (req.files && req.files.length > 0) {
+            filePaths = req.files.map((file) => file.path);
+            req.body.ids = filePaths;
+        }
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+            const TeachersManagementInstance = await registeredAccount.getTeacher()
+
+            const response = await TeachersManagementInstance.update(req.body);
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    };
+
+        /*-----------------------------------| READ TEACHERS KYC |-----------------------------------*/
+    
+        static async readTeacherKYC(req, res) {
+
+            const { id } = req.userData
+            const account_id = req.query.account_id ? req.query.account_id : id;
+    
+            const registeredAccount = await Account.findByPk(account_id);
+    
+            let filePaths = [];
+    
+            if (req.files && req.files.length > 0) {
+                filePaths = req.files.map((file) => file.path);
+                req.body.ids = filePaths;
+            }
+    
+            const errors = validationResult(req);
+    
+            if (!errors.isEmpty()) {
+                return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+            }
+    
+            try {
+    
+                const TeachersManagementInstance = await registeredAccount.getTeacher()
+
+
+                const payload = {...registeredAccount.dataValues, ...TeachersManagementInstance.dataValues};
+    
+    
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'server error', extra: error.message });
+            };
+    
+        };
+
+
     /*-----------------------------------| READ CLASS WITH ALL ASSIGNED TEACHERS |-----------------------------------*/
 
 
@@ -83,10 +164,9 @@ class TeacherController {
         const { id } = req.params;
 
         const decryptedId = HashUtils.decrypt(id);
-        console.log(id)
 
         try {
-            const accountInstance = await Account.findByPk(Number(decryptedId), { attributes: { exclude: ['password'] } });
+            const accountInstance = await Account.findByPk(Number(decryptedId), { attributes: { exclude: ['password'] }, include : [Teacher] });
 
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -96,18 +176,19 @@ class TeacherController {
                 return res.status(ResponseStatus.code.bad_request).json({ error: true, message: ResponseStatus.fail.accepted });
             }
 
-            const teacherInstance = await accountInstance.getTeacher({ joinTableAttributes: [] });
-
-            if (!teacherInstance) {
+            if (!accountInstance.Teacher) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
             const classInstance = await teacherInstance.getClasses({ joinTableAttributes: [] });
             const subjectInstance = await teacherInstance.getSubjects({ joinTableAttributes: [] });
+            const armsInstance = await teacherInstance.getClassArms({ joinTableAttributes: [] });
+
 
             const payload = {
                 account: accountInstance,
                 classes: classInstance,
+                arms: armsInstance,
                 subjects: subjectInstance
             };
 
@@ -215,6 +296,10 @@ class TeacherController {
 
             req.body.flag = 'active';
 
+            req.body.status = 'active';
+
+            req.body.verification_status = 1
+
             const response = await accountInstance.update(req.body);
 
             const link = `${process.env.BASE_URL}/api/account/signin`;
@@ -263,7 +348,15 @@ class TeacherController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const classInstance = await teacherInstance.getClasses({ joinTableAttributes: [], include: [ClassArm] });
+            const classInstance = await teacherInstance.getClasses({ joinTableAttributes: [] });
+
+            const classArmInstance = await teacherInstance.getClassArms({ joinTableAttributes: [] });
+
+            for (let index = 0; index < classInstance.length; index++) {
+                classInstance[index].dataValues.ClassArms = classArmInstance.filter((arm) => {
+                    return arm.ClassId == classInstance[index].id;
+                });
+            }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classInstance });
 

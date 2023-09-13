@@ -135,7 +135,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/school/teachers/', SchoolManagementController.authSchoolTeachers);
     router.get('/school/teachers/:id', SchoolManagementController.schoolTeachers);
     router.get('/school/:id/terms', SchoolManagementController.schoolTerms);
-    router.post('/school/kyc', UploadService.uploadLesson.array('files'), SchoolManagementController.kyc);
+    router.post('/school/kyc', UploadService.uploadLesson.array('files'), SchoolManagementController.updateKyc);
     router.post('/school/admin', SchoolManagementController.addSchoolAdminUser);
     router.delete('/school/admin/:id', SchoolManagementController.removeAdmin);
     router.get('/school/admin', SchoolManagementController.readSchoolAdmins);
@@ -204,6 +204,8 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/teacher/classess/:id', TeacherController.teacherClasses);
     router.get('/teacher/subjects/:id', TeacherController.teacherSubjects);
     router.get('/teacher/:id', TeacherController.fetchTeacher);
+    router.post('/teacher/kyc', UploadService.uploadLesson.array('files'), TeacherController.kyc);
+    router.get('/teacher/read/kyc', TeacherController.readTeacherKYC);
 
     /* --------------------------------- STUDENT -------------------------------- */
 
@@ -251,6 +253,11 @@ const AuthorizedRoutesGroup = (router) => {
     router.delete('/logging', LoggingController.clear);
 
     router.post('/settings/preference', PreferenceController.create);
+
+    router.post('/settings/teacher/preference', PreferenceController.teachearCreate);
+    router.get('/settings/teacher/preference', PreferenceController.teacherRead);
+    router.put('/settings/teacher/preference', PreferenceController.update);
+
     router.put('/settings/preference', PreferenceController.update);
     router.get('/settings/preference', PreferenceController.read);
     router.post('/settings/student/preference', PreferenceController.setStudentPreference);

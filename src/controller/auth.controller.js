@@ -47,7 +47,7 @@ class AuthController {
             if (req.body.account_type === "school") {
 
                 const registeredSchoolManagement = await SchoolManagement.create({
-                    school_name: req.body.school
+                    school_name : req.body.school
                 });
                 const { publicKey, privateKey } = HashUtils.generateKeyPair();
                 const createKeypairs = await Keypairs.create({
@@ -60,7 +60,7 @@ class AuthController {
 
             if (req.body.account_type === "freelancer") {
                 const registeredSchoolManagement = await SchoolManagement.create({
-                    school_name: req.body.school,
+                    school_name : req.body.school,
                     school_types: '["Custome"]',
                     naming_types: 'C'
                 });
@@ -1189,7 +1189,7 @@ class AuthController {
 
 
 
-        const link = `${process.env.CICD_WEB_URL}/confirmation`;
+        const link = `${process.env.WEB_URL}/account/verify/${hash}`;
 
         console.log(link);
 

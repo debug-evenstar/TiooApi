@@ -15,10 +15,10 @@ module.exports = (sequelize, DataTypes) => {
             school_types: {
                 type: DataTypes.TEXT,
                 defaultValue: JSON.stringify(['primary', 'secondary']),
-                get() {
-                    const value = this.getDataValue('school_types');
-                    return value ? JSON.parse(value) : [];
-                },
+                // get() {
+                //     const value = this.getDataValue('school_types');
+                //     return value ? JSON.parse(value) : [];
+                // },
             },
             school_name: {
                 type: DataTypes.TEXT,
