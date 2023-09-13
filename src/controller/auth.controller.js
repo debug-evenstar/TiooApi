@@ -154,66 +154,67 @@ class AuthController {
 
     }
 
-  /* ------------------- CREATE STUDENT FROM EXTERNAL SCHOOL ------------------ */
-  static async deleteExternalStudent(req, res) {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
-    }
-    try {
-        const data = req.body
-        const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
+    /* ------------------- DELETE STUDENT FROM EXTERNAL SCHOOL ------------------ */
+    static async deleteExternalStudent(req, res) {
 
-        if (!jwtRegex.test(data.payload)) {
-            return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
+        try {
+            const data = req.body
+         
+            const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
 
-        const Schoolkey = await Keypairs.findOne({
-            where: {
-                public_key: data.public_key
+          
+            if (!jwtRegex.test(data.payload)) {
+                return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
             }
-        });
 
-        if (!Schoolkey) {
-            return res.status(ResponseStatus.code.not_found).json({ message: ResponseStatus.fail.school });
-        }
-        const privateKey = Schoolkey.private_key;
-        const school = await Schoolkey.getSchoolManagement();
-        const decoded = jwt.verify(data.payload, privateKey);
-        if (!decoded) {
-            return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
-        }
-        const emailExist = await AuthController.validateEmail(decoded.userdata.email);
-
-        if (emailExist.pass) {
-            return res.status(ResponseStatus.code.conflict).json({
-                error: true, message:
-                    ResponseStatus.fail.account_conflict
+            const Schoolkey = await Keypairs.findOne({
+                where: {
+                    public_key: data.public_key
+                }
             });
-        }
-        const user = await Account.findOne({
-            where: {
-                email: decoded.userdata.email
-            }
-        });
-        if (user.account_type == "student") {
-            (await Student.findOne({ where: { AccountId: user.id } })).destroy();
-        }
-        const response = await user.destroy();
 
-        return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({ error: 'server error', extra: error.message });
+            if (!Schoolkey) {
+                return res.status(ResponseStatus.code.not_found).json({ message: ResponseStatus.fail.school });
+            }
+            const privateKey = Schoolkey.private_key;
+            const school = await Schoolkey.getSchoolManagement();
+            const decoded = jwt.verify(data.payload, privateKey);
+            if (!decoded) {
+                return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
+            }
+            const emailExist = await AuthController.validateEmail(decoded.userdata.email);
+            if (!emailExist.pass) {
+                return res.status(ResponseStatus.code.conflict).json({
+                    error: true, message:
+                        ResponseStatus.fail.not_found
+                });
+            }
+            const user = await Account.findOne({
+                where: {
+                    email: decoded.userdata.email
+                }
+            });
+            if (user.account_type == "student") {
+                (await Student.findOne({ where: { AccountId: user.id } })).destroy();
+            }
+            const response = await user.destroy();
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: 'server error', extra: error.message });
+
+        }
+
 
     }
 
 
-}
 
 
-    
-    
 
     /*-----------------------------------| VERIFY ACCOUNT |-----------------------------------*/
 

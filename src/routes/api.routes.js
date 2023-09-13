@@ -54,8 +54,8 @@ const OpenRoutesGroup = (router) => {
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
+    router.post('/account/student/external', RegisterExternalStudentValidator, AuthenicationController.registerExternalStudent);
     router.post('/delete/account/student/external', AuthenicationController.deleteExternalStudent);
-
     router.post('/account/send_otp', SendOTPValidator, AuthenicationController.requestVerificationOTP);
     router.post('/account/verify/resend', SendOTPValidator, AuthenicationController.resendVerification);
     router.put('/account/change_password', ChangePasswordValidator, AuthenicationController.changePassword);
