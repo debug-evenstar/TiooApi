@@ -128,10 +128,8 @@ class AuthController {
                         ResponseStatus.fail.account_conflict
                 });
             }
-
             console.log(decoded.userdata.first_name + " " + decoded.userdata.last_name)
-
-            const account = Account.create({
+            const account = await Account.create({
                 name: decoded.userdata.first_name + " " + decoded.userdata.last_name,
                 email: decoded.userdata.email,
                 phone: "",
@@ -141,17 +139,82 @@ class AuthController {
                 flag: "active",
                 password: decoded.userdata.password,
             })
-
+            const studentInstance = await Student.create();
+            await account.setStudent(studentInstance);
+            await school.addStudent(studentInstance);
             if (account) {
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
             }
         } catch (error) {
+            console.log(error)
             res.status(500).json({ error: 'server error', extra: error.message });
 
         }
 
 
     }
+
+  /* ------------------- CREATE STUDENT FROM EXTERNAL SCHOOL ------------------ */
+  static async deleteExternalStudent(req, res) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+    }
+    try {
+        const data = req.body
+        const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
+
+        if (!jwtRegex.test(data.payload)) {
+            return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
+        }
+
+        const Schoolkey = await Keypairs.findOne({
+            where: {
+                public_key: data.public_key
+            }
+        });
+
+        if (!Schoolkey) {
+            return res.status(ResponseStatus.code.not_found).json({ message: ResponseStatus.fail.school });
+        }
+        const privateKey = Schoolkey.private_key;
+        const school = await Schoolkey.getSchoolManagement();
+        const decoded = jwt.verify(data.payload, privateKey);
+        if (!decoded) {
+            return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
+        }
+        const emailExist = await AuthController.validateEmail(decoded.userdata.email);
+
+        if (emailExist.pass) {
+            return res.status(ResponseStatus.code.conflict).json({
+                error: true, message:
+                    ResponseStatus.fail.account_conflict
+            });
+        }
+        const user = await Account.findOne({
+            where: {
+                email: decoded.userdata.email
+            }
+        });
+        if (user.account_type == "student") {
+            (await Student.findOne({ where: { AccountId: user.id } })).destroy();
+        }
+        const response = await user.destroy();
+
+        return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'server error', extra: error.message });
+
+    }
+
+
+}
+
+
+    
+    
+
     /*-----------------------------------| VERIFY ACCOUNT |-----------------------------------*/
 
     static async verifyAccount(req, res) {
@@ -395,8 +458,8 @@ class AuthController {
 
                     payload.schoolName = studentSchoolAccount.name;
 
-                    payload.studentClass =  classData.naming;
-                    payload.studentClassArm =  classArmData.naming;
+                    payload.studentClass = classData.naming;
+                    payload.studentClassArm = classArmData.naming;
 
                     payload.subjectsCount = studentSubject.length;
                     payload.schoolStudent = true;
@@ -599,8 +662,8 @@ class AuthController {
                     const studentSubject = await classData.getSubjects();
 
                     payload.schoolName = studentSchool.school_name;
-                    payload.studentClass =  classData.naming;
-                    payload.studentClassArm =  classArmData.naming;
+                    payload.studentClass = classData.naming;
+                    payload.studentClassArm = classArmData.naming;
 
                     payload.subjectsCount = studentSubject.length;
                     payload.schoolStudent = true;
@@ -705,6 +768,36 @@ class AuthController {
             }
             if (user.account_type == "teacher") {
                 (await Teacher.findOne({ where: { AccountId: id } })).destroy();
+            }
+
+            const response = await user.destroy();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: {} });
+
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+    static async deleteAccountByEmail(req, res) {
+
+        const useremail = req.params.email;
+
+        try {
+
+            const user = await Account.findOne({
+                where: {
+                    email: useremail
+                }
+            })
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            // Temp fix for Cascading relationships -- to be removed
+            if (user.account_type == "student") {
+                (await Student.findOne({ where: { AccountId: user.id } })).destroy();
             }
 
             const response = await user.destroy();
