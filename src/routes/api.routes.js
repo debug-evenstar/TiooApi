@@ -46,6 +46,7 @@ const ErrorLogs = require('../controller/error.controller');
 const PreferenceController = require('../controller/preference.controller');
 const BillingController = require('../controller/billing.controller');
 const NotificationController = require('../controller/notification.controller');
+const ExternalSchoolController = require('../controller/external_school/auth.controller');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -274,6 +275,9 @@ const AuthorizedRoutesGroup = (router) => {
     router.put('/settings/notification', NotificationController.update);
 
 
+    /* ---------------------------- External Schools ---------------------------- */
+    router.post('/resetpassword/account/student/external', ExternalSchoolController.ResetPassword);
+
 };
 
 
@@ -342,9 +346,19 @@ const AdminRoutesGroup = (router) => {
 };
 
 
+// const ExternalSchoolRoutesGroup = (router) => {
+
+//     router.use(AuthenticationMiddleware.externalSchool) //--use middleware--//
+    
+// };
+
+
+
+
 OpenRoutesGroup(router);
 AuthorizedRoutesGroup(router);
 AdminRoutesGroup(router);
+
 
 module.exports = router;
 

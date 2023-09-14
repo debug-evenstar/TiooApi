@@ -47,7 +47,7 @@ class AuthController {
             if (req.body.account_type === "school") {
 
                 const registeredSchoolManagement = await SchoolManagement.create({
-                    school_name : req.body.school
+                    school_name: req.body.school
                 });
                 const { publicKey, privateKey } = HashUtils.generateKeyPair();
                 const createKeypairs = await Keypairs.create({
@@ -60,7 +60,7 @@ class AuthController {
 
             if (req.body.account_type === "freelancer") {
                 const registeredSchoolManagement = await SchoolManagement.create({
-                    school_name : req.body.school,
+                    school_name: req.body.school,
                     school_types: '["Custome"]',
                     naming_types: 'C'
                 });
@@ -163,10 +163,10 @@ class AuthController {
         }
         try {
             const data = req.body
-         
+
             const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
 
-          
+
             if (!jwtRegex.test(data.payload)) {
                 return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
             }
@@ -183,6 +183,7 @@ class AuthController {
             const privateKey = Schoolkey.private_key;
             const school = await Schoolkey.getSchoolManagement();
             const decoded = jwt.verify(data.payload, privateKey);
+
             if (!decoded) {
                 return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
             }
@@ -193,6 +194,8 @@ class AuthController {
                         ResponseStatus.fail.not_found
                 });
             }
+
+
             const user = await Account.findOne({
                 where: {
                     email: decoded.userdata.email
