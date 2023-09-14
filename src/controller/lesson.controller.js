@@ -792,7 +792,7 @@ class LessonController {
             await classInstance.addLesson(lessonInstance);
 
 
-            const group = await Group.findAll({ include: [ClassArm] });
+            const group = await Group.findAll({ include: [ClassArm], where: {SubjectId: req.body.subject } });
 
 
             let groupInstance;
