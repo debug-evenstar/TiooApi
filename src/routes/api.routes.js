@@ -46,6 +46,7 @@ const ErrorLogs = require('../controller/error.controller');
 const PreferenceController = require('../controller/preference.controller');
 const BillingController = require('../controller/billing.controller');
 const NotificationController = require('../controller/notification.controller');
+const TokenMiddleware = require('../middleware/token.middleware');
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -295,9 +296,10 @@ const AdminRoutesGroup = (router) => {
     router.delete('/admin/settings/pricing/:id', PriceController.delete);
 
     router.post('/admin/user', AuthorizationController.addAdminUser);
-    router.get('/admin/user', AuthorizationController.readAdminUser);
+    router.get('/admin/user',  TokenMiddleware.checkAuthorization(['manage_school']), AuthorizationController.readAdminUser);
     router.delete('/admin/user', AuthorizationController.deleteAdmin);
     router.get('/admin/permissions', AuthorizationController.readPermissions);
+    router.post('/admin/permissions', AuthorizationController.createPermissions);
 
     router.get('/admin/freelancer', AdminController.freeLancers);
     router.get('/admin/freelancer/:id', AdminController.freeLancersById);

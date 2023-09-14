@@ -69,7 +69,7 @@ class AuthorizationController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -81,9 +81,7 @@ class AuthorizationController {
 
         try {
 
-            const authorization = await Authorization.findAll({where: {AccountId: null}});
-
-            console.log(authorization);
+            const authorization = await Authorization.findAll({ where: { AccountId: null } });
 
             const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
                 const userdata = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'] } });
@@ -108,7 +106,7 @@ class AuthorizationController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -165,12 +163,12 @@ class AuthorizationController {
 
         } catch (error) {
             console.log(error)
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
 
-    /*-----------------------------------| READ ADMIN USER |-----------------------------------*/
+    /*-----------------------------------| READ PERMISSIONS |-----------------------------------*/
 
     static async readPermissions(req, res) {
 
@@ -195,44 +193,65 @@ class AuthorizationController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
-    
 
 
-        /*-----------------------------------| DELETE ADMIN |-----------------------------------*/
 
-        static async deleteAdmin(req, res) {
+    /*-----------------------------------| READ ADD PERMISSIONS |-----------------------------------*/
 
-            const { admin_id } = req.query;
+    static async createPermissions(req, res) {
 
-            console.log(admin_id);
-       
-    
-            try {
-                const user = await Admin.findOne({ where: { id: admin_id } });
+        try {
 
-                console.log(user);
-    
-                if (!user) {
-                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-                }
+            const permissionInstance = await Permission.create(req.body);
 
-                const authorization = await user.getAuthorization();
-                const deletedAuthorization = await authorization.destroy();
-                const deletedAdmin = await user.destroy();
-    
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: deletedAdmin });
-    
-    
-            } catch (error) {
-                console.log(error)
-                res.status(500).json({ error: 'server error' ,  extra: error.message });
-            };
-    
-        }
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.added,
+                data: permissionInstance
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+    /*-----------------------------------| DELETE ADMIN |-----------------------------------*/
+
+    static async deleteAdmin(req, res) {
+
+        const { admin_id } = req.query;
+
+        console.log(admin_id);
+
+
+        try {
+            const user = await Admin.findOne({ where: { id: admin_id } });
+
+            console.log(user);
+
+            if (!user) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const authorization = await user.getAuthorization();
+            const deletedAuthorization = await authorization.destroy();
+            const deletedAdmin = await user.destroy();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: deletedAdmin });
+
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
 
 
 }
