@@ -297,12 +297,14 @@ const AdminRoutesGroup = (router) => {
     router.put('/admin/settings/pricing', PriceController.update);
     router.delete('/admin/settings/pricing/:id', PriceController.delete);
 
-    router.post('/admin/user', AuthorizationController.addAdminUser);
+
     // router.get('/admin/user',  TokenMiddleware.checkAuthorization(['manage_admin']), AuthorizationController.readAdminUser);
+    router.post('/admin/user', AuthorizationController.addAdminUser);
     router.get('/admin/user', AuthorizationController.readAdminUser);
     router.delete('/admin/user', AuthorizationController.deleteAdmin);
     router.get('/admin/permissions', AuthorizationController.readPermissions);
     router.post('/admin/permissions', AuthorizationController.createPermissions);
+
 
     router.get('/admin/freelancer', AdminController.freeLancers);
     router.get('/admin/freelancer/:id', AdminController.freeLancersById);
