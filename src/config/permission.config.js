@@ -9,6 +9,7 @@ const Authorization = {
         manage_students,
         manage_library,
         manage_marketplace,
+        manage_admin
     },
 
 }
