@@ -296,7 +296,8 @@ const AdminRoutesGroup = (router) => {
     router.delete('/admin/settings/pricing/:id', PriceController.delete);
 
     router.post('/admin/user', AuthorizationController.addAdminUser);
-    router.get('/admin/user',  TokenMiddleware.checkAuthorization(['manage_school']), AuthorizationController.readAdminUser);
+    // router.get('/admin/user',  TokenMiddleware.checkAuthorization(['manage_admin']), AuthorizationController.readAdminUser);
+    router.get('/admin/user', AuthorizationController.readAdminUser);
     router.delete('/admin/user', AuthorizationController.deleteAdmin);
     router.get('/admin/permissions', AuthorizationController.readPermissions);
     router.post('/admin/permissions', AuthorizationController.createPermissions);
