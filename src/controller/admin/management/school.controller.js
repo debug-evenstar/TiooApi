@@ -27,15 +27,13 @@ class AdminSchoolController {
             const authorization = await Authorization.findByPk(data.id);
             let montisoryManager;
 
-            // if (authorization.permissions.includes('manage_prax_school') && JSON.parse(authorization.permissions).length == 1) {
-            //     montisoryManager = 'support@hellotioo.com';
-            // }
-
             if (authorization.dataValues.permissions) {
-                if (authorization.dataValues.permissions.includes('manage_prax_school')) {
+                if (authorization.dataValues.permissions.includes('manage_prax_school') && JSON.parse(authorization.dataValues.permissions).length == 1) {
                     montisoryManager = 'support@hellotioo.com';
                 }
             }
+            
+            // console.log(authorization.dataValues, JSON.parse(authorization.dataValues.permissions).length)
 
             const whereClause = montisoryManager ? { account_type: 'school', email: montisoryManager } : { account_type: 'school', };
 
@@ -64,7 +62,7 @@ class AdminSchoolController {
             }));
             
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: authorization });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountData });
 
         } catch (error) {
             console.log(error);
