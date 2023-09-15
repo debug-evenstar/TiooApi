@@ -16,7 +16,7 @@ class AdminController {
             let montisoryManager;
 
             if (authorization.permissions) {
-                if (authorization.permissions.includes('manage_prax_school') && JSON.parse(authorization.permissions).length == 1) {
+                if (authorization.permissions.includes('manage_prax_school')) {
                     montisoryManager = 'support@hellotioo.com';
                 }
             }
