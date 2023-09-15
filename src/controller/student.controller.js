@@ -96,10 +96,9 @@ class StudentController {
             const response = await classInstance.addStudent(studentInstance);
 
             const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
-            console.log(hashedUser)
             const link = `${process.env.WEB_URL}/student/${hashedUser}`;
 
-            console.log(link);
+            console.log('this is the invite link url', link);
 
             //TODO: Create a Proper Invitation mail Template;
 
