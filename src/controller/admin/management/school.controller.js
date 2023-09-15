@@ -31,8 +31,8 @@ class AdminSchoolController {
             //     montisoryManager = 'support@hellotioo.com';
             // }
 
-            if (authorization.permissions) {
-                if (authorization.permissions.includes('manage_prax_school')) {
+            if (authorization.dataValues.permissions) {
+                if (authorization.dataValues.permissions.includes('manage_prax_school')) {
                     montisoryManager = 'support@hellotioo.com';
                 }
             }
@@ -62,8 +62,9 @@ class AdminSchoolController {
                 return school;
 
             }));
+            
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountData });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: authorization });
 
         } catch (error) {
             console.log(error);
