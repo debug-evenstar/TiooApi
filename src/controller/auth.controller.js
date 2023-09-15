@@ -1097,14 +1097,10 @@ class AuthController {
             if (!isCodeValid) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.incorrect_otp });
             }
-
+           
             const hashPassword = await account.hashPassword(data.password);
-
             const response = await account.update({ password: hashPassword });
-
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update });
-
-
 
         } catch (error) {
             console.log(error);

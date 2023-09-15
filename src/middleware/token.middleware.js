@@ -23,8 +23,7 @@ class TokenMiddleware {
                 where: {
                     public_key: token.toString()
                 }
-            });
-            console.log(Schoolkey)            
+            });            
             if (Schoolkey) {
                 req.schoolKey = Schoolkey.private_key;
                 next();

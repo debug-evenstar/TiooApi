@@ -8,7 +8,7 @@ class ExternalSchoolController {
 
     /* ------------------- ResetPassword------------------ */
     static async ResetPassword(req, res) {
-        console.log("req.schoolKey")
+        console.log(req.schoolKey)
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -16,14 +16,10 @@ class ExternalSchoolController {
         }
         try {
             const data = req.body
-
             const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
-
-
             if (!jwtRegex.test(data.payload)) {
                 return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
             }
-
             const privateKey = req.schoolKey
             // const school = await Schoolkey.getSchoolManagement();
             const decoded = jwt.verify(data.payload, privateKey);
@@ -42,20 +38,18 @@ class ExternalSchoolController {
                     email: decoded.userdata.email
                 }
             });
-            console.log("update user password");
-            return
-            if (user.account_type == "student") {
-                (await Student.findOne({ where: { AccountId: user.id } })).destroy();
+            const hashPassword = await user.hashPassword(decoded.userdata.password);
+            const update = await user.update({ password: hashPassword });
+
+            if (update) {   
+             console.log("update user password");
             }
-            const response = await user.destroy();
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseMessage.pass.delete, data: {} });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update });
         } catch (error) {
             console.log(error)
             res.status(500).json({ error: 'server error', extra: error.message });
 
         }
-
-
     }
 }
 module.exports = ExternalSchoolController;
