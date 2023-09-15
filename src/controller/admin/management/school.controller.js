@@ -24,22 +24,11 @@ class AdminSchoolController {
 
         try {
 
-            const authorization = await Authorization.findByPk(data.id);
-            let montisoryManager;
-
-            if (authorization.permissions) {
-                if (authorization.permissions.includes('manage_prax_school') && JSON.parse(authorization.dataValues.permissions).length == 1) {
-                    montisoryManager = 'support@hellotioo.com';
-                }
-            }
-
-            // console.log(authorization.dataValues, JSON.parse(authorization.dataValues.permissions).length)
-
-            const whereClause = montisoryManager ? { account_type: 'school', email: montisoryManager } : { account_type: 'school', };
+       
 
             const accountInstances = await Account.findAll({
                 attributes: { exclude: ['password'] },
-                where: whereClause
+                where:  { account_type: 'school'}
             });
 
             if (!accountInstances) {
