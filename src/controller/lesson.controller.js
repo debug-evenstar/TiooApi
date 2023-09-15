@@ -962,6 +962,31 @@ class LessonController {
     }
 
 
+    static async deleteLesson(req, res) {
+
+        const {id} = req.params;
+        
+        try {
+
+            const lessonInstance = await Lesson.findByPk(id, {where: {library: true}});
+
+            if (!lessonInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const response = await lessonInstance.destroy();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+
 
     static async updateGeneratedLesson(req, res) {
 

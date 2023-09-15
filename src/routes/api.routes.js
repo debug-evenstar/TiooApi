@@ -239,6 +239,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/lesson/groups/:id/editarms', LessonController.editGroupArms);
     router.delete('/lesson/groups/:id/lesson/:lesson', LessonController.removeLessonFromGroup);
     router.put('/lesson/:id', LessonController.updateLesson);
+    router.delete('/lesson/:id', LessonController.deleteLesson);
     router.get('/lesson/:id/template', LessonController.lessonTemplate);
     router.put('/lesson/:id/status', LessonController.updateLessonStatus);
     router.get('/lesson/check', LessonController.subjectGroupedLessons);
