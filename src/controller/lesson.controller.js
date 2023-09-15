@@ -10,6 +10,7 @@ const HtmlToDocx = require('html-to-docx');
 const Sequelize = require('sequelize');
 const LessonTemplateProvider = require("../providers/AI/lesson.template");
 const { equal } = require("../utils/array");
+const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
 
 
 
@@ -792,7 +793,7 @@ class LessonController {
             await classInstance.addLesson(lessonInstance);
 
 
-            const group = await Group.findAll({ include: [ClassArm] });
+            const group = await Group.findAll({ include: [ClassArm], where: {SubjectId: req.body.subject } });
 
 
             let groupInstance;
@@ -1011,6 +1012,32 @@ class LessonController {
 
     }
 
+
+
+
+    static async updateTemplateImage(req, res) {
+
+        let payload = {};
+        
+        if (req.file) {
+            const ImageResponse = await cloudinaryUploadImage(req.file.path);
+            payload.image = ImageResponse.secure_url;
+        }
+
+        try {
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.update,
+                data: payload
+            });
+
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
 
 
 

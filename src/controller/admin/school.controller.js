@@ -1,5 +1,5 @@
 const ResponseStatus = require('../../config/message.config');
-const { Account, Validation, Teacher, SchoolManagement } = require('../../database/connection');
+const { Account, Validation, Teacher, SchoolManagement, Authorization, Admin } = require('../../database/connection');
 
 class AdminController {
 
@@ -9,11 +9,26 @@ class AdminController {
 
         try {
 
+            const data = req.userData;
+
+            const admin = await Admin.findByPk(data.id);
+
+            const authorization = await admin.getAuthorization();
+
+            let montisoryManager;
+
+            if (authorization) {
+                if (authorization.permissions.includes('manage_prax_school')) {
+                    montisoryManager = 'support@hellotioo.com';
+                }
+            }
+
+            const whereClause = montisoryManager ? { account_type: 'school', email: montisoryManager } : { account_type: 'school', };
+
+
             const accountInstances = await Account.findAll({
                 attributes: { exclude: ['password'] },
-                where: {
-                    account_type: 'school',
-                },
+                where: whereClause
             });
 
             if (!accountInstances) {
@@ -22,6 +37,7 @@ class AdminController {
                         ResponseStatus.fail.no_user
                 });
             }
+
 
             const accountData = await Promise.all(accountInstances.map(async (account) => {
                 const payload = {};

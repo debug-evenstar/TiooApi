@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { Account, Admin, ErrorLog, Keypairs } = require('../database/connection');
+const { Account, Admin, ErrorLog, Keypairs, Authorization } = require('../database/connection');
 const ResponseMessage = require('../config/message.config');
 const { school } = require('../controller/billing.controller');
 
@@ -144,8 +144,6 @@ class TokenMiddleware {
                 //  console.log(error);
             });
 
-
-
         } catch (err) {
             console.log(err)
             var logError = await ErrorLog.create({
@@ -161,6 +159,33 @@ class TokenMiddleware {
             }
         }
     }
+
+
+    static checkAuthorization(requiredAuthorizations) {
+
+        return async (req, res, next) => {
+
+            const data = req.userData;
+
+            const authorization = await Authorization.findByPk(data.id);
+
+            console.log(authorization.permissions);
+
+            const userAuthorizations = authorization.permissions || [];
+
+            const hasAuthorization = requiredAuthorizations.some((authorization) =>
+            
+                userAuthorizations.includes(authorization)
+            );
+
+            if (hasAuthorization) {
+                next();
+            } else {
+
+                res.status(403).json({ error: 'Unauthorized' });
+            }
+        };
+    };
 }
 
 
