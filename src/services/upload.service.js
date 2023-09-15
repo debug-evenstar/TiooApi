@@ -28,6 +28,8 @@ class UploadService {
     static uploadDisplayPicture = multer({ storage: UploadService.createStorage('public/profile')});
 
     static uploadLessonTemplate = multer({ storage: UploadService.createStorage('public/templates/lessons')});
+
+    static uploadTemplateImage = multer({ storage: UploadService.createStorage('public/templates/images')});
 }
 
 module.exports = UploadService;
