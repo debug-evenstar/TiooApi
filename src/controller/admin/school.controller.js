@@ -23,6 +23,7 @@ class AdminController {
                 });
             }
 
+
             const accountData = await Promise.all(accountInstances.map(async (account) => {
                 const payload = {};
                 const schoolInstance = await account.getSchoolManagement();
