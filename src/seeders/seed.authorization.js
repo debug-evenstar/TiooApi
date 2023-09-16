@@ -7,6 +7,7 @@ const { Role, Permission } = require('../database/connection/index');
     { name: 'Manage Students', code: 'manage_students', account: 'admin' },
     { name: 'Manage Library', code: 'manage_library', account: 'admin' },
     { name: 'Manage Marketplace', code: 'manage_marketplace', account: 'admin' },
+    { name: 'Manage Admin', code: 'manage_admin', account: 'admin' },
 
   ];
 

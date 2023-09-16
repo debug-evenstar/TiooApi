@@ -47,6 +47,8 @@ const PreferenceController = require('../controller/preference.controller');
 const BillingController = require('../controller/billing.controller');
 const NotificationController = require('../controller/notification.controller');
 const ExternalSchoolController = require('../controller/external_school/auth.controller');
+const TokenMiddleware = require('../middleware/token.middleware');
+
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -237,6 +239,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/lesson/groups/:id/editarms', LessonController.editGroupArms);
     router.delete('/lesson/groups/:id/lesson/:lesson', LessonController.removeLessonFromGroup);
     router.put('/lesson/:id', LessonController.updateLesson);
+    router.delete('/lesson/:id', LessonController.deleteLesson);
     router.get('/lesson/:id/template', LessonController.lessonTemplate);
     router.put('/lesson/:id/status', LessonController.updateLessonStatus);
     router.get('/lesson/check', LessonController.subjectGroupedLessons);
@@ -247,6 +250,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/lesson/create', UploadService.uploadLesson.array('files'), LessonController.createLesson);
     router.post('/lesson/add', UploadService.uploadLesson.array('files'), LessonController.addLesson);
     router.put('/lesson/template/:id', LessonController.updateLessonTemplate);
+    router.put('/lesson/templateimage/:id',  UploadService.uploadTemplateImage.single('image'), LessonController.updateTemplateImage);
 
     router.get('/chapter/subject/:id', ChapterController.read);
 
@@ -265,6 +269,8 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/settings/billing/school', BillingController.school);
     router.get('/settings/billing/freelancer', BillingController.freelancer);
     router.get('/settings/billing/student', BillingController.student);
+    router.post('/settings/billing/teacher/generate', BillingController.generateIndependentTeachersBill);
+    router.get('/settings/billing/teacher', BillingController.independentTeacher);
     router.post('/settings/billing/generate', BillingController.generateBill);
     router.post('/settings/account/changepassword', AuthenicationController.accountChangePassword);
 
@@ -298,10 +304,14 @@ const AdminRoutesGroup = (router) => {
     router.put('/admin/settings/pricing', PriceController.update);
     router.delete('/admin/settings/pricing/:id', PriceController.delete);
 
+
+    // router.get('/admin/user',  TokenMiddleware.checkAuthorization(['manage_admin']), AuthorizationController.readAdminUser);
     router.post('/admin/user', AuthorizationController.addAdminUser);
     router.get('/admin/user', AuthorizationController.readAdminUser);
     router.delete('/admin/user', AuthorizationController.deleteAdmin);
     router.get('/admin/permissions', AuthorizationController.readPermissions);
+    router.post('/admin/permissions', AuthorizationController.createPermissions);
+
 
     router.get('/admin/freelancer', AdminController.freeLancers);
     router.get('/admin/freelancer/:id', AdminController.freeLancersById);

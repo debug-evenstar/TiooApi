@@ -31,6 +31,8 @@ class BillingController {
                 pricing = payload.schools;
             }
 
+            console.log(priceInstance)
+
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: pricing });
 
         } catch (error) {
@@ -76,6 +78,55 @@ class BillingController {
                 pricing = exceptionedFreelancer;
             } else {
                 pricing = payload.freelancers;
+            }
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: pricing });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+
+    static async independentTeacher(req, res) {
+
+        const { id } = req.userData
+
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
+
+        try {
+
+            let pricing = {};
+
+            const payload = {};
+
+            const priceInstance = await Price.findAll();
+
+            const freelancerPricing = priceInstance.filter((price) => price.tab === 'freelancers' && price.tag === 'all');
+            const exceptionedFreelancersPricing = priceInstance.filter((price) => price.tab === 'freelancers' && price.tag === 'exceptions');
+
+            const exceptionedF = await Promise.all(exceptionedFreelancersPricing.map(async (element) => {
+                const account = await Account.findByPk(element.accounts);
+                element.dataValues.school_name = account.name;
+                delete element.dataValues.tab;
+                return element;
+
+            }));
+
+            payload.freelancers = freelancerPricing[0];
+            payload.exceptionedFreelancers = exceptionedF;
+
+            console.log(payload.freelancers);
+
+            const exceptionedFreelancer = payload.exceptionedFreelancers.filter(item => item.accounts == account_id);
+
+            if (exceptionedFreelancer.length !== 0) {
+                pricing = {tio_price: exceptionedFreelancer.teachers_price};
+            } else {
+                pricing = {tio_price:  payload.freelancers.teachers_price};
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: pricing });
@@ -201,8 +252,6 @@ class BillingController {
     }
 
 
-
-
     static async generateBill(req, res) {
 
         const today = new Date();
@@ -214,14 +263,55 @@ class BillingController {
         req.body.student_expiry = teacherDaysAhead;
         req.body.teacher_expiry = studentDaysAhead;
 
-        console.log(req.body.student_expiry);
-        console.log(req.body.teacher_expiry);
-
         try {
 
             const accountInstance = await Account.findByPk(req.body.account);
 
             const billingInstance = await Billing.create(req.body);
+
+            const response = await accountInstance.addBillings(billingInstance);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: billingInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+    static async generateIndependentTeachersBill(req, res) {
+
+        const today = new Date();
+        const studentDaysAhead = new Date();
+        const teacherDaysAhead = new Date();
+        studentDaysAhead.setDate(today.getDate() + req.body.month_covered);
+        teacherDaysAhead.setDate(today.getDate() + req.body.month_covered);
+
+        req.body.student_expiry = teacherDaysAhead;
+        req.body.teacher_expiry = studentDaysAhead;
+
+        try {
+
+            const accountInstance = await Account.findByPk(req.body.account);
+
+            
+            const payload = {
+                    status: "pending",
+                    account: 2,
+                    source: "paystack",
+                    type: "freelance-teacher",
+                    amount: req.body.amount,
+                    student_convered: 0,
+                    teachers_convered: 1,
+                    student_month_convered: 0,
+                    teachers_month_convered: req.month_covered,
+                    student_expiry:  req.body.student_expiry,
+                    teacher_expiry:  req.body.teacher_expiry
+                }
+
+
+            const billingInstance = await Billing.create(payload);
 
             const response = await accountInstance.addBillings(billingInstance);
 

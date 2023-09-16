@@ -19,13 +19,16 @@ class AdminSchoolController {
 
     static async read(req, res) {
 
+
+        const data = req.userData;
+
         try {
+
+       
 
             const accountInstances = await Account.findAll({
                 attributes: { exclude: ['password'] },
-                where: {
-                    account_type: 'school',
-                },
+                where:  { account_type: 'school'}
             });
 
             if (!accountInstances) {
@@ -46,6 +49,7 @@ class AdminSchoolController {
                 return school;
 
             }));
+            
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: accountData });
 
