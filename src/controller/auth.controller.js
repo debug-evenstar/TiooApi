@@ -116,8 +116,10 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ message: ResponseStatus.fail.school });
             }
             const privateKey = Schoolkey.private_key;
+            const publicKey = Schoolkey.public_key;
             const school = await Schoolkey.getSchoolManagement();
             const decoded = jwt.verify(data.payload, privateKey);
+
             if (!decoded) {
                 return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
             }
@@ -176,17 +178,19 @@ class AuthController {
                     public_key: data.public_key
                 }
             });
-
+        
             if (!Schoolkey) {
                 return res.status(ResponseStatus.code.not_found).json({ message: ResponseStatus.fail.school });
             }
+
+
             const privateKey = Schoolkey.private_key;
             const school = await Schoolkey.getSchoolManagement();
             const decoded = jwt.verify(data.payload, privateKey);
-
             if (!decoded) {
                 return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
             }
+         
             const emailExist = await AuthController.validateEmail(decoded.userdata.email);
             if (!emailExist.pass) {
                 return res.status(ResponseStatus.code.conflict).json({
@@ -1097,7 +1101,7 @@ class AuthController {
             if (!isCodeValid) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.incorrect_otp });
             }
-           
+
             const hashPassword = await account.hashPassword(data.password);
             const response = await account.update({ password: hashPassword });
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update });
