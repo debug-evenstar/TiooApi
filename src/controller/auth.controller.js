@@ -92,6 +92,47 @@ class AuthController {
 
     }
 
+    /* ---------------------- CHECKS IF USER EXIS VIA EMAIL --------------------- */
+
+    static async userExist(req, res) {
+        try {
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+            }
+
+            const email = req.params.email
+            console.log(email)
+            if (email == undefined) {
+                return res.status(ResponseStatus.code.conflict).json({
+                    error: true, message:
+                        ResponseStatus.fail.bad_request
+                });
+            }
+
+            const emailExist = await AuthController.validateEmail(email);
+        
+            if (!emailExist) {
+                return res.status(ResponseStatus.code.conflict).json({
+                    error: true, message:
+                        ResponseStatus.fail.no_user
+                });
+            }
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: emailExist.pass == false ? "email not found" : "email exist",
+                exists: emailExist.pass,
+            });
+
+            console.log(emailExist)
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ error: 'server error', extra: error.message });
+        }
+    }
+
     /* ------------------- CREATE STUDENT FROM EXTERNAL SCHOOL ------------------ */
     static async registerExternalStudent(req, res) {
         const errors = validationResult(req);
@@ -134,7 +175,7 @@ class AuthController {
             const account = await Account.create({
                 name: decoded.userdata.first_name + " " + decoded.userdata.last_name,
                 email: decoded.userdata.email,
-                phone: "",
+                phone: decoded.userdata.phone,
                 account_type: "student",
                 verification_status: 1,
                 status: "active",
@@ -178,7 +219,7 @@ class AuthController {
                     public_key: data.public_key
                 }
             });
-        
+
             if (!Schoolkey) {
                 return res.status(ResponseStatus.code.not_found).json({ message: ResponseStatus.fail.school });
             }
@@ -190,7 +231,7 @@ class AuthController {
             if (!decoded) {
                 return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
             }
-         
+
             const emailExist = await AuthController.validateEmail(decoded.userdata.email);
             if (!emailExist.pass) {
                 return res.status(ResponseStatus.code.conflict).json({

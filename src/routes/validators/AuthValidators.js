@@ -33,6 +33,9 @@ module.exports = {
     ChangePasswordValidator: [
         body('password').notEmpty().withMessage("password field is required"),
     ],
+    EmailValidator: [
+        body('password').notEmpty().withMessage("password field is required"),
+    ],
 
     SchoolSetupValidator: [
         body('email').notEmpty().isString().isEmail().withMessage("email field required"),
