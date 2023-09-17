@@ -134,7 +134,7 @@ class AuthController {
             const account = await Account.create({
                 name: decoded.userdata.first_name + " " + decoded.userdata.last_name,
                 email: decoded.userdata.email,
-                phone: "",
+                phone: decoded.userdata.phone,
                 account_type: "student",
                 verification_status: 1,
                 status: "active",
@@ -178,7 +178,7 @@ class AuthController {
                     public_key: data.public_key
                 }
             });
-        
+
             if (!Schoolkey) {
                 return res.status(ResponseStatus.code.not_found).json({ message: ResponseStatus.fail.school });
             }
@@ -190,7 +190,7 @@ class AuthController {
             if (!decoded) {
                 return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
             }
-         
+
             const emailExist = await AuthController.validateEmail(decoded.userdata.email);
             if (!emailExist.pass) {
                 return res.status(ResponseStatus.code.conflict).json({
