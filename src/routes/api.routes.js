@@ -3,7 +3,7 @@ router = express.Router();
 
 /* -------------------------------| Validators |------------------------------- */
 
-const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator, RegisterExternalStudentValidator } = require("./validators/AuthValidators")
+const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator, RegisterExternalStudentValidator, EmailValidator } = require("./validators/AuthValidators")
 
 /*-----------------------------------| HOME |-----------------------------------*/
 
@@ -57,6 +57,7 @@ const OpenRoutesGroup = (router) => {
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
+    router.get('/account/email/exits/:email', AuthenicationController.userExist);
     router.post('/account/student/external', RegisterExternalStudentValidator, AuthenicationController.registerExternalStudent);
     router.post('/delete/account/student/external', AuthenicationController.deleteExternalStudent);
     router.post('/account/send_otp', SendOTPValidator, AuthenicationController.requestVerificationOTP);
@@ -250,7 +251,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/lesson/create', UploadService.uploadLesson.array('files'), LessonController.createLesson);
     router.post('/lesson/add', UploadService.uploadLesson.array('files'), LessonController.addLesson);
     router.put('/lesson/template/:id', LessonController.updateLessonTemplate);
-    router.put('/lesson/templateimage/:id',  UploadService.uploadTemplateImage.single('image'), LessonController.updateTemplateImage);
+    router.put('/lesson/templateimage/:id', UploadService.uploadTemplateImage.single('image'), LessonController.updateTemplateImage);
 
     router.get('/chapter/subject/:id', ChapterController.read);
 
