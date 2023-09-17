@@ -104,6 +104,10 @@ const OpenRoutesGroup = (router) => {
 
     router.post('/coupon/apply', CouponController.apply);
 
+    router.get('open/lesson/:id/template', LessonController.lessonTemplate);
+    router.put('open/lesson/template/:id', LessonController.updateLessonTemplate);
+    router.put('open/lesson/templateimage/:id',  UploadService.uploadTemplateImage.single('image'), LessonController.updateTemplateImage);
+
 };
 
 

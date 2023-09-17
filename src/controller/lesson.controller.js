@@ -852,7 +852,8 @@ class LessonController {
                     "grade": classInstance.naming,
                     "objectives": req.body.objective,
                     "duration": req.body.duration,
-                    "extra": req.body.additional_instruction
+                    "extra": req.body.additional_instruction,
+                    "subject": subjectInstance.naming
                 }
 
                 const response = await LessonTemplateProvider.getenerateLesson(body);
@@ -907,7 +908,8 @@ class LessonController {
 
             const body = {
                 "query": req.body.query,
-                "session_id": req.body.session_id
+                "session_id": req.body.session_id,
+                "lesson_id": lessonInstance.id
             }
 
             const response = await LessonTemplateProvider.getenerateLessonWithExtra(body);
