@@ -230,6 +230,8 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/classarmsmates', StudentController.studentArmsMates);
     router.get('/student/personalinfo', StudentController.personalInformation);
     router.put('/student/personalinfo', StudentController.updatePersonalInformation);
+    router.get('/student/library', StudentController.independentStudentLibrary);
+    router.get('/student/network', StudentController.independentStudentNetwork);
     router.get('/student/:id', StudentController.fetchStudent);
 
     /* --------------------------------- LESSON -------------------------------- */
@@ -351,7 +353,7 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
 
     router.post('/admin/library', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
-    router.get('/admin/library', UploadService.uploadLesson.single('file'), AdminLibraryController.read);
+    router.get('/admin/library', AdminLibraryController.read);
     router.delete('/admin/library/:id', AdminLibraryController.deleteLibrary);
     router.post('/admin/library/subject', AdminLibraryController.libraryMaterial);
     router.post('/admin/library/lesson', UploadService.uploadLesson.single('file'), AdminLibraryController.createLibraryLesson);

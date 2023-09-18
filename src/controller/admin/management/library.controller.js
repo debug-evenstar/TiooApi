@@ -158,7 +158,7 @@ class AdminLibraryController {
 
             await subjectInstance.addLesson(lessonInstance);
 
-
+            
             const classInstance = await Class.findByPk(req.body.class);
 
             const classarmInstances = await classInstance.getClassArms();

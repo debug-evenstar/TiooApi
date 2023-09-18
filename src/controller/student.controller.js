@@ -10,6 +10,7 @@ const AuthController = require('../controller/auth.controller');
 const Mailer = require('../services/mailer');
 const HashUtils = require('../utils/hash.utilities');
 const { classArmStudents } = require("./classArms.controller");
+const { lib } = require("crypto-js");
 
 
 class StudentController {
@@ -547,7 +548,7 @@ class StudentController {
         };
     }
 
-    
+
 
     /*-----------------------------------| STUDENTS CLASS MATES |-----------------------------------*/
 
@@ -572,7 +573,7 @@ class StudentController {
             const classMates = await studentClass.getStudents({
                 include: [{
                     model: Account,
-                    where: {verification_status: 1, status: "active", flag: "active"}
+                    where: { verification_status: 1, status: "active", flag: "active" }
                 }]
             });
 
@@ -625,9 +626,9 @@ class StudentController {
 
 
 
-      /*-----------------------------------| STUDENTS CLASS TEACHERS AND MATES |-----------------------------------*/
+    /*-----------------------------------| STUDENTS CLASS TEACHERS AND MATES |-----------------------------------*/
 
-      static async studentClassTeachersAndMates(req, res) {
+    static async studentClassTeachersAndMates(req, res) {
 
         const { id } = req.userData
 
@@ -648,10 +649,10 @@ class StudentController {
             const classMates = await studentClass.getStudents({
                 include: [{
                     model: Account,
-                    where: {verification_status: 1, status: "active", flag: "active"}
+                    where: { verification_status: 1, status: "active", flag: "active" }
                 }]
             });
-            
+
             const filterclassMates = classMates.filter((element) => element.id != classStudents.id)
 
             const classMatesAccount = await Promise.all(filterclassMates.map(async (profile) => {
@@ -751,6 +752,8 @@ class StudentController {
             const registeredAccount = await validationInstance.getAccount();
 
             registeredAccount.status = 'active';
+            registeredAccount.flag = 'active';
+            registeredAccount.verification_status = 1;
 
             const studentInstance = await Student.create({
                 ...req.body,
@@ -879,6 +882,83 @@ class StudentController {
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+    static async independentStudentLibrary(req, res) {
+
+        try {
+
+            const { id } = req.userData
+            const account_id = req.query.account_id ? req.query.account_id : id;
+
+            const accountInstance = await Account.findByPk(account_id);
+
+            const studentInstance = await accountInstance.getStudent()
+
+            const studentClass = await studentInstance.getClass();
+
+            const studentLibrary = await studentClass.getSubjects({where: {library: true}, through: []});
+
+            const response = await Promise.all(studentLibrary.map( async (library)=>{
+
+                const lessons = await library.getLessons();
+
+                delete library.dataValues.ClassSubjects;
+                delete library.dataValues.ages;
+
+              const payload = {
+                ...library.dataValues,
+                lessons: lessons.length,
+                class: studentClass.id,
+
+            };
+
+
+              return payload;
+
+            }));
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+    static async independentStudentNetwork(req, res) {
+
+        try {
+
+            const { id } = req.userData
+            const account_id = req.query.account_id ? req.query.account_id : id;
+
+            const accountInstance = await Account.findByPk(account_id);
+
+            const studentInstance = await accountInstance.getStudent()
+
+            const school = await studentInstance.getSchoolManagement();
+
+            const students = await school.getStudents();
+
+            const response = await Promise.all(students.map( async (student)=>{
+
+                const studentAccount = await student.getAccount();
+
+               const {name, email, phone } = studentAccount;
+
+                return  {name, email, phone, age: student.age, school: school.school_name };
+
+            }));
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
 
         } catch (error) {
             console.log(error);
