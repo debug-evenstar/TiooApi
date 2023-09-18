@@ -58,7 +58,7 @@ class SchoolManagementController {
 
             const registeredSchoolManagement = await registeredAccount.SchoolManagement.update(parsedBody);
 
-            registeredAccount.status = 'active';
+            registeredAccount.status = 'inreview';
             await registeredAccount.save();
 
             /*-------------/ for standard school naming convention /-------------*/
