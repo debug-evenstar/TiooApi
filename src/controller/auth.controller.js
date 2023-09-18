@@ -1235,7 +1235,7 @@ class AuthController {
 
         const link = `${process.env.WEB_URL}/account/verify/${hash}`;
 
-        console.log(link);
+        console.log(link, hash);
 
         Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { link }).send();
     }

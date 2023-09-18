@@ -26,6 +26,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false
             },
+            tab: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            }
         }, {
         timestamps: false,
     });
