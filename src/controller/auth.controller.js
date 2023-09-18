@@ -1097,7 +1097,7 @@ class AuthController {
 
         const link = `${process.env.CICD_WEB_URL}/confirmation`;
 
-        console.log(link);
+        console.log(link, hash);
 
         Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { link }).send();
     }

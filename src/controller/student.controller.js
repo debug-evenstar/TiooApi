@@ -751,6 +751,8 @@ class StudentController {
             const registeredAccount = await validationInstance.getAccount();
 
             registeredAccount.status = 'active';
+            registeredAccount.flag = 'active';
+            registeredAccount.verification_status = 1;
 
             const studentInstance = await Student.create({
                 ...req.body,
