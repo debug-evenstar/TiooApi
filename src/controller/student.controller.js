@@ -948,27 +948,17 @@ class StudentController {
 
             const students = await school.getStudents();
 
+            const response = await Promise.all(students.map( async (student)=>{
 
-            // const response = await Promise.all(studentLibrary.map( async (library)=>{
+                const studentAccount = await student.getAccount();
 
-            //     const lessons = await library.getLessons();
+               const {name, email, phone } = studentAccount;
 
-            //     delete library.dataValues.ClassSubjects;
-            //     delete library.dataValues.ages;
-                
-            //   const payload = {
-            //     ...library.dataValues,
-            //     lessons: lessons.length,
-            //     class: studentClass.id,
+                return  {name, email, phone, age: student.age, school: school.school_name };
 
-            // };
+            }));
 
-
-            //   return payload;
-
-            // }));
-
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: students });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
 
         } catch (error) {
             console.log(error);

@@ -225,6 +225,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/personalinfo', StudentController.personalInformation);
     router.put('/student/personalinfo', StudentController.updatePersonalInformation);
     router.get('/student/library', StudentController.independentStudentLibrary);
+    router.get('/student/network', StudentController.independentStudentNetwork);
     router.get('/student/:id', StudentController.fetchStudent);
 
     /* --------------------------------- LESSON -------------------------------- */
