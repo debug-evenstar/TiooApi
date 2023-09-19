@@ -351,6 +351,7 @@ const AdminRoutesGroup = (router) => {
     router.post('/admin/library/lesson', UploadService.uploadLesson.single('file'), AdminLibraryController.createLibraryLesson);
     
     router.get('/admin/library/lesson/check', AdminLibraryController.subjectGroupedLessons);
+    router.get('/admin/librarysubject/:id/classes', AdminLibraryController.libraryClasses);
 
     router.post('/admin/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.adminLibraryLessonUploadTemplate);
 

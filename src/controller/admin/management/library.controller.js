@@ -23,16 +23,23 @@ class AdminLibraryController {
 
             // --------------------------------------------------------- subject
 
-            const classInstance = await Class.findByPk(data.class[0]);
+            const classInstance = await Class.findAll({ where: { id: [...req.body.class] } });
 
             if (!classInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
             const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
+
             const schoolInstance = await accountInstance.getSchoolManagement();
 
-            const classarmInstances = await classInstance.getClassArms();
+            const classIds = classInstance.map((element)=> element.id);
+
+            console.log(classIds);
+
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...classInstance.map((element)=> element.id)] } });
+
+
             const subjectInstance = await Subject.create(req.body);
 
             await schoolInstance.addSubjects(subjectInstance);
@@ -329,6 +336,32 @@ class AdminLibraryController {
         };
 
     }
+
+
+
+    static async libraryClasses(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const libraryInstance = await Subject.findByPk(id, { where: { library: true } });
+
+            if (!libraryInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const response = await libraryInstance.getClasses();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
 
 
 
