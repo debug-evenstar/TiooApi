@@ -1,7 +1,7 @@
 const AuthController = require('../../auth.controller');
 const { validationResult } = require('express-validator');
 const ResponseStatus = require("../../../config/message.config");
-const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class, Library, LessonSlide } = require('../../../database/connection');
+const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class, Library, LessonSlide, Group } = require('../../../database/connection');
 const { use } = require('chai');
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
 const TokenMiddleware = require('../../../middleware/token.middleware');
@@ -175,6 +175,68 @@ class AdminLibraryController {
             const instance1 = await lessonInstance.addClassArms(classarmInstances);
 
             await classInstance.addLesson(lessonInstance);
+
+
+
+
+
+
+
+
+            const group = await Group.findAll({ include: [ClassArm], where: { SubjectId: req.body.subject } });
+
+
+            let groupInstance;
+            let groupId;
+
+            const arms = classarmInstances.map((element)=> element.id);
+
+            for (let i = 0; i < group.length; i++) {
+
+                const data = group[i].ClassArms.map((element) => element.id);
+
+                if (arms.length == 1) {
+
+                    if (arms[0] == data) {
+                        console.log('single found', arms, data, group[i].id);
+                        groupId = group[i].id;
+                    } else {
+                        console.log('single not found', arms, data);
+                    }
+
+                } else {
+
+                    if (arms.every((arm) => data.includes(arm))) {
+                        console.log('found', arms, data, group[i].id);
+                        groupId = group[i].id;
+                    } else {
+                        console.log('not found', arms, data);
+                    }
+
+                }
+            }
+
+
+            if (groupId) {
+                groupInstance = await Group.findByPk(groupId);
+            } else {
+
+                groupInstance = await Group.create({
+                    naming: classInstance.naming,
+                    ref_cid: classInstance.id
+                });
+            }
+
+            console.log('this is the id', groupId);
+
+            console.log(groupInstance);
+
+
+            await groupInstance.addLesson(lessonInstance);
+            const instance2 = await groupInstance.addClassArms(classarmInstances);
+            const subjejctGroup = await subjectInstance.addGroup(groupInstance);
+
+
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: lessonInstance });
 
