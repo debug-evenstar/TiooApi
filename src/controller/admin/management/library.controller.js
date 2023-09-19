@@ -227,10 +227,6 @@ class AdminLibraryController {
                 });
             }
 
-            console.log('this is the id', groupId);
-
-            console.log(groupInstance);
-
 
             await groupInstance.addLesson(lessonInstance);
             const instance2 = await groupInstance.addClassArms(classarmInstances);
@@ -246,6 +242,9 @@ class AdminLibraryController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
+
+
+    
 
     static async subjectGroupedLessons(req, res) {
 
