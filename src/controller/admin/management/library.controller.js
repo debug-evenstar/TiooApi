@@ -1,7 +1,7 @@
 const AuthController = require('../../auth.controller');
 const { validationResult } = require('express-validator');
 const ResponseStatus = require("../../../config/message.config");
-const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class, Library, LessonSlide } = require('../../../database/connection');
+const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class, Library, LessonSlide, Group } = require('../../../database/connection');
 const { use } = require('chai');
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
 const TokenMiddleware = require('../../../middleware/token.middleware');
@@ -23,16 +23,23 @@ class AdminLibraryController {
 
             // --------------------------------------------------------- subject
 
-            const classInstance = await Class.findByPk(data.class[0]);
+            const classInstance = await Class.findAll({ where: { id: [...req.body.class] } });
 
             if (!classInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
             const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
+
             const schoolInstance = await accountInstance.getSchoolManagement();
 
-            const classarmInstances = await classInstance.getClassArms();
+            const classIds = classInstance.map((element)=> element.id);
+
+            console.log(classIds);
+
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...classInstance.map((element)=> element.id)] } });
+
+
             const subjectInstance = await Subject.create(req.body);
 
             await schoolInstance.addSubjects(subjectInstance);
@@ -169,6 +176,64 @@ class AdminLibraryController {
 
             await classInstance.addLesson(lessonInstance);
 
+
+
+
+
+
+
+
+            const group = await Group.findAll({ include: [ClassArm], where: { SubjectId: req.body.subject } });
+
+
+            let groupInstance;
+            let groupId;
+
+            const arms = classarmInstances.map((element)=> element.id);
+
+            for (let i = 0; i < group.length; i++) {
+
+                const data = group[i].ClassArms.map((element) => element.id);
+
+                if (arms.length == 1) {
+
+                    if (arms[0] == data) {
+                        console.log('single found', arms, data, group[i].id);
+                        groupId = group[i].id;
+                    } else {
+                        console.log('single not found', arms, data);
+                    }
+
+                } else {
+
+                    if (arms.every((arm) => data.includes(arm))) {
+                        console.log('found', arms, data, group[i].id);
+                        groupId = group[i].id;
+                    } else {
+                        console.log('not found', arms, data);
+                    }
+
+                }
+            }
+
+
+            if (groupId) {
+                groupInstance = await Group.findByPk(groupId);
+            } else {
+
+                groupInstance = await Group.create({
+                    naming: classInstance.naming,
+                    ref_cid: classInstance.id
+                });
+            }
+
+
+            await groupInstance.addLesson(lessonInstance);
+            const instance2 = await groupInstance.addClassArms(classarmInstances);
+            const subjejctGroup = await subjectInstance.addGroup(groupInstance);
+
+
+
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: lessonInstance });
 
 
@@ -177,6 +242,9 @@ class AdminLibraryController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
+
+
+    
 
     static async subjectGroupedLessons(req, res) {
 
@@ -329,6 +397,32 @@ class AdminLibraryController {
         };
 
     }
+
+
+
+    static async libraryClasses(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const libraryInstance = await Subject.findByPk(id, { where: { library: true } });
+
+            if (!libraryInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const response = await libraryInstance.getClasses();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
 
 
 
