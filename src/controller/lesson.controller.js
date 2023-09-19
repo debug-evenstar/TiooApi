@@ -157,23 +157,23 @@ class LessonController {
             const groupArmIds = classarmInstances.map(arm => arm.id);
             const groupSubject = await groupInstance.getSubject();
             const subjectGroups = await groupSubject.getGroups({
-                include : [ClassArm]
+                include: [ClassArm]
             });
 
             for (let index = 0; index < subjectGroups.length; index++) {
                 const group = subjectGroups[index];
                 const armsIds = group.ClassArms.map(arm => arm.id);
-                if( 
-                    armsIds.length == groupArmIds.length && 
-                    equal(armsIds,groupArmIds) &&
+                if (
+                    armsIds.length == groupArmIds.length &&
+                    equal(armsIds, groupArmIds) &&
                     group.id !== groupInstance.id
-                ){
+                ) {
                     // Move all lessons to this group
                     const groupLessons = await group.getLessons();
                     for (let i = 0; i < groupLessons.length; i++) {
                         const lesson = groupLessons[i];
                         await lesson.update({
-                            GroupId : groupInstance.id
+                            GroupId: groupInstance.id
                         });
                     }
                     // Delete current group
@@ -793,7 +793,7 @@ class LessonController {
             await classInstance.addLesson(lessonInstance);
 
 
-            const group = await Group.findAll({ include: [ClassArm], where: {SubjectId: req.body.subject } });
+            const group = await Group.findAll({ include: [ClassArm], where: { SubjectId: req.body.subject } });
 
 
             let groupInstance;
@@ -966,11 +966,11 @@ class LessonController {
 
     static async deleteLesson(req, res) {
 
-        const {id} = req.params;
-        
+        const { id } = req.params;
+
         try {
 
-            const lessonInstance = await Lesson.findByPk(id, {where: {library: true}});
+            const lessonInstance = await Lesson.findByPk(id, { where: { library: true } });
 
             if (!lessonInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
@@ -1044,14 +1044,17 @@ class LessonController {
 
     static async updateTemplateImage(req, res) {
 
+        console.log("this is the file", req.file);
+
         let payload = {};
-        
-        if (req.file) {
-            const ImageResponse = await cloudinaryUploadImage(req.file.path);
-            payload.image = ImageResponse.secure_url;
-        }
 
         try {
+
+
+            if (req.file) {
+                const ImageResponse = await cloudinaryUploadImage(req.file.path);
+                payload.image = ImageResponse.secure_url;
+            }
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
