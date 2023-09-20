@@ -356,7 +356,12 @@ class InviteController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
+            req.body.status = "active",
+            req.body.flag = "active",
+            req.body.verification_status = 1;
+
             const registeredAccount = await Account.create(req.body);
+            
             const newValidation = await Validation.create({ otp });
             await registeredAccount.setValidation(newValidation);
 

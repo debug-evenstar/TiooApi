@@ -9,7 +9,7 @@ cloudinary.config({
 
 const cloudinaryUploadImage = async(fileToUpload)=>{
 
-    const res = await cloudinary.uploader.upload(fileToUpload, {public_id: "olympic_flag"});
+    const res = await cloudinary.uploader.upload(fileToUpload, {public_id: "olympic_flag", resource_type: 'auto'});
    
     return res;
 }
