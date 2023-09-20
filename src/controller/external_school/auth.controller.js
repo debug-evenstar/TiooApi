@@ -88,8 +88,8 @@ class ExternalSchoolController {
             if (user.account_type === 'student') {
                 const profile = await user.getStudent();
                 const payload = {}
-                payload.redirect = "https://student.hellotioo.com/auth";
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
+                payload.redirect = `https://student.hellotioo.com/auth/${generatedToken}`;
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, payload: payload });
 
             } else {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseMessage.student })
