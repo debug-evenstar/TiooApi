@@ -346,6 +346,7 @@ const AdminRoutesGroup = (router) => {
 
     router.post('/admin/library', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
     router.get('/admin/library', AdminLibraryController.read);
+    router.delete('/admin/librarylesson/:id', AdminLibraryController.deleteLibraryLesson);
     router.delete('/admin/library/:id', AdminLibraryController.deleteLibrary);
     router.post('/admin/library/subject', AdminLibraryController.libraryMaterial);
     router.post('/admin/library/lesson', UploadService.uploadLesson.single('file'), AdminLibraryController.createLibraryLesson);

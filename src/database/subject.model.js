@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
             },
             library_status: {
                 type: DataTypes.STRING,
-                allowNull: false,
+                allowNull: true,
                 default: ''
             },
             // status: {
