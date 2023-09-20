@@ -89,14 +89,14 @@ class AdminLibraryController {
             );
 
            const response = await Promise.all(subjectInstance.map( async (element)=>{
-             const classes = await element.getClasses()
+             const rawClasses = await element.getClasses()
              const lessonCount = element.Lessons.length
 
-             const classFilter = classes.map((element)=> ({ id: element.id, naming: element.naming, type: element.type }));
+             const classes = rawClasses.map((element)=> ({ id: element.id, naming: element.naming, type: element.type }));
 
              delete element.dataValues.Lessons;
 
-             return {...element.dataValues, classFilter, lessonCount}
+             return {...element.dataValues, classes, lessonCount}
            }))
 
             // ------------------------------------------
