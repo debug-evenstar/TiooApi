@@ -5,7 +5,8 @@ const { Account, Authorization, Permission, Validation, Admin, SchoolManagement,
 const { use } = require('chai');
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
 const TokenMiddleware = require('../../../middleware/token.middleware');
-const LessonTemplateProvider = require('../../../providers/AI/lesson.template')
+const LessonTemplateProvider = require('../../../providers/AI/lesson.template');
+const e = require('express');
 
 
 
@@ -39,6 +40,7 @@ class AdminLibraryController {
 
             const classarmInstances = await ClassArm.findAll({ where: { id: [...classInstance.map((element)=> element.id)] } });
 
+            req.body.status = "unpublished";
 
             const subjectInstance = await Subject.create(req.body);
 
@@ -86,17 +88,20 @@ class AdminLibraryController {
                 }
             );
 
+           const response = await Promise.all(subjectInstance.map( async (element)=>{
+             const rawClasses = await element.getClasses()
+             const lessonCount = element.Lessons.length
 
-            const subjectsWithLessonCount = subjectInstance.map(subject => {
-                const subjectObj = { ...subject.toJSON(), lessonCount: subject.Lessons.length };
-                delete subjectObj.Lessons;
-                return subjectObj;
-            });
+             const classes = rawClasses.map((element)=> ({ id: element.id, naming: element.naming, type: element.type }));
 
+             delete element.dataValues.Lessons;
+
+             return {...element.dataValues, classes, lessonCount}
+           }))
 
             // ------------------------------------------
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectsWithLessonCount });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: response });
 
         } catch (error) {
             console.log(error);
@@ -175,12 +180,6 @@ class AdminLibraryController {
             const instance1 = await lessonInstance.addClassArms(classarmInstances);
 
             await classInstance.addLesson(lessonInstance);
-
-
-
-
-
-
 
 
             const group = await Group.findAll({ include: [ClassArm], where: { SubjectId: req.body.subject } });
@@ -398,6 +397,84 @@ class AdminLibraryController {
 
     }
 
+    static async deleteLibraryLesson(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const libraryLessonInstance = await Lesson.findByPk(id);
+
+            if (!libraryLessonInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const response = await libraryLessonInstance.destroy();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: response });
+
+        } catch (error) {
+            // console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+    static async toggleLibrarySubjectStatus(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const libraryInstance = await Subject.findByPk(id, { where: { library: true } });
+
+            if (!libraryInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            console.log(libraryInstance);
+
+            libraryInstance.library_status =  libraryInstance.library_status == 'unpublished' ? 'published': 'unpublished'
+
+            const response = await libraryInstance.save();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: response });
+
+        } catch (error) {
+            // console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+
+    static async toggleLibraryLessonStatus(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const libraryLessonInstance = await Lesson.findByPk(id);
+
+            if (!libraryLessonInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            console.log(libraryLessonInstance);
+
+            libraryLessonInstance.library_status =  libraryLessonInstance.library_status == 'unpublished' ? 'published': 'unpublished'
+
+            const response = await libraryLessonInstance.save();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: response });
+
+        } catch (error) {
+            // console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
 
 
     static async libraryClasses(req, res) {
@@ -414,7 +491,9 @@ class AdminLibraryController {
 
             const response = await libraryInstance.getClasses();
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: response });
+            const filter = response.map((element)=> ({ id: element.id, naming: element.naming, type: element.type }));
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: filter });
 
         } catch (error) {
             console.log(error);
@@ -422,10 +501,6 @@ class AdminLibraryController {
         };
 
     }
-
-
-
-
 
 
     static async read(req, res) {

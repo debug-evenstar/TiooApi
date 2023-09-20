@@ -67,6 +67,11 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
         defaultValue: 'Locked',
       },
+      library_status: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        defaultValue: 'unpublished',
+      },
       published: {
         type: Sequelize.INTEGER,
         allowNull: false,
