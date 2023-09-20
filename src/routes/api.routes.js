@@ -55,6 +55,7 @@ const TokenMiddleware = require('../middleware/token.middleware');
 const OpenRoutesGroup = (router) => {
     router.get('/error/logs', ErrorLogs.fetchErrors);
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
+    router.post('/account/signin/external/student', SigninValidator, ExternalSchoolController.loginExeternalStudent);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
     router.get('/account/email/exits/:email', AuthenicationController.userExist);
