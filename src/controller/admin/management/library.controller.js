@@ -39,6 +39,7 @@ class AdminLibraryController {
 
             const classarmInstances = await ClassArm.findAll({ where: { id: [...classInstance.map((element)=> element.id)] } });
 
+            req.body.status = "unpublished";
 
             const subjectInstance = await Subject.create(req.body);
 
@@ -175,12 +176,6 @@ class AdminLibraryController {
             const instance1 = await lessonInstance.addClassArms(classarmInstances);
 
             await classInstance.addLesson(lessonInstance);
-
-
-
-
-
-
 
 
             const group = await Group.findAll({ include: [ClassArm], where: { SubjectId: req.body.subject } });
@@ -399,6 +394,63 @@ class AdminLibraryController {
     }
 
 
+    static async toggleLibrarySubjectStatus(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const libraryInstance = await Subject.findByPk(id, { where: { library: true } });
+
+            if (!libraryInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            console.log(libraryInstance);
+
+            libraryInstance.library_status =  libraryInstance.library_status == 'unpublished' ? 'published': 'unpublished'
+
+            const response = await libraryInstance.save();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: response });
+
+        } catch (error) {
+            // console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+
+    static async toggleLibraryLessonStatus(req, res) {
+
+        const { id } = req.params;
+
+        try {
+
+            const libraryLessonInstance = await Lesson.findByPk(id);
+
+            if (!libraryLessonInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            console.log(libraryLessonInstance);
+
+            libraryLessonInstance.library_status =  libraryLessonInstance.library_status == 'unpublished' ? 'published': 'unpublished'
+
+            const response = await libraryLessonInstance.save();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: response });
+
+        } catch (error) {
+            // console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
 
     static async libraryClasses(req, res) {
 
@@ -414,7 +466,9 @@ class AdminLibraryController {
 
             const response = await libraryInstance.getClasses();
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: response });
+            const filter = response.map((element)=> ({ id: element.id, naming: element.naming, type: element.type }));
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: filter });
 
         } catch (error) {
             console.log(error);

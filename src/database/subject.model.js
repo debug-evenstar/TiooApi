@@ -29,7 +29,16 @@ module.exports = (sequelize, DataTypes) => {
             tab: {
                 type: DataTypes.INTEGER,
                 allowNull: true,
-            }
+            },
+            library_status: {
+                type: DataTypes.STRING,
+                allowNull: false,
+                default: ''
+            },
+            // status: {
+            //     type: DataTypes.STRING,
+            //     allowNull: true,
+            // }
         }, {
         timestamps: false,
     });
