@@ -392,6 +392,56 @@ class SubjectController {
         };
     }
 
+
+    static async schoolfrontLibraryMaterial(req, res) {
+
+        const data = req.body;
+
+        data.library = true;
+
+        try {
+
+            // --------------------------------------------------------- subject
+
+            const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
+
+            const schoolInstance = await accountInstance.getSchoolManagement();
+
+            const subjectInstance = await schoolInstance.getSubjects(
+                {
+                    where: { library: true }, joinTableAttributes: [],
+                    include: [
+                        {
+                            model: Lesson,
+                            attributes: { exclude: ['LibraryId'] },
+                        },
+                    ],
+                }
+            );
+
+           const response = await Promise.all(subjectInstance.map( async (element)=>{
+             const rawClasses = await element.getClasses()
+             const lessonCount = element.Lessons.length
+
+             const classes = rawClasses.map((element)=> ({ id: element.id, naming: element.naming, type: element.type }));
+
+             delete element.dataValues.Lessons;
+
+             return {...element.dataValues, classes}
+           }))
+
+            // ------------------------------------------
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
 }
 
 module.exports = SubjectController;
