@@ -38,13 +38,9 @@ module.exports = (sequelize, DataTypes) => {
             subject_category: {
                 type: DataTypes.INTEGER,
                 allowNull: true,
-                
             },
-            
-            // status: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true,
-            // }
+
+         
         }, {
         timestamps: false,
     });
