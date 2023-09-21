@@ -37,7 +37,6 @@ const ResponseMessage = {
         invite: 'Invite Not accepted yet',
         accepted: 'Invite Already Accepted',
         
-
     },
 
     code: {
