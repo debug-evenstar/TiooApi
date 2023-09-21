@@ -36,8 +36,6 @@ class AdminLibraryController {
 
             const classIds = classInstance.map((element)=> element.id);
 
-            console.log(classIds);
-
             const classarmInstances = await ClassArm.findAll({ where: { id: [...classInstance.map((element)=> element.id)] } });
 
             req.body.status = "unpublished";
@@ -156,8 +154,6 @@ class AdminLibraryController {
         req.body.start_date = today;
         req.body.end_date = threeDaysAhead;
 
-
-
         try {
 
             const lessonInstance = await Lesson.create(req.body);
@@ -258,8 +254,6 @@ class AdminLibraryController {
 
         req.body.start_date = today;
         req.body.end_date = threeDaysAhead;
-
-
 
         try {
 

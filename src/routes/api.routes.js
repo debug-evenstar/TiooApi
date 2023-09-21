@@ -200,6 +200,8 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/subjects/:id/student/lessons', SubjectController.studentLessons);
     router.delete('/subjects/delete/:id', SubjectController.delete);
 
+    router.get('/schoolfront/librarysubject', SubjectController.schoolfrontLibraryMaterial);
+
     /* --------------------------------- TEACHERS -------------------------------- */
 
     router.post('/teacher/invite', TeacherController.sendInvite);

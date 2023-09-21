@@ -35,10 +35,12 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
                 default: ''
             },
-            // status: {
-            //     type: DataTypes.STRING,
-            //     allowNull: true,
-            // }
+            subject_category: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            },
+
+         
         }, {
         timestamps: false,
     });
