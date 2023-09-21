@@ -243,6 +243,82 @@ class AdminLibraryController {
     }
 
 
+
+    static async addLibraryLesson(req, res) {
+
+        const today = new Date();
+        const threeDaysAhead = new Date();
+        threeDaysAhead.setDate(today.getDate() + 3);
+
+        if (req.file) {
+            req.body.files = [req.file.path];
+
+            console.log(req.body.files);
+        }
+
+        req.body.start_date = today;
+        req.body.end_date = threeDaysAhead;
+
+
+
+        try {
+
+            const selectedGroup = await Group.findByPk(req.query.group_id, { include: [ClassArm] });
+
+            const classarms = selectedGroup.ClassArms.map((element) => element.id);
+
+            const body = {
+                topic: req.body.topic,
+                duration: "45 Minutes",
+                curriculum: "",
+                subject: selectedGroup.SubjectId,
+                start_date: req.body.start_date,
+                end_date: req.body.end_date,
+                objective: "",
+                additioinal_instruction: "",
+                week: "Week 3",
+                status: "locked",
+                term: req.body.term,
+                class: selectedGroup.ref_cid,
+                class_arms: classarms,
+                files: req.body.files
+            }
+
+            const lessonInstance = await Lesson.create(body);
+
+            const subjectInstance = await Subject.findByPk(body.subject);
+
+            if (!subjectInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
+
+            }
+
+            await subjectInstance.addLesson(lessonInstance);
+
+
+
+            const classInstance = await Class.findByPk(body.class);
+
+            const classarmInstances = await classInstance.getClassArms();
+
+            const instance1 = await lessonInstance.addClassArms(classarmInstances);
+
+            await classInstance.addLesson(lessonInstance);
+
+            await selectedGroup.addLesson(lessonInstance);
+            const instance2 = await selectedGroup.addClassArms(classarmInstances);
+            const subjejctGroup = await subjectInstance.addGroup(selectedGroup);
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: lessonInstance });
+
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
     
 
     static async subjectGroupedLessons(req, res) {
@@ -319,12 +395,9 @@ class AdminLibraryController {
             await subjectInstance.addLesson(lessonInstance);
 
 
-
             const grade = `{reference:${classInstance.id},name:"${classInstance.naming}"}`;
 
             const subject = subjectInstance.naming;
-
-            
 
             const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath, grade, subject);
 
@@ -360,6 +433,66 @@ class AdminLibraryController {
             };
 
             await lessonInstance.addLessonSlides(parseSlides);
+
+
+            const classarmInstances = await classInstance.getClassArms();
+
+            const instance1 = await lessonInstance.addClassArms(classarmInstances);
+
+
+            /*------------------------------------------------
+            Grouping Libbrary Lesson Flow
+            ----------------------------------------------*/ 
+
+            const group = await Group.findAll({ include: [ClassArm], where: { SubjectId: req.body.subject } });
+
+            let groupInstance;
+            let groupId;
+
+            const arms = classarmInstances.map((element)=> element.id);
+
+            for (let i = 0; i < group.length; i++) {
+
+                const data = group[i].ClassArms.map((element) => element.id);
+
+                if (arms.length == 1) {
+
+                    if (arms[0] == data) {
+                        console.log('single found', arms, data, group[i].id);
+                        groupId = group[i].id;
+                    } else {
+                        console.log('single not found', arms, data);
+                    }
+
+                } else {
+
+                    if (arms.every((arm) => data.includes(arm))) {
+                        console.log('found', arms, data, group[i].id);
+                        groupId = group[i].id;
+                    } else {
+                        console.log('not found', arms, data);
+                    }
+
+                }
+            }
+
+            if (groupId) {
+                groupInstance = await Group.findByPk(groupId);
+            } else {
+
+                groupInstance = await Group.create({
+                    naming: classInstance.naming,
+                    ref_cid: classInstance.id
+                });
+            }
+
+
+            await groupInstance.addLesson(lessonInstance);
+            const instance2 = await groupInstance.addClassArms(classarmInstances);
+            const subjejctGroup = await subjectInstance.addGroup(groupInstance);
+
+
+
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,

@@ -4,6 +4,7 @@ const ResponseMessage = {
         added: 'Added successfully',
         update: 'Updated successfully',
         delete: 'Deleted successfully',
+        delete: 'Generated successfully',
         removed: 'Removed successfully',
         read: 'Fetched successfully',
         register: 'Account created successfully',
@@ -36,7 +37,6 @@ const ResponseMessage = {
         invite: 'Invite Not accepted yet',
         accepted: 'Invite Already Accepted',
         
-
     },
 
     code: {

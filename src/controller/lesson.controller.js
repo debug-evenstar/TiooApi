@@ -1044,16 +1044,26 @@ class LessonController {
 
     static async updateTemplateImage(req, res) {
 
-        console.log("this is the file", req.file);
+        let payload = [];
 
-        let payload = {};
+        let filePaths = [];
+
+        console.log(req.files);
+
+        if (req.files && req.files.length > 0) {
+            filePaths = req.files.map((file) => file.path);
+        }
 
         try {
 
 
-            if (req.file) {
-                const ImageResponse = await cloudinaryUploadImage(req.file.path);
-                payload.image = ImageResponse.secure_url;
+            if (filePaths.length > 0) {
+
+                for (var item of filePaths) {
+                    const ImageResponse = await cloudinaryUploadImage(item);
+                    payload.push(ImageResponse.secure_url);
+                }
+
             }
 
             return res.status(ResponseStatus.code.success).json({
