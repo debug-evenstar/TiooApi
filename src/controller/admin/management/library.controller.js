@@ -576,7 +576,34 @@ class AdminLibraryController {
 
 
 
-    static async toggleLibraryLessonStatus(req, res) {
+    static async updateLibraryLessonStatus(req, res) {
+
+        const { id } = req.params;
+        const data = req.query;
+
+        try {
+
+            const lessonInstance = await Lesson.findByPk(id);
+
+            const response = await lessonInstance.update({ library_status: data.status });
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: response
+            });
+
+
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+
+    static async togglePublishLibraryLesson(req, res) {
 
         const { id } = req.params;
 
@@ -588,10 +615,7 @@ class AdminLibraryController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            console.log(libraryLessonInstance);
-
-            libraryLessonInstance.library_status =  libraryLessonInstance.library_status == 'unpublished' ? 'published': 'unpublished'
-            libraryLessonInstance.published =  libraryLessonInstance.library_status == 'unpublished' ? 1: 0
+            libraryLessonInstance.published =  libraryLessonInstance.published == 0 ? 1: 0
 
             const response = await libraryLessonInstance.save();
 
