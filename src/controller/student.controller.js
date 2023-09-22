@@ -905,7 +905,7 @@ class StudentController {
 
             const studentClass = await studentInstance.getClass();
 
-            const studentLibrary = await Subject.findAll();
+            const studentLibrary = await Subject.findAll({where: {library: true}});
             
             // await studentClass.getSubjects({where: {library: true}, through: []});
 
