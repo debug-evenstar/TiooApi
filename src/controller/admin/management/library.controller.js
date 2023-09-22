@@ -602,6 +602,29 @@ class AdminLibraryController {
     }
 
 
+    static async updateLibraryLesson(req, res) {
+
+        try {
+
+            const lesson = await Lesson.findByPk(req.params.id);
+
+            if (!lesson) {
+                res.status(400).json({ error: "Lesson not found" });
+            }
+
+            const lessonUpdate = await lesson.update(req.body);
+
+            const newInstance = await Lesson.findByPk(req.params.id);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: newInstance });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
 
     static async togglePublishLibraryLesson(req, res) {
 
