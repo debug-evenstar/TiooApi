@@ -82,6 +82,11 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
         defaultValue: 1
       },
+      chapter: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        defaultValue: 0
+      },
       files: {
         type: Sequelize.JSON,
         defaultValue: [],

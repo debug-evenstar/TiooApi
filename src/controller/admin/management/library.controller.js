@@ -591,6 +591,7 @@ class AdminLibraryController {
             console.log(libraryLessonInstance);
 
             libraryLessonInstance.library_status =  libraryLessonInstance.library_status == 'unpublished' ? 'published': 'unpublished'
+            libraryLessonInstance.published =  libraryLessonInstance.library_status == 'unpublished' ? 1: 0
 
             const response = await libraryLessonInstance.save();
 
