@@ -341,6 +341,8 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/management/subject/groups', AdminSchoolController.subjectGroups)
     router.get('/admin/management/lesson/check', AdminSchoolController.subjectGroupedLessons);
     router.put('/admin/management/lesson/:id/status', AdminSchoolController.adminUpdateLessonStatus);
+    router.put('/admin/management/librarylesson/:id/status', AdminLibraryController.updateLibraryLessonStatus);
+
 
 
     router.get('/admin/management/subjects/lessons', AdminSchoolController.lessonsGroupedBySubjects);
@@ -366,7 +368,7 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/library/lesson/check', AdminLibraryController.subjectGroupedLessons);
     router.get('/admin/librarysubject/:id/classes', AdminLibraryController.libraryClasses);
     router.post('/admin/librarysubject/status/:id', AdminLibraryController.toggleLibrarySubjectStatus);
-    router.post('/admin/librarylesson/status/:id', AdminLibraryController.toggleLibraryLessonStatus);
+    router.post('/admin/publish/librarylesson/:id', AdminLibraryController.togglePublishLibraryLesson);
 
     router.post('/admin/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.adminLibraryLessonUploadTemplate);
     router.put('/admin/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.addLibraryLesson);
