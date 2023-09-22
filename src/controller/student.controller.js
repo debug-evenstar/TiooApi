@@ -895,7 +895,9 @@ class StudentController {
         try {
 
             const { id } = req.userData
-            const account_id = req.query.account_id ? req.query.account_id : id;
+            const account_id = 7;
+            //req.query.account_id ? req.query.account_id : id;
+
 
             const accountInstance = await Account.findByPk(account_id);
 
@@ -903,7 +905,9 @@ class StudentController {
 
             const studentClass = await studentInstance.getClass();
 
-            const studentLibrary = await studentClass.getSubjects({where: {library: true}, through: []});
+            const studentLibrary = await Subject.findAll();
+            
+            // await studentClass.getSubjects({where: {library: true}, through: []});
 
             const response = await Promise.all(studentLibrary.map( async (library)=>{
 
