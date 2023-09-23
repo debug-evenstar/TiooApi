@@ -197,9 +197,7 @@ class StudentController {
                 if (created) {
 
                     const studentInstance = await Student.create(createdRecords[i]);
-
                     await accountInstance.setStudent(studentInstance);
-
                     const classInstance = await classarmInstance.getClass();
                     await schoolInstance.addStudent(studentInstance);
                     await classarmInstance.addStudent(studentInstance);
