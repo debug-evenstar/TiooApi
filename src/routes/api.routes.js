@@ -33,6 +33,10 @@ const ActionController = require('../controller/action.controller');
 const StudentController = require('../controller/student.controller');
 const AuthorizationController = require('../controller/admin/authorization.controller');
 const LoggingController = require('../controller/error.controller');
+const PreferenceController = require('../controller/preference.controller');
+const BillingController = require('../controller/billing.controller');
+const NotificationController = require('../controller/notification.controller');
+const SchoolFront = require('../controller/schoolfront.controller');
 
 
 
@@ -43,9 +47,6 @@ const { InviteValidator, AcceptValidator } = require('./validators/StudentValida
 const UploadService = require('../services/upload.service');
 const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
-const PreferenceController = require('../controller/preference.controller');
-const BillingController = require('../controller/billing.controller');
-const NotificationController = require('../controller/notification.controller');
 const ExternalSchoolController = require('../controller/external_school/auth.controller');
 const TokenMiddleware = require('../middleware/token.middleware');
 
@@ -234,8 +235,10 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/personalinfo', StudentController.personalInformation);
     router.put('/student/personalinfo', StudentController.updatePersonalInformation);
     router.get('/student/library', StudentController.independentStudentLibrary);
+
     router.get('/student/network', StudentController.independentStudentNetwork);
     router.get('/student/:id', StudentController.fetchStudent);
+    router.get('/front/material/:id/lessons', SchoolFront.readLibraryLessons);
 
     /* --------------------------------- LESSON -------------------------------- */
 

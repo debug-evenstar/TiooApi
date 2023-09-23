@@ -486,11 +486,20 @@ class AdminLibraryController {
             const subjejctGroup = await subjectInstance.addGroup(groupInstance);
 
 
+            const newlessonInstance = await Lesson.findByPk(lessonInstance.id, {
+                include: [
+                    {
+                        model: LessonSlide,
+                        orderBy: { slide_index: "asc" }
+                    }, Subject
+                ]
+            });
 
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.added
+                message: ResponseStatus.pass.added,
+                data: newlessonInstance
             });
 
         } catch (error) {
