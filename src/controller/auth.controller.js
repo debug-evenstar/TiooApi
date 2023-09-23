@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, TempValidation, Teacher, SchoolManagement, Student, Keypairs, } = require('../database/connection');
+const { Account, Validation, TempValidation, Teacher, SchoolManagement, Student, Keypairs, ClassArm, } = require('../database/connection');
 const TokenMiddleware = require('../middleware/token.middleware');
 const Mailer = require('../services/mailer');
 require('dotenv').config();
@@ -112,7 +112,7 @@ class AuthController {
             }
 
             const emailExist = await AuthController.validateEmail(email);
-        
+
             if (!emailExist) {
                 return res.status(ResponseStatus.code.conflict).json({
                     error: true, message:
@@ -182,9 +182,17 @@ class AuthController {
                 flag: "active",
                 password: decoded.userdata.password,
             })
+            const classarmInstance = await ClassArm.findByPk("7");
+            const classInstance = await classarmInstance.getClass();
+            // console.log(classInstance)
+            // console.log(classarmInstance)
+
             const studentInstance = await Student.create();
+
             await account.setStudent(studentInstance);
             await school.addStudent(studentInstance);
+            await classarmInstance.addStudent(studentInstance);
+            await classInstance.addStudent(studentInstance);
             if (account) {
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
             }
@@ -423,6 +431,8 @@ class AuthController {
         };
 
     }
+
+
 
     /*-----------------------------------| SIGNIN ACCOUNT |-----------------------------------*/
 
