@@ -3,7 +3,7 @@ router = express.Router();
 
 /* -------------------------------| Validators |------------------------------- */
 
-const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator, RegisterExternalStudentValidator } = require("./validators/AuthValidators")
+const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator, RegisterExternalStudentValidator, EmailValidator } = require("./validators/AuthValidators")
 
 /*-----------------------------------| HOME |-----------------------------------*/
 
@@ -47,16 +47,21 @@ const { InviteValidator, AcceptValidator } = require('./validators/StudentValida
 const UploadService = require('../services/upload.service');
 const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
+const ExternalSchoolController = require('../controller/external_school/auth.controller');
 const TokenMiddleware = require('../middleware/token.middleware');
+
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
 const OpenRoutesGroup = (router) => {
     router.get('/error/logs', ErrorLogs.fetchErrors);
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
+    router.post('/account/signin/external/student', SigninValidator, ExternalSchoolController.loginExeternalStudent);
     router.post('/account/signup', SignupValidator, AuthenicationController.createAccount);
     router.post('/account/verify', VerifyAccountValidator, AuthenicationController.verifyAccount);
+    router.get('/account/email/exits/:email', AuthenicationController.userExist);
     router.post('/account/student/external', RegisterExternalStudentValidator, AuthenicationController.registerExternalStudent);
+    router.post('/delete/account/student/external', AuthenicationController.deleteExternalStudent);
     router.post('/account/send_otp', SendOTPValidator, AuthenicationController.requestVerificationOTP);
     router.post('/account/verify/resend', SendOTPValidator, AuthenicationController.resendVerification);
     router.put('/account/change_password', ChangePasswordValidator, AuthenicationController.changePassword);
@@ -126,12 +131,14 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/account/exist/:email', AuthenicationController.accountExist);
     router.post('/account/profile/upload', UploadService.uploadDisplayPicture.single('file'), AuthenicationController.uploadDisplayPicture);
     router.delete('/account/delete/:id', AuthenicationController.deleteAccount);
+    router.delete('/account/email/delete/:email', AuthenicationController.deleteAccountByEmail);
 
     /* --------------------------------- SCHOOL --------------------------------- */
     router.get('/school/classes/:id', SchoolManagementController.classes);
     router.get('/school/read/', SchoolManagementController.read);
     router.get('/school/profile/', SchoolManagementController.schoolProfile);
     router.get('/school/read/:id', SchoolManagementController.readById);
+    router.get('/school/keypairs/read/:id', SchoolManagementController.readKeysById);
     router.get('/school/read/classes/:id', SchoolManagementController.readByIdWithClasses);
     router.post('/school/class/remove', SchoolManagementController.removeClassFromSchool);
     router.get('/school/class/read', SchoolManagementController.getClassBySidANDCid);
@@ -256,7 +263,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/lesson/create', UploadService.uploadLesson.array('files'), LessonController.createLesson);
     router.post('/lesson/add', UploadService.uploadLesson.array('files'), LessonController.addLesson);
     router.put('/lesson/template/:id', LessonController.updateLessonTemplate);
-    router.put('/lesson/templateimage/:id',  UploadService.uploadTemplateImage.single('image'), LessonController.updateTemplateImage);
+    router.put('/lesson/templateimage/:id', UploadService.uploadTemplateImage.single('image'), LessonController.updateTemplateImage);
 
     router.get('/chapter/subject/:id', ChapterController.read);
 
@@ -286,6 +293,9 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/settings/notification', NotificationController.subscription);
     router.put('/settings/notification', NotificationController.update);
 
+
+    /* ---------------------------- External Schools ---------------------------- */
+    router.post('/resetpassword/account/student/external', ExternalSchoolController.ResetPassword);
 
 };
 
@@ -374,9 +384,19 @@ const AdminRoutesGroup = (router) => {
 };
 
 
+// const ExternalSchoolRoutesGroup = (router) => {
+
+//     router.use(AuthenticationMiddleware.externalSchool) //--use middleware--//
+
+// };
+
+
+
+
 OpenRoutesGroup(router);
 AuthorizedRoutesGroup(router);
 AdminRoutesGroup(router);
+
 
 module.exports = router;
 

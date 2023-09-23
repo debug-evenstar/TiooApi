@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
-const { Account, Admin, ErrorLog, Authorization } = require('../database/connection');
+const { Account, Admin, ErrorLog, Keypairs, Authorization } = require('../database/connection');
 const ResponseMessage = require('../config/message.config');
+const { school } = require('../controller/billing.controller');
 
 class TokenMiddleware {
 
@@ -18,6 +19,16 @@ class TokenMiddleware {
                 return res.status(401).json({ message: 'Authentication failed. Token missing.' });
             }
 
+            const Schoolkey = await Keypairs.findOne({
+                where: {
+                    public_key: token.toString()
+                }
+            });            
+            if (Schoolkey) {
+                req.schoolKey = Schoolkey.private_key;
+                next();
+                return
+            }
             const decoded = jwt.verify(token, process.env.JWT_SECRETE);
             const email = decoded.userdata.email;
 
@@ -65,6 +76,41 @@ class TokenMiddleware {
     }
 
 
+    // static externalSchool = async (req, res, next) => {
+
+    //     const token = req.headers['authorization']?.split(' ')[1];
+
+    //     if (!token) {
+    //         return res.status(401).json({ message: 'school authentication failed. public key missing.' });
+    //     }
+    //     try {
+
+    //         const Schoolkey = await Keypairs.findOne({
+    //             where: {
+    //                 public_key: token.toString()
+    //             }
+    //         });
+    //         if (!Schoolkey) {
+    //             return res.status(ResponseStatus.code.not_found).json({ message: ResponseStatus.fail.school });
+    //         }
+    //         req.schoolKey = Schoolkey.private_key;
+    //         next();
+
+    //     } catch (err) {
+    //         console.log(err)
+    //         var logError = await ErrorLog.create({
+    //             error_name: "Error at Admin Middleware",
+    //             error_description: err.toString(),
+    //             route: `${req.originalUrl}`,
+    //             method: `${req.method}`,
+    //             error_code: "401",
+    //         });
+
+    //         if (logError) {
+    //             return res.status(401).json({ message: 'Authentication failed. Public Key invalid.' });
+    //         }
+    //     }
+    // }
     static admin = async (req, res, next) => {
 
         const token = req.headers['authorization']?.split(' ')[1];
