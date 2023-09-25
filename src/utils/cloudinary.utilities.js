@@ -9,7 +9,10 @@ cloudinary.config({
 
 const cloudinaryUploadImage = async(fileToUpload)=>{
 
-    const res = await cloudinary.uploader.upload(fileToUpload, {public_id: "olympic_flag", resource_type: 'auto'});
+    const timestamp = new Date().getTime(); // Generate a unique timestamp
+    const publicId = `image_${timestamp}`; // Create a unique public_id
+
+    const res = await cloudinary.uploader.upload(fileToUpload, {public_id: publicId, resource_type: 'auto'});
    
     return res;
 }

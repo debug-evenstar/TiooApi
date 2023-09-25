@@ -65,8 +65,6 @@ class LessonTemplateProvider {
     }
 
 
-
-
     async getenerateLessonWithExtra(body) {
         const path = "lesson/v1/query";
         let errorResponse = {};
