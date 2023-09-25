@@ -182,10 +182,9 @@ class AuthController {
                 flag: "active",
                 password: decoded.userdata.password,
             })
-            const classarmInstance = await ClassArm.findByPk("7");
+            const classarmInstance = await ClassArm.findByPk("89");
             const classInstance = await classarmInstance.getClass();
-            // console.log(classInstance)
-            // console.log(classarmInstance)
+
 
             const studentInstance = await Student.create();
 
@@ -216,30 +215,23 @@ class AuthController {
             const data = req.body
 
             const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/;
-
-
             if (!jwtRegex.test(data.payload)) {
                 return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
             }
-
             const Schoolkey = await Keypairs.findOne({
                 where: {
                     public_key: data.public_key
                 }
             });
-
             if (!Schoolkey) {
                 return res.status(ResponseStatus.code.not_found).json({ message: ResponseStatus.fail.school });
             }
-
-
             const privateKey = Schoolkey.private_key;
             const school = await Schoolkey.getSchoolManagement();
             const decoded = jwt.verify(data.payload, privateKey);
             if (!decoded) {
                 return res.status(ResponseStatus.code.bad_request).json({ message: ResponseStatus.fail.bad_request });
             }
-
             const emailExist = await AuthController.validateEmail(decoded.userdata.email);
             if (!emailExist.pass) {
                 return res.status(ResponseStatus.code.conflict).json({
@@ -247,8 +239,6 @@ class AuthController {
                         ResponseStatus.fail.not_found
                 });
             }
-
-
             const user = await Account.findOne({
                 where: {
                     email: decoded.userdata.email
@@ -264,8 +254,6 @@ class AuthController {
             res.status(500).json({ error: 'server error', extra: error.message });
 
         }
-
-
     }
 
 
