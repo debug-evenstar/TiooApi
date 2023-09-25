@@ -1060,6 +1060,7 @@ class LessonController {
             if (filePaths.length > 0) {
 
                 for (var item of filePaths) {
+                    console.log("this is the item",item)
                     const ImageResponse = await cloudinaryUploadImage(item);
                     payload.push(ImageResponse.secure_url);
                 }

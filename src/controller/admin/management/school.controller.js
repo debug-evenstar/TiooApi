@@ -422,7 +422,8 @@ class AdminSchoolController {
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.added
+                message: ResponseStatus.pass.added,
+                data: slides
             });
 
         } catch (error) {
@@ -452,7 +453,6 @@ class AdminSchoolController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
-
 
 
     static async downloadLessons(req, res) {
@@ -511,7 +511,6 @@ class AdminSchoolController {
         }
     }
 
-
     static async subjectGroups(req, res) {
 
         try {
@@ -534,7 +533,6 @@ class AdminSchoolController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
-
 
     static async subjectGroupedLessons(req, res) {
 
@@ -562,7 +560,6 @@ class AdminSchoolController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
-
 
     static async adminUpdateLessonStatus(req, res) {
 
