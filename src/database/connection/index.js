@@ -57,8 +57,10 @@ const Notification = db.preferences = require("../notification.model")(sequelize
 const Subscription = db.billings = require("../notification_subscribers.model")(sequelize, Sequelize);
 
 const Textbook = db.textbooks = require("../textbook.model")(sequelize, Sequelize);
+const CartItem = db.cartItems = require("../cartItem.model")(sequelize, Sequelize);
 
-const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group, LessonSlide, Preference, Billing, Notification, Subscription, Keypairs, Textbook]
+
+const models = [Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group, LessonSlide, Preference, Billing, Notification, Subscription, Keypairs, Textbook, CartItem]
 
 Relationships.group(...models);
 
@@ -91,5 +93,6 @@ module.exports = {
   Keypairs,
   Notification,
   Subscription,
-  Textbook
+  Textbook,
+  CartItem
 };
