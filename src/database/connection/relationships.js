@@ -1,7 +1,7 @@
 
 class Relationships {
 
-    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group, LessonSlide, Preference, Billing, Notification, Subscription, Keypairs) {
+    static group(Account, Validation, Subject, Class, SchoolManagement, Student, Teacher, TempValidation, ClassArm, Lesson, Chapter, Authorization, Admin, Coupon, Library, Group, LessonSlide, Preference, Billing, Notification, Subscription, Keypairs, Textbook) {
 
 
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
@@ -97,6 +97,9 @@ class Relationships {
         Account.hasMany(Billing);
         Billing.belongsTo(Account);
 
+        Subject.hasMany(Textbook);
+        Textbook.belongsTo(Subject);
+
         //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 
         Coupon.belongsToMany(Account, { through: 'CouponAccount' });
@@ -122,6 +125,9 @@ class Relationships {
 
         Lesson.belongsToMany(ClassArm, { through: 'ClassArmLessons' });
         ClassArm.belongsToMany(Lesson, { through: 'ClassArmLessons' });
+
+        Textbook.belongsToMany(Account, { through: 'AccountTextbook' });
+        Account.belongsToMany(Textbook, { through: 'AccountTextbook' });
     }
 
 }

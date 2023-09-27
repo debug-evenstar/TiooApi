@@ -239,6 +239,8 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/network', StudentController.independentStudentNetwork);
     router.get('/student/:id', StudentController.fetchStudent);
     router.get('/front/material/:id/lessons', SchoolFront.readLibraryLessons);
+    router.post('/front/textbook/addtoschool', SchoolFront.addLessonToSchool);
+
 
     /* --------------------------------- LESSON -------------------------------- */
 
@@ -292,7 +294,6 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.get('/settings/notification', NotificationController.subscription);
     router.put('/settings/notification', NotificationController.update);
-
 
     /* ---------------------------- External Schools ---------------------------- */
     router.post('/resetpassword/account/student/external', ExternalSchoolController.ResetPassword);
