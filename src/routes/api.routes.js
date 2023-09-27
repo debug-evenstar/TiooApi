@@ -37,7 +37,7 @@ const PreferenceController = require('../controller/preference.controller');
 const BillingController = require('../controller/billing.controller');
 const NotificationController = require('../controller/notification.controller');
 const SchoolFront = require('../controller/schoolfront.controller');
-
+const CartController = require('../controller/cart.controller');
 
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
@@ -200,7 +200,6 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/subjects/lessons/:subjectId', SubjectController.subjectLessons);
     router.get('/subjects/:id/student/lessons', SubjectController.studentLessons);
     router.delete('/subjects/delete/:id', SubjectController.delete);
-
     router.get('/schoolfront/librarysubject', SubjectController.schoolfrontLibraryMaterial);
 
     /* --------------------------------- TEACHERS -------------------------------- */
@@ -239,6 +238,9 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/network', StudentController.independentStudentNetwork);
     router.get('/student/:id', StudentController.fetchStudent);
     router.get('/front/material/:id/lessons', SchoolFront.readLibraryLessons);
+    router.post('/front/textbook/addtoschool', SchoolFront.addLibraryMaterialTextBookToSchool);
+    router.get('/front/school/librarytextbooks', SchoolFront.readSchoolLibraryMaterialTextBooks);
+
 
     /* --------------------------------- LESSON -------------------------------- */
 
@@ -293,6 +295,10 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/settings/notification', NotificationController.subscription);
     router.put('/settings/notification', NotificationController.update);
 
+
+    router.post('/cart/add', CartController.add);
+    router.delete('/cart/:id/remove', CartController.remove);
+    router.get('/cart/read', CartController.read);
 
     /* ---------------------------- External Schools ---------------------------- */
     router.post('/resetpassword/account/student/external', ExternalSchoolController.ResetPassword);
