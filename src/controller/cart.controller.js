@@ -44,7 +44,30 @@ class CartController {
 
            await cartItemInstance.destroy();
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.added, data: data });
+           const response = await accountInstance.getCartItems();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+    }
+
+
+    static async read(req, res) {
+
+        const { id } = req.params
+
+        const account_id = req.query.account_id ? req.query.account_id : req.userData.id;
+
+        try {
+
+            const accountInstance = await Account.findByPk(account_id);
+
+            const response = await accountInstance.getCartItems();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
 
         } catch (error) {
             console.log(error);
