@@ -7,10 +7,15 @@ module.exports = (sequelize, DataTypes) => {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            subject: {
+            subject_pair: {
                 type: DataTypes.INTEGER,
                 allowNull: true,
                 defaultValue: 0,
+            },
+            grades: {
+                type: DataTypes.JSON,
+                allowNull: true,
+                defaultValue: [],
             },
 
         }, {

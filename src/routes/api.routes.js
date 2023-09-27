@@ -239,7 +239,8 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/network', StudentController.independentStudentNetwork);
     router.get('/student/:id', StudentController.fetchStudent);
     router.get('/front/material/:id/lessons', SchoolFront.readLibraryLessons);
-    router.post('/front/textbook/addtoschool', SchoolFront.addLessonToSchool);
+    router.post('/front/textbook/addtoschool', SchoolFront.addLibraryMaterialTextBookToSchool);
+    router.get('/front/school/librarytextbooks', SchoolFront.readSchoolLibraryMaterialTextBooks);
 
 
     /* --------------------------------- LESSON -------------------------------- */

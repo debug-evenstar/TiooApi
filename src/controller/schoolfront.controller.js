@@ -37,7 +37,7 @@ class SchoolFront {
 
 
 
-    static async addLessonToSchool(req, res) {
+    static async addLibraryMaterialTextBookToSchool(req, res) {
 
         const { id } = req.userData
 
@@ -53,9 +53,9 @@ class SchoolFront {
 
                 const subjectInstance = await Subject.findByPk(item.textbook)
 
-                const textbookInstance = await Textbook.create(item); 
+                const textbookInstance = await Textbook.create(item);
 
-                const data =  await accountInstance.addTextbook(textbookInstance);
+                const data = await accountInstance.addTextbook(textbookInstance);
 
                 await subjectInstance.addTextbook(textbookInstance)
 
@@ -65,7 +65,47 @@ class SchoolFront {
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.read, data: {}
+                message: ResponseStatus.pass.added, data: {}
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    };
+
+
+    static async readSchoolLibraryMaterialTextBooks(req, res) {
+
+        const { id } = req.userData
+
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
+        try {
+
+            const accountInstance = await Account.findByPk(account_id);
+
+            const textBooks = await accountInstance.getTextbooks({ include: [Subject] })
+
+            const response = await Promise.all(textBooks.map((item) => {
+
+                const data = {
+                    id: item.id,
+                    subject_pair: item.subject_pair,
+                    material_id: item.Subject.id,
+                    namining: item.Subject.naming,
+                    description: item.Subject.description,
+                    ages: item.Subject.ages,
+                    grades: item.grades
+                }
+                
+                return data
+            }))
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read, data: response
             });
 
         } catch (error) {
