@@ -240,6 +240,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/front/material/:id/lessons', SchoolFront.readLibraryLessons);
     router.post('/front/textbook/addtoschool', SchoolFront.addLibraryMaterialTextBookToSchool);
     router.get('/front/school/librarytextbooks', SchoolFront.readSchoolLibraryMaterialTextBooks);
+    router.delete('/front/librarytextbooks/:id/remove', SchoolFront.removeTextbookFromSchool);
 
 
     /* --------------------------------- LESSON -------------------------------- */
@@ -325,7 +326,6 @@ const AdminRoutesGroup = (router) => {
     router.put('/admin/settings/pricing', PriceController.update);
     router.delete('/admin/settings/pricing/:id', PriceController.delete);
 
-
     // router.get('/admin/user',  TokenMiddleware.checkAuthorization(['manage_admin']), AuthorizationController.readAdminUser);
     router.post('/admin/user', AuthorizationController.addAdminUser);
     router.get('/admin/user', AuthorizationController.readAdminUser);
@@ -353,8 +353,6 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/management/lesson/check', AdminSchoolController.subjectGroupedLessons);
     router.put('/admin/management/lesson/:id/status', AdminSchoolController.adminUpdateLessonStatus);
     router.put('/admin/management/librarylesson/:id/status', AdminLibraryController.updateLibraryLessonStatus);
-
-
 
     router.get('/admin/management/subjects/lessons', AdminSchoolController.lessonsGroupedBySubjects);
     router.get('/admin/management/subject/lessons', AdminSchoolController.lessonsBySubjectId);

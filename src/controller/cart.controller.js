@@ -81,7 +81,6 @@ class CartController {
         const account_id = req.query.account_id ? req.query.account_id : req.userData.id;
 
         try {
-            // Delete all cart items associated with the account
             await CartItem.destroy({
                 where: {
                     AccountId: account_id,
