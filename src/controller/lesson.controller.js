@@ -888,10 +888,6 @@ class LessonController {
 
 
 
-
-
-
-
     static async generateLessonWithExtra(req, res) {
 
         const { id } = req.params;
