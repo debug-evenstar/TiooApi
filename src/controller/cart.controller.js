@@ -14,15 +14,15 @@ class CartController {
 
             const cartItemInstance = await CartItem.create(req.body);
 
-           const data =  await accountInstance.addCartItem(cartItemInstance);
+            const data = await accountInstance.addCartItem(cartItemInstance);
 
-           const response = await accountInstance.getCartItems();
+            const response = await accountInstance.getCartItems();
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.added, data: response });
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -42,15 +42,15 @@ class CartController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-           await cartItemInstance.destroy();
+            await cartItemInstance.destroy();
 
-           const response = await accountInstance.getCartItems();
+            const response = await accountInstance.getCartItems();
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed, data: response });
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -71,9 +71,34 @@ class CartController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
+
+
+    static async clearCart(req, res) {
+        const { id } = req.params;
+        const account_id = req.query.account_id ? req.query.account_id : req.userData.id;
+
+        try {
+            // Delete all cart items associated with the account
+            await CartItem.destroy({
+                where: {
+                    AccountId: account_id,
+                },
+            });
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: 'Cart cleared successfully',
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Server error', extra: error.message });
+        }
+    }
+
+
 
 }
 

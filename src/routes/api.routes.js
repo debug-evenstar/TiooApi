@@ -299,6 +299,8 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/cart/add', CartController.add);
     router.delete('/cart/:id/remove', CartController.remove);
     router.get('/cart/read', CartController.read);
+    router.delete('/cart/clear', CartController.clearCart);
+
 
     /* ---------------------------- External Schools ---------------------------- */
     router.post('/resetpassword/account/student/external', ExternalSchoolController.ResetPassword);
