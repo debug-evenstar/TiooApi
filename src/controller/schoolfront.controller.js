@@ -4,6 +4,8 @@ const { Account, Validation, SchoolManagement, Permission, Admin, Authorization,
 const SyncDB = require('../server/syncDatabase');
 const AuthorizationSeed = require('../seeders/seed.authorization');
 
+const {Op}  = require('sequelize');
+
 class SchoolFront {
 
     /*-----------------------------------| READ SCHOOL FRONT LIRARY LESSONS |-----------------------------------*/
@@ -86,9 +88,16 @@ class SchoolFront {
 
             const accountInstance = await Account.findByPk(account_id);
 
-            const textBooks = await accountInstance.getTextbooks({ include: [Subject] })
-
+            const textBooks = await accountInstance.getTextbooks({
+                where: {
+                  SubjectId: {
+                    [Op.not]: null
+                  }
+                },
+                include: [Subject]
+              });
             const response = await Promise.all(textBooks.map((item) => {
+                
 
                 const data = {
                     id: item.id,
