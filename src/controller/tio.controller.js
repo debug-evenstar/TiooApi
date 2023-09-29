@@ -176,6 +176,68 @@ class TioController {
     }
 
 
+    static async updateClassName(req, res) {
+
+        try {
+
+            const {id} = req.params;
+
+            const classInstace = await Class.findByPk(id);
+
+            if (!classInstace) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+          const response = await classInstace.update(req.body);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
+    static async bulkClassCreate(req, res) {
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        try {
+
+
+            const AccountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } }, { include: [SchoolManagement] });
+
+            if (!AccountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
+            }
+            const SchoolInstances = await AccountInstance.getSchoolManagement();
+            if (!SchoolInstances) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            req.body.classes.map(async (data) => {
+                const classInstance = await Class.create(data);
+                SchoolInstances.addClass(classInstance);
+            })
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+
+    };
+
+
+
+
 
     /*-----------------------------------| TIO AVAILABLE SUBJECTS |-----------------------------------*/
 
