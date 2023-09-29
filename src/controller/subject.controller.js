@@ -425,14 +425,17 @@ class SubjectController {
 
              const classes = rawClasses.map((element)=> ({ id: element.id, naming: element.naming, type: element.type }));
 
+             console.log(classes);
+
+
              delete element.dataValues.Lessons;
 
-             return {...element.dataValues, classes}
+             return {...element.dataValues, classes: classes}
            }))
 
             // ------------------------------------------
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: response });
 
         } catch (error) {
             console.log(error);
