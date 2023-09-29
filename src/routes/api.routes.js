@@ -101,6 +101,9 @@ const OpenRoutesGroup = (router) => {
     router.get('/tio/subjects', TioController.subjects);
     router.get('/tio/subjectslessons', TioController.subjectsLessons);
 
+    router.post('/tio/updateclass/:id', TioController.updateClassName);
+    router.post('/tio/bulkcreate', TioController.bulkClassCreate);
+
     router.post('/actions/superadmin', ActionController.superAdmin);
     router.post('/actions/sync', ActionController.syncDB);
     router.delete('/actions/superadmin', ActionController.cleanAdmin);
