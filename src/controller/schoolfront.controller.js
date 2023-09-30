@@ -65,6 +65,12 @@ class SchoolFront {
 
             }
 
+            await CartItem.destroy({
+                where: {
+                    AccountId: account_id,
+                },
+            });
+
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.added, data: {}
