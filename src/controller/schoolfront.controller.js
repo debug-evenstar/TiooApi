@@ -109,7 +109,7 @@ class SchoolFront {
                     id: item.id,
                     subject_pair: item.subject_pair,
                     material_id: item.Subject.id,
-                    namining: item.Subject.naming,
+                    naming: item.Subject.naming,
                     description: item.Subject.description,
                     ages: item.Subject.ages,
                     grades: item.grades
@@ -159,7 +159,7 @@ class SchoolFront {
                     id: item.id,
                     subject_pair: item.subject_pair,
                     material_id: item.Subject.id,
-                    namining: item.Subject.naming,
+                    naming: item.Subject.naming,
                     description: item.Subject.description,
                     ages: item.Subject.ages,
                     grades: item.grades
