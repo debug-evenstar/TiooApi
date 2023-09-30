@@ -1,6 +1,6 @@
 const { validationResult, body } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Permission, Admin, Authorization, Preference, Subject, Textbook, } = require('../database/connection');
+const { Account, Validation, SchoolManagement, Permission, Admin, Authorization, Preference, Subject, Textbook, CartItem, } = require('../database/connection');
 const SyncDB = require('../server/syncDatabase');
 const AuthorizationSeed = require('../seeders/seed.authorization');
 
@@ -100,6 +100,56 @@ class SchoolFront {
                         [Op.not]: null
                     }
                 },
+                include: [Subject]
+            });
+            const response = await Promise.all(textBooks.map((item) => {
+
+
+                const data = {
+                    id: item.id,
+                    subject_pair: item.subject_pair,
+                    material_id: item.Subject.id,
+                    namining: item.Subject.naming,
+                    description: item.Subject.description,
+                    ages: item.Subject.ages,
+                    grades: item.grades
+                }
+
+                return data
+            }))
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read, data: response
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    };
+
+
+
+    static async readSchoolLibraryMaterialTextBooksBySubject(req, res) {
+
+        const {sid} = req.params;
+
+        const { id } = req.userData
+
+        const account_id = req.query.account_id ? req.query.account_id : id;
+
+        try {
+
+            const accountInstance = await Account.findByPk(account_id);
+
+            const textBooks = await accountInstance.getTextbooks({
+                where: {
+                    SubjectId: {
+                        [Op.not]: null
+                    },
+                    subject_pair:  sid},
                 include: [Subject]
             });
             const response = await Promise.all(textBooks.map((item) => {
