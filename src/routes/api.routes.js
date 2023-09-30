@@ -243,6 +243,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/front/material/:id/lessons', SchoolFront.readLibraryLessons);
     router.post('/front/textbook/addtoschool', SchoolFront.addLibraryMaterialTextBookToSchool);
     router.get('/front/school/librarytextbooks', SchoolFront.readSchoolLibraryMaterialTextBooks);
+    router.get('/front/school/librarytextbooks/:sid', SchoolFront.readSchoolLibraryMaterialTextBooksBySubject);
     router.delete('/front/librarytextbooks/:id/remove', SchoolFront.removeTextbookFromSchool);
 
 
