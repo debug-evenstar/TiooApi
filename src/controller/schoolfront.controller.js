@@ -1,6 +1,6 @@
 const { validationResult, body } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Permission, Admin, Authorization, Preference, Subject, Textbook, CartItem, } = require('../database/connection');
+const { Account, Validation, SchoolManagement, Permission, Admin, Authorization, Preference, Subject, Textbook, CartItem, Class, } = require('../database/connection');
 const SyncDB = require('../server/syncDatabase');
 const AuthorizationSeed = require('../seeders/seed.authorization');
 
@@ -102,8 +102,10 @@ class SchoolFront {
                 },
                 include: [Subject]
             });
-            const response = await Promise.all(textBooks.map((item) => {
+            const response = await Promise.all(textBooks.map(async (item) => {
 
+
+               const classsInstances = await Class.findAll({where: {id: item.grades }});
 
                 const data = {
                     id: item.id,
@@ -112,7 +114,7 @@ class SchoolFront {
                     naming: item.Subject.naming,
                     description: item.Subject.description,
                     ages: item.Subject.ages,
-                    grades: item.grades
+                    grades: classsInstances.map((element)=> ({id: element.id, type: element.type, naming: element.naming }))
                 }
 
                 return data
@@ -152,8 +154,10 @@ class SchoolFront {
                     subject_pair:  sid},
                 include: [Subject]
             });
-            const response = await Promise.all(textBooks.map((item) => {
+            const response = await Promise.all(textBooks.map( async (item) => {
 
+
+                const classsInstances = await Class.findAll({where: {id: item.grades }});
 
                 const data = {
                     id: item.id,
@@ -162,7 +166,7 @@ class SchoolFront {
                     naming: item.Subject.naming,
                     description: item.Subject.description,
                     ages: item.Subject.ages,
-                    grades: item.grades
+                    grades: classsInstances.map((element)=> ({id: element.id, type: element.type, naming: element.naming }))
                 }
 
                 return data

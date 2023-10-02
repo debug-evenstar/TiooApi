@@ -661,6 +661,32 @@ class AdminLibraryController {
     }
 
 
+
+    static async updateLibraryLessonTemplate(req, res) {
+
+        const { id } = req.params;
+        const data = req.body;
+
+        try {
+
+            const lessonSlideInstance = await LessonSlide.findByPk(id);
+
+            const response = await lessonSlideInstance.update({ slide_data: data.slide_data });
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.update,
+                data: response
+            });
+
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
     static async libraryClasses(req, res) {
 
         const { id } = req.params;
@@ -701,6 +727,8 @@ class AdminLibraryController {
         };
 
     }
+
+    
 
 
 

@@ -246,7 +246,6 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/front/school/librarytextbooks/:sid', SchoolFront.readSchoolLibraryMaterialTextBooksBySubject);
     router.delete('/front/librarytextbooks/:id/remove', SchoolFront.removeTextbookFromSchool);
 
-
     /* --------------------------------- LESSON -------------------------------- */
 
     router.get('/lesson/alllessons', LessonController.allLessons);
@@ -388,7 +387,7 @@ const AdminRoutesGroup = (router) => {
 
     router.post('/admin/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.adminLibraryLessonUploadTemplate);
     router.put('/admin/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.addLibraryLesson);
-
+    router.put('/admin/librarylesson/template/:id',  AdminLibraryController.updateLibraryLessonTemplate);
 
 
 };
