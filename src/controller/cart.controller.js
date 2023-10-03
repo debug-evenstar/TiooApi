@@ -1,5 +1,5 @@
 const ResponseStatus = require("../config/message.config");
-const { Account, Chapter, CartItem } = require("../database/connection");
+const { Account, Chapter, CartItem, Class } = require("../database/connection");
 
 class CartController {
 
@@ -67,7 +67,19 @@ class CartController {
 
             const response = await accountInstance.getCartItems();
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
+            const data = await Promise.all(response.map( async (element)=>{
+
+                const classes = await Class.findAll({where: {id: element.item.grades}});
+
+                element.item.grades = classes.map((element)=> ({id: element.id, naming: element.naming}));
+
+
+                return element;
+
+               
+            }))
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: data });
 
         } catch (error) {
             console.log(error);
