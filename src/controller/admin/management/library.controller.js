@@ -510,6 +510,96 @@ class AdminLibraryController {
 
 
 
+    static async adminUpdateLibraryLessonUploadTemplate(req, res) {
+
+        try {
+
+            const today = new Date();
+            const threeDaysAhead = new Date();
+            threeDaysAhead.setDate(today.getDate() + 3);
+            let filePath = "";
+
+            let payload =  {
+                topic: req.body.title,
+                objective: req.body.objective,
+                age: req.body.age,
+            };
+
+            if (req.file) {
+                payload.files = [req.file.path];
+                filePath = req.file.path;
+
+                console.log(payload.files);
+            }
+
+            payload.start_date = today;
+            payload.end_date = threeDaysAhead;
+
+            const lessonInstance = await Lesson.findByPk(req.body.lesson);
+
+            const response = await lessonInstance.update(req.body);
+
+            const grade = await lessonInstance.getClass();
+
+            const subject = await lessonInstance.getSubject();
+
+            const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath, grade.id, subject.id);
+            
+            const parseSlides = [];
+
+            const previousSlides = await lessonInstance.getLessonSlides({
+                orderBy: { slide_index: "asc" }
+            });
+
+
+            if (previousSlides && previousSlides.length > 0 && previousSlides.length > slides.data.length) {
+                for (let i = slides.data.length; i < previousSlides.length; i++) {
+                    const slide = previousSlides[i];
+                    await slide.destroy();
+                }
+            }
+
+            for (let index = 0; index < slides.data.length; index++) {
+                const slide = slides.data[index];
+                if (previousSlides && previousSlides.length > index) {
+                    const updated = previousSlides[index];
+                    updated.slide_data = slide;
+                    updated.save();
+                } else {
+                    const created = await LessonSlide.create({
+                        slide_index: index,
+                        slide_data: slide
+                    });
+                    parseSlides.push(created);
+                }
+            };
+
+            await lessonInstance.addLessonSlides(parseSlides);
+
+
+            const newlessonInstance = await Lesson.findByPk(lessonInstance.id, {
+                include: [
+                    {
+                        model: LessonSlide,
+                        orderBy: { slide_index: "asc" }
+                    }, Subject
+                ]
+            });
+
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.added,
+                data: newlessonInstance
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
     static async deleteLibrary(req, res) {
 
         const { id } = req.params;
