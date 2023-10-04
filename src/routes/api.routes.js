@@ -379,7 +379,7 @@ const AdminRoutesGroup = (router) => {
     router.post('/admin/library/subject', AdminLibraryController.libraryMaterial);
     router.put('/admin/librarylesson/:id', AdminLibraryController.updateLibraryLesson);
 
-    
+     
     // router.post('/admin/library/lesson', UploadService.uploadLesson.single('file'), AdminLibraryController.createLibraryLesson);
     
     router.get('/admin/library/lesson/check', AdminLibraryController.subjectGroupedLessons);
@@ -388,6 +388,7 @@ const AdminRoutesGroup = (router) => {
     router.post('/admin/publish/librarylesson/:id', AdminLibraryController.togglePublishLibraryLesson);
 
     router.post('/admin/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.adminLibraryLessonUploadTemplate);
+    router.put('/admin/updatelibrarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.adminUpdateLibraryLessonUploadTemplate);
     router.put('/admin/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.addLibraryLesson);
     router.put('/admin/librarylesson/template/:id',  AdminLibraryController.updateLibraryLessonTemplate);
 

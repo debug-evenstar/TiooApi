@@ -263,7 +263,6 @@ class SchoolFront {
             payload.exceptionedFreelancers = exceptionedF;
             payload.exceptionedIndependentsStudents = exceptionedIS;
 
-
             const exchangeRates = { // Replace with actual exchange rates
                 'USD': 1.23,  
                 'EUR': 1.0,
