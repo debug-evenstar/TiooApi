@@ -113,6 +113,8 @@ const OpenRoutesGroup = (router) => {
     router.get('/open/lesson/:id/template', LessonController.lessonTemplate);
     router.put('/open/lesson/template/:id', LessonController.updateLessonTemplate);
     router.put('/open/lesson/templateimage/:id',  UploadService.uploadTemplateImage.array('image'), LessonController.updateTemplateImage);
+    router.get('/open/pricing/', SchoolFront.openPricing);
+
 
 };
 
