@@ -60,7 +60,7 @@ module.exports = (sequelize, Sequelize) => {
             return 'Unlocked';
           }
           return this.getDataValue('status');
-      },
+        },
       },
       admin_status: {
         type: Sequelize.STRING,
@@ -86,6 +86,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         allowNull: true,
         defaultValue: 0
+      },
+      covers: {
+        type: Sequelize.JSON,
+        defaultValue: [],
       },
       files: {
         type: Sequelize.JSON,

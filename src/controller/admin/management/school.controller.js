@@ -387,8 +387,6 @@ class AdminSchoolController {
 
             const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath, grade, subject);
 
-            console.log('this is the slide response', slides);
-
             const parseSlides = [];
 
             const previousSlides = await lessonInstance.getLessonSlides({
