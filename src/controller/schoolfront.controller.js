@@ -1,6 +1,6 @@
 const { validationResult, body } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, SchoolManagement, Permission, Admin, Authorization, Preference, Subject, Textbook, CartItem, Class, Price, } = require('../database/connection');
+const { Account, Validation, SchoolManagement, Permission, Admin, Authorization, Preference, Subject, Textbook, CartItem, Class, Price, LessonSlide, } = require('../database/connection');
 const SyncDB = require('../server/syncDatabase');
 const AuthorizationSeed = require('../seeders/seed.authorization');
 
@@ -22,7 +22,8 @@ class SchoolFront {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const lessonInstance = await subjectIinstance.getLessons();
+            const lessonInstance = await subjectIinstance.getLessons({include : [ LessonSlide ]});
+
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,

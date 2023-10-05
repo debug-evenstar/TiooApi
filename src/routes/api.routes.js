@@ -387,7 +387,7 @@ const AdminRoutesGroup = (router) => {
     router.post('/admin/librarysubject/status/:id', AdminLibraryController.toggleLibrarySubjectStatus);
     router.post('/admin/publish/librarylesson/:id', AdminLibraryController.togglePublishLibraryLesson);
 
-    router.post('/admin/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.adminLibraryLessonUploadTemplate);
+    router.post('/admin/librarylesson/template', UploadService.uploadLesson.fields([{ name: 'template' }, { name: 'cover' }]), AdminLibraryController.adminLibraryLessonUploadTemplate);
     router.put('/admin/updatelibrarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.adminUpdateLibraryLessonUploadTemplate);
     router.put('/admin/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.addLibraryLesson);
     router.put('/admin/librarylesson/template/:id',  AdminLibraryController.updateLibraryLessonTemplate);

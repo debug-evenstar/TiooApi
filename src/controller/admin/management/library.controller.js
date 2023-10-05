@@ -7,6 +7,7 @@ const AuthorizationSeed = require("../../../seeders/seed.authorization");
 const TokenMiddleware = require('../../../middleware/token.middleware');
 const LessonTemplateProvider = require('../../../providers/AI/lesson.template');
 const e = require('express');
+const cloudinaryUploadImage = require('../../../utils/cloudinary.utilities');
 
 
 
@@ -363,15 +364,25 @@ class AdminLibraryController {
                 age: req.body.age,
             };
 
-            if (req.file) {
-                payload.files = [req.file.path];
-                filePath = req.file.path;
+            let covers = [];
 
-                console.log(payload.files);
+            if (req.files) {
+                payload.files = [req.files['template'][0].path];
+                filePath = req.files['template'][0].path;
             }
+
+            if (req.files['cover'].length > 0) {
+                for (var item of req.files['cover']) {
+                    console.log("this is the item",item)
+                    const ImageResponse = await cloudinaryUploadImage(item.path);
+                    covers.push(ImageResponse.secure_url);
+                }
+            }
+
 
             payload.start_date = today;
             payload.end_date = threeDaysAhead;
+            payload.covers = covers;
 
             const lessonInstance = await Lesson.create(payload);
 
@@ -394,8 +405,6 @@ class AdminLibraryController {
             const subject = subjectInstance.naming;
 
             const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath, grade, subject);
-
-            console.log('this is the slide response', slides);
 
             const parseSlides = [];
 
@@ -484,7 +493,6 @@ class AdminLibraryController {
             await groupInstance.addLesson(lessonInstance);
             const instance2 = await groupInstance.addClassArms(classarmInstances);
             const subjejctGroup = await subjectInstance.addGroup(groupInstance);
-
 
             const newlessonInstance = await Lesson.findByPk(lessonInstance.id, {
                 include: [
