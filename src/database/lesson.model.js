@@ -91,6 +91,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.JSON,
         defaultValue: [],
       },
+      preview: {
+        type: Sequelize.JSON,
+        defaultValue: [],
+      },
       files: {
         type: Sequelize.JSON,
         defaultValue: [],
