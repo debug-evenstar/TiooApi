@@ -365,11 +365,21 @@ class AdminLibraryController {
             };
 
             let covers = [];
+            let preview = []
 
             if (req.files) {
                 payload.files = [req.files['template'][0].path];
                 filePath = req.files['template'][0].path;
             }
+
+            if (req.files['preview'].length > 0) {
+                for (var item of req.files['preview']) {
+                    console.log("this is the item",item)
+                    const ImageResponse = await cloudinaryUploadImage(item.path);
+                    preview.push(ImageResponse.secure_url);
+                }
+            }
+
 
             if (req.files['cover'].length > 0) {
                 for (var item of req.files['cover']) {
@@ -383,6 +393,7 @@ class AdminLibraryController {
             payload.start_date = today;
             payload.end_date = threeDaysAhead;
             payload.covers = covers;
+            payload.preview = preview;
 
             const lessonInstance = await Lesson.create(payload);
 
