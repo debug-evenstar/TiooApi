@@ -19,12 +19,17 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
                 defaultValue: 'exceptions',
             },
+            currency: {
+                type: DataTypes.STRING,
+                allowNull: true,
+                defaultValue: 'NGN',
+            },
+
             tab: {
                 type: DataTypes.STRING,
                 allowNull: true,
                 defaultValue: 'school',
             },
-
             students_breakdown: {
                 type: DataTypes.JSON,
                 defaultValue: { "quater": 0.000, "half": 0.000, "yearly": 0.000 },
