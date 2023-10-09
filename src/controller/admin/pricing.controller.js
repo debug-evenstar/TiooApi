@@ -88,8 +88,8 @@ class PriceController {
 
             /*-----------------------------------| SCHOOL TEACHERS & STUDENTS DISCOUNTS  |-----------------------------------*/
 
-            payload.schools = schoolPricing[0];
-            payload.freelancers = freelancerPricing[0];
+            payload.schools = schoolPricing.filter((element)=> element.currency != null) //schoolPricing[schoolPricing.length - 1];
+            payload.freelancers = freelancerPricing.filter((element)=> element.currency != null) //freelancerPricing[freelancerPricing.length - 1];
             payload.students = independentStudentPricing[0];
 
             payload.exceptionedSchools = exceptionedSchoolsPricing;
