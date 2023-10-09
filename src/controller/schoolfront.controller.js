@@ -22,7 +22,7 @@ class SchoolFront {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const lessonInstance = await subjectIinstance.getLessons({include : [ LessonSlide ]});
+            const lessonInstance = await subjectIinstance.getLessons({ include: [LessonSlide] });
 
 
             return res.status(ResponseStatus.code.success).json({
@@ -256,7 +256,7 @@ class SchoolFront {
 
             }));
 
-            payload.schools = schoolPricing[0];
+            payload.schools = schoolPricing[schoolPricing.length - 1];
             payload.freelancers = freelancerPricing[0];
             payload.students = independentStudentPricing[0];
 
@@ -265,21 +265,28 @@ class SchoolFront {
             payload.exceptionedIndependentsStudents = exceptionedIS;
 
             const exchangeRates = { // Replace with actual exchange rates
-                'USD': 1.23,  
-                'EUR': 1.0,
-                'GBP': 0.85,
+                'USD': 1.00,
+                'EUR': 1.00,
+                'GBP': 1.00,
                 'NGN': 1.00,
             };
 
-            console.log(exchangeRates[cc]);
+            console.log(schoolPricing);
 
             const studentData = {
                 currency: exchangeRates[cc] ? cc : 'NGN',
-                pricing: [
-                    { 'monthly': exchangeRates[cc] ? payload.schools.student_price * exchangeRates[cc] : payload.schools.student_price},
-                    { 'quaterly': exchangeRates[cc] ? payload.schools.students_breakdown.quater * exchangeRates[cc]  : payload.schools.students_breakdown.quater },
-                    { 'yearly': exchangeRates[cc] ? payload.schools.students_breakdown.yearly * exchangeRates[cc]  : payload.schools.students_breakdown.yearly },
-                ]
+                pricing: exchangeRates[cc] ?
+                    [
+                        { 'monthly': exchangeRates[cc] != 'NGN' ? payload.schools.student_price * exchangeRates[cc] : payload.schools.student_price },
+                        { 'quaterly': exchangeRates[cc] != 'NGN' ? payload.schools.students_breakdown.quater * exchangeRates[cc] : payload.schools.students_breakdown.quater },
+                        { 'yearly': exchangeRates[cc] != 'NGN' ? payload.schools.students_breakdown.yearly * exchangeRates[cc] : payload.schools.students_breakdown.yearly },
+                    ]
+                    :
+                    [
+                        { 'monthly': payload.schools.student_price },
+                        { 'quaterly': payload.schools.students_breakdown.quater },
+                        { 'yearly': payload.schools.students_breakdown.yearly },
+                    ]
             };
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: studentData });
