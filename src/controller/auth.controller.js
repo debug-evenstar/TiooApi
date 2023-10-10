@@ -476,12 +476,12 @@ class AuthController {
 
             if (user.account_type === "school") {
                 payload.school = user.SchoolManagement.school_name;
-                payload.redirect = "https://dashboard.hellotioo.com/auth";
+                payload.redirect = `${process.env.SCHOOL_DASHBOARD_URL}/auth`;
             }
 
             if (user.account_type === "freelancer") {
                 payload.school = user.SchoolManagement.school_name;
-                payload.redirect = "https://dashboard.hellotioo.com/auth";
+                payload.redirect = `${process.env.SCHOOL_DASHBOARD_URL}/auth`;
             }
 
             if (user.account_type === "teacher") {
@@ -489,7 +489,7 @@ class AuthController {
                 payload.profileId = profile.id;
                 payload.teacher_type = profile.teacher_type;
                 payload.schoolManagement = profile.SchoolManagementId;
-                payload.redirect = "https://dashboard.hellotioo.com/auth";
+                payload.redirect = `${process.env.SCHOOL_DASHBOARD_URL}/auth`;
 
             } else if (user.account_type === 'student') {
 
@@ -516,7 +516,7 @@ class AuthController {
                     payload.studentClass = profile.class;
                 }
                 payload.term = "undefined";
-                payload.redirect = "https://student.hellotioo.com/auth";
+                payload.redirect = `${process.env.STUDENT_AREA_URL}/auth`;
 
             } else {
 
