@@ -87,10 +87,6 @@ module.exports = (sequelize, Sequelize) => {
         allowNull: true,
         defaultValue: 0
       },
-      covers: {
-        type: Sequelize.JSON,
-        defaultValue: [],
-      },
       preview: {
         type: Sequelize.JSON,
         defaultValue: [],
