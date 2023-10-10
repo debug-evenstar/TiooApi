@@ -166,6 +166,13 @@ class TioController {
             }
             const ClassInstances = await SchoolInstances.getClasses();
 
+            ClassInstances.sort((a, b) => {
+                const gradeA = parseInt(a.naming, 12);
+                const gradeB = parseInt(b.naming, 12);              
+                return gradeA - gradeB;
+                
+              });
+
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
 
         } catch (error) {
