@@ -256,7 +256,7 @@ class SchoolFront {
 
             }));
 
-            payload.schools = schoolPricing[schoolPricing.length - 1];
+            payload.schools =  !cc ?  schoolPricing.filter((e)=> e.currency == 'NGN')[0] : cc == 'NGN' ? schoolPricing.filter((e)=> e.currency == 'NGN')[0] : schoolPricing.filter((e)=> e.currency == 'USD')[0] 
             payload.freelancers = freelancerPricing[0];
             payload.students = independentStudentPricing[0];
 
@@ -271,10 +271,10 @@ class SchoolFront {
                 'NGN': 1.00,
             };
 
-            console.log(schoolPricing);
+            // console.log();
 
             const studentData = {
-                currency: exchangeRates[cc] ? cc : 'NGN',
+                currency: payload.schools.currency,
                 pricing: exchangeRates[cc] ?
                     [
                         { 'monthly': exchangeRates[cc] != 'NGN' ? payload.schools.student_price * exchangeRates[cc] : payload.schools.student_price },
