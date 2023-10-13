@@ -39,8 +39,12 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 allowNull: true,
             },
+            cover: {
+                type: DataTypes.STRING,
+                allowNull: true,
+                defaultValue: '',
+            },
 
-         
         }, {
         timestamps: false,
     });

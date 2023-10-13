@@ -21,9 +21,21 @@ class AdminLibraryController {
 
         data.library = true;
 
+        let cover = "";
+
         try {
+            
 
             // --------------------------------------------------------- subject
+
+            if (req.file) {
+                const filePath = req.file.path;
+                console.log("this is the item",filePath)
+                const ImageResponse = await cloudinaryUploadImage(filePath);
+                req.body.cover =  ImageResponse.secure_url;
+
+            }
+
 
             const classInstance = await Class.findAll({ where: { id: [...req.body.class] } });
 
@@ -379,16 +391,6 @@ class AdminLibraryController {
                     preview.push(ImageResponse.secure_url);
                 }
             }
-
-
-            if (req.files['cover'].length > 0) {
-                for (var item of req.files['cover']) {
-                    console.log("this is the item",item)
-                    const ImageResponse = await cloudinaryUploadImage(item.path);
-                    covers.push(ImageResponse.secure_url);
-                }
-            }
-
 
             payload.start_date = today;
             payload.end_date = threeDaysAhead;
