@@ -1103,6 +1103,31 @@ class LessonController {
 
     }
 
+    static async createLessonSlide(req, res) {
+
+        const { id } = req.params;
+        const data = req.body;
+
+        try {
+
+            const lessonSlideInstance = await LessonSlide.create({
+                LessonId : id,
+                slide_index : data.slide_index,
+                slide_data : data.slide_data
+            });
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.create,
+                data: lessonSlideInstance
+            });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
 }
 
 module.exports = LessonController;
