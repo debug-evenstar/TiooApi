@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            dateOfBirth: {
+            date_of_birth: {
                 type: DataTypes.DATE,
                 allowNull: true,
             },
