@@ -15,7 +15,13 @@ module.exports = {
         body('phone').notEmpty().isNumeric().withMessage("phone field is required"),
         body('account_type').notEmpty().isString().withMessage("account type field is required"),
         body('password').notEmpty().withMessage("password field is required"),
-        body('school').if(body('account_type').equals('school')).isString().notEmpty()
+        body('school')
+        .custom((value, { req }) => {
+          if (req.body.account_type === 'school' && !value) {
+            throw new Error('school field is required when account_type is school.');
+          }
+          return true;
+        })
     ],
 
     VerifyAccountValidator: [

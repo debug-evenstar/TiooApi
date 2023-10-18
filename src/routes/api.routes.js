@@ -175,6 +175,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/class/teacher', ClassController.addTeacherToClass);
     router.post('/class/addSubject', ClassController.addSubjectToClass)
     router.post('/class/remove/subject', ClassController.removeSubjectFromClass)
+    
     /* --------------------------------- CLASS ARMS -------------------------------- */
     router.post('/class/arms/create', ClassArmsController.create);
     router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
