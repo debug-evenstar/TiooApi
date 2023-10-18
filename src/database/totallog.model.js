@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     const TotalLog = sequelize.define(
         'TotalLog',
         {
-            responseBody: {
+            response_body: {
                 type: DataTypes.STRING,
                 allowNull: true,
                 defaultValue: 'Undefined',
@@ -39,7 +39,12 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
                 defaultValue: 'Undefined'
             },
-            originalUrl: {
+            status_message: {
+                type: DataTypes.STRING,
+                allowNull: true,
+                defaultValue: 'Undefined'
+            },
+            original_url: {
                 type: DataTypes.STRING,
                 allowNull: true,
                 defaultValue: 'Undefined'

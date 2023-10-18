@@ -6,8 +6,8 @@ class Relationships {
 
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
-        Account.hasOne(Validation, { foreignKey: 'accountId', as: 'validation' });
-        Validation.belongsTo(Account, { foreignKey: 'accountId', as: 'account' });
+        Account.hasOne(Validation, { foreignKey: 'account_id', as: 'validation' });
+        Validation.belongsTo(Account, { foreignKey: 'account_id', as: 'account' });
 
         Account.hasOne(SchoolManagement, { allowNull: true, onDelete: 'CASCADE'});
         SchoolManagement.belongsTo(Account, { allowNull: true });
