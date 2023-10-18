@@ -7,10 +7,7 @@ const AuthorizationSeed = require("../../../seeders/seed.authorization");
 const TokenMiddleware = require('../../../middleware/token.middleware');
 const LessonTemplateProvider = require('../../../providers/AI/lesson.template');
 const e = require('express');
-const cloudinaryUploadImage = require('../../../utils/cloudinary.utilities');
-
-
-
+const cloudinaryUploadImage = require('../../../services/cloudinary.service');
 
 
 class AdminLibraryController {
