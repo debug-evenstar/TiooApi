@@ -738,6 +738,15 @@ class AuthController {
 
     static async updateAccount(req, res) {
 
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        console.log(req.body);
+        return;
         const { id } = req.userData;
         delete req.body.email;
 
@@ -773,6 +782,15 @@ class AuthController {
         const id = req.params.id;
         delete req.body.email;
         delete req.verification_status;
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+        console.log(req.body);
+
         try {
 
             const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' } });

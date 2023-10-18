@@ -9,19 +9,24 @@ module.exports = {
         body('password').notEmpty().withMessage("password field is required with strong password"),
     ],
 
-    SignupValidator: [
+    UpdateAccountValidator: [
         body('name').notEmpty().isString().withMessage("name field is required"),
         body('email').notEmpty().isString().isEmail().withMessage("email field is required"),
         body('phone').notEmpty().isNumeric().withMessage("phone field is required"),
         body('account_type').notEmpty().isString().withMessage("account type field is required"),
         body('password').notEmpty().withMessage("password field is required"),
         body('school')
-        .custom((value, { req }) => {
-          if (req.body.account_type === 'school' && !value) {
-            throw new Error('school field is required when account_type is school.');
-          }
-          return true;
-        })
+            .custom((value, { req }) => {
+                if (req.body.account_type === 'school' && !value) {
+                    throw new Error('school field is required when account_type is school.');
+                }
+                return true;
+            })
+    ],
+
+    UpdateAccountValidator: [
+        body('name').notEmpty().isString().withMessage('Name field is required'),
+        body('phone').notEmpty().isString().isLength({ min: 10, max: 15 }).withMessage('Phone field is required and must be between 10 and 15 characters'),
     ],
 
     VerifyAccountValidator: [

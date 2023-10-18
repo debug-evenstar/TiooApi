@@ -3,7 +3,7 @@ router = express.Router();
 
 /* -------------------------------| Validators |------------------------------- */
 
-const { SigninValidator, SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator, RegisterExternalStudentValidator, EmailValidator } = require("./validators/AuthValidators")
+const { SigninValidator, UpdateAccountValidator: SignupValidator, VerifyAccountValidator, SendOTPValidator, ChangePasswordValidator, SchoolSetupValidator, ResetPasswordValidator, VerifyResetPasswordValidator, RegisterExternalStudentValidator, EmailValidator, UpdateAccountValidator } = require("./validators/AuthValidators")
 
 /*-----------------------------------| HOME |-----------------------------------*/
 
@@ -112,7 +112,7 @@ const OpenRoutesGroup = (router) => {
 
     router.get('/open/lesson/:id/template', LessonController.lessonTemplate);
     router.put('/open/lesson/template/:id', LessonController.updateLessonTemplate);
-    router.put('/open/lesson/templateimage/:id',  UploadService.uploadTemplateImage.array('image'), LessonController.updateTemplateImage);
+    router.put('/open/lesson/templateimage/:id', UploadService.uploadTemplateImage.array('image'), LessonController.updateTemplateImage);
     router.get('/open/pricing/', SchoolFront.openPricing);
 
 
@@ -131,7 +131,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.put('/account/flag', AuthenicationController.flagAccount);
     router.post('/account/auth/resetpassword', AuthenicationController.resetAuthPassword);
     router.get('/account/auth/account', AuthenicationController.authAccountByID);
-    router.put('/account/update/:id', AuthenicationController.updateAccountById);
+    router.put('/account/update/:id', UpdateAccountValidator, AuthenicationController.updateAccountById);
     router.get('/account/read/:id', AuthenicationController.accountByID);
     router.get('/account/exist/:email', AuthenicationController.accountExist);
     router.post('/account/profile/upload', UploadService.uploadDisplayPicture.single('file'), AuthenicationController.uploadDisplayPicture);
@@ -175,7 +175,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/class/teacher', ClassController.addTeacherToClass);
     router.post('/class/addSubject', ClassController.addSubjectToClass)
     router.post('/class/remove/subject', ClassController.removeSubjectFromClass)
-    
+
     /* --------------------------------- CLASS ARMS -------------------------------- */
     router.post('/class/arms/create', ClassArmsController.create);
     router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
@@ -380,9 +380,9 @@ const AdminRoutesGroup = (router) => {
     router.post('/admin/library/subject', UploadService.uploadLessonTemplate.single('cover'), AdminLibraryController.libraryMaterial);
     router.put('/admin/librarylesson/:id', AdminLibraryController.updateLibraryLesson);
 
-     
+
     // router.post('/admin/library/lesson', UploadService.uploadLesson.single('file'), AdminLibraryController.createLibraryLesson);
-    
+
     router.get('/admin/library/lesson/check', AdminLibraryController.subjectGroupedLessons);
     router.get('/admin/librarysubject/:id/classes', AdminLibraryController.libraryClasses);
     router.post('/admin/librarysubject/status/:id', AdminLibraryController.toggleLibrarySubjectStatus);
@@ -391,7 +391,7 @@ const AdminRoutesGroup = (router) => {
     router.post('/admin/librarylesson/template', UploadService.uploadLesson.fields([{ name: 'template' }, { name: 'preview' }, { name: 'cover' }]), AdminLibraryController.adminLibraryLessonUploadTemplate);
     router.put('/admin/updatelibrarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.adminUpdateLibraryLessonUploadTemplate);
     router.put('/admin/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.addLibraryLesson);
-    router.put('/admin/librarylesson/template/:id',  AdminLibraryController.updateLibraryLessonTemplate);
+    router.put('/admin/librarylesson/template/:id', AdminLibraryController.updateLibraryLessonTemplate);
 
 
 };
