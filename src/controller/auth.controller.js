@@ -29,7 +29,7 @@ class AuthController {
         }
 
         // console.log(req.body)
-        // return
+        // return 
 
         try {
 
@@ -746,8 +746,6 @@ class AuthController {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
 
-        console.log(req.body);
-        return;
         const { id } = req.userData;
         delete req.body.email;
 
@@ -790,7 +788,6 @@ class AuthController {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
 
-        console.log(req.body);
 
         try {
 

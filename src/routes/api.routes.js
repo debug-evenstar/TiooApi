@@ -127,7 +127,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.use(AuthenticationMiddleware.verify) //--use middleware--//
     router.get('/account/read_all', AuthenicationController.accounts);
     router.get('/account/read', AuthenicationController.accountProfile);
-    router.put('/account/update', AuthenicationController.updateAccount);
+    router.put('/account/update', UpdateAccountValidator, AuthenicationController.updateAccount);
     router.put('/account/flag', AuthenicationController.flagAccount);
     router.post('/account/auth/resetpassword', AuthenicationController.resetAuthPassword);
     router.get('/account/auth/account', AuthenicationController.authAccountByID);
