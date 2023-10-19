@@ -33,7 +33,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     };
 
@@ -46,6 +46,7 @@ class ClassController {
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
+
 
         try {
 
@@ -66,7 +67,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     };
@@ -91,7 +92,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -111,15 +112,17 @@ class ClassController {
             if (!SchoolInstances) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
-            const ClassInstances = await SchoolInstances.getClasses({ include: [
-                { model : ClassArm , include : [Subject]}
-            ]});
+            const ClassInstances = await SchoolInstances.getClasses({
+                include: [
+                    { model: ClassArm, include: [Subject] }
+                ]
+            });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: ClassInstances });
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -146,7 +149,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -168,7 +171,7 @@ class ClassController {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: singleClass });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -195,7 +198,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -222,7 +225,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -241,7 +244,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -268,39 +271,39 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
 
-        /*-----------------------------------| REMOVE SUBJECT FROM CLASS |-----------------------------------*/
+    /*-----------------------------------| REMOVE SUBJECT FROM CLASS |-----------------------------------*/
 
-        static async removeSubjectFromClass(req, res) {
+    static async removeSubjectFromClass(req, res) {
 
-            const { classId, subjectId } = req.body;
-    
-            const { id } = req.userData;
-    
-            try {
-    
-                const classSubjects = await Class.findByPk(classId);
-    
-                const subjectInstance = await Subject.findByPk(subjectId);
-    
-                const response = await classSubjects.removeSubject(subjectInstance);
+        const { classId, subjectId } = req.body;
 
-                console.log(response);
+        const { id } = req.userData;
 
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed });
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'server error' ,  extra: error.message });
-            };
-        }
+        try {
+
+            const classSubjects = await Class.findByPk(classId);
+
+            const subjectInstance = await Subject.findByPk(subjectId);
+
+            const response = await classSubjects.removeSubject(subjectInstance);
+
+            console.log(response);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
 
 
-    
+
 
 
     /*-----------------------------------| READ CLASS WITH ALL ASSIGNED TEACHERS |-----------------------------------*/
@@ -337,7 +340,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -350,14 +353,14 @@ class ClassController {
 
         try {
             const classStudents = await Student.findAll({
-                where : {ClassId : id},
-                include : [Account, ClassArm]
+                where: { ClassId: id },
+                include: [Account, ClassArm]
             })
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classStudents });
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -397,7 +400,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
 
     }
@@ -438,7 +441,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
 
     }
@@ -449,11 +452,11 @@ class ClassController {
         const errors = validationResult(req);
         const data = req.body;
         try {
-            const classarmInstance = await ClassArm.findAll({where : {id : data.arms}});
-            
+            const classarmInstance = await ClassArm.findAll({ where: { id: data.arms } });
+
             const classIds = classarmInstance.map(arm => arm.ClassId);
 
-            const classInstances = await Class.findAll({ where : { id : classIds.filter((id,index) => index == classIds.indexOf(id) ) } });
+            const classInstances = await Class.findAll({ where: { id: classIds.filter((id, index) => index == classIds.indexOf(id)) } });
 
             if (!classarmInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
@@ -466,12 +469,12 @@ class ClassController {
             } else {
 
                 // Class arms add teacher
-                for(var i = 0; i < classarmInstance.length; i++){
+                for (var i = 0; i < classarmInstance.length; i++) {
                     await classarmInstance[i].addTeacher(teacherInstance);
                 }
 
                 // Class instances add teacher
-                for(var i = 0; i < classInstances.length; i++){
+                for (var i = 0; i < classInstances.length; i++) {
                     await classInstances[i].addTeacher(teacherInstance);
                 }
 
@@ -480,7 +483,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
     }
 
@@ -489,7 +492,7 @@ class ClassController {
     static async readStudentsTeachers(req, res) {
 
         const { id } = req.params;
-        
+
         try {
             const classInstance = await Class.findByPk(id, { include: [Teacher, Student] });
 
@@ -501,7 +504,7 @@ class ClassController {
             const studentAccountIds = classInstance.Students.map(student => student.AccountId);
 
             const accounts = await Account.findAll({ where: { id: [...studentAccountIds, ...teacherAccountIds] }, attributes: { exclude: ['password'] } });
-            
+
             const mapType = (type) => accounts.filter(
                 account => account.account_type == type
             );
@@ -515,7 +518,7 @@ class ClassController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
     }
 

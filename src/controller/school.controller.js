@@ -271,8 +271,16 @@ class SchoolManagementController {
 
     static async removeClassFromSchool(req, res) {
 
+
+
         const { schoolId, classId } = req.body;
 
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
         try {
 
             const classInstance = await Class.findByPk(classId);
