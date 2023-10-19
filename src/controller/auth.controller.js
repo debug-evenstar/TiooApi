@@ -28,7 +28,8 @@ class AuthController {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
 
- 
+        // console.log(req.body)
+        // return 
 
         try {
 

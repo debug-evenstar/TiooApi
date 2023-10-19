@@ -49,6 +49,7 @@ const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
 const ExternalSchoolController = require('../controller/external_school/auth.controller');
 const TokenMiddleware = require('../middleware/token.middleware');
+const { ClassRemoveValidator: ClassValidator } = require('./validators/SchoolValidator');
 
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
@@ -145,7 +146,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/school/read/:id', SchoolManagementController.readById);
     router.get('/school/keypairs/read/:id', SchoolManagementController.readKeysById);
     router.get('/school/read/classes/:id', SchoolManagementController.readByIdWithClasses);
-    router.post('/school/class/remove', SchoolManagementController.removeClassFromSchool);
+    router.post('/school/class/remove', ClassValidator, SchoolManagementController.removeClassFromSchool);
     router.get('/school/class/read', SchoolManagementController.getClassBySidANDCid);
     router.get('/school/teachers/', SchoolManagementController.authSchoolTeachers);
     router.get('/school/teachers/:id', SchoolManagementController.schoolTeachers);
