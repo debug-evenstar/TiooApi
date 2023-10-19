@@ -942,6 +942,8 @@ class StudentController {
             const { id } = req.userData
             const account_id = req.query.account_id ? req.query.account_id : id;
 
+            console.log(req.query);
+
             const accountInstance = await Account.findByPk(account_id);
 
             const studentInstance = await accountInstance.getStudent()
@@ -954,13 +956,15 @@ class StudentController {
 
                 const studentAccount = await student.getAccount();
 
-               const {name, email, phone } = studentAccount;
+               const {name, email, phone, id } = studentAccount;
 
-                return  {name, email, phone, age: student.age, school: school.school_name };
+                return  {id, name, email, phone, age: student.age, school: school.school_name };
 
             }));
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: response });
+            const filteredData = response.filter((data)=> data.id != account_id );
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: filteredData });
 
         } catch (error) {
             console.log(error);
