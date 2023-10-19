@@ -50,7 +50,7 @@ const ErrorLogs = require('../controller/error.controller');
 const ExternalSchoolController = require('../controller/external_school/auth.controller');
 const TokenMiddleware = require('../middleware/token.middleware');
 const { SchoolClassRemoveValidator: ClassValidator, SchoolClassRemoveValidator: ClassRemoveValidator, SchoolClassRemoveValidator } = require('./validators/SchoolValidator');
-const { CreateClass, CreateBulkClassValidator, BulkClassValidator, validateClassList, BulkCreateClass } = require('./validators/ClassValidator');
+const { CreateClass, CreateBulkClassValidator, BulkClassValidator, validateClassList, BulkCreateClass, ClassArmTeacherValidator, ClassAddSubjectValidator, AddStudentToClassValidator } = require('./validators/ClassValidator');
 
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
@@ -172,10 +172,10 @@ const AuthorizedRoutesGroup = (router) => {
     router.put('/class/update/:id', UpdateAccountValidator, ClassController.update);
     router.get('/class/students/:id', ClassController.classStudent);
     router.delete('/class/delete/:id', ClassController.delete);
-    router.post('/class/student', ClassController.addStudentToClass);
+    router.post('/class/student', AddStudentToClassValidator, ClassController.addStudentToClass);
     router.post('/class/remove/student', ClassController.removeStudentFromClass);
-    router.post('/class/teacher', ClassController.addTeacherToClass);
-    router.post('/class/addSubject', ClassController.addSubjectToClass)
+    router.post('/class/teacher', ClassArmTeacherValidator, ClassController.addTeacherToClass);
+    router.post('/class/addSubject', ClassAddSubjectValidator, ClassController.addSubjectToClass)
     router.post('/class/remove/subject', ClassController.removeSubjectFromClass)
 
     /* --------------------------------- CLASS ARMS -------------------------------- */

@@ -252,6 +252,12 @@ class ClassController {
 
     static async addSubjectToClass(req, res) {
 
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
         const { classId, subjectId } = req.body;
 
         const { id } = req.userData;
@@ -450,6 +456,9 @@ class ClassController {
 
     static async addTeacherToClass(req, res) {
         const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
         const data = req.body;
         try {
             const classarmInstance = await ClassArm.findAll({ where: { id: data.arms } });
