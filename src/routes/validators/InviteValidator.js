@@ -144,7 +144,7 @@ module.exports = {
         body('arm')
           .notEmpty()
           .isInt({ min: 1 })
-          .withMessage('Arm field is required and must be a positive integer'),
+          .withMessage('Arm field is required'),
       
         body('schoolId')
           .notEmpty()
