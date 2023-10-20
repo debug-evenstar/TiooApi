@@ -709,6 +709,8 @@ class StudentController {
                 });
             }
 
+            req.body.student_type = 'independent';
+
 
             const registeredAccount = await Account.create(req.body);
             // const newValidation = await Validation.create({ otp: random_hash });
@@ -752,6 +754,9 @@ class StudentController {
             registeredAccount.status = 'active';
             registeredAccount.flag = 'active';
             registeredAccount.verification_status = 1;
+
+            req.body.student_type = 'independent';
+
 
             const studentInstance = await Student.create({
                 ...req.body,
