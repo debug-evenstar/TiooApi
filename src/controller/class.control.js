@@ -375,6 +375,10 @@ class ClassController {
     static async addStudentToClass(req, res) {
 
         const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
         const data = req.body;
         try {
             const classarmInstance = await ClassArm.findByPk(data.arm);

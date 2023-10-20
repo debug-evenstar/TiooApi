@@ -51,6 +51,7 @@ const ExternalSchoolController = require('../controller/external_school/auth.con
 const TokenMiddleware = require('../middleware/token.middleware');
 const { SchoolClassRemoveValidator: ClassValidator, SchoolClassRemoveValidator: ClassRemoveValidator, SchoolClassRemoveValidator } = require('./validators/SchoolValidator');
 const { CreateClass, CreateBulkClassValidator, BulkClassValidator, validateClassList, BulkCreateClass, ClassArmTeacherValidator, ClassAddSubjectValidator, AddStudentToClassValidator } = require('./validators/ClassValidator');
+const { CreateClassArm, UpdateClassArm, CreateBulkClassArmValidator } = require('./validators/ClassArmValidator');
 
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
@@ -179,14 +180,14 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/class/remove/subject', ClassController.removeSubjectFromClass)
 
     /* --------------------------------- CLASS ARMS -------------------------------- */
-    router.post('/class/arms/create', ClassArmsController.create);
-    router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
+    router.post('/class/arms/create',CreateClassArm, ClassArmsController.create);
+    router.post('/class/arms/create_bulk', CreateBulkClassArmValidator, ClassArmsController.createBulk);
     router.get('/class/arms/read', ClassArmsController.readAll);
     router.get('/class/:id/arms', ClassArmsController.readAllByClass);
     router.get('/class/arms/read/:id', ClassArmsController.readById);
     router.get('/class/arms/students/:id', ClassArmsController.classArmStudents);
     router.get('/class/arms/:id/subjects', ClassArmsController.classArmSubjects); // This is the a better route format /entity/:entityId/relationship
-    router.put('/class/arms/update/:id', ClassArmsController.updateById);
+    router.put('/class/arms/update/:id', UpdateClassArm, ClassArmsController.updateById);
     router.get('/class/classarms', ClassArmsController.classArmsByClass)
     router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
 

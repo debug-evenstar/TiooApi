@@ -1,11 +1,17 @@
 const { SchoolManagement, ClassArm, Class, Account, Teacher, Student, Subject } = require('../database/connection');
 const ResponseStatus = require('../config/message.config');
+const { validationResult } = require('express-validator');
 
 class classArms {
 
     /*----------------------------------| CREATE CLASS ARMS |----------------------------------*/
 
     static async create(req, res) {
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
 
         const { classId, arms } = req.body;
 
@@ -26,8 +32,8 @@ class classArms {
             const subjectInstances = await classInstance.getSubjects();
 
             await Promise.all(subjectInstances.map(async (subjectInstance) => {
-                
-               const response =  await subjectInstance.addClassArm(classArmInstance);
+
+                const response = await subjectInstance.addClassArm(classArmInstance);
 
                 return true;
             }));
@@ -37,13 +43,19 @@ class classArms {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classWithArms });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
     }
 
     /*----------------------------------| CREATE BULK CLASS ARMS |----------------------------------*/
 
     static async createBulk(req, res) {
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
 
         const { classId, arms } = req.body;
 
@@ -64,13 +76,13 @@ class classArms {
                 await classInstance.addClassArm(classArmInstance);
 
                 await Promise.all(subjectInstances.map(async (subjectInstance) => {
-                    const response =  await subjectInstance.addClassArm(classArmInstance);
-                     return true;
-                 }));
-                 
+                    const response = await subjectInstance.addClassArm(classArmInstance);
+                    return true;
+                }));
+
             }
 
-           
+
 
 
 
@@ -80,7 +92,7 @@ class classArms {
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classWithArms });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
     }
 
@@ -102,7 +114,7 @@ class classArms {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
     }
 
@@ -112,18 +124,18 @@ class classArms {
 
         try {
             let armsResult = await ClassArm.findAll({
-                where : { ClassId : req.params.id},
-                include : [
-                    { model : Subject },
-                    { model : Student, include : [Account]},
-                    { model : Teacher, include : [Account]},
+                where: { ClassId: req.params.id },
+                include: [
+                    { model: Subject },
+                    { model: Student, include: [Account] },
+                    { model: Teacher, include: [Account] },
                 ]
             });
 
             if (req.userData.account_type == "teacher") {
-                const teacherInstance  =  await Teacher.findOne({
-                    where : {AccountId : req.userData.id},
-                    include : [ClassArm]
+                const teacherInstance = await Teacher.findOne({
+                    where: { AccountId: req.userData.id },
+                    include: [ClassArm]
                 });
 
                 armsResult = armsResult.filter((arm) => {
@@ -134,7 +146,7 @@ class classArms {
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: armsResult });
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
     }
 
@@ -150,7 +162,7 @@ class classArms {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
     }
 
@@ -160,6 +172,12 @@ class classArms {
     static async updateById(req, res) {
 
         const { id } = req.params;
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
 
         try {
 
@@ -175,7 +193,7 @@ class classArms {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
     }
 
@@ -199,65 +217,65 @@ class classArms {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
     }
 
 
-        /*----------------------------------|  |----------------------------------*/
+    /*----------------------------------|  |----------------------------------*/
 
-        static async classArmStudents(req, res) {
+    static async classArmStudents(req, res) {
 
-            const { id } = req.params;
-    
-            try {
-    
-                const classArmInstance = await ClassArm.findByPk(id);
-    
-                if (!classArmInstance) {
-                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-                }
-    
-                const classStudents = await classArmInstance.getStudents();
+        const { id } = req.params;
 
-                const studentsId = classStudents.map((student) => student.AccountId);
+        try {
 
-                const classStudentsAccount = await Account.findAll({ where: { id: [...studentsId] }, attributes: { exclude: ['password'] } });    
-    
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classStudentsAccount });
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'server error' ,  extra: error.message });
+            const classArmInstance = await ClassArm.findByPk(id);
+
+            if (!classArmInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
+
+            const classStudents = await classArmInstance.getStudents();
+
+            const studentsId = classStudents.map((student) => student.AccountId);
+
+            const classStudentsAccount = await Account.findAll({ where: { id: [...studentsId] }, attributes: { exclude: ['password'] } });
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classStudentsAccount });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
+    }
 
 
 
-        static async classArmSubjects(req, res) {
+    static async classArmSubjects(req, res) {
 
-            const { id } = req.params;
-    
-            try {
-    
-                const classArmInstance = await ClassArm.findByPk(id);
-    
-                if (!classArmInstance) {
-                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-                }
-    
-                const classSubjects = await classArmInstance.getSubjects();
-   
-    
-                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classSubjects });
-    
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ error: 'server error' ,  extra: error.message });
+        const { id } = req.params;
+
+        try {
+
+            const classArmInstance = await ClassArm.findByPk(id);
+
+            if (!classArmInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
-        }
 
-            /* ---------------------------- READ BY CLASS ID ---------------------------- */
+            const classSubjects = await classArmInstance.getSubjects();
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classSubjects });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        }
+    }
+
+    /* ---------------------------- READ BY CLASS ID ---------------------------- */
 
     static async classArmsByClass(req, res) {
 
@@ -268,7 +286,7 @@ class classArms {
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classArms });
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         }
     }
 
