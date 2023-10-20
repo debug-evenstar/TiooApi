@@ -72,6 +72,47 @@ class AdminLibraryController {
 
     }
 
+    static async updateLibraryMaterial(req, res) {
+
+        const data = req.body;
+
+        const {id} = req.params;
+
+        data.library = true;
+
+        let cover = "";
+
+        try {
+            
+
+            // --------------------------------------------------------- subject
+
+            if (req.file) {
+                const filePath = req.file.path;
+                console.log("this is the item",filePath)
+                const ImageResponse = await cloudinaryUploadImage(filePath);
+                req.body.cover =  ImageResponse.secure_url;
+
+            }
+
+            const thisSubject = await Subject.findByPk(id);
+
+
+            const subjectInstance = await thisSubject.update(req.body);
+
+
+            // ------------------------------------------
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: {} });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+
 
     static async readLibraryMaterial(req, res) {
 
