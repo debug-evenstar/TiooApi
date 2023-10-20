@@ -42,8 +42,6 @@ module.exports = {
             .withMessage('SchoolManagementId field is required and must be a positive integer'),
     ],
 
-
-
     UpdateSubjectValidator: [
         body('subjectId')
             .notEmpty()
