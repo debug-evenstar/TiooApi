@@ -499,11 +499,6 @@ class AuthController {
 
                 const school = await profile.getSchoolManagement({include: [Account]});
 
-
-
-
-                
-
                 console.log(profile);
 
                 if (schoolManagementId) {
@@ -728,10 +723,12 @@ class AuthController {
 
                     payload.subjectsCount = studentSubject.length;
                     payload.schoolStudent = true;
+                    payload.student_type = profile.student_type;
                 } else {
                     payload.schoolStudent = false;
                     payload.schoolName = profile.school;
                     payload.studentClass = profile.class;
+                    payload.student_type = profile.student_type;
                 }
                 payload.term = "undefined";
                 payload.status = payload.flag === 'active' ? "On Track" : "??";
