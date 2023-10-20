@@ -55,6 +55,7 @@ const { CreateClassArm, UpdateClassArm, CreateBulkClassArmValidator } = require(
 const { TeacherInviteValidator, StudentInviteValidator, AcceptTeacherValidator, AcceptStudentValidator } = require('./validators/InviteValidator');
 const { CreateSubjectValidator, UpdateSubjectValidator } = require('./validators/SubjectValidator');
 const { InviteTeacherValidator, UnAssignSubjectTeacherValidator: AssignSubjectTeacherValidator, UnAssignSubjectTeacherValidator } = require('./validators/TeacherValidator');
+const { PricingValidator } = require('./validators/PricingValidators');
 
 
 
@@ -334,7 +335,7 @@ const AdminRoutesGroup = (router) => {
 
     /* --------------------------------- PRICING -------------------------------- */
 
-    router.post('/admin/settings/pricing', PriceController.create);
+    router.post('/admin/settings/pricing', PricingValidator, PriceController.create);
     router.get('/admin/settings/pricing', PriceController.read);
     router.put('/admin/settings/pricing', PriceController.update);
     router.delete('/admin/settings/pricing/:id', PriceController.delete);

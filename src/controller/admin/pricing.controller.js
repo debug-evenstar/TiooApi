@@ -9,6 +9,13 @@ class PriceController {
 
         const data = req.body;
 
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
+
         try {
 
             if (!data.accounts) {
@@ -36,7 +43,7 @@ class PriceController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     };
@@ -88,8 +95,8 @@ class PriceController {
 
             /*-----------------------------------| SCHOOL TEACHERS & STUDENTS DISCOUNTS  |-----------------------------------*/
 
-            payload.schools = schoolPricing.filter((element)=> element.currency != null) //schoolPricing[schoolPricing.length - 1];
-            payload.freelancers = freelancerPricing.filter((element)=> element.currency != null) //freelancerPricing[freelancerPricing.length - 1];
+            payload.schools = schoolPricing.filter((element) => element.currency != null) //schoolPricing[schoolPricing.length - 1];
+            payload.freelancers = freelancerPricing.filter((element) => element.currency != null) //freelancerPricing[freelancerPricing.length - 1];
             payload.students = independentStudentPricing[0];
 
             payload.exceptionedSchools = exceptionedSchoolsPricing;
@@ -103,7 +110,7 @@ class PriceController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     };
@@ -127,18 +134,18 @@ class PriceController {
                 return res.status(ResponseStatus.code.bad_request).json({ error: false, message: ResponseStatus.fail.bad_request, data: {} });
             }
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update});
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update });
 
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
     static async delete(req, res) {
 
-        const {id} = req.params;
+        const { id } = req.params;
 
         try {
 
@@ -158,7 +165,7 @@ class PriceController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
