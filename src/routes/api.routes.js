@@ -56,6 +56,7 @@ const { TeacherInviteValidator, StudentInviteValidator, AcceptTeacherValidator, 
 const { CreateSubjectValidator, UpdateSubjectValidator } = require('./validators/SubjectValidator');
 const { InviteTeacherValidator, UnAssignSubjectTeacherValidator: AssignSubjectTeacherValidator, UnAssignSubjectTeacherValidator } = require('./validators/TeacherValidator');
 const { PricingValidator, UpdatePricingValidator } = require('./validators/PricingValidators');
+const { CreateAdminValidator, AdminLoginValidator } = require('./validators/AdminValidator');
 
 
 
@@ -102,7 +103,7 @@ const OpenRoutesGroup = (router) => {
     router.post('/invites/student/accept', AcceptStudentValidator, InviteController.studentAccept);
     router.post('/invites/teacher/accept', AcceptTeacherValidator, InviteController.teacherAccept);
 
-    router.post('/admin/login', AuthorizationController.login);
+    router.post('/admin/login', AdminLoginValidator, AuthorizationController.login);
 
     router.post('/tio/setup', TioController.setup);
     router.get('/tio/classes', TioController.classes);
@@ -341,7 +342,7 @@ const AdminRoutesGroup = (router) => {
     router.delete('/admin/settings/pricing/:id', PriceController.delete);
 
     // router.get('/admin/user',  TokenMiddleware.checkAuthorization(['manage_admin']), AuthorizationController.readAdminUser);
-    router.post('/admin/user', AuthorizationController.addAdminUser);
+    router.post('/admin/user',CreateAdminValidator, AuthorizationController.addAdminUser);
     router.get('/admin/user', AuthorizationController.readAdminUser);
     router.delete('/admin/user', AuthorizationController.deleteAdmin);
     router.get('/admin/permissions', AuthorizationController.readPermissions);
