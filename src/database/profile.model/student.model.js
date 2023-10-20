@@ -28,6 +28,12 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             },
 
+            student_type: {
+                type: DataTypes.STRING,
+                allowNull: true,
+                default: "dependent"
+            },
+
             age: {
                 type: DataTypes.INTEGER,
                 allowNull: true,
