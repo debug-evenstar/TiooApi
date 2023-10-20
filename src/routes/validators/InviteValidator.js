@@ -149,7 +149,7 @@ module.exports = {
         body('schoolId')
           .notEmpty()
           .isInt({ min: 1 })
-          .withMessage('School ID field is required and must be a positive integer'),
+          .withMessage('School ID field is required '),
       ]
 
 }
