@@ -63,37 +63,62 @@ module.exports = {
 
     AcceptTeacherValidator: [
         body('name')
-          .notEmpty()
-          .isString()
-          .withMessage('Name field is required and must be a string'),
-      
+            .notEmpty()
+            .isString()
+            .withMessage('Name field is required and must be a string'),
+
         body('email')
-          .notEmpty()
-          .isString()
-          .isEmail()
-          .withMessage('Email field is required and must be a valid email address'),
-      
+            .notEmpty()
+            .isString()
+            .isEmail()
+            .withMessage('Email field is required and must be a valid email address'),
+
         body('phone')
-          .notEmpty()
-          .isString()
-          .isMobilePhone()
-          .withMessage('Phone field is required and must be a valid phone number'),
-      
+            .notEmpty()
+            .isString()
+            .isMobilePhone()
+            .withMessage('Phone field is required and must be a valid phone number'),
+
         body('account_type')
-          .notEmpty()
-          .isString()
-          .equals('teacher')
-          .withMessage('Account type field is required and must be "teacher"'),
-      
+            .notEmpty()
+            .isString()
+            .equals('teacher')
+            .withMessage('Account type field is required and must be "teacher"'),
+
         body('password')
-          .notEmpty()
-          .isString()
-          .isLength({ min: 4 })
-          .withMessage('Password field is required and must be at least 4 characters long'),
-      
+            .notEmpty()
+            .isString()
+            .isLength({ min: 4 })
+            .withMessage('Password field is required and must be at least 4 characters long'),
+
         body('accountId')
-          .notEmpty()
-          .isString()
-          .withMessage('Account ID field is required and must be a string'),
-      ]
+            .notEmpty()
+            .isString()
+            .withMessage('Account ID field is required and must be a string'),
+    ],
+
+    UnAssignSubjectTeacherValidator: [
+        body('teacher')
+            .notEmpty()
+            .isInt({ min: 1 })
+            .withMessage('Teacher field is required and must be a positive integer'),
+
+        body('subject')
+            .notEmpty()
+            .isInt({ min: 1 })
+            .withMessage('Subject field is required and must be a positive integer'),
+    ],
+
+    UnAssignSubjectTeacherValidator: [
+        body('teacher')
+            .notEmpty()
+            .isInt({ min: 1 })
+            .withMessage('Teacher field is required and must be a positive integer'),
+
+        body('subject')
+            .notEmpty()
+            .isInt({ min: 1 })
+            .withMessage('Subject field is required and must be a positive integer'),
+    ]
 }
+

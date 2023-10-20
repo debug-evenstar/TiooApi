@@ -542,7 +542,11 @@ class TeacherController {
     /*-----------------------------------| ASSIGN SUBJECT TO TEACHER |-----------------------------------*/
 
     static async assignSubjectToTeacher(req, res) {
+        const errors = validationResult(req);
 
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
         const { subject, teacher } = req.body;
 
         try {
@@ -584,6 +588,12 @@ class TeacherController {
     static async unAssignSubjectToTeacher(req, res) {
 
         const { subject, teacher } = req.body;
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+
 
         try {
 

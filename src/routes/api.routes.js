@@ -54,7 +54,7 @@ const { CreateClass, CreateBulkClassValidator, BulkClassValidator, validateClass
 const { CreateClassArm, UpdateClassArm, CreateBulkClassArmValidator } = require('./validators/ClassArmValidator');
 const { TeacherInviteValidator, StudentInviteValidator, AcceptTeacherValidator, AcceptStudentValidator } = require('./validators/InviteValidator');
 const { CreateSubjectValidator, UpdateSubjectValidator } = require('./validators/SubjectValidator');
-const { InviteTeacherValidator } = require('./validators/TeacherValidator');
+const { InviteTeacherValidator, UnAssignSubjectTeacherValidator: AssignSubjectTeacherValidator, UnAssignSubjectTeacherValidator } = require('./validators/TeacherValidator');
 
 
 
@@ -220,8 +220,8 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/teacher/invite', InviteTeacherValidator, TeacherController.sendInvite);
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
-    router.post('/teacher/assignsubject', TeacherController.assignSubjectToTeacher);
-    router.post('/teacher/unassignsubject', TeacherController.unAssignSubjectToTeacher);
+    router.post('/teacher/assignsubject', AssignSubjectTeacherValidator, TeacherController.assignSubjectToTeacher);
+    router.post('/teacher/unassignsubject',UnAssignSubjectTeacherValidator, TeacherController.unAssignSubjectToTeacher);
     router.get('/teacher/students/:id', TeacherController.teacherStudents);
     router.get('/teacher/subjectswithLessons/:id', TeacherController.teacherSubjectsWithLessons)
     router.get('/teacher/subjectswithLessonscount/:id', TeacherController.teacherSubjectsWithLessonsCount)
