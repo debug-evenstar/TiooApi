@@ -149,7 +149,11 @@ class CouponController {
     static async update(req, res) {
 
         const data = req.body;
+        const errors = validationResult(req);
 
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
         try {
 
             const couponInstances = await Coupon.findByPk(data.id);

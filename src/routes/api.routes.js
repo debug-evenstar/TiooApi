@@ -57,6 +57,7 @@ const { CreateSubjectValidator, UpdateSubjectValidator } = require('./validators
 const { InviteTeacherValidator, UnAssignSubjectTeacherValidator: AssignSubjectTeacherValidator, UnAssignSubjectTeacherValidator } = require('./validators/TeacherValidator');
 const { PricingValidator, UpdatePricingValidator } = require('./validators/PricingValidators');
 const { CreateAdminValidator, AdminLoginValidator } = require('./validators/AdminValidator');
+const { CreateCouponValidator, UpdateCouponValidator } = require('./validators/CouponValidation');
 
 
 
@@ -342,7 +343,7 @@ const AdminRoutesGroup = (router) => {
     router.delete('/admin/settings/pricing/:id', PriceController.delete);
 
     // router.get('/admin/user',  TokenMiddleware.checkAuthorization(['manage_admin']), AuthorizationController.readAdminUser);
-    router.post('/admin/user',CreateAdminValidator, AuthorizationController.addAdminUser);
+    router.post('/admin/user', CreateAdminValidator, AuthorizationController.addAdminUser);
     router.get('/admin/user', AuthorizationController.readAdminUser);
     router.delete('/admin/user', AuthorizationController.deleteAdmin);
     router.get('/admin/permissions', AuthorizationController.readPermissions);
@@ -352,10 +353,10 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/freelancer', AdminController.freeLancers);
     router.get('/admin/freelancer/:id', AdminController.freeLancersById);
 
-    router.post('/admin/coupon', CouponController.create);
+    router.post('/admin/coupon', CreateCouponValidator, CouponController.create);
     router.get('/admin/coupon', CouponController.read);
     router.delete('/admin/coupon', CouponController.delete);
-    router.put('/admin/coupon', CouponController.update);
+    router.put('/admin/coupon', UpdateCouponValidator, CouponController.update);
     router.post('/admin/coupon/activate', CouponController.activate);
 
     router.get('/admin/management/schools', AdminSchoolController.read);
