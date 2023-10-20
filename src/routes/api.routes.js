@@ -52,7 +52,7 @@ const TokenMiddleware = require('../middleware/token.middleware');
 const { SchoolClassRemoveValidator: ClassValidator, SchoolClassRemoveValidator: ClassRemoveValidator, SchoolClassRemoveValidator } = require('./validators/SchoolValidator');
 const { CreateClass, CreateBulkClassValidator, BulkClassValidator, validateClassList, BulkCreateClass, ClassArmTeacherValidator, ClassAddSubjectValidator, AddStudentToClassValidator } = require('./validators/ClassValidator');
 const { CreateClassArm, UpdateClassArm, CreateBulkClassArmValidator } = require('./validators/ClassArmValidator');
-const { TeacherInviteValidator } = require('./validators/InviteValidator');
+const { TeacherInviteValidator, StudentInviteValidator, AcceptTeacherValidator, AcceptStudentValidator } = require('./validators/InviteValidator');
 
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
@@ -89,14 +89,14 @@ const OpenRoutesGroup = (router) => {
     /* --------------------------------- INVITES -------------------------------- */
 
     router.post('/invites/generate', TeacherInviteValidator, InviteController.generateLink);
-    router.post('/invites/student/generate', InviteController.generateStudentLink);
+    router.post('/invites/student/generate', StudentInviteValidator, InviteController.generateStudentLink);
     router.get('/invites/read', InviteController.invites);
     router.get('/invites/read/:id', InviteController.invite);
     router.get('/invites/student/info/:code', InviteController.studentInvite);
     router.get('/invites/info/:code', InviteController.inviteByCode);
     router.delete('/invites/delete/:id', InviteController.delete);
-    router.post('/invites/student/accept', InviteController.studentAccept);
-    router.post('/invites/teacher/accept', InviteController.teacherAccept);
+    router.post('/invites/student/accept', AcceptStudentValidator, InviteController.studentAccept);
+    router.post('/invites/teacher/accept', AcceptTeacherValidator, InviteController.teacherAccept);
 
     router.post('/admin/login', AuthorizationController.login);
 

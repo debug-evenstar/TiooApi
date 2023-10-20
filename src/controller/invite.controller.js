@@ -31,9 +31,8 @@ class InviteController {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
         console.log(req.body)
-        return
-        try {
 
+        try {
             req.body.code = InviteController.generateReferralCode(8);
 
             const inviteInstance = await Invite.create(req.body);
@@ -51,6 +50,12 @@ class InviteController {
     }
 
     static async generateStudentLink(req, res) {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+        console.log(req.body)
 
         try {
 
