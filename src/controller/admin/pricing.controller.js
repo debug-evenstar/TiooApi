@@ -7,6 +7,7 @@ class PriceController {
 
     static async create(req, res) {
 
+
         const data = req.body;
 
         const errors = validationResult(req);
@@ -117,6 +118,12 @@ class PriceController {
 
 
     static async update(req, res) {
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
 
         try {
 

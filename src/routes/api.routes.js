@@ -55,7 +55,7 @@ const { CreateClassArm, UpdateClassArm, CreateBulkClassArmValidator } = require(
 const { TeacherInviteValidator, StudentInviteValidator, AcceptTeacherValidator, AcceptStudentValidator } = require('./validators/InviteValidator');
 const { CreateSubjectValidator, UpdateSubjectValidator } = require('./validators/SubjectValidator');
 const { InviteTeacherValidator, UnAssignSubjectTeacherValidator: AssignSubjectTeacherValidator, UnAssignSubjectTeacherValidator } = require('./validators/TeacherValidator');
-const { PricingValidator } = require('./validators/PricingValidators');
+const { PricingValidator, UpdatePricingValidator } = require('./validators/PricingValidators');
 
 
 
@@ -222,7 +222,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
     router.post('/teacher/assignsubject', AssignSubjectTeacherValidator, TeacherController.assignSubjectToTeacher);
-    router.post('/teacher/unassignsubject',UnAssignSubjectTeacherValidator, TeacherController.unAssignSubjectToTeacher);
+    router.post('/teacher/unassignsubject', UnAssignSubjectTeacherValidator, TeacherController.unAssignSubjectToTeacher);
     router.get('/teacher/students/:id', TeacherController.teacherStudents);
     router.get('/teacher/subjectswithLessons/:id', TeacherController.teacherSubjectsWithLessons)
     router.get('/teacher/subjectswithLessonscount/:id', TeacherController.teacherSubjectsWithLessonsCount)
@@ -337,7 +337,7 @@ const AdminRoutesGroup = (router) => {
 
     router.post('/admin/settings/pricing', PricingValidator, PriceController.create);
     router.get('/admin/settings/pricing', PriceController.read);
-    router.put('/admin/settings/pricing', PriceController.update);
+    router.put('/admin/settings/pricing', UpdatePricingValidator, PriceController.update);
     router.delete('/admin/settings/pricing/:id', PriceController.delete);
 
     // router.get('/admin/user',  TokenMiddleware.checkAuthorization(['manage_admin']), AuthorizationController.readAdminUser);
