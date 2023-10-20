@@ -53,6 +53,7 @@ const { SchoolClassRemoveValidator: ClassValidator, SchoolClassRemoveValidator: 
 const { CreateClass, CreateBulkClassValidator, BulkClassValidator, validateClassList, BulkCreateClass, ClassArmTeacherValidator, ClassAddSubjectValidator, AddStudentToClassValidator } = require('./validators/ClassValidator');
 const { CreateClassArm, UpdateClassArm, CreateBulkClassArmValidator } = require('./validators/ClassArmValidator');
 const { TeacherInviteValidator, StudentInviteValidator, AcceptTeacherValidator, AcceptStudentValidator } = require('./validators/InviteValidator');
+const SubjectValidator = require('./validators/SubjectValidator');
 
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
@@ -83,8 +84,8 @@ const OpenRoutesGroup = (router) => {
 
     router.get('/student/invited/:id', StudentController.fetchInvitedStudent);
     router.post('/student/invite/accept', AcceptValidator, StudentController.acceptInvitation);
-    router.post('/student/parent/signup_first', ParentSignupValidator1 ,StudentController.parentSignupOne);
-    router.post('/student/parent/signup_second',ParentValidator, StudentController.parentSignupTwo);
+    router.post('/student/parent/signup_first', ParentSignupValidator1, StudentController.parentSignupOne);
+    router.post('/student/parent/signup_second', ParentValidator, StudentController.parentSignupTwo);
 
     /* --------------------------------- INVITES -------------------------------- */
 
@@ -194,7 +195,7 @@ const AuthorizedRoutesGroup = (router) => {
 
     /* -------------------------------- SUBJECTS -------------------------------- */
 
-    router.post('/subjects/create', SubjectController.create);
+    router.post('/subjects/create', SubjectValidator.CreateSubjectValidator, SubjectController.create);
     router.get('/subjects/read', SubjectController.readAll);
     router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
     router.get('/subjects/school/lessons/:id', SubjectController.schoolSubjectLessons);
