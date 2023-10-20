@@ -39,6 +39,7 @@ class AdminLibraryController {
 
             const classInstance = await Class.findAll({ where: { id: [...req.body.class] } });
 
+
             if (!classInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
@@ -48,6 +49,8 @@ class AdminLibraryController {
             const schoolInstance = await accountInstance.getSchoolManagement();
 
             const classIds = classInstance.map((element)=> element.id);
+
+            console.log(classIds);
 
             const classarmInstances = await ClassArm.findAll({ where: { id: [...classInstance.map((element)=> element.id)] } });
 
@@ -61,9 +64,14 @@ class AdminLibraryController {
 
             const subjectArms = await subjectInstance.addClassArms(classarmInstances);
 
+
+            const respons = await Subject.findByPk(subjectInstance.id, {include: [Class]})
+
+            console.log(respons, subjectInstance.id, )
+
             // ------------------------------------------
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {} });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {subject: respons}, selected_classes: classIds });
 
         } catch (error) {
             console.log(error);
