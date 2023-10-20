@@ -82,11 +82,6 @@ class classArms {
 
             }
 
-
-
-
-
-
             const classWithArms = await Class.findByPk(classId, { include: [ClassArm] });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: classWithArms });

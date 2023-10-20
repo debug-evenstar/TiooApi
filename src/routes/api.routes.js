@@ -52,6 +52,7 @@ const TokenMiddleware = require('../middleware/token.middleware');
 const { SchoolClassRemoveValidator: ClassValidator, SchoolClassRemoveValidator: ClassRemoveValidator, SchoolClassRemoveValidator } = require('./validators/SchoolValidator');
 const { CreateClass, CreateBulkClassValidator, BulkClassValidator, validateClassList, BulkCreateClass, ClassArmTeacherValidator, ClassAddSubjectValidator, AddStudentToClassValidator } = require('./validators/ClassValidator');
 const { CreateClassArm, UpdateClassArm, CreateBulkClassArmValidator } = require('./validators/ClassArmValidator');
+const { TeacherInviteValidator } = require('./validators/InviteValidator');
 
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
@@ -87,7 +88,7 @@ const OpenRoutesGroup = (router) => {
 
     /* --------------------------------- INVITES -------------------------------- */
 
-    router.post('/invites/generate', InviteController.generateLink);
+    router.post('/invites/generate', TeacherInviteValidator, InviteController.generateLink);
     router.post('/invites/student/generate', InviteController.generateStudentLink);
     router.get('/invites/read', InviteController.invites);
     router.get('/invites/read/:id', InviteController.invite);

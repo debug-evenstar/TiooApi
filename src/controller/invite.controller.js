@@ -25,7 +25,13 @@ class InviteController {
     /*-----------------------------------| GENERATE INVITE LINK |-----------------------------------*/
 
     static async generateLink(req, res) {
+        const errors = validationResult(req);
 
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+        console.log(req.body)
+        return
         try {
 
             req.body.code = InviteController.generateReferralCode(8);
@@ -136,9 +142,9 @@ class InviteController {
             let invitedClassArms;
 
             if (process.env.ENVIRONMENT) {
-                 invitedClassArms = JSON.parse(inviteInstance.classarms);
+                invitedClassArms = JSON.parse(inviteInstance.classarms);
             } else {
-                 invitedClassArms = inviteInstance.classarms;
+                invitedClassArms = inviteInstance.classarms;
             }
 
             const classArmInstance = await ClassArm.findByPk(invitedClassArms[0]);
@@ -180,20 +186,20 @@ class InviteController {
             let invitedClassArms;
 
             if (process.env.ENVIRONMENT) {
-                 invitedClasses = JSON.parse(inviteInstance.classes);
-                 invitedClassArms = JSON.parse(inviteInstance.classarms);
+                invitedClasses = JSON.parse(inviteInstance.classes);
+                invitedClassArms = JSON.parse(inviteInstance.classarms);
             } else {
-                 invitedClasses = inviteInstance.classes;
-                 invitedClassArms = inviteInstance.classarms;
+                invitedClasses = inviteInstance.classes;
+                invitedClassArms = inviteInstance.classarms;
             }
 
             console.log(inviteInstance)
 
             const subjects = await Subject.findAll({ where: { id: [...inviteInstance.subjects] }, attributes: { exclude: ["SchoolManagementId"] } });
 
-            const classes = await Class.findAll({where: {id: [...invitedClasses]}, attributes: {exclude: ["SchoolManagementId"]}});
+            const classes = await Class.findAll({ where: { id: [...invitedClasses] }, attributes: { exclude: ["SchoolManagementId"] } });
 
-            const classArms = await ClassArm.findAll({where: {id: [...invitedClassArms]}, attributes: {exclude: ["SchoolManagementId"]}});
+            const classArms = await ClassArm.findAll({ where: { id: [...invitedClassArms] }, attributes: { exclude: ["SchoolManagementId"] } });
 
 
             let payload;
@@ -205,8 +211,8 @@ class InviteController {
                 "flag": "invited",
                 "classes": invitedClasses,
                 "classarms": invitedClassArms,
-                "class_naming": classes.map(data => ({'naming': data.naming})),
-                "arms_naming": classArms.map(data => ({'naming': data.naming})),
+                "class_naming": classes.map(data => ({ 'naming': data.naming })),
+                "arms_naming": classArms.map(data => ({ 'naming': data.naming })),
                 "Subjects": subjects,
                 "schoolId": inviteInstance.schoolId
             }
@@ -280,8 +286,8 @@ class InviteController {
             }
 
             req.body.status = "active",
-            req.body.flag = "active",
-            req.body.verification_status = 1;
+                req.body.flag = "active",
+                req.body.verification_status = 1;
 
             const registeredAccount = await Account.create(req.body);
             const newValidation = await Validation.create({ otp });
@@ -290,7 +296,7 @@ class InviteController {
             const teacherInstance = await Teacher.create(req.body);
             await registeredAccount.setTeacher(teacherInstance);
 
-            const classArmsInstance = await ClassArm.findAll({ where: { id: [...req.body.classes] } , include : [Class]});
+            const classArmsInstance = await ClassArm.findAll({ where: { id: [...req.body.classes] }, include: [Class] });
             const subjectInstance = await Subject.findAll({ where: { id: [...req.body.subjects] } });
 
             let getClasses = classArmsInstance.map((arm) =>
@@ -298,7 +304,7 @@ class InviteController {
             );
 
             const classInstance = getClasses.filter((armclass, index) => {
-                const classIds = getClasses.map((item)=> item.id);
+                const classIds = getClasses.map((item) => item.id);
                 return classIds.indexOf(armclass.id) == index;
             });
 
@@ -357,11 +363,11 @@ class InviteController {
             }
 
             req.body.status = "active",
-            req.body.flag = "active",
-            req.body.verification_status = 1;
+                req.body.flag = "active",
+                req.body.verification_status = 1;
 
             const registeredAccount = await Account.create(req.body);
-            
+
             const newValidation = await Validation.create({ otp });
             await registeredAccount.setValidation(newValidation);
 
