@@ -43,7 +43,7 @@ const CartController = require('../controller/cart.controller');
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
 const AuthenticationMiddleware = require('../middleware/token.middleware');
-const { InviteValidator, AcceptValidator, BulkStudentValidator } = require('./validators/StudentValidators');
+const { InviteValidator, AcceptValidator, BulkStudentValidator, ParentSignupValidator1, ParentValidator } = require('./validators/StudentValidators');
 const UploadService = require('../services/upload.service');
 const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
@@ -83,8 +83,8 @@ const OpenRoutesGroup = (router) => {
 
     router.get('/student/invited/:id', StudentController.fetchInvitedStudent);
     router.post('/student/invite/accept', AcceptValidator, StudentController.acceptInvitation);
-    router.post('/student/parent/signup_first', StudentController.parentSignupOne);
-    router.post('/student/parent/signup_second', StudentController.parentSignupTwo);
+    router.post('/student/parent/signup_first', ParentSignupValidator1 ,StudentController.parentSignupOne);
+    router.post('/student/parent/signup_second',ParentValidator, StudentController.parentSignupTwo);
 
     /* --------------------------------- INVITES -------------------------------- */
 
