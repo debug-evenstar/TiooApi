@@ -53,7 +53,8 @@ const { SchoolClassRemoveValidator: ClassValidator, SchoolClassRemoveValidator: 
 const { CreateClass, CreateBulkClassValidator, BulkClassValidator, validateClassList, BulkCreateClass, ClassArmTeacherValidator, ClassAddSubjectValidator, AddStudentToClassValidator } = require('./validators/ClassValidator');
 const { CreateClassArm, UpdateClassArm, CreateBulkClassArmValidator } = require('./validators/ClassArmValidator');
 const { TeacherInviteValidator, StudentInviteValidator, AcceptTeacherValidator, AcceptStudentValidator } = require('./validators/InviteValidator');
-const SubjectValidator = require('./validators/SubjectValidator');
+const { CreateSubjectValidator, UpdateSubjectValidator } = require('./validators/SubjectValidator');
+
 
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
@@ -195,7 +196,7 @@ const AuthorizedRoutesGroup = (router) => {
 
     /* -------------------------------- SUBJECTS -------------------------------- */
 
-    router.post('/subjects/create', SubjectValidator.CreateSubjectValidator, SubjectController.create);
+    router.post('/subjects/create', CreateSubjectValidator, SubjectController.create);
     router.get('/subjects/read', SubjectController.readAll);
     router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
     router.get('/subjects/school/lessons/:id', SubjectController.schoolSubjectLessons);
@@ -205,7 +206,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/subjects/teachers/read/:id', SubjectController.subjectTeachers);
     router.get('/subjects/students/read/:id', SubjectController.subjectStudents);
     router.get('/subjects/read/:id', SubjectController.readBySubjectId);
-    router.put('/subjects/update', SubjectController.update);
+    router.put('/subjects/update', UpdateSubjectValidator, SubjectController.update);
     router.get('/subjects/lessons/', SubjectController.subjectsWithLessons);
     router.get('/subjects/lessons/count', SubjectController.subjectsWithLessonCount);
     router.get('/subjects/lessons/:subjectId', SubjectController.subjectLessons);

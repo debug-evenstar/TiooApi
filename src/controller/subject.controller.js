@@ -8,6 +8,11 @@ class SubjectController {
     /*-----------------------------------| CREATE SUBJECT |-----------------------------------*/
 
     static async create(req, res) {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
 
         try {
 
@@ -118,6 +123,11 @@ class SubjectController {
     /*-----------------------------------| UPDATE SUBJECT |-----------------------------------*/
 
     static async update(req, res) {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
 
         try {
 
