@@ -264,7 +264,6 @@ class InviteController {
 
     static async teacherAccept(req, res) {
 
-
         const errors = validationResult(req);
         const otp = Math.floor(Math.random() * 900000) + 100000;
         const data = req.body;

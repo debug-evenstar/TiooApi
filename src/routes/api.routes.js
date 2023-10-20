@@ -43,7 +43,7 @@ const CartController = require('../controller/cart.controller');
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
 const AuthenticationMiddleware = require('../middleware/token.middleware');
-const { InviteValidator, AcceptValidator } = require('./validators/StudentValidators');
+const { InviteValidator, AcceptValidator, BulkStudentValidator } = require('./validators/StudentValidators');
 const UploadService = require('../services/upload.service');
 const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
@@ -181,7 +181,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/class/remove/subject', ClassController.removeSubjectFromClass)
 
     /* --------------------------------- CLASS ARMS -------------------------------- */
-    router.post('/class/arms/create',CreateClassArm, ClassArmsController.create);
+    router.post('/class/arms/create', CreateClassArm, ClassArmsController.create);
     router.post('/class/arms/create_bulk', CreateBulkClassArmValidator, ClassArmsController.createBulk);
     router.get('/class/arms/read', ClassArmsController.readAll);
     router.get('/class/:id/arms', ClassArmsController.readAllByClass);
@@ -235,7 +235,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/student/readinvited/:id', StudentController.invitedStudents);
     router.get('/students/classess/:id', StudentController.getStudentClass); //something is wrong with this controller Six;
     router.delete('/students/delete/:id', StudentController.deleteStudent);
-    router.post('/students/bulk/invite', StudentController.sendBulkInvite);
+    router.post('/students/bulk/invite', BulkStudentValidator, StudentController.sendBulkInvite);
     router.get('/student/subjects', StudentController.studentSubjects);
     router.get('/student/classteacher', StudentController.studentClassTeacher);
     router.get('/student/classmates', StudentController.studentMates);

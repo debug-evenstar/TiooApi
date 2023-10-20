@@ -132,6 +132,7 @@ class StudentController {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
 
+
         try {
 
             const schoolAccountInstance = await Account.findByPk(id);
@@ -903,26 +904,26 @@ class StudentController {
 
             const studentClass = await studentInstance.getClass();
 
-            const studentLibrary = await Subject.findAll({where: {library: true}});
-            
+            const studentLibrary = await Subject.findAll({ where: { library: true } });
+
             // await studentClass.getSubjects({where: {library: true}, through: []});
 
-            const response = await Promise.all(studentLibrary.map( async (library)=>{
+            const response = await Promise.all(studentLibrary.map(async (library) => {
 
                 const lessons = await library.getLessons();
 
                 delete library.dataValues.ClassSubjects;
                 delete library.dataValues.ages;
 
-              const payload = {
-                ...library.dataValues,
-                lessons: lessons.length,
-                class: studentClass.id,
+                const payload = {
+                    ...library.dataValues,
+                    lessons: lessons.length,
+                    class: studentClass.id,
 
-            };
+                };
 
 
-              return payload;
+                return payload;
 
             }));
 
@@ -950,13 +951,13 @@ class StudentController {
 
             const students = await school.getStudents();
 
-            const response = await Promise.all(students.map( async (student)=>{
+            const response = await Promise.all(students.map(async (student) => {
 
                 const studentAccount = await student.getAccount();
 
-               const {name, email, phone } = studentAccount;
+                const { name, email, phone } = studentAccount;
 
-                return  {name, email, phone, age: student.age, school: school.school_name };
+                return { name, email, phone, age: student.age, school: school.school_name };
 
             }));
 
