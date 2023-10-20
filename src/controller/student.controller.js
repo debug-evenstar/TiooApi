@@ -132,7 +132,6 @@ class StudentController {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
 
-
         try {
 
             const schoolAccountInstance = await Account.findByPk(id);

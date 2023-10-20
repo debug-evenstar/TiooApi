@@ -17,22 +17,48 @@ module.exports = {
         body('accountId').notEmpty().isString().withMessage("accountId field is required and its numeric"),
     ],
 
-    BulkStudentValidator : [
+    BulkStudentValidator: [
         body('email').isEmail()
-          .notEmpty()
-          .isArray({ min: 1 })
-          .withMessage('Email field is required and must be a non-empty array')
-          .custom((emails, { req }) => {
-            const isValid = emails.every(email => typeof email === 'string');
-            if (!isValid) {
-              throw new Error('All elements in the email array must be valid email addresses');
-            }
-            return true;
-          }),
-      
+            .notEmpty()
+            .isArray({ min: 1 })
+            .withMessage('Email field is required and must be a non-empty array')
+            .custom((emails, { req }) => {
+                console.log(req.body)
+                const isValid = emails.every(email => typeof email === 'string');
+                if (!isValid) {
+                    throw new Error('All elements in the email array must be valid email addresses');
+                }
+                return true;
+            }),
+
         body('arm')
+            .notEmpty()
+            .isInt({ min: 1 })
+            .withMessage('Arm field is required and must be a positive integer'),
+    ],
+
+
+    AcceptInviteStudentValidator : [
+        body('name')
           .notEmpty()
-          .isInt({ min: 1 })
-          .withMessage('Arm field is required and must be a positive integer'),
+          .isString()
+          .withMessage('Name field is required and must be a string'),
+      
+        body('phone')
+          .notEmpty()
+          .isString()
+          .isMobilePhone()
+          .withMessage('Phone field is required and must be a valid phone number'),
+      
+        body('password')
+          .notEmpty()
+          .isString()
+          .isLength({ min: 4 })
+          .withMessage('Password field is required and must be at least 4 characters long'),
+      
+        body('accountId')
+          .notEmpty()
+          .isString()
+          .withMessage('Account ID field is required and must be a string'),
       ]
 }
