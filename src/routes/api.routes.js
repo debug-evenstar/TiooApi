@@ -54,6 +54,7 @@ const { CreateClass, CreateBulkClassValidator, BulkClassValidator, validateClass
 const { CreateClassArm, UpdateClassArm, CreateBulkClassArmValidator } = require('./validators/ClassArmValidator');
 const { TeacherInviteValidator, StudentInviteValidator, AcceptTeacherValidator, AcceptStudentValidator } = require('./validators/InviteValidator');
 const { CreateSubjectValidator, UpdateSubjectValidator } = require('./validators/SubjectValidator');
+const { InviteTeacherValidator } = require('./validators/TeacherValidator');
 
 
 
@@ -80,7 +81,7 @@ const OpenRoutesGroup = (router) => {
     router.post('/school/setup', SchoolSetupValidator, SchoolManagementController.setup);
     router.post('/freelancer/setup', SchoolSetupValidator, FreelancerController.setup);
 
-    router.post('/teacher/invite/accept', TeacherController.acceptInvite);
+    router.post('/teacher/invite/accept', AcceptTeacherValidator, TeacherController.acceptInvite);
     router.get('/teacher/invited/:id', TeacherController.fetchInvitedTeacher);
 
     router.get('/student/invited/:id', StudentController.fetchInvitedStudent);
@@ -216,7 +217,7 @@ const AuthorizedRoutesGroup = (router) => {
 
     /* --------------------------------- TEACHERS -------------------------------- */
 
-    router.post('/teacher/invite', TeacherController.sendInvite);
+    router.post('/teacher/invite', InviteTeacherValidator, TeacherController.sendInvite);
     router.get('/teacher/readall', TeacherController.allTeachers);
     router.get('/teacher/readInvited', TeacherController.invitedTeachers);
     router.post('/teacher/assignsubject', TeacherController.assignSubjectToTeacher);
