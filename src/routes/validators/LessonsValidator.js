@@ -33,13 +33,13 @@ module.exports = {
 
         body('file')
             .custom((value, { req }) => {
-                console.log([value,req.file,!req.file, req.body])
+                //    console.log([value, req.file, !req.file, req.body])
                 if (req.file == undefined) {
                     throw new Error('Image file is required');
                     return
                 }
-                console.log(req.file.mimetype)
-                
+                // console.log(req.file.mimetype)
+
                 if (!req.file.mimetype.toLowerCase() == 'image/jpeg') {
                     throw new Error('File must be an image');
                 }

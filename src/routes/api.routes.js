@@ -67,7 +67,7 @@ const { LessonValidator } = require('./validators/LessonsValidator');
 
 const OpenRoutesGroup = (router) => {
 
-    router.post('/admin/librarys', UploadService.uploadLesson.single('file'), LessonValidator, AdminLibraryController.create);
+    // router.post('/admin/librarys', UploadService.uploadLesson.single('file'), LessonValidator, AdminLibraryController.create);
 
     router.get('/error/logs', ErrorLogs.fetchErrors);
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
@@ -389,7 +389,7 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
     router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
 
-    router.post('/admin/library', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
+    router.post('/admin/library', UploadService.uploadLesson.single('file'), LessonValidator, AdminLibraryController.create);
     router.get('/admin/library', AdminLibraryController.read);
     router.delete('/admin/librarylesson/:id', AdminLibraryController.deleteLibraryLesson);
     router.delete('/admin/library/:id', AdminLibraryController.deleteLibrary);

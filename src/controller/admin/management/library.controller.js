@@ -129,11 +129,11 @@ class AdminLibraryController {
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
-        console.log(req.body);
-        console.log(req.file);
-        return
+
         const data = req.body;
 
+
+        return
         if (req.file) {
             req.body.file = req.file.path;
         }
