@@ -21,6 +21,14 @@ class LessonController {
 
     static async createLesson(req, res) {
 
+
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+        console.log(req.body, req.files)
+        return
         let filePaths = [];
         const today = new Date();
         const threeDaysAhead = new Date();
@@ -1056,7 +1064,7 @@ class LessonController {
             if (filePaths.length > 0) {
 
                 for (var item of filePaths) {
-                    console.log("this is the item",item)
+                    console.log("this is the item", item)
                     const ImageResponse = await cloudinaryUploadImage(item);
                     payload.push(ImageResponse.secure_url);
                 }

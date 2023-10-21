@@ -49,6 +49,102 @@ module.exports = {
 
                 return true;
             }),
+    ],
+
+    CreateLessonValidator: [
+        body('topic')
+            .notEmpty()
+            .isString()
+            .withMessage('Topic field is required and must be a string'),
+
+        body('duration')
+            .notEmpty()
+            .isString()
+            .withMessage('Duration field is required and must be a string'),
+
+        body('curriculumn')
+            .isString()
+            .optional()
+            .withMessage('Curriculumn must be a string'),
+
+        body('subject')
+            .notEmpty()
+            .isString()
+            .withMessage('Subject field is required and must be a string'),
+
+        body('start_date')
+            .isString()
+            .optional()
+            .withMessage('Start Date must be a string'),
+
+        body('end_date')
+            .isString()
+            .optional()
+            .withMessage('End Date must be a string'),
+
+        body('objective')
+            .isString()
+            .optional()
+            .withMessage('Objective must be a string'),
+
+        body('additional_instruction')
+            .isString()
+            .optional()
+            .withMessage('Additional Instruction must be a string'),
+
+        body('week')
+            .notEmpty()
+            .isString()
+            .withMessage('Week field is required and must be a string'),
+
+        body('status')
+            .notEmpty()
+            .isString()
+            .withMessage('Status field is required and must be a string'),
+
+        body('term')
+            .notEmpty()
+            .isString()
+            .withMessage('Term field is required and must be a string'),
+
+        body('class')
+            .notEmpty()
+            .isString()
+            .withMessage('Class field is required and must be a string'),
+
+        body('class_arms')
+            .isArray()
+            .custom((value) => {
+                console.log(JSON.parse(value).length)
+                console.log(typeof JSON.parse(value).length)
+                if (JSON.parse(value).length === 0) {
+                    throw new Error('At least one class arm must be selected');
+                }
+                return true;
+            }
+            ),
+
+        body('file')
+            .custom((files, { req }) => {
+                if (!files) {
+                    throw new Error('Image files are required');
+                }
+
+                if (!Array.isArray(files)) {
+                    throw new Error('Files must be an array');
+                }
+
+                // Validate each file in the array
+                for (const file of files) {
+                    if (!file.mimetype.startsWith('image/')) {
+                        throw new Error('All files must be images');
+                    }
+                }
+
+                return true;
+            }),
+
+
     ]
 
 }
