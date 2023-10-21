@@ -27,8 +27,8 @@ class LessonController {
         if (!errors.isEmpty()) {
             return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
         }
-        console.log(req.body, req.files)
-        return
+        // console.log(req.body, req.files)
+        // return
         let filePaths = [];
         const today = new Date();
         const threeDaysAhead = new Date();

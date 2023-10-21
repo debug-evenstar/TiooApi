@@ -69,7 +69,7 @@ const OpenRoutesGroup = (router) => {
 
     // router.post('/admin/librarys', UploadService.uploadLesson.single('file'), LessonValidator, AdminLibraryController.create);
 
-    router.post('/lesson/creates', UploadService.uploadLesson.array('files'), CreateLessonValidator, LessonController.createLesson);
+    // router.post('/lesson/creates', UploadService.uploadLesson.array('files'), CreateLessonValidator, LessonController.createLesson);
 
     router.get('/error/logs', ErrorLogs.fetchErrors);
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);

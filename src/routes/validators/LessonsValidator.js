@@ -113,9 +113,10 @@ module.exports = {
             .withMessage('Class field is required and must be a string'),
 
         body('class_arms')
-            .isArray()
+            .isString()
             .custom((value) => {
-                console.log(JSON.parse(value).length)
+                console.log(typeof JSON.parse(value))
+               
                 console.log(typeof JSON.parse(value).length)
                 if (JSON.parse(value).length === 0) {
                     throw new Error('At least one class arm must be selected');
@@ -126,16 +127,16 @@ module.exports = {
 
         body('file')
             .custom((files, { req }) => {
-                if (!files) {
-                    throw new Error('Image files are required');
+                if (req.files == undefined) {
+                    throw new Error('Image file is required');
+                    return
                 }
 
-                if (!Array.isArray(files)) {
+                if (!Array.isArray(req.files)) {
                     throw new Error('Files must be an array');
                 }
 
-                // Validate each file in the array
-                for (const file of files) {
+                for (const file of req.files) {
                     if (!file.mimetype.startsWith('image/')) {
                         throw new Error('All files must be images');
                     }
