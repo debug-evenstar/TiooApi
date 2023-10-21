@@ -58,6 +58,8 @@ const { InviteTeacherValidator, UnAssignSubjectTeacherValidator: AssignSubjectTe
 const { PricingValidator, UpdatePricingValidator } = require('./validators/PricingValidators');
 const { CreateAdminValidator, AdminLoginValidator } = require('./validators/AdminValidator');
 const { CreateCouponValidator, UpdateCouponValidator, CouponActivationValidator } = require('./validators/CouponValidation');
+const { LessonValidator } = require('./validators/LessonsValidator');
+
 
 
 
@@ -65,7 +67,7 @@ const { CreateCouponValidator, UpdateCouponValidator, CouponActivationValidator 
 
 const OpenRoutesGroup = (router) => {
 
-    router.post('/admin/librarys', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
+    router.post('/admin/librarys', UploadService.uploadLesson.single('file'), LessonValidator, AdminLibraryController.create);
 
     router.get('/error/logs', ErrorLogs.fetchErrors);
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
