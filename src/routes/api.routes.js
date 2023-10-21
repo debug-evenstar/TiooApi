@@ -57,13 +57,16 @@ const { CreateSubjectValidator, UpdateSubjectValidator } = require('./validators
 const { InviteTeacherValidator, UnAssignSubjectTeacherValidator: AssignSubjectTeacherValidator, UnAssignSubjectTeacherValidator } = require('./validators/TeacherValidator');
 const { PricingValidator, UpdatePricingValidator } = require('./validators/PricingValidators');
 const { CreateAdminValidator, AdminLoginValidator } = require('./validators/AdminValidator');
-const { CreateCouponValidator, UpdateCouponValidator } = require('./validators/CouponValidation');
+const { CreateCouponValidator, UpdateCouponValidator, CouponActivationValidator } = require('./validators/CouponValidation');
 
 
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
 const OpenRoutesGroup = (router) => {
+
+    router.post('/admin/librarys', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
+
     router.get('/error/logs', ErrorLogs.fetchErrors);
     router.post('/account/signin', SigninValidator, AuthenicationController.signInAccount);
     router.post('/account/signin/external/student', SigninValidator, ExternalSchoolController.loginExeternalStudent);
@@ -357,7 +360,8 @@ const AdminRoutesGroup = (router) => {
     router.get('/admin/coupon', CouponController.read);
     router.delete('/admin/coupon', CouponController.delete);
     router.put('/admin/coupon', UpdateCouponValidator, CouponController.update);
-    router.post('/admin/coupon/activate', CouponController.activate);
+
+    router.post('/admin/coupon/activate', CouponActivationValidator, CouponController.activate);
 
     router.get('/admin/management/schools', AdminSchoolController.read);
     router.get('/admin/management/groupedLessons', AdminSchoolController.lessonsGroupedByClasses);

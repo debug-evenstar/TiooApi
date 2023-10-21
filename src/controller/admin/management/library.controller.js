@@ -24,15 +24,15 @@ class AdminLibraryController {
         let cover = "";
 
         try {
-            
+
 
             // --------------------------------------------------------- subject
 
             if (req.file) {
                 const filePath = req.file.path;
-                console.log("this is the item",filePath)
+                console.log("this is the item", filePath)
                 const ImageResponse = await cloudinaryUploadImage(filePath);
-                req.body.cover =  ImageResponse.secure_url;
+                req.body.cover = ImageResponse.secure_url;
 
             }
 
@@ -47,9 +47,9 @@ class AdminLibraryController {
 
             const schoolInstance = await accountInstance.getSchoolManagement();
 
-            const classIds = classInstance.map((element)=> element.id);
+            const classIds = classInstance.map((element) => element.id);
 
-            const classarmInstances = await ClassArm.findAll({ where: { id: [...classInstance.map((element)=> element.id)] } });
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...classInstance.map((element) => element.id)] } });
 
             req.body.status = "unpublished";
 
@@ -99,16 +99,16 @@ class AdminLibraryController {
                 }
             );
 
-           const response = await Promise.all(subjectInstance.map( async (element)=>{
-             const rawClasses = await element.getClasses()
-             const lessonCount = element.Lessons.length
+            const response = await Promise.all(subjectInstance.map(async (element) => {
+                const rawClasses = await element.getClasses()
+                const lessonCount = element.Lessons.length
 
-             const classes = rawClasses.map((element)=> ({ id: element.id, naming: element.naming, type: element.type }));
+                const classes = rawClasses.map((element) => ({ id: element.id, naming: element.naming, type: element.type }));
 
-             delete element.dataValues.Lessons;
+                delete element.dataValues.Lessons;
 
-             return {...element.dataValues, classes, lessonCount}
-           }))
+                return { ...element.dataValues, classes, lessonCount }
+            }))
 
             // ------------------------------------------
 
@@ -124,6 +124,14 @@ class AdminLibraryController {
 
     static async create(req, res) {
 
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
+        }
+        console.log(req.body);
+        console.log(req.file);
+        return
         const data = req.body;
 
         if (req.file) {
@@ -197,7 +205,7 @@ class AdminLibraryController {
             let groupInstance;
             let groupId;
 
-            const arms = classarmInstances.map((element)=> element.id);
+            const arms = classarmInstances.map((element) => element.id);
 
             for (let i = 0; i < group.length; i++) {
 
@@ -326,7 +334,7 @@ class AdminLibraryController {
         };
     }
 
-    
+
 
     static async subjectGroupedLessons(req, res) {
 
@@ -370,7 +378,7 @@ class AdminLibraryController {
             threeDaysAhead.setDate(today.getDate() + 3);
             let filePath = "";
 
-            let payload =  {
+            let payload = {
                 topic: req.body.title,
                 objective: req.body.objective,
                 age: req.body.age,
@@ -386,7 +394,7 @@ class AdminLibraryController {
 
             if (req.files['preview'].length > 0) {
                 for (var item of req.files['preview']) {
-                    console.log("this is the item",item)
+                    console.log("this is the item", item)
                     const ImageResponse = await cloudinaryUploadImage(item.path);
                     preview.push(ImageResponse.secure_url);
                 }
@@ -458,14 +466,14 @@ class AdminLibraryController {
 
             /*------------------------------------------------
             Grouping Libbrary Lesson Flow
-            ----------------------------------------------*/ 
+            ----------------------------------------------*/
 
             const group = await Group.findAll({ include: [ClassArm], where: { SubjectId: req.body.subject } });
 
             let groupInstance;
             let groupId;
 
-            const arms = classarmInstances.map((element)=> element.id);
+            const arms = classarmInstances.map((element) => element.id);
 
             for (let i = 0; i < group.length; i++) {
 
@@ -540,7 +548,7 @@ class AdminLibraryController {
             threeDaysAhead.setDate(today.getDate() + 3);
             let filePath = "";
 
-            let payload =  {
+            let payload = {
                 topic: req.body.title,
                 objective: req.body.objective,
                 age: req.body.age,
@@ -565,7 +573,7 @@ class AdminLibraryController {
             const subject = await lessonInstance.getSubject();
 
             const slides = await LessonTemplateProvider.loadLessonSlidesFromTemplate(filePath, grade.id, subject.id);
-            
+
             const parseSlides = [];
 
             const previousSlides = await lessonInstance.getLessonSlides({
@@ -681,7 +689,7 @@ class AdminLibraryController {
 
             console.log(libraryInstance);
 
-            libraryInstance.library_status =  libraryInstance.library_status == 'unpublished' ? 'published': 'unpublished'
+            libraryInstance.library_status = libraryInstance.library_status == 'unpublished' ? 'published' : 'unpublished'
 
             const response = await libraryInstance.save();
 
@@ -758,7 +766,7 @@ class AdminLibraryController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            libraryLessonInstance.published =  libraryLessonInstance.published == 0 ? 1: 0
+            libraryLessonInstance.published = libraryLessonInstance.published == 0 ? 1 : 0
 
             const response = await libraryLessonInstance.save();
 
@@ -812,7 +820,7 @@ class AdminLibraryController {
 
             const response = await libraryInstance.getClasses();
 
-            const filter = response.map((element)=> ({ id: element.id, naming: element.naming, type: element.type }));
+            const filter = response.map((element) => ({ id: element.id, naming: element.naming, type: element.type }));
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: filter });
 
@@ -839,7 +847,7 @@ class AdminLibraryController {
 
     }
 
-    
+
 
 
 
