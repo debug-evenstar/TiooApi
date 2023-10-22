@@ -14,15 +14,15 @@ class Logger {
             if ( req.body.password) {
                 delete  req.body.password;
             }
-            const statusMessage = res.statusMessage;
-            const reqBody =  JSON.stringify(req.body);;
-            const responseBody = res._treblleResponsebody;
+            const status_message = res.statusMessage;
+            const req_body =  JSON.stringify(req.body);;
+            const response_body = res._treblleResponsebody;
             const params = JSON.stringify(req.params);
             const query = JSON.stringify(req.query);;
             const method = req.method;
             const url = req.url;
-            const originalUrl = req.url;
-            const payload = { statusMessage, reqBody, responseBody, params, query, method, url, body: reqBody, originalUrl, statuscode: JSON.stringify(res.statusCode)}
+            const original_url = req.url;
+            const payload = { status_message, reqBody, response_body, params, query, method, url, body: reqBody, original_url, statuscode: JSON.stringify(res.statusCode)}
 
             if(url !== '/logging'){
                try{

@@ -34,7 +34,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.JSON,
         allowNull: true,
       },
-      schoolId: {
+      school_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
       },

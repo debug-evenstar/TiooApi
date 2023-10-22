@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true
             },
 
-            dateOfBirth: {
+            date_of_birth: {
                 type: DataTypes.DATE,
                 allowNull: true,
             },
@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
                 defaultValue: "Nigeria"
             },
-            residentialAddress: {
+            residential_address: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },

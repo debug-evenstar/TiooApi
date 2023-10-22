@@ -6,8 +6,8 @@ class Relationships {
 
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
-        Account.hasOne(Validation, { foreignKey: 'accountId', as: 'validation' });
-        Validation.belongsTo(Account, { foreignKey: 'accountId', as: 'account' });
+        Account.hasOne(Validation, { foreignKey: 'account_id', as: 'validation' });
+        Validation.belongsTo(Account, { foreignKey: 'account_id', as: 'account' });
 
         Account.hasOne(SchoolManagement, { allowNull: true, onDelete: 'CASCADE'});
         SchoolManagement.belongsTo(Account, { allowNull: true });
@@ -105,32 +105,32 @@ class Relationships {
 
         //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 
-        Coupon.belongsToMany(Account, { through: 'CouponAccount' });
-        Account.belongsToMany(Coupon, { through: 'CouponAccount' });
+        Coupon.belongsToMany(Account, { through: 'coupon_account' });
+        Account.belongsToMany(Coupon, { through: 'coupon_account' });
 
-        Subject.belongsToMany(Teacher, { through: 'SubjectTeachers' });
-        Teacher.belongsToMany(Subject, { through: 'SubjectTeachers' });
+        Subject.belongsToMany(Teacher, { through: 'subject_teachers' });
+        Teacher.belongsToMany(Subject, { through: 'subject_teachers' });
 
-        Class.belongsToMany(Subject, { through: 'ClassSubjects' });
-        Subject.belongsToMany(Class, { through: 'ClassSubjects' });
+        Class.belongsToMany(Subject, { through: 'class_subjects' });
+        Subject.belongsToMany(Class, { through: 'class_subjects' });
 
-        ClassArm.belongsToMany(Subject, { through: 'ClassArmSubjects' });
-        Subject.belongsToMany(ClassArm, { through: 'ClassArmSubjects' });
+        ClassArm.belongsToMany(Subject, { through: 'classarm_subjects' });
+        Subject.belongsToMany(ClassArm, { through: 'classarm_subjects' });
 
-        Teacher.belongsToMany(Class, { through: 'TeacherClasses' });
-        Class.belongsToMany(Teacher, { through: 'TeacherClasses' });
+        Teacher.belongsToMany(Class, { through: 'teacher_classes' });
+        Class.belongsToMany(Teacher, { through: 'teacher_classes' });
 
-        Teacher.belongsToMany(ClassArm, { through: 'TeacherClassArms' });
-        ClassArm.belongsToMany(Teacher, { through: 'TeacherClassArms' });
+        Teacher.belongsToMany(ClassArm, { through: 'teacher_classarms' });
+        ClassArm.belongsToMany(Teacher, { through: 'teacher_classarms' });
 
-        ClassArm.belongsToMany(Group, { through: 'ClassArmGroups' });
-        Group.belongsToMany(ClassArm, { through: 'ClassArmGroups' });
+        ClassArm.belongsToMany(Group, { through: 'classarm_groups' });
+        Group.belongsToMany(ClassArm, { through: 'classarm_groups' });
 
-        Lesson.belongsToMany(ClassArm, { through: 'ClassArmLessons' });
-        ClassArm.belongsToMany(Lesson, { through: 'ClassArmLessons' });
+        Lesson.belongsToMany(ClassArm, { through: 'classarm_lessons' });
+        ClassArm.belongsToMany(Lesson, { through: 'classarm_lessons' });
 
-        Textbook.belongsToMany(Account, { through: 'AccountTextbook' });
-        Account.belongsToMany(Textbook, { through: 'AccountTextbook' });
+        Textbook.belongsToMany(Account, { through: 'account_textbook' });
+        Account.belongsToMany(Textbook, { through: 'account_textbook' });
     }
 
 }

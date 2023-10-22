@@ -10,7 +10,7 @@ const HtmlToDocx = require('html-to-docx');
 const Sequelize = require('sequelize');
 const LessonTemplateProvider = require("../providers/AI/lesson.template");
 const { equal } = require("../utils/array");
-const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
+const cloudinaryUploadImage = require("../services/cloudinary.service");
 
 
 
