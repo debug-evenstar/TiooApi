@@ -39,6 +39,9 @@ class AuthController {
                 });
             }
 
+
+            req.body.status = 'registered';
+
             const registeredAccount = await Account.create(req.body);
             const newValidation = await Validation.create({ otp });
             const response = await registeredAccount.setValidation(newValidation);
