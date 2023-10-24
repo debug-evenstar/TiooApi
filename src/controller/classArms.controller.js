@@ -233,6 +233,33 @@ class classArms {
         }
 
 
+        static async classArmTeachers(req, res) {
+
+            const { id } = req.params;
+    
+            try {
+    
+                const classArmInstance = await ClassArm.findByPk(id);
+    
+                if (!classArmInstance) {
+                    return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                }
+    
+                const classTeachers = await classArmInstance.getTeachers();
+
+                const teacherId = classTeachers.map((student) => student.AccountId);
+
+                const classTeachersAccount = await Account.findAll({ where: { id: [...teacherId] }, attributes: { exclude: ['password'] } });    
+    
+                return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classTeachersAccount });
+    
+            } catch (error) {
+                console.log(error);
+                res.status(500).json({ error: 'server error' ,  extra: error.message });
+            }
+        }
+
+
 
         static async classArmSubjects(req, res) {
 

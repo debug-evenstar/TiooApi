@@ -67,8 +67,6 @@ class SubjectController {
               const teachers = await element.getTeachers();
               const lessons = await element.getLessons();
 
-              console.log("tis is the data", element.dataValues);
-
               element.dataValues.class_count = classes.length;
               element.dataValues.teacher_count = teachers.length;
               element.dataValues.textbook_count = lessons.length;
