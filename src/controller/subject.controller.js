@@ -60,7 +60,26 @@ class SubjectController {
                 include: [ClassArm]
             });
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectInstance });
+
+            const response = await Promise.all(subjectInstance.map( async (element)=>{
+
+              const classes = await element.getClasses();
+              const teachers = await element.getTeachers();
+              const lessons = await element.getLessons();
+
+              element.dataValues.class_count = classes.length;
+              element.dataValues.teacher_count = teachers.length;
+              element.dataValues.textbook_count = lessons.length;
+
+              return element;
+
+            }));
+
+            
+
+            // console.log(classes);
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: response });
 
         } catch (error) {
             console.log(error);
