@@ -15,10 +15,6 @@ module.exports = (sequelize, DataTypes) => {
             school_types: {
                 type: DataTypes.TEXT,
                 defaultValue: JSON.stringify(['primary', 'secondary']),
-                // get() {
-                //     const value = this.getDataValue('school_types');
-                //     return value ? JSON.parse(value) : [];
-                // },
             },
             school_name: {
                 type: DataTypes.TEXT,
@@ -33,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true
             },
 
-            dateOfBirth: {
+            dob: {
                 type: DataTypes.DATE,
                 allowNull: true,
             },
@@ -47,7 +43,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
                 defaultValue: "Nigeria"
             },
-            residentialAddress: {
+            residential_address: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
@@ -61,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             },
 
-            schoo_owner: {
+            owner: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },

@@ -27,7 +27,6 @@ class AdminLibraryController {
             
 
             // --------------------------------------------------------- subject
-
             if (req.file) {
                 const filePath = req.file.path;
                 console.log("this is the item",filePath)
@@ -50,8 +49,6 @@ class AdminLibraryController {
 
             const classIds = classInstance.map((element)=> element.id);
 
-            console.log(classIds);
-
             const classarmInstances = await ClassArm.findAll({ where: { id: [...classInstance.map((element)=> element.id)] } });
 
             req.body.status = "unpublished";
@@ -64,10 +61,8 @@ class AdminLibraryController {
 
             const subjectArms = await subjectInstance.addClassArms(classarmInstances);
 
-
             const respons = await Subject.findByPk(subjectInstance.id, {include: [Class]})
 
-            console.log(respons, subjectInstance.id, )
 
             // ------------------------------------------
 

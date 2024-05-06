@@ -831,7 +831,7 @@ class StudentController {
                 school: studentInstance.SchoolManagement.school_name,
                 class: studentInstance.Class.naming,
                 age: studentInstance.age !== null ? studentInstance.age : 0,
-                address: studentInstance.residentialAddress,
+                address: studentInstance.residential_address,
                 gender: studentInstance.gender,
                 country: studentInstance.country,
                 nationality: studentInstance.nationality
@@ -878,7 +878,7 @@ class StudentController {
                 school: studentInstance.SchoolManagement.school_name,
                 class: studentInstance.Class.naming,
                 age: studentInstance.age !== null ? studentInstance.age : 0,
-                address: studentInstance.residentialAddress,
+                address: studentInstance.residential_address,
                 gender: studentInstance.gender,
                 country: studentInstance.country,
                 nationality: studentInstance.nationality

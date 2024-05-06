@@ -11,11 +11,11 @@ module.exports = (sequelize, DataTypes) => {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            dateOfBirth: {
+            dob: {
                 type: DataTypes.DATE,
                 allowNull: true,
             },
-            owerner_name: {
+            name: {
                 type: DataTypes.STRING,
                 allowNull: true,
                 defaultValue: '',

@@ -43,15 +43,15 @@ class AdminController {
                 const payload = {};
                 const schoolInstance = await account.getSchoolManagement();
 
-                let school = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residentialAddress }
+                let school = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residential_address }
 
-                const teacherInstances = await schoolInstance.getTeachers({ attributes: { exclude: ['passportNumber', 'residentialAddress', 'nationality'] }, include: Account });
+                const teacherInstances = await schoolInstance.getTeachers({ attributes: { exclude: ['passportNumber', 'residential_address', 'nationality'] }, include: Account });
 
-                const hybridTeachers = await schoolInstance.getTeachers({ where: { teacher_type: 'subject' } }, { attributes: { exclude: ['passportNumber', 'residentialAddress', 'nationality'] }, include: Account });
+                const hybridTeachers = await schoolInstance.getTeachers({ where: { teacher_type: 'subject' } }, { attributes: { exclude: ['passportNumber', 'residential_address', 'nationality'] }, include: Account });
 
                 const classInstances = await schoolInstance.getClasses();
 
-                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['nationality', 'residentialAddress', 'passportNumber', 'dateOfBirth', 'gender', 'parent', 'class', 'school', 'age'] }, include: Account });
+                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['nationality', 'residential_address', 'passportNumber', 'dob', 'gender', 'parent', 'class', 'school', 'age'] }, include: Account });
 
                 const subjectInstances = await schoolInstance.getSubjects();
 
@@ -95,12 +95,12 @@ class AdminController {
             const accountData = await Promise.all(accountInstances.map(async (account) => {
                 const payload = {};
                 const schoolInstance = await account.getSchoolManagement();
-                let freelancer = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residentialAddress }
+                let freelancer = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residential_address }
 
                 const classInstances = await schoolInstance.getClasses();
                 console.log(classInstances)
                 const subjectInstances = await schoolInstance.getSubjects();
-                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['nationality', 'residentialAddress', 'passportNumber', 'dateOfBirth', 'gender', 'parent', 'class', 'school', 'age'] }, include: Account });
+                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['nationality', 'residential_address', 'passportNumber', 'dob', 'gender', 'parent', 'class', 'school', 'age'] }, include: Account });
                 payload.freelancer = freelancer;
                 payload.subjects = { subjectInstances, "count": subjectInstances.length };
                 payload.students = { studentInstances, "count": studentInstances.length };
@@ -135,12 +135,12 @@ class AdminController {
             const accountData = await Promise.all(accountInstances.map(async (account) => {
                 const payload = {};
                 const schoolInstance = await account.getSchoolManagement();
-                let freelancer = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residentialAddress }
+                let freelancer = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residential_address }
 
                 const classInstances = await schoolInstance.getClasses();
                 console.log(classInstances)
                 const subjectInstances = await schoolInstance.getSubjects();
-                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['nationality', 'residentialAddress', 'passportNumber', 'dateOfBirth', 'gender', 'parent', 'class', 'school', 'age'] }, include: Account });
+                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['nationality', 'residential_address', 'passportNumber', 'dob', 'gender', 'parent', 'class', 'school', 'age'] }, include: Account });
                 payload.freelancer = freelancer;
                 payload.subjects = { subjectInstances, "count": subjectInstances.length };
                 payload.students = { studentInstances, "count": studentInstances.length };
@@ -183,10 +183,10 @@ class AdminController {
             const accountData = await Promise.all([accountInstances].map(async (account) => {
                 const payload = {};
                 const schoolInstance = await account.getSchoolManagement();
-                let freelancer = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residentialAddress }
+                let freelancer = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residential_address }
                 const classInstances = await schoolInstance.getClasses();
                 const subjectInstances = await schoolInstance.getSubjects();
-                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['nationality', 'residentialAddress', 'passportNumber', 'dateOfBirth', 'gender', 'parent', 'class', 'school', 'age'] }, include: Account });
+                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['nationality', 'residential_address', 'passportNumber', 'dob', 'gender', 'parent', 'class', 'school', 'age'] }, include: Account });
                 payload.freelancer = freelancer;
                 payload.subjects = { subjectInstances, "count": subjectInstances.length };
                 payload.students = { studentInstances, "count": studentInstances.length };

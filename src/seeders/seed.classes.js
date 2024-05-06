@@ -1,4 +1,4 @@
-const { Class } = require('../model/database/index');
+const { Class } = require('../database/connection/index');
 
 const { Op } = require("sequelize");
 

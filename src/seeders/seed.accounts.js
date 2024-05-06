@@ -31,7 +31,6 @@ const seed = async () => {
             const [newAccount] = await Account.findOrCreate({ where: eachAccount });
             const newValidation = await Validation.create({ otp: newOtp });
             const setup = await newAccount.setValidation(newValidation);
-
         });
 
 
