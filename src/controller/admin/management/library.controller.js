@@ -1,7 +1,7 @@
 const AuthController = require('../../auth.controller');
 const { validationResult } = require('express-validator');
 const ResponseStatus = require("../../../config/message.config");
-const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class, Library, LessonSlide, Group } = require('../../../database/connection');
+const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class, Library, LessonSlide, Group, Textbook } = require('../../../database/connection');
 const { use } = require('chai');
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
 const TokenMiddleware = require('../../../middleware/token.middleware');
@@ -43,7 +43,7 @@ class AdminLibraryController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
+            // const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
             const schoolInstance = await accountInstance.getSchoolManagement();
 
@@ -67,6 +67,50 @@ class AdminLibraryController {
             // ------------------------------------------
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {subject: respons}, selected_classes: classIds });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+
+    }
+
+    static async createLibraryTextbook(req, res) {
+
+        const data = req.body;
+
+        data.library = true;
+
+        let cover = "";
+
+        if (req.file) {
+            const filePath = req.file.path;
+            const ImageResponse = await cloudinaryUploadImage(filePath);
+            req.body.cover_photo =  ImageResponse.secure_url;
+        }
+
+        try {
+
+            const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
+
+            if (!classInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            const classIds = classInstance.map((element)=> element.id);
+
+            const textbookInstance = await Textbook.create(req.body);
+
+            const subjectInstance = await Subject.findByPk(req.body.subject_id);
+
+            await textbookInstance.addClasses(classInstance);
+
+            await subjectInstance.addTextbook(textbookInstance);
+
+
+            // ------------------------------------------
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {subject: textbookInstance}});
 
         } catch (error) {
             console.log(error);
@@ -127,13 +171,11 @@ class AdminLibraryController {
 
             // --------------------------------------------------------- subject
 
-            const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
+            // const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
-            const schoolInstance = await accountInstance.getSchoolManagement();
-
-            const subjectInstance = await schoolInstance.getSubjects(
+            const subjectInstance = await Subject.findAll(
                 {
-                    where: { library: true }, joinTableAttributes: [],
+                    where: { default: true }, joinTableAttributes: [],
                     include: [
                         {
                             model: Lesson,

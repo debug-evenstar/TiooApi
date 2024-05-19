@@ -53,7 +53,8 @@ class SchoolUtils {
             const classes = seedClass.map((classData) => ({
                 ...classData,
                 equivalent : Number.parseInt(classData.equivalent),
-                SchoolManagementId: schoolId,
+                SchoolManagementId: schoolId ?? null,
+                default : schoolId ? false : true
             }));
 
             await Class.bulkCreate(classes);

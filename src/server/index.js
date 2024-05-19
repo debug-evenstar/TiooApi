@@ -59,7 +59,7 @@ class Server {
 
         IndexRoute(app).register();
         const jwt = require('jsonwebtoken');
-        const server = app.listen(PORT, () => {
+        const server = app.listen(PORT,"0.0.0.0" , () => {
 
             //  console.log([randomPrivateKey, randomPublicKey, token]);
 

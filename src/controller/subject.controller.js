@@ -13,9 +13,9 @@ class SubjectController {
 
             const subjectInstance = await Subject.create(req.body);
 
-            const classInstance = await Class.findAll({ where: { id: [...req.body.class] } });
+            const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
 
-            const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.classArm] } });
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.classArms] } });
 
             const newItems = await subjectInstance.addClasses(classInstance);
 
@@ -36,8 +36,8 @@ class SubjectController {
     static async readAll(req, res) {
 
         try {
-
             const subjectInstance = await Subject.findAll({
+                ...(req.query.default ? { where : { default : true}} : {}),
                 include: IncludeManager.parseParamIncludes(req.query)
             });
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectInstance });
@@ -422,7 +422,7 @@ class SubjectController {
 
             // --------------------------------------------------------- subject
 
-            const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
+            // const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
             const schoolInstance = await accountInstance.getSchoolManagement();
 

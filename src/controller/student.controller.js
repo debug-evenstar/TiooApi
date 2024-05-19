@@ -778,7 +778,7 @@ class StudentController {
 
             // BIND STUDENT TO TIO ACADEMY
 
-            const tiooAccount = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
+            // const tiooAccount = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
             if (tiooAccount) {
 
