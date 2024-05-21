@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            residentialAddress: {
+            residential_address: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },

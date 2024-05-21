@@ -40,5 +40,4 @@ const { Role, Permission } = require('../database/connection/index');
 
   }
 
-
   module.exports = AuthorizationSeed;

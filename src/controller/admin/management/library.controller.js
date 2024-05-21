@@ -1,7 +1,7 @@
 const AuthController = require('../../auth.controller');
 const { validationResult } = require('express-validator');
 const ResponseStatus = require("../../../config/message.config");
-const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class, Library, LessonSlide, Group } = require('../../../database/connection');
+const { Account, Authorization, Permission, Validation, Admin, SchoolManagement, ClassArm, Subject, Lesson, Class, Library, LessonSlide, Group, Textbook } = require('../../../database/connection');
 const { use } = require('chai');
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
 const TokenMiddleware = require('../../../middleware/token.middleware');
@@ -15,7 +15,7 @@ const cloudinaryUploadImage = require('../../../utils/cloudinary.utilities');
 
 class AdminLibraryController {
 
-    static async libraryMaterial(req, res) {
+    static async createLibraryTextbook(req, res) {
 
         const data = req.body;
 
@@ -23,55 +23,34 @@ class AdminLibraryController {
 
         let cover = "";
 
+        if (req.file) {
+            const filePath = req.file.path;
+            const ImageResponse = await cloudinaryUploadImage(filePath);
+            req.body.cover_photo =  ImageResponse.secure_url;
+        }
+
         try {
-            
 
-            // --------------------------------------------------------- subject
-
-            if (req.file) {
-                const filePath = req.file.path;
-                console.log("this is the item",filePath)
-                const ImageResponse = await cloudinaryUploadImage(filePath);
-                req.body.cover =  ImageResponse.secure_url;
-
-            }
-
-
-            const classInstance = await Class.findAll({ where: { id: [...req.body.class] } });
-
+            const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
 
             if (!classInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
-
-            const schoolInstance = await accountInstance.getSchoolManagement();
-
             const classIds = classInstance.map((element)=> element.id);
 
-            console.log(classIds);
+            const textbookInstance = await Textbook.create(req.body);
 
-            const classarmInstances = await ClassArm.findAll({ where: { id: [...classInstance.map((element)=> element.id)] } });
+            const subjectInstance = await Subject.findByPk(req.body.subject_id);
 
-            req.body.status = "unpublished";
+            await textbookInstance.addClasses(classInstance);
 
-            const subjectInstance = await Subject.create(req.body);
+            await subjectInstance.addTextbook(textbookInstance);
 
-            await schoolInstance.addSubjects(subjectInstance);
-
-            const newItems = await subjectInstance.addClasses(classInstance);
-
-            const subjectArms = await subjectInstance.addClassArms(classarmInstances);
-
-
-            const respons = await Subject.findByPk(subjectInstance.id, {include: [Class]})
-
-            console.log(respons, subjectInstance.id, )
 
             // ------------------------------------------
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {subject: respons}, selected_classes: classIds });
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: textbookInstance});
 
         } catch (error) {
             console.log(error);
@@ -80,33 +59,39 @@ class AdminLibraryController {
 
     }
 
-    static async updateLibraryMaterial(req, res) {
+    static async updateLibraryTextbook(req, res) {
 
         const data = req.body;
 
         const {id} = req.params;
 
-        data.library = true;
-
-        let cover = "";
-
         try {
-            
-
-            // --------------------------------------------------------- subject
 
             if (req.file) {
                 const filePath = req.file.path;
-                console.log("this is the item",filePath)
                 const ImageResponse = await cloudinaryUploadImage(filePath);
-                req.body.cover =  ImageResponse.secure_url;
-
+                req.body.cover_photo =  ImageResponse.secure_url;
             }
 
-            const thisSubject = await Subject.findByPk(id);
 
+            const textbook = await Textbook.findByPk(id);
 
-            const subjectInstance = await thisSubject.update(req.body);
+            const previousSubjectInstance = await Subject.findByPk(textbook.SubjectId);
+
+            const textbookInstance = await textbook.update(req.body);
+
+            if (req.body.classes) {
+                const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
+                const classIds = classInstance.map((element)=> element.id);
+                await textbookInstance.removeClasses();
+                await textbookInstance.addClasses(classInstance);
+            }
+
+            if (req.body.subject_id) {
+                const subjectInstance = await Subject.findByPk(req.body.subject_id);
+                await previousSubjectInstance.removeTextbook(textbookInstance);
+                await subjectInstance.addTextbook(textbookInstance);
+            }
 
 
             // ------------------------------------------
@@ -122,23 +107,17 @@ class AdminLibraryController {
 
 
 
-    static async readLibraryMaterial(req, res) {
-
-        const data = req.body;
-
-        data.library = true;
+    static async fetchLibraryTextbooks(req, res) {
 
         try {
 
             // --------------------------------------------------------- subject
 
-            const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
+            // const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
-            const schoolInstance = await accountInstance.getSchoolManagement();
-
-            const subjectInstance = await schoolInstance.getSubjects(
+            const textbookInstance = await Textbook.findAll(
                 {
-                    where: { library: true }, joinTableAttributes: [],
+                    where: { default: true }, joinTableAttributes: [],
                     include: [
                         {
                             model: Lesson,

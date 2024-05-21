@@ -131,6 +131,8 @@ class Relationships {
 
         Textbook.belongsToMany(Account, { through: 'AccountTextbook' });
         Account.belongsToMany(Textbook, { through: 'AccountTextbook' });
+
+        Textbook.belongsToMany(Class, { through: 'ClassTextbooks' });
     }
 
 }

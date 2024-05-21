@@ -42,7 +42,7 @@ class AdminSchoolController {
 
                 const schoolInstance = await account.getSchoolManagement();
 
-                let school = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residentialAddress };
+                let school = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residential_address };
 
                 school.subscription = 'Active'; //This will be gotten from the subscription table
 
@@ -87,15 +87,15 @@ class AdminSchoolController {
                 const payload = {};
                 const schoolInstance = await account.getSchoolManagement();
 
-                let school = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residentialAddress }
+                let school = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residential_address }
 
-                const teacherInstances = await schoolInstance.getTeachers({ attributes: { exclude: ['passportNumber', 'residentialAddress', 'nationality'] }, include: Account });
+                const teacherInstances = await schoolInstance.getTeachers({ attributes: { exclude: ['passportNumber', 'residential_address', 'nationality'] }, include: Account });
 
-                const hybridTeachers = await schoolInstance.getTeachers({ where: { teacher_type: 'subject' } }, { attributes: { exclude: ['passportNumber', 'residentialAddress', 'nationality'] }, include: Account });
+                const hybridTeachers = await schoolInstance.getTeachers({ where: { teacher_type: 'subject' } }, { attributes: { exclude: ['passportNumber', 'residential_address', 'nationality'] }, include: Account });
 
                 const classInstances = await schoolInstance.getClasses();
 
-                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['residentialAddress', 'passportNumber', 'dateOfBirth', 'parent', 'class', 'school',] }, include: Account });
+                const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['residential_address', 'passportNumber', 'dob', 'parent', 'class', 'school',] }, include: Account });
 
                 const subjectInstances = await schoolInstance.getSubjects();
 

@@ -13,9 +13,9 @@ class SubjectController {
 
             const subjectInstance = await Subject.create(req.body);
 
-            const classInstance = await Class.findAll({ where: { id: [...req.body.class] } });
+            const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
 
-            const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.classArm] } });
+            const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.classArms] } });
 
             const newItems = await subjectInstance.addClasses(classInstance);
 
@@ -36,8 +36,8 @@ class SubjectController {
     static async readAll(req, res) {
 
         try {
-
             const subjectInstance = await Subject.findAll({
+                ...(req.query.default ? { where : { default : true}} : {}),
                 include: IncludeManager.parseParamIncludes(req.query)
             });
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectInstance });
@@ -140,7 +140,8 @@ class SubjectController {
 
         try {
 
-            const subjectInstance = await Subject.findByPk(req.body.subjectId);
+            const subjectId = req.body.subjectId ?? req.params.id;
+            const subjectInstance = await Subject.findByPk(subjectId);
 
             if (!subjectInstance) {
 
@@ -150,7 +151,19 @@ class SubjectController {
 
             const updatedInstance = await subjectInstance.update(req.body);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: updatedInstance });
+            const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
+            await subjectInstance.removeClasses();
+            await subjectInstance.addClasses(classInstance);
+
+            if (req.body.classArms) {
+                const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.classArms] } });
+                await subjectInstance.removeClassArms();
+                await subjectInstance.addClassArms(classarmInstances);
+            }
+
+
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: updatedInstance });
 
         } catch (error) {
             console.log(error);
@@ -422,7 +435,7 @@ class SubjectController {
 
             // --------------------------------------------------------- subject
 
-            const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
+            // const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
             const schoolInstance = await accountInstance.getSchoolManagement();
 

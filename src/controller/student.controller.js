@@ -778,7 +778,7 @@ class StudentController {
 
             // BIND STUDENT TO TIO ACADEMY
 
-            const tiooAccount = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
+            // const tiooAccount = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
             if (tiooAccount) {
 
@@ -831,7 +831,7 @@ class StudentController {
                 school: studentInstance.SchoolManagement.school_name,
                 class: studentInstance.Class.naming,
                 age: studentInstance.age !== null ? studentInstance.age : 0,
-                address: studentInstance.residentialAddress,
+                address: studentInstance.residential_address,
                 gender: studentInstance.gender,
                 country: studentInstance.country,
                 nationality: studentInstance.nationality
@@ -878,7 +878,7 @@ class StudentController {
                 school: studentInstance.SchoolManagement.school_name,
                 class: studentInstance.Class.naming,
                 age: studentInstance.age !== null ? studentInstance.age : 0,
-                address: studentInstance.residentialAddress,
+                address: studentInstance.residential_address,
                 gender: studentInstance.gender,
                 country: studentInstance.country,
                 nationality: studentInstance.nationality
