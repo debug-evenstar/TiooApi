@@ -15,66 +15,6 @@ const cloudinaryUploadImage = require('../../../utils/cloudinary.utilities');
 
 class AdminLibraryController {
 
-    static async libraryMaterial(req, res) {
-
-        const data = req.body;
-
-        data.library = true;
-
-        let cover = "";
-
-        try {
-            
-
-            // --------------------------------------------------------- subject
-            if (req.file) {
-                const filePath = req.file.path;
-                console.log("this is the item",filePath)
-                const ImageResponse = await cloudinaryUploadImage(filePath);
-                req.body.cover =  ImageResponse.secure_url;
-
-            }
-
-
-            const classInstance = await Class.findAll({ where: { id: [...req.body.class] } });
-
-
-            if (!classInstance) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-            }
-
-            // const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
-
-            const schoolInstance = await accountInstance.getSchoolManagement();
-
-            const classIds = classInstance.map((element)=> element.id);
-
-            const classarmInstances = await ClassArm.findAll({ where: { id: [...classInstance.map((element)=> element.id)] } });
-
-            req.body.status = "unpublished";
-
-            const subjectInstance = await Subject.create(req.body);
-
-            await schoolInstance.addSubjects(subjectInstance);
-
-            const newItems = await subjectInstance.addClasses(classInstance);
-
-            const subjectArms = await subjectInstance.addClassArms(classarmInstances);
-
-            const respons = await Subject.findByPk(subjectInstance.id, {include: [Class]})
-
-
-            // ------------------------------------------
-
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {subject: respons}, selected_classes: classIds });
-
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
-    }
-
     static async createLibraryTextbook(req, res) {
 
         const data = req.body;
@@ -110,7 +50,7 @@ class AdminLibraryController {
 
             // ------------------------------------------
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: {subject: textbookInstance}});
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: textbookInstance});
 
         } catch (error) {
             console.log(error);
@@ -119,33 +59,39 @@ class AdminLibraryController {
 
     }
 
-    static async updateLibraryMaterial(req, res) {
+    static async updateLibraryTextbook(req, res) {
 
         const data = req.body;
 
         const {id} = req.params;
 
-        data.library = true;
-
-        let cover = "";
-
         try {
-            
-
-            // --------------------------------------------------------- subject
 
             if (req.file) {
                 const filePath = req.file.path;
-                console.log("this is the item",filePath)
                 const ImageResponse = await cloudinaryUploadImage(filePath);
-                req.body.cover =  ImageResponse.secure_url;
-
+                req.body.cover_photo =  ImageResponse.secure_url;
             }
 
-            const thisSubject = await Subject.findByPk(id);
 
+            const textbook = await Textbook.findByPk(id);
 
-            const subjectInstance = await thisSubject.update(req.body);
+            const previousSubjectInstance = await Subject.findByPk(textbook.SubjectId);
+
+            const textbookInstance = await textbook.update(req.body);
+
+            if (req.body.classes) {
+                const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
+                const classIds = classInstance.map((element)=> element.id);
+                await textbookInstance.removeClasses();
+                await textbookInstance.addClasses(classInstance);
+            }
+
+            if (req.body.subject_id) {
+                const subjectInstance = await Subject.findByPk(req.body.subject_id);
+                await previousSubjectInstance.removeTextbook(textbookInstance);
+                await subjectInstance.addTextbook(textbookInstance);
+            }
 
 
             // ------------------------------------------
@@ -161,11 +107,7 @@ class AdminLibraryController {
 
 
 
-    static async readLibraryMaterial(req, res) {
-
-        const data = req.body;
-
-        data.library = true;
+    static async fetchLibraryTextbooks(req, res) {
 
         try {
 
@@ -173,7 +115,7 @@ class AdminLibraryController {
 
             // const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
-            const subjectInstance = await Subject.findAll(
+            const textbookInstance = await Textbook.findAll(
                 {
                     where: { default: true }, joinTableAttributes: [],
                     include: [

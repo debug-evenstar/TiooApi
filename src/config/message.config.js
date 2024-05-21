@@ -4,7 +4,7 @@ const ResponseMessage = {
         added: 'Added successfully',
         update: 'Updated successfully',
         delete: 'Deleted successfully',
-        delete: 'Generated successfully',
+        generate: 'Generated successfully',
         removed: 'Removed successfully',
         read: 'Fetched successfully',
         register: 'Account created successfully',

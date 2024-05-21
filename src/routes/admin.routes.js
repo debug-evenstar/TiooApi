@@ -25,6 +25,7 @@ const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
 const ExternalSchoolController = require('../controller/external_school/auth.controller');
 const TokenMiddleware = require('../middleware/token.middleware');
+const TextbookValidator = require('./validators/TextbookValidator');
 
 
 
@@ -52,7 +53,9 @@ const AdminRoutesGroup = (router) => {
 
     /* -------------------------------- SUBJECTS -------------------------------- */
     
-    router.post('/subjects',SubjectValidator.Subject,SubjectController.create);
+    router.post('/subjects', SubjectValidator.CreateSubject, SubjectController.create);
+    router.put('/subjects/:id', SubjectValidator.UpdateSubject, SubjectController.update);
+    router.delete('/subjects/:id', SubjectController.delete);
     router.get('/subjects',SubjectController.readAll);
 
     /* --------------------------------- PRICING -------------------------------- */
@@ -92,7 +95,7 @@ const AdminRoutesGroup = (router) => {
 
     router.get('/management/subjects/lessons', AdminSchoolController.lessonsGroupedBySubjects);
     router.get('/management/subject/lessons', AdminSchoolController.lessonsBySubjectId);
-    router.get('/management/subjects/lessons/count', AdminLibraryController.readLibraryMaterial);
+    // router.get('/management/subjects/lessons/count', AdminLibraryController.readLibraryMaterial);
 
     router.get('/management/class/:id/arms', AdminSchoolController.readAllByClass);
     router.get('/management/class/readwitharms', AdminSchoolController.readAllWithArms);
@@ -104,14 +107,17 @@ const AdminRoutesGroup = (router) => {
     router.get('/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
 
     /* -------------------------------- TEXTBOOKS ------------------------------- */
-    router.post('/library/textbooks', UploadService.uploadLesson.single('cover'), AdminLibraryController.createLibraryTextbook);
+    router.get('/library/textbooks', AdminLibraryController.fetchLibraryTextbooks);
+    router.post('/library/textbooks', [UploadService.uploadLesson.single('cover'), TextbookValidator.CreateTextbook], AdminLibraryController.createLibraryTextbook);
+    router.put('/library/textbooks/:id',[UploadService.uploadLesson.single('cover'), TextbookValidator.UpdateTextbook], AdminLibraryController.updateLibraryTextbook);
+
 
     router.post('/library', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
     router.get('/library', AdminLibraryController.read);
     router.delete('/librarylesson/:id', AdminLibraryController.deleteLibraryLesson);
     router.delete('/library/:id', AdminLibraryController.deleteLibrary);
-    router.post('/library/subject', UploadService.uploadTemplateImage.single('cover'), AdminLibraryController.libraryMaterial);
-    router.put('/library/subject/:id', UploadService.uploadTemplateImage.single('cover'), AdminLibraryController.updateLibraryMaterial);
+    // router.post('/library/subject', UploadService.uploadTemplateImage.single('cover'), AdminLibraryController.libraryMaterial);
+    // router.put('/library/subject/:id', UploadService.uploadTemplateImage.single('cover'), AdminLibraryController.updateLibraryMaterial);
 
     router.put('/librarylesson/:id', AdminLibraryController.updateLibraryLesson);
 
