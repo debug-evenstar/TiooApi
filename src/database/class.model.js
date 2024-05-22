@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 defaultValue: "Primary",
             },
-            naming: {
+            name: {
                 type: DataTypes.STRING,
                 defaultValue: "Primary 1",
             },
