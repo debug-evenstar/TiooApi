@@ -25,6 +25,10 @@ const e = require("express");
 const cloudinaryUploadImage = require("../../../utils/cloudinary.utilities");
 
 class AdminLibraryController {
+    
+    /* ---------------------------------------------------------------------------------------------- */
+    /*                                            TEXTBOOK                                            */
+    /* ---------------------------------------------------------------------------------------------- */
     static async createLibraryTextbook(req, res) {
         const data = req.body;
 
@@ -172,34 +176,27 @@ class AdminLibraryController {
         }
     }
 
-    static async create(req, res) {
-        const data = req.body;
-
-        if (req.file) {
-            req.body.file = req.file.path;
-        }
+    static async deleteTextbook(req, res) {
+        const { id } = req.params;
 
         try {
-            const classInstance = await Class.findByPk(data.class);
+            const textbookInstance = await Textbook.findByPk(id);
 
-            if (!classInstance) {
+            if (!textbookInstance) {
                 return res.status(ResponseStatus.code.not_found).json({
                     error: true,
                     message: ResponseStatus.fail.not_found,
                 });
             }
 
-            const libraryInstance = await Library.create(req.body);
-
-            // const response = await classInstance.addLibrary(libraryInstance);
+            const response = await textbookInstance.destroy();
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.create,
-                data: {},
+                message: ResponseStatus.pass.delete,
+                data: response,
             });
         } catch (error) {
-            console.log(error);
             res.status(500).json({
                 error: "server error",
                 extra: error.message,
@@ -207,26 +204,39 @@ class AdminLibraryController {
         }
     }
 
-    static async createLibraryLesson(req, res) {
-        const today = new Date();
-        const threeDaysAhead = new Date();
-        threeDaysAhead.setDate(today.getDate() + 3);
+    /* ---------------------------------------------------------------------------------------------- */
+    /*                                             LESSONS                                            */
+    /* ---------------------------------------------------------------------------------------------- */
 
-        if (req.file) {
-            req.body.files = [req.file.path];
+    static async createTextbookLesson(req, res) {
+        req.query.material_type = "textbook";
+        return this.createLesson(req, res);
+    }
 
-            console.log(req.body.files);
-        }
+    static async fetchTextbookLesson(req, res) {
+        req.query.material_type = "textbook";
+        return this.fetchLessons(req, res);
+    }
 
-        req.body.start_date = today;
-        req.body.end_date = threeDaysAhead;
+    static async createLesson(req, res) {
+
+        // if (req.file) {
+        //     req.body.files = [req.file.path];
+
+        //     console.log(req.body.files);
+        // }
 
         try {
             const lessonInstance = await Lesson.create(req.body);
 
-            const subjectInstance = await Subject.findByPk(req.body.subject);
+            const materialInstance = null;
+            if (req.query.material_type == "textbook") {
+                const materialInstance = await Textbook.findByPk(req.params.id);
+            }
 
-            if (!subjectInstance) {
+
+
+            if (!materialInstance) {
                 return res.status(ResponseStatus.code.not_found).json({
                     error: false,
                     message: ResponseStatus.fail.not_found,
@@ -304,6 +314,42 @@ class AdminLibraryController {
             });
         }
     }
+    static async create(req, res) {
+        const data = req.body;
+
+        if (req.file) {
+            req.body.file = req.file.path;
+        }
+
+        try {
+            const classInstance = await Class.findByPk(data.class);
+
+            if (!classInstance) {
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: true,
+                    message: ResponseStatus.fail.not_found,
+                });
+            }
+
+            const libraryInstance = await Library.create(req.body);
+
+            // const response = await classInstance.addLibrary(libraryInstance);
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.create,
+                data: {},
+            });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
+
+
 
     static async addLibraryLesson(req, res) {
         const today = new Date();
@@ -717,33 +763,6 @@ class AdminLibraryController {
         }
     }
 
-    static async deleteTextbook(req, res) {
-        const { id } = req.params;
-
-        try {
-            const textbookInstance = await Textbook.findByPk(id);
-
-            if (!textbookInstance) {
-                return res.status(ResponseStatus.code.not_found).json({
-                    error: true,
-                    message: ResponseStatus.fail.not_found,
-                });
-            }
-
-            const response = await textbookInstance.destroy();
-
-            return res.status(ResponseStatus.code.success).json({
-                error: false,
-                message: ResponseStatus.pass.delete,
-                data: response,
-            });
-        } catch (error) {
-            res.status(500).json({
-                error: "server error",
-                extra: error.message,
-            });
-        }
-    }
 
     static async deleteLibraryLesson(req, res) {
         const { id } = req.params;

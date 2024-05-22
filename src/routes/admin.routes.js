@@ -123,6 +123,9 @@ const AdminRoutesGroup = (router) => {
     router.delete('/library/textbooks/:id', AdminLibraryController.deleteTextbook);
 
     /* ---------------------------------------------- - --------------------------------------------- */
+    /* ------------------------------------------- LESSONS ------------------------------------------ */
+
+    // router.get('/lessons', AdminLibraryController.fetchLessons);
 
     // router.post('/library', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
     // router.get('/library', AdminLibraryController.read);
