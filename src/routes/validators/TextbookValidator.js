@@ -18,11 +18,6 @@ module.exports = {
             name: vine.string(),
             description: vine.string(),
             subject_id: vine.number().optional(),
-            classes : vine.unionOfTypes([
-                vine.array(vine.number()).minLength(1),
-                vine.string(),
-            ]).optional()
-             
         })
     )),
 };

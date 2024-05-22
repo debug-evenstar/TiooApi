@@ -106,20 +106,34 @@ const AdminRoutesGroup = (router) => {
     router.get('/school/dashboard/home', AdminSchoolController.dashboardHome);
     router.get('/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
 
-    /* -------------------------------- TEXTBOOKS ------------------------------- */
+
+
+
+    /* ---------------------------------------------------------------------------------------------- */
+    /*                                             LIBRARY                                            */
+    /* ---------------------------------------------------------------------------------------------- */
+
+
+
+   /* ------------------------------------------ TEXTBOOKS ----------------------------------------- */
+
     router.get('/library/textbooks', AdminLibraryController.fetchLibraryTextbooks);
     router.post('/library/textbooks', [UploadService.uploadLesson.single('cover'), TextbookValidator.CreateTextbook], AdminLibraryController.createLibraryTextbook);
-    router.put('/library/textbooks/:id',[UploadService.uploadLesson.single('cover'), TextbookValidator.UpdateTextbook], AdminLibraryController.updateLibraryTextbook);
+    router.put('/library/textbooks/:id',[UploadService.uploadLesson.single('cover'), TextbookValidator.UpdateTextbook],AdminLibraryController.updateLibraryTextbook);
+    router.delete('/library/textbooks/:id', AdminLibraryController.deleteTextbook);
 
+    /* ---------------------------------------------- - --------------------------------------------- */
+    /* ------------------------------------------- LESSONS ------------------------------------------ */
 
-    router.post('/library', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
-    router.get('/library', AdminLibraryController.read);
-    router.delete('/librarylesson/:id', AdminLibraryController.deleteLibraryLesson);
-    router.delete('/library/:id', AdminLibraryController.deleteLibrary);
+    // router.get('/lessons', AdminLibraryController.fetchLessons);
+
+    // router.post('/library', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
+    // router.get('/library', AdminLibraryController.read);
+    // router.delete('/librarylesson/:id', AdminLibraryController.deleteLibraryLesson);
     // router.post('/library/subject', UploadService.uploadTemplateImage.single('cover'), AdminLibraryController.libraryMaterial);
     // router.put('/library/subject/:id', UploadService.uploadTemplateImage.single('cover'), AdminLibraryController.updateLibraryMaterial);
 
-    router.put('/librarylesson/:id', AdminLibraryController.updateLibraryLesson);
+    // router.put('/librarylesson/:id', AdminLibraryController.updateLibraryLesson);
 
      
     // router.post('/library/lesson', UploadService.uploadLesson.single('file'), AdminLibraryController.createLibraryLesson);

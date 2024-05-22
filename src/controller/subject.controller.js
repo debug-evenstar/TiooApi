@@ -15,7 +15,11 @@ class SubjectController {
 
             const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
 
-            const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.classArms] } });
+            let classarmInstances = [];
+
+            if (req.body.classArms) { 
+                classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.classArms] } });
+            }
 
             const newItems = await subjectInstance.addClasses(classInstance);
 
