@@ -1,8 +1,8 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 module.exports = (sequelize, DataTypes) => {
     const Billing = sequelize.define(
-        'Billing',
+        "Billing",
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
             status: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                defaultValue: 'pending',
+                defaultValue: "pending",
             },
 
             billing_id: {
@@ -20,27 +20,27 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: DataTypes.UUIDV4,
                 primaryKey: true,
                 allowNull: false,
-                unique: true
+                unique: true,
             },
             source: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                defaultValue: 'paystack',
+                defaultValue: "paystack",
             },
             coupon: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                defaultValue: 'none',
+                defaultValue: "none",
             },
             type: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                defaultValue: 'school',
+                defaultValue: "school",
             },
             amount: {
                 type: DataTypes.FLOAT,
                 allowNull: true,
-                defaultValue: 0.00,
+                defaultValue: 0.0,
             },
             student_convered: {
                 type: DataTypes.INTEGER,
@@ -61,16 +61,16 @@ module.exports = (sequelize, DataTypes) => {
             student_expiry: {
                 type: DataTypes.DATE,
                 allowNull: false,
-                defaultValue: DataTypes.NOW
+                defaultValue: DataTypes.NOW,
             },
             teacher_expiry: {
                 type: DataTypes.DATE,
                 allowNull: false,
-                defaultValue: DataTypes.NOW
+                defaultValue: DataTypes.NOW,
             },
-        }, {
-        timestamps: true,
-    });
+        },
+        { timestamps: true }
+    );
 
     return Billing;
 };

@@ -210,33 +210,39 @@ class AdminLibraryController {
 
     static async createTextbookLesson(req, res) {
         req.query.material_type = "textbook";
-        return this.createLesson(req, res);
+        return AdminLibraryController.createLesson(req, res);
     }
 
-    static async fetchTextbookLesson(req, res) {
+    static async fetchTextbookLessons(req, res) {
         req.query.material_type = "textbook";
-        return this.fetchLessons(req, res);
+        return await AdminLibraryController.fetchLessons(req, res);
     }
 
     static async createLesson(req, res) {
-
-        // if (req.file) {
-        //     req.body.files = [req.file.path];
-
-        //     console.log(req.body.files);
-        // }
-
         try {
-            const lessonInstance = await Lesson.create(req.body);
 
-            const materialInstance = null;
-            if (req.query.material_type == "textbook") {
-                const materialInstance = await Textbook.findByPk(req.params.id);
+            let preview = [];
+            if ( req.files["preview"] && req.files["preview"].length > 0) {
+                for (var item of req.files["preview"]) {
+                    const ImageResponse = await cloudinaryUploadImage(
+                        item.path
+                    );
+                    preview.push(ImageResponse.secure_url);
+                }
+            } else {
+                if (req.files) {
+                    const filePath = req.files[0].path;
+                    const ImageResponse = await cloudinaryUploadImage(filePath);
+                    preview.push(ImageResponse.secure_url);
+                }
             }
 
+            req.body.preview = preview;
+            req.body.covers = [];
 
+            const textbookInstance = await Textbook.findByPk(req.params.id);
 
-            if (!materialInstance) {
+            if (!textbookInstance) {
                 return res.status(ResponseStatus.code.not_found).json({
                     error: false,
                     message: ResponseStatus.fail.not_found,
@@ -244,70 +250,23 @@ class AdminLibraryController {
                 });
             }
 
-            await subjectInstance.addLesson(lessonInstance);
+            const lessonInstance = await Lesson.create(req.body);
 
-            const classInstance = await Class.findByPk(req.body.class);
+            if (req.body.class) {
 
-            const classarmInstances = await classInstance.getClassArms();
+                const classInstance = await Class.findByPk(req.body.class);
 
-            const instance1 = await lessonInstance.addClassArms(
-                classarmInstances
-            );
-
-            await classInstance.addLesson(lessonInstance);
-
-            const group = await Group.findAll({
-                include: [ClassArm],
-                where: { SubjectId: req.body.subject },
-            });
-
-            let groupInstance;
-            let groupId;
-
-            const arms = classarmInstances.map((element) => element.id);
-
-            for (let i = 0; i < group.length; i++) {
-                const data = group[i].ClassArms.map((element) => element.id);
-
-                if (arms.length == 1) {
-                    if (arms[0] == data) {
-                        console.log("single found", arms, data, group[i].id);
-                        groupId = group[i].id;
-                    } else {
-                        console.log("single not found", arms, data);
-                    }
-                } else {
-                    if (arms.every((arm) => data.includes(arm))) {
-                        console.log("found", arms, data, group[i].id);
-                        groupId = group[i].id;
-                    } else {
-                        console.log("not found", arms, data);
-                    }
-                }
+                await classInstance.addLesson(lessonInstance);
             }
 
-            if (groupId) {
-                groupInstance = await Group.findByPk(groupId);
-            } else {
-                groupInstance = await Group.create({
-                    naming: classInstance.naming,
-                    ref_cid: classInstance.id,
-                });
-            }
-
-            await groupInstance.addLesson(lessonInstance);
-            const instance2 = await groupInstance.addClassArms(
-                classarmInstances
-            );
-            const subjejctGroup = await subjectInstance.addGroup(groupInstance);
+            await textbookInstance.addLesson(lessonInstance);
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.create,
+                message: ResponseStatus.pass.added,
                 data: lessonInstance,
             });
         } catch (error) {
-            console.log(error);
             res.status(500).json({
                 error: "server error",
                 extra: error.message,
@@ -349,6 +308,26 @@ class AdminLibraryController {
         }
     }
 
+    static async fetchLessons(req, res) {
+        try {
+            let lessons = [];
+            if (req.query.material_type == "textbook") {
+                const textbook = await Textbook.findByPk(req.params.id);
+                lessons = await textbook.getLessons();
+            }
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: lessons,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
 
 
     static async addLibraryLesson(req, res) {

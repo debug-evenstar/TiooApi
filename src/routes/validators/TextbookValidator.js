@@ -20,4 +20,16 @@ module.exports = {
             subject_id: vine.number().optional(),
         })
     )),
+    CreateTextbookLesson: createValidator((vine)=>(
+        vine.object({
+            topic: vine.string(),
+            description: vine.string(),
+            objectives: vine.string().optional(),
+            curriculum: vine.string().optional(),
+            duration: vine.string().optional(),
+            additional_instruction: vine.string().optional(),
+            chapter: vine.number().optional(),
+            class : vine.number().optional(),
+        })
+    )),
 };

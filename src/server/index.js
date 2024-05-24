@@ -1,30 +1,27 @@
 const express = require("express");
 const cors = require("cors");
-require('dotenv').config();
+require("dotenv").config();
 const crypto = require("crypto");
 const app = express();
 const { db } = require("../database/connection");
 const PORT = process.env.PORT || 8080;
-const IndexRoute = require('../routes/index');
-const treblle = require('@treblle/express');
-const UploadService = require('../services/upload.service');
+const IndexRoute = require("../routes/index");
+const treblle = require("@treblle/express");
+const UploadService = require("../services/upload.service");
 const AutoMigrate = require("../migrations/automigrate");
 const AuthorizationSeed = require("../seeders/seed.authorization");
 const Logger = require("../middleware/logger.middleware");
 const path = require("path");
 
-
 class Server {
-
     static boot() {
-
         const corsOptions = {
-            origin: '*',
-            methods: ['GET', 'POST', 'PUT', 'DELETE'],
-            allowedHeaders: ['Content-Type', 'Authorization'],
+            origin: "*",
+            methods: ["GET", "POST", "PUT", "DELETE"],
+            allowedHeaders: ["Content-Type", "Authorization"],
             credentials: true,
             preflightContinue: false,
-            optionsSuccessStatus: 200
+            optionsSuccessStatus: 200,
         };
 
         app.use(cors(corsOptions));
@@ -40,9 +37,10 @@ class Server {
 
         //=============== INITIALIZE DATABASE ================//
         //{force : true}
-        db.sequelize.sync()
+        db.sequelize
+            .sync()
             .then(async () => {
-                AutoMigrate.validateModelsIntegrity();
+                // AutoMigrate.validateModelsIntegrity();
                 // AuthorizationSeed.permission();
                 console.log("Synced db.");
             })
@@ -50,25 +48,20 @@ class Server {
                 console.log("Failed to sync db: " + err.message);
             });
 
-        app.use(express.static(path.join(__dirname, '../../public')));
-
+        app.use(express.static(path.join(__dirname, "../../public")));
 
         app.use(Logger.monitor);
 
         //=============== REGISTERED ROUTE ================//
 
         IndexRoute(app).register();
-        const jwt = require('jsonwebtoken');
-        const server = app.listen(PORT,"0.0.0.0" , () => {
-
+        const jwt = require("jsonwebtoken");
+        const server = app.listen(PORT, "0.0.0.0", () => {
             //  console.log([randomPrivateKey, randomPublicKey, token]);
 
             console.log(`NIMO SERVER RUNNING @ http://127.0.0.1:${PORT}/api`);
-
         });
-
     }
-
 }
 
 module.exports = Server;

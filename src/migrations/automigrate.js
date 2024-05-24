@@ -5,7 +5,6 @@ class AutoMigrate {
     static async validateModelsIntegrity(){
         const database = db;
         const allModels = Object.values(database.sequelize.models);
-        console.log();
         allModels.forEach((model) => {
             this.compareTableAttributes(database, model)
         });
@@ -35,6 +34,10 @@ class AutoMigrate {
                     ...tableDescription[attribute],
                     fieldName : attribute
                 });
+            } else {
+                // const columnType =  tableDescription[attribute].type;
+                // console.log(model.tableAttributes[attribute].type.toSql())
+                // console.log(model.tableAttributes[attribute].type.constructor.name)
             }
         })
 

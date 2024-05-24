@@ -1,10 +1,10 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 module.exports = (sequelize, DataTypes) => {
     const Teacher = sequelize.define(
-        'Teacher',
+        "Teacher",
         {
-            //================= PERSONAL INFORMATION=========// 
+            //================= PERSONAL INFORMATION=========//
 
             id: {
                 type: DataTypes.INTEGER,
@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
             name: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: '',
+                defaultValue: "",
             },
             gender: {
                 type: DataTypes.STRING,
@@ -51,15 +51,15 @@ module.exports = (sequelize, DataTypes) => {
             teacher_type: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: 'school',
+                defaultValue: "school",
             },
             institution_type: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: 'teacher',
+                defaultValue: "teacher",
             },
-            
-            //=========== BANK INFORMATION =========// 
+
+            //=========== BANK INFORMATION =========//
 
             bank_name: {
                 type: DataTypes.STRING,
@@ -81,9 +81,9 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.JSON,
                 defaultValue: [],
             },
-        }, {
-        timestamps: false,
-    });
+        },
+        { timestamps: false }
+    );
 
     return Teacher;
 };

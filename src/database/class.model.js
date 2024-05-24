@@ -22,14 +22,12 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 defaultValue: 0,
             },
-            default : {
-                type : DataTypes.BOOLEAN,
-                defaultValue : false
-            }
+            default: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+            },
         },
-        {
-            timestamps: false,
-        }
+        { timestamps: false }
     );
 
     return Class;

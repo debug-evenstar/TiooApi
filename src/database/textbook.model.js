@@ -19,14 +19,12 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
-            published : {
+            published: {
                 type: DataTypes.BOOLEAN,
-                defaultValue: false
-            }
+                defaultValue: false,
+            },
         },
-        {
-            timestamps: false,
-        }
+        { timestamps: false }
     );
 
     return Textbook;
