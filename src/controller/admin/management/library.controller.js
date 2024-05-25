@@ -61,7 +61,7 @@ class AdminLibraryController {
 
             await textbookInstance.addClasses(classInstance);
 
-            await subjectInstance.addTextbooks(textbookInstance);
+            await subjectInstance.addTextbook(textbookInstance);
 
             // ------------------------------------------
 
@@ -217,6 +217,37 @@ class AdminLibraryController {
         return await AdminLibraryController.fetchLessons(req, res);
     }
 
+    static async updateTextbookLesson(req, res) {
+        req.query.material_type = "textbook";
+        return AdminLibraryController.updateLesson(req, res);
+    }
+
+    static async deleteTextbookLesson(req, res) {
+        req.query.material_type = "textbook";
+        return AdminLibraryController.deleteLesson(req, res);
+    }
+
+    static async fetchLessons(req, res) {
+        try {
+            let lessons = [];
+            if (req.query.material_type == "textbook") {
+                const textbook = await Textbook.findByPk(req.params.id);
+                lessons = await textbook.getLessons();
+            }
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: lessons,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
+
     static async createLesson(req, res) {
         try {
             let preview = [];
@@ -270,6 +301,91 @@ class AdminLibraryController {
             });
         }
     }
+
+    static async updateLesson(req, res) {
+        try {
+            let preview = [];
+            if (req.files["preview"] && req.files["preview"].length > 0) {
+                for (var item of req.files["preview"]) {
+                    const ImageResponse = await cloudinaryUploadImage(
+                        item.path
+                    );
+                    preview.push(ImageResponse.secure_url);
+                }
+            } else {
+                if (req.files) {
+                    const filePath = req.files[0].path;
+                    const ImageResponse = await cloudinaryUploadImage(filePath);
+                    preview.push(ImageResponse.secure_url);
+                }
+            }
+
+            const textbookInstance = await Textbook.findByPk(req.params.id);
+
+            if (!textbookInstance) {
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: false,
+                    message: ResponseStatus.fail.not_found,
+                    data: {},
+                });
+            }
+
+            const lessonInstance = await Lesson.findByPk(req.params.lessonid);
+
+            req.body.preview = preview.length
+                ? preview
+                : lessonInstance.preview;
+
+            await lessonInstance.update(req.body);
+
+            if (req.body.class) {
+                const previousClass = await lessonInstance.getClass();
+                const classInstance = await Class.findByPk(req.body.class);
+                await previousClass.removeLesson(lessonInstance);
+                await classInstance.addLesson(lessonInstance);
+            }
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.update,
+                data: lessonInstance,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
+
+    static async deleteLesson(req, res) {
+        const { lessonid } = req.params;
+
+        try {
+            const lessonInstance = await Lesson.findByPk(lessonid);
+
+            if (!lessonInstance) {
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: true,
+                    message: ResponseStatus.fail.not_found,
+                });
+            }
+
+            const response = await lessonInstance.destroy();
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.delete,
+                data: response,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
+
     static async create(req, res) {
         const data = req.body;
 
@@ -298,27 +414,6 @@ class AdminLibraryController {
             });
         } catch (error) {
             console.log(error);
-            res.status(500).json({
-                error: "server error",
-                extra: error.message,
-            });
-        }
-    }
-
-    static async fetchLessons(req, res) {
-        try {
-            let lessons = [];
-            if (req.query.material_type == "textbook") {
-                const textbook = await Textbook.findByPk(req.params.id);
-                lessons = await textbook.getLessons();
-            }
-
-            return res.status(ResponseStatus.code.success).json({
-                error: false,
-                message: ResponseStatus.pass.read,
-                data: lessons,
-            });
-        } catch (error) {
             res.status(500).json({
                 error: "server error",
                 extra: error.message,
