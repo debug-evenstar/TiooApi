@@ -1,9 +1,7 @@
-
-module.exports = { 
-    createValidator : (schema) => {
+module.exports = {
+    createValidator: (schema) => {
         return async (req, res, next) => {
-            console.log(req.body);
-            const Vine = await import('@vinejs/vine');
+            const Vine = await import("@vinejs/vine");
             const vine = Vine.default;
             try {
                 const validator = vine.compile(schema(vine));
@@ -11,14 +9,24 @@ module.exports = {
                 next();
             } catch (error) {
                 if (error instanceof Vine.errors.E_VALIDATION_ERROR) {
-                    res.status(400).json({ 
-                        errors: error.messages.map((e)=>({
-                            field : e.field,
-                            message : e.message
-                        }))
+                    res.status(400).json({
+                        errors: error.messages.map((e) => ({
+                            field: e.field,
+                            message: e.message,
+                        })),
                     });
                 }
             }
         };
-    }
-}
+    },
+    generateRule: (ruleFunction) => {
+        let Vine = null;
+        const getVine = async () => {
+            Vine = (await import("@vinejs/vine")).default;
+        };
+        getVine();
+        return (...args) => {
+            return Vine.createRule(ruleFunction)(...args);
+        };
+    },
+};

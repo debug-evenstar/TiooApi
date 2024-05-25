@@ -1,26 +1,26 @@
 const { createValidator } = require("./Base");
+const { exists } = require("./custom/models");
 
 module.exports = {
-    CreateTextbook: createValidator((vine)=>(
+    CreateTextbook: createValidator((vine) =>
         vine.object({
             name: vine.string(),
             description: vine.string(),
-            subject_id: vine.number(),
-            classes : vine.unionOfTypes([
+            subject_id: vine.number().use(exists({ table: "subjects" })),
+            classes: vine.unionOfTypes([
                 vine.array(vine.number()).minLength(1),
                 vine.string(),
-            ])
-             
+            ]),
         })
-    )),
-    UpdateTextbook: createValidator((vine)=>(
+    ),
+    UpdateTextbook: createValidator((vine) =>
         vine.object({
             name: vine.string(),
             description: vine.string(),
             subject_id: vine.number().optional(),
         })
-    )),
-    CreateTextbookLesson: createValidator((vine)=>(
+    ),
+    CreateTextbookLesson: createValidator((vine) =>
         vine.object({
             topic: vine.string(),
             description: vine.string(),
@@ -29,7 +29,7 @@ module.exports = {
             duration: vine.string().optional(),
             additional_instruction: vine.string().optional(),
             chapter: vine.number().optional(),
-            class : vine.number().optional(),
+            class: vine.number().optional(),
         })
-    )),
+    ),
 };
