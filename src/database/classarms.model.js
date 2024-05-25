@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: "Primary 1A",
             },
         },
-        { timestamps: false }
+        { timestamps: true }
     );
 
     return ClassArm;

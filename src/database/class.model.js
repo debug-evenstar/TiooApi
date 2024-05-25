@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: false,
             },
         },
-        { timestamps: false }
+        { timestamps: true }
     );
 
     return Class;

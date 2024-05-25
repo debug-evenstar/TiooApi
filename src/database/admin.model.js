@@ -46,6 +46,7 @@ module.exports = (sequelize, Sequelize) => {
         {
             indexes: [{ unique: true, fields: ["email"] }],
             timestamps: true,
+            paranoid: true,
             defaultScope: {
                 attributes: {
                     exclude: ["updatedAt"],

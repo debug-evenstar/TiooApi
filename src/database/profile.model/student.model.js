@@ -52,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             },
         },
-        { timestamps: false }
+        { timestamps: true }
     );
 
     return Student;

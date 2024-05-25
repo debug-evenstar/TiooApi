@@ -39,7 +39,7 @@ module.exports = (sequelize, Sequelize) => {
                 allowNull: false,
             },
         },
-        { timestamps: false }
+        { timestamps: true }
     );
 
     Invite.beforeCreate(async (invite, options) => {});

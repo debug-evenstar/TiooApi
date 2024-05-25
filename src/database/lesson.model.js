@@ -116,7 +116,7 @@ module.exports = (sequelize, Sequelize) => {
                 defaultValue: false,
             },
         },
-        { timestamps: true }
+        { timestamps: true, paranoid : true }
     );
 
     return Lesson;

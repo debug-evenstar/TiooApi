@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: false,
             },
         },
-        { timestamps: false }
+        { timestamps: true, paranoid : true }
     );
 
     return Textbook;

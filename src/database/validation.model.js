@@ -28,7 +28,7 @@ module.exports = (sequelize, Sequelize) => {
                 defaultValue: () => new Date(Date.now() + 30 * 60 * 1000), // Set default expiration to 3 minutes from now
             },
         },
-        { timestamps: false }
+        { timestamps: true }
     );
 
     // Validation.beforeSave(async (validation, options) => {

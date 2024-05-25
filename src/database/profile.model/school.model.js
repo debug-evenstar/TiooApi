@@ -116,7 +116,7 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: [],
             },
         },
-        { timestamps: false }
+        { timestamps: true }
     );
 
     return SchoolManagement;

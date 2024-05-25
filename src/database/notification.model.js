@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: "school",
             },
         },
-        { timestamps: false }
+        { timestamps: true }
     );
 
     Notification.seedIfEmpty = async () => {

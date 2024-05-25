@@ -151,7 +151,7 @@ class Relationships {
         ClassArm.belongsToMany(Group, { through: "classarm_groups" });
         Group.belongsToMany(ClassArm, { through: "classarm_groups" });
 
-        Lesson.belongsToMany(ClassArm, { through: "clasarm_lessons" });
+        Lesson.belongsToMany(ClassArm, { through: "classarm_lessons" });
         ClassArm.belongsToMany(Lesson, { through: "classarm_lessons" });
 
         Textbook.belongsToMany(Account, { through: "account_textbooks" });
