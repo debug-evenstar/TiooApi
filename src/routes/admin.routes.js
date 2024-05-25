@@ -122,10 +122,8 @@ const AdminRoutesGroup = (router) => {
     router.put('/library/textbooks/:id',[UploadService.uploadLesson.single('cover'), TextbookValidator.UpdateTextbook],AdminLibraryController.updateLibraryTextbook);
     router.delete('/library/textbooks/:id', AdminLibraryController.deleteTextbook);
 
-    /* ---------------------------------------------- - --------------------------------------------- */
-    /* ------------------------------------------- LESSONS ------------------------------------------ */
-
-    // router.get('/lessons', AdminLibraryController.fetchLessons);
+    router.get('/library/textbooks/:id/lessons', AdminLibraryController.fetchTextbookLessons);
+    router.post('/library/textbooks/:id/lessons', [UploadService.uploadLesson.array('preview'), TextbookValidator.CreateTextbookLesson], AdminLibraryController.createTextbookLesson);
 
     // router.post('/library', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
     // router.get('/library', AdminLibraryController.read);

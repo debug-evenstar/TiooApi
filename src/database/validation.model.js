@@ -1,32 +1,34 @@
 const { MD5 } = require("crypto-js");
 
 module.exports = (sequelize, Sequelize) => {
-    const Validation = sequelize.define("Validation", {
-        id: {
-            type: Sequelize.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
+    const Validation = sequelize.define(
+        "Validation",
+        {
+            id: {
+                type: Sequelize.INTEGER,
+                primaryKey: true,
+                autoIncrement: true,
+            },
+            otp: {
+                type: Sequelize.STRING(6),
+                allowNull: true,
+            },
+            token: {
+                type: Sequelize.TEXT,
+                allowNull: true,
+            },
+            createdAt: {
+                type: Sequelize.DATE,
+                allowNull: false,
+                defaultValue: Sequelize.NOW,
+            },
+            expires_at: {
+                type: Sequelize.DATE,
+                allowNull: false,
+                defaultValue: () => new Date(Date.now() + 30 * 60 * 1000), // Set default expiration to 3 minutes from now
+            },
         },
-        otp: {
-            type: Sequelize.STRING(6),
-            allowNull: true,
-        },
-        token: {
-            type: Sequelize.TEXT,
-            allowNull: true,
-        },
-        createdAt: {
-            type: Sequelize.DATE,
-            allowNull: false,
-            defaultValue: Sequelize.NOW,
-        },
-        expires_at: {
-            type: Sequelize.DATE,
-            allowNull: false,
-            defaultValue: () => new Date(Date.now() + 30 * 60 * 1000), // Set default expiration to 3 minutes from now
-        },
-    },
-        { timestamps: false },
+        { timestamps: true }
     );
 
     // Validation.beforeSave(async (validation, options) => {

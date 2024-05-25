@@ -1,11 +1,10 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 module.exports = (sequelize, DataTypes) => {
     const SchoolManagement = sequelize.define(
-        'SchoolManagement',
+        "SchoolManagement",
         {
-
-            //================= PERSONAL INFORMATION=========// 
+            //================= PERSONAL INFORMATION=========//
 
             id: {
                 type: DataTypes.INTEGER,
@@ -14,19 +13,19 @@ module.exports = (sequelize, DataTypes) => {
             },
             school_types: {
                 type: DataTypes.TEXT,
-                defaultValue: JSON.stringify(['primary', 'secondary']),
+                defaultValue: JSON.stringify(["primary", "secondary"]),
             },
             school_name: {
                 type: DataTypes.TEXT,
-                allowNull: false
+                allowNull: false,
             },
             naming_types: {
                 type: DataTypes.TEXT,
-                defaultValue: "nurs-sec"
+                defaultValue: "nurs-sec",
             },
             others: {
                 type: DataTypes.JSON,
-                allowNull: true
+                allowNull: true,
             },
 
             dob: {
@@ -36,21 +35,18 @@ module.exports = (sequelize, DataTypes) => {
             gender: {
                 type: DataTypes.STRING,
                 allowNull: true,
-
             },
             nationality: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: "Nigeria"
+                defaultValue: "Nigeria",
             },
             residential_address: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
 
-
-            //=========== IDENTIFICATION DOCUMENT =========// 
-
+            //=========== IDENTIFICATION DOCUMENT =========//
 
             ssn: {
                 type: DataTypes.STRING,
@@ -119,10 +115,9 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.JSON,
                 defaultValue: [],
             },
-
-        }, {
-        timestamps: false,
-    });
+        },
+        { timestamps: true }
+    );
 
     return SchoolManagement;
 };

@@ -2,6 +2,7 @@
 module.exports = { 
     createValidator : (schema) => {
         return async (req, res, next) => {
+            console.log(req.body);
             const Vine = await import('@vinejs/vine');
             const vine = Vine.default;
             try {

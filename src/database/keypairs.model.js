@@ -1,25 +1,23 @@
-const bcrypt = require('bcrypt');
-const HashUtils = require('../utils/hash.utilities');
+const bcrypt = require("bcrypt");
+const HashUtils = require("../utils/hash.utilities");
 
 module.exports = (sequelize, DataTypes) => {
     const Keypairs = sequelize.define(
-        'Keypairs',
+        "Keypairs",
         {
             public_key: {
                 type: DataTypes.TEXT,
                 allowNull: true,
-               // defaultValue: 
-
+                // defaultValue:
             },
             private_key: {
                 type: DataTypes.TEXT,
                 allowNull: true,
-               // defaultValue: 
+                // defaultValue:
             },
-
-        }, {
-        timestamps: true,
-    });
+        },
+        { timestamps: true }
+    );
 
     return Keypairs;
 };

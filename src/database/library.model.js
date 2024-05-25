@@ -1,23 +1,23 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 module.exports = (sequelize, DataTypes) => {
     const Library = sequelize.define(
-        'Library',
+        "Library",
         {
             age: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
-                defaultValue: 5, 
+                defaultValue: 5,
             },
             name: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: 'Undefined',
+                defaultValue: "Undefined",
             },
             description: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: 'Undefined',
+                defaultValue: "Undefined",
             },
             file: {
                 type: DataTypes.STRING,
@@ -26,10 +26,10 @@ module.exports = (sequelize, DataTypes) => {
             category: {
                 type: DataTypes.INTEGER,
                 allowNull: true,
-            }
-        }, {
-        timestamps: false,
-    });
+            },
+        },
+        { timestamps: false }
+    );
 
     return Library;
 };

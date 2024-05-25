@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
     const CartItem = sequelize.define(
-        'CartItem',
+        "CartItem",
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
             },
             type: {
                 type: DataTypes.STRING,
-                defaultValue: 'textbook',
+                defaultValue: "textbook",
             },
             item: {
                 type: DataTypes.JSON,
@@ -21,9 +21,9 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
                 defaultValue: {},
             },
-        }, {
-        timestamps: false,
-    });
+        },
+        { timestamps: false }
+    );
 
     return CartItem;
 };
