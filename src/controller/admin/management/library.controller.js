@@ -25,7 +25,6 @@ const e = require("express");
 const cloudinaryUploadImage = require("../../../utils/cloudinary.utilities");
 
 class AdminLibraryController {
-    
     /* ---------------------------------------------------------------------------------------------- */
     /*                                            TEXTBOOK                                            */
     /* ---------------------------------------------------------------------------------------------- */
@@ -62,7 +61,7 @@ class AdminLibraryController {
 
             await textbookInstance.addClasses(classInstance);
 
-            await subjectInstance.addTextbook(textbookInstance);
+            await subjectInstance.addTextbooks(textbookInstance);
 
             // ------------------------------------------
 
@@ -220,9 +219,8 @@ class AdminLibraryController {
 
     static async createLesson(req, res) {
         try {
-
             let preview = [];
-            if ( req.files["preview"] && req.files["preview"].length > 0) {
+            if (req.files["preview"] && req.files["preview"].length > 0) {
                 for (var item of req.files["preview"]) {
                     const ImageResponse = await cloudinaryUploadImage(
                         item.path
@@ -253,7 +251,6 @@ class AdminLibraryController {
             const lessonInstance = await Lesson.create(req.body);
 
             if (req.body.class) {
-
                 const classInstance = await Class.findByPk(req.body.class);
 
                 await classInstance.addLesson(lessonInstance);
@@ -328,7 +325,6 @@ class AdminLibraryController {
             });
         }
     }
-
 
     static async addLibraryLesson(req, res) {
         const today = new Date();
@@ -741,7 +737,6 @@ class AdminLibraryController {
             });
         }
     }
-
 
     static async deleteLibraryLesson(req, res) {
         const { id } = req.params;
