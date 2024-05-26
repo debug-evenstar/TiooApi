@@ -28,6 +28,8 @@ const TokenMiddleware = require('../middleware/token.middleware');
 const TextbookValidator = require('./validators/TextbookValidator');
 const LessonValidator = require('./validators/LessonValidator');
 const LessonController = require('../controller/lesson.controller');
+const TextbookController = require('../controller/admin/management/textbook.controller');
+const TeacherController = require('../controller/teacher.controller');
 
 
 
@@ -124,10 +126,15 @@ const AdminRoutesGroup = (router) => {
     router.put('/library/textbooks/:id',[UploadService.uploadLesson.single('cover'), TextbookValidator.UpdateTextbook],AdminLibraryController.updateLibraryTextbook);
     router.delete('/library/textbooks/:id', AdminLibraryController.deleteTextbook);
 
-    router.get('/library/textbooks/:id/lessons', AdminLibraryController.fetchTextbookLessons);
-    router.post('/library/textbooks/:id/lessons', [UploadService.uploadLesson.array('preview'), TextbookValidator.CreateTextbookLesson], AdminLibraryController.createTextbookLesson);
-    router.put('/library/textbooks/:id/lessons/:lessonid', [UploadService.uploadLesson.array('preview'), TextbookValidator.CreateTextbookLesson], AdminLibraryController.updateTextbookLesson);
-    router.delete('/library/textbooks/:id/lessons/:lessonid', AdminLibraryController.deleteTextbookLesson);
+    router.get('/library/textbooks/:id/chapters', TextbookController.fetchChapters);
+    router.post('/library/textbooks/:id/chapters', TextbookValidator.CreateTextbookChapter, TextbookController.createChapter);
+    router.put('/library/textbooks/:id/chapters/:chapterid', TextbookValidator.CreateTextbookChapter, TextbookController.updateChapter);
+    router.delete('/library/textbooks/:id/chapters/:chapterid', TextbookController.deleteChapter);
+
+    router.get('/library/textbooks/:id/lessons', TextbookController.fetchTextbookLessons);
+    router.post('/library/textbooks/:id/lessons', [UploadService.uploadLesson.array('preview'), TextbookValidator.CreateTextbookLesson], TextbookController.createTextbookLesson);
+    router.put('/library/textbooks/:id/lessons/:lessonid', [UploadService.uploadLesson.array('preview'), TextbookValidator.CreateTextbookLesson], TextbookController.updateTextbookLesson);
+    router.delete('/library/textbooks/:id/lessons/:lessonid', TextbookController.deleteTextbookLesson);
 
 
     /* ------------------------------------------- LESSONS ------------------------------------------ */

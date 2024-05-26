@@ -28,8 +28,15 @@ module.exports = {
             curriculum: vine.string().optional(),
             duration: vine.string().optional(),
             additional_instruction: vine.string().optional(),
-            chapter: vine.number().optional(),
+            chapter_id: vine.number(),
             class: vine.number().optional(),
+        })
+    ),
+    CreateTextbookChapter: createValidator((vine) =>
+        vine.object({
+            name: vine.string(),
+            description: vine.string().optional(),
+            index: vine.number(),
         })
     ),
 };

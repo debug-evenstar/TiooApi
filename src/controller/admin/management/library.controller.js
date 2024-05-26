@@ -16,6 +16,7 @@ const {
     LessonSlide,
     Group,
     Textbook,
+    Chapter,
 } = require("../../../database/connection");
 const { use } = require("chai");
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
@@ -99,7 +100,7 @@ class AdminLibraryController {
             const textbook = await Textbook.findByPk(id);
 
             const previousSubjectInstance = await Subject.findByPk(
-                textbook.SubjectId
+                textbook.subject_id
             );
 
             const textbookInstance = await textbook.update(req.body);
@@ -208,30 +209,6 @@ class AdminLibraryController {
         }
     }
 
-    /* ---------------------------------------------------------------------------------------------- */
-    /*                                             LESSONS                                            */
-    /* ---------------------------------------------------------------------------------------------- */
-
-    static async createTextbookLesson(req, res) {
-        req.query.material_type = "textbook";
-        return AdminLibraryController.createLesson(req, res);
-    }
-
-    static async fetchTextbookLessons(req, res) {
-        req.query.material_type = "textbook";
-        return await AdminLibraryController.fetchLessons(req, res);
-    }
-
-    static async updateTextbookLesson(req, res) {
-        req.query.material_type = "textbook";
-        return AdminLibraryController.updateLesson(req, res);
-    }
-
-    static async deleteTextbookLesson(req, res) {
-        req.query.material_type = "textbook";
-        return AdminLibraryController.deleteLesson(req, res);
-    }
-
     static async fetchLessons(req, res) {
         try {
             let lessons = [];
@@ -292,6 +269,13 @@ class AdminLibraryController {
                 await classInstance.addLesson(lessonInstance);
             }
 
+            if (req.body.chapter_id) {
+                const chapterInstance = await Chapter.findByPk(
+                    req.body.chapter_id
+                );
+                await chapterInstance.addLesson(lessonInstance);
+            }
+
             await textbookInstance.addLesson(lessonInstance);
 
             return res.status(ResponseStatus.code.success).json({
@@ -348,6 +332,17 @@ class AdminLibraryController {
                 const classInstance = await Class.findByPk(req.body.class);
                 await previousClass.removeLesson(lessonInstance);
                 await classInstance.addLesson(lessonInstance);
+            }
+
+            if (req.body.chapter_id) {
+                const chapterInstance = await Chapter.findByPk(
+                    req.body.chapter_id
+                );
+
+                const previousChapterInstance =
+                    await lessonInstance.getChapter();
+                await chapterInstance.addLesson(lessonInstance);
+                await previousChapterInstance.removeLesson(lessonInstance);
             }
 
             return res.status(ResponseStatus.code.success).json({

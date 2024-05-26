@@ -40,7 +40,7 @@ class Server {
         db.sequelize
             .sync()
             .then(async () => {
-                // AutoMigrate.validateModelsIntegrity();
+                AutoMigrate.validateModelsIntegrity();
                 // AuthorizationSeed.permission();
                 console.log("Synced db.");
             })

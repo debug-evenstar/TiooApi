@@ -14,7 +14,11 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
                 defaultValue: "Chapter 1",
             },
-            title: {
+            index: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            },
+            description: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
