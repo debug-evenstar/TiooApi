@@ -40,93 +40,166 @@ class Relationships {
             allowNull: true,
             onDelete: "CASCADE",
         });
-        SchoolManagement.belongsTo(Account, { allowNull: true });
 
-        Account.hasOne(Teacher, { allowNull: true, onDelete: "CASCADE" });
-        Teacher.belongsTo(Account, { allowNull: true });
+        SchoolManagement.belongsTo(Account, {
+            allowNull: true,
+            foreignKey: "account_id",
+        });
 
-        Account.hasOne(Student, { allowNull: true, onDelete: "CASCADE" });
-        Student.belongsTo(Account, { allowNull: true });
+        Account.hasOne(Teacher, {
+            allowNull: true,
+            onDelete: "CASCADE",
+            foreignKey: "account_id",
+        });
+        Teacher.belongsTo(Account, {
+            allowNull: true,
+            foreignKey: "account_id",
+        });
 
-        Account.hasOne(Authorization, { allowNull: true, onDelete: "CASCADE" });
-        Authorization.belongsTo(Account, { allowNull: true });
+        Account.hasOne(Student, {
+            allowNull: true,
+            onDelete: "CASCADE",
+            foreignKey: "account_id",
+        });
+        Student.belongsTo(Account, {
+            allowNull: true,
+            foreignKey: "account_id",
+        });
 
-        Admin.hasOne(Validation, { allowNull: true });
-        Validation.belongsTo(Admin, { allowNull: true });
+        Account.hasOne(Authorization, {
+            allowNull: true,
+            onDelete: "CASCADE",
+            foreignKey: "account_id",
+        });
+        Authorization.belongsTo(Account, {
+            allowNull: true,
+            foreignKey: "account_id",
+        });
 
-        Admin.hasOne(Authorization, { allowNull: true, onDelete: "CASCADE" });
-        Authorization.belongsTo(Admin, { allowNull: true });
+        Admin.hasOne(Validation, { allowNull: true, foreignKey: "admin_id" });
+        Validation.belongsTo(Admin, {
+            allowNull: true,
+            foreignKey: "admin_id",
+        });
 
-        Account.hasOne(Preference, { allowNull: true, onDelete: "CASCADE" });
-        Preference.belongsTo(Account, { allowNull: true });
+        Admin.hasOne(Authorization, {
+            allowNull: true,
+            onDelete: "CASCADE",
+            foreignKey: "admin_id",
+        });
+        Authorization.belongsTo(Admin, {
+            allowNull: true,
+            foreignKey: "admin_id",
+        });
 
-        SchoolManagement.hasOne(Keypairs);
-        Keypairs.belongsTo(SchoolManagement);
-        -Account.hasOne(Preference, { allowNull: true, onDelete: "CASCADE" });
-        Preference.belongsTo(Account, { allowNull: true });
+        Account.hasOne(Preference, {
+            allowNull: true,
+            onDelete: "CASCADE",
+            foreignKey: "account_id",
+        });
+        Preference.belongsTo(Account, {
+            allowNull: true,
+            foreignKey: "account_id",
+        });
+
+        SchoolManagement.hasOne(Keypairs, {
+            foreignKey: "school_management_id",
+        });
+
+        Keypairs.belongsTo(SchoolManagement, {
+            foreignKey: "school_management_id",
+        });
+
+        -Account.hasOne(Preference, {
+            allowNull: true,
+            onDelete: "CASCADE",
+            foreignKey: "account_id",
+        });
+        Preference.belongsTo(Account, {
+            allowNull: true,
+            foreignKey: "school_management_id",
+        });
 
         //---------/ ONE-TO-MANY - SCHOOL -*- CLASS | TEACHERS | STUDENT | SUBJECT /--------------------
 
-        SchoolManagement.hasMany(Teacher);
-        Teacher.belongsTo(SchoolManagement);
+        SchoolManagement.hasMany(Teacher, {
+            foreignKey: "school_management_id",
+        });
+        Teacher.belongsTo(SchoolManagement, {
+            foreignKey: "school_management_id",
+        });
 
-        Notification.hasMany(Subscription);
-        Subscription.belongsTo(Notification);
+        Notification.hasMany(Subscription, { foreignKey: "notification_id" });
+        Subscription.belongsTo(Notification, { foreignKey: "notification_id" });
 
-        Account.hasMany(Subscription);
-        Subscription.belongsTo(Account);
+        Account.hasMany(Subscription, { foreignKey: "account_id" });
+        Subscription.belongsTo(Account, { foreignKey: "account_id" });
 
-        SchoolManagement.hasMany(Student);
-        Student.belongsTo(SchoolManagement);
+        SchoolManagement.hasMany(Student, {
+            foreignKey: "school_management_id",
+        });
+        Student.belongsTo(SchoolManagement, {
+            foreignKey: "school_management_id",
+        });
 
-        SchoolManagement.hasMany(Subject);
-        Subject.belongsTo(SchoolManagement);
+        SchoolManagement.hasMany(Subject, {
+            foreignKey: "school_management_id",
+        });
+        Subject.belongsTo(SchoolManagement, {
+            foreignKey: "school_management_id",
+        });
 
-        SchoolManagement.hasMany(Class);
-        Class.belongsTo(SchoolManagement);
+        SchoolManagement.hasMany(Class, { foreignKey: "school_management_id" });
+        Class.belongsTo(SchoolManagement, {
+            foreignKey: "school_management_id",
+        });
 
-        SchoolManagement.hasMany(Authorization);
-        Authorization.belongsTo(SchoolManagement);
+        SchoolManagement.hasMany(Authorization, {
+            foreignKey: "school_management_id",
+        });
+        Authorization.belongsTo(SchoolManagement, {
+            foreignKey: "school_management_id",
+        });
 
-        Subject.hasMany(Group);
-        Group.belongsTo(Subject);
+        Subject.hasMany(Group, { foreignKey: "subject_id" });
+        Group.belongsTo(Subject, { foreignKey: "subject_id" });
 
-        Group.hasMany(Lesson);
-        Lesson.belongsTo(Group);
+        Group.hasMany(Lesson, { foreignKey: "group_id" });
+        Lesson.belongsTo(Group, { foreignKey: "group_id" });
 
         //---------/ ONE-TO-MANY - CLASS -*- STUDENTS /--------------------
 
-        Class.hasMany(Student);
-        Student.belongsTo(Class);
+        Class.hasMany(Student, { foreignKey: "class_id" });
+        Student.belongsTo(Class, { foreignKey: "class_id" });
 
-        Class.hasMany(ClassArm);
-        ClassArm.belongsTo(Class);
+        Class.hasMany(ClassArm, { foreignKey: "class_id" });
+        ClassArm.belongsTo(Class, { foreignKey: "class_id" });
 
-        ClassArm.hasMany(Student);
-        Student.belongsTo(ClassArm);
+        ClassArm.hasMany(Student, { foreignKey: "class_aram_id" });
+        Student.belongsTo(ClassArm, { foreignKey: "class_aram_id" });
 
-        Class.hasMany(Lesson);
-        Lesson.belongsTo(Class);
+        Class.hasMany(Lesson, { foreignKey: "class_id" });
+        Lesson.belongsTo(Class, { foreignKey: "class_id" });
 
         Group.belongsTo(Class, { foreignKey: "ref_cid" });
 
-        Subject.hasMany(Chapter);
-        Chapter.belongsTo(Subject);
+        Subject.hasMany(Chapter, { foreignKey: "subject_id" });
+        Chapter.belongsTo(Subject, { foreignKey: "subject_id" });
 
-        Chapter.hasMany(Lesson);
-        Lesson.belongsTo(Chapter);
+        Chapter.hasMany(Lesson, { foreignKey: "chapter_id" });
+        Lesson.belongsTo(Chapter, { foreignKey: "chapter_id" });
 
-        Lesson.hasMany(LessonSlide);
-        LessonSlide.belongsTo(Lesson);
+        Lesson.hasMany(LessonSlide, { foreignKey: "lesson_id" });
+        LessonSlide.belongsTo(Lesson, { foreignKey: "lesson_id" });
 
-        Account.hasMany(Billing);
-        Billing.belongsTo(Account);
+        Account.hasMany(Billing, { foreignKey: "account_id" });
+        Billing.belongsTo(Account, { foreignKey: "account_id" });
 
-        Subject.hasMany(Textbook);
-        Textbook.belongsTo(Subject);
+        Subject.hasMany(Textbook, { foreignKey: "subject_id" });
+        Textbook.belongsTo(Subject, { foreignKey: "subject_id" });
 
-        Account.hasMany(CartItem);
-        CartItem.belongsTo(Account);
+        Account.hasMany(CartItem, { foreignKey: "account_id" });
+        CartItem.belongsTo(Account, { foreignKey: "account_id" });
 
         //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 

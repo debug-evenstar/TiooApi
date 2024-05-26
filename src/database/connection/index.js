@@ -10,6 +10,9 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     operatorsAliases: 0,
     define: {
         underscored: true,
+        createdAt: "created_at",
+        updatedAt: "updated_at",
+        deletedAt: "deleted_at",
     },
     pool: {
         max: dbConfig.pool.max,
