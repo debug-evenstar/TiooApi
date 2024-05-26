@@ -9,6 +9,7 @@ const {
     Group,
     LessonSlide,
     Account,
+    Textbook,
 } = require("../database/connection");
 
 const fs = require("fs-extra");
@@ -724,7 +725,7 @@ class LessonController {
                         model: LessonSlide,
                         orderBy: { slide_index: "asc" },
                     },
-                    Subject,
+                    Textbook,
                 ],
             });
 
@@ -1162,11 +1163,20 @@ class LessonController {
         const data = req.body;
 
         try {
+            const lessonInstance = await Lesson.findByPk(id);
+
+            if (!lessonInstance) {
+                return res.status(ResponseStatus.code.bad_request).json({
+                    error: true,
+                    message: ResponseStatus.fail.not_found,
+                });
+            }
             const lessonSlideInstance = await LessonSlide.create({
-                lesson_id: id,
                 slide_index: data.slide_index,
                 slide_data: data.slide_data,
             });
+
+            await lessonInstance.addLessonSlide(lessonSlideInstance);
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
