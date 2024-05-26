@@ -42,6 +42,11 @@ class AdminLibraryController {
         }
 
         try {
+            let classes = JSON.parse(req.body.classes);
+            req.body.classes = classes;
+        } catch (err) {}
+
+        try {
             const classInstance = await Class.findAll({
                 where: { id: [...req.body.classes] },
             });
