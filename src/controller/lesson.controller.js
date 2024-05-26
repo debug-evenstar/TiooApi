@@ -1,26 +1,30 @@
 const ResponseStatus = require("../config/message.config");
-const { validationResult, param } = require('express-validator');
-const { Lesson, Subject, Chapter, Class, ClassArm, Group, LessonSlide, Account } = require("../database/connection");
+const { validationResult, param } = require("express-validator");
+const {
+    Lesson,
+    Subject,
+    Chapter,
+    Class,
+    ClassArm,
+    Group,
+    LessonSlide,
+    Account,
+} = require("../database/connection");
 
-const fs = require('fs-extra');
-const path = require('path');
-const Docxtemplater = require('docxtemplater');
-const docx = require('docx');
-const HtmlToDocx = require('html-to-docx');
-const Sequelize = require('sequelize');
+const fs = require("fs-extra");
+const path = require("path");
+const Docxtemplater = require("docxtemplater");
+const docx = require("docx");
+const HtmlToDocx = require("html-to-docx");
+const Sequelize = require("sequelize");
 const LessonTemplateProvider = require("../providers/AI/lesson.template");
 const { equal } = require("../utils/array");
 const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
 
-
-
 class LessonController {
-
-
     /*-----------------------------------| UPLOAD LESSON |-----------------------------------*/
 
     static async createLesson(req, res) {
-
         let filePaths = [];
         const today = new Date();
         const threeDaysAhead = new Date();
@@ -40,15 +44,16 @@ class LessonController {
         }
 
         try {
-
             const lessonInstance = await Lesson.create(req.body);
             const subjectInstance = await Subject.findByPk(req.body.subject);
 
             if (!subjectInstance) {
-                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
-
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: false,
+                    message: ResponseStatus.fail.not_found,
+                    data: {},
+                });
             }
-
 
             await subjectInstance.addLesson(lessonInstance);
 
@@ -61,7 +66,9 @@ class LessonController {
 
             const classInstance = await Class.findByPk(req.body.class);
 
-            const classarmInstances = await ClassArm.findAll({ where: { id: [...JSON.parse(req.body.class_arms)] } });
+            const classarmInstances = await ClassArm.findAll({
+                where: { id: [...JSON.parse(req.body.class_arms)] },
+            });
 
             await subjectInstance.addChapter(chapterInstance);
 
@@ -69,31 +76,38 @@ class LessonController {
 
             await subjectInstance.addLesson(lessonInstance);
 
-            const instance1 = await lessonInstance.addClassArms(classarmInstances);
+            const instance1 = await lessonInstance.addClassArms(
+                classarmInstances
+            );
 
             await classInstance.addLesson(lessonInstance);
 
             const groupInstance = await Group.create({
                 naming: classInstance.naming,
-                ref_cid: classInstance.id
+                ref_cid: classInstance.id,
             });
 
             await groupInstance.addLesson(lessonInstance);
-            const instance2 = await groupInstance.addClassArms(classarmInstances);
+            const instance2 = await groupInstance.addClassArms(
+                classarmInstances
+            );
             const subjejctGroup = await subjectInstance.addGroup(groupInstance);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
-
-
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.create,
+                data: groupInstance,
+            });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
     static async addLessonToGroup(req, res) {
-
         let filePaths = [];
 
         if (req.files && req.files.length > 0) {
@@ -102,10 +116,11 @@ class LessonController {
         }
 
         try {
-
             const lessonInstance = await Lesson.create(req.body);
             const groupInstance = await Group.findByPk(req.params.id);
-            const subjectInstance = await Subject.findByPk(groupInstance.SubjectId);
+            const subjectInstance = await Subject.findByPk(
+                groupInstance.SubjectId
+            );
 
             // Create a new chapter instance
             const chapter = new Chapter();
@@ -129,40 +144,44 @@ class LessonController {
 
             await lessonInstance.addClassArms(classArms);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
-
-
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.create,
+                data: groupInstance,
+            });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
-
-
 
     static async editGroupArms(req, res) {
         try {
-
             const groupInstance = await Group.findByPk(req.params.id);
 
             const classArms = await groupInstance.getClassArms();
 
             await groupInstance.removeClassArms(classArms);
 
-            const classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.class_arms] } });
+            const classarmInstances = await ClassArm.findAll({
+                where: { id: [...req.body.class_arms] },
+            });
 
             await groupInstance.addClassArms(classarmInstances);
 
             // Merge class groups if similar groups exist
-            const groupArmIds = classarmInstances.map(arm => arm.id);
+            const groupArmIds = classarmInstances.map((arm) => arm.id);
             const groupSubject = await groupInstance.getSubject();
             const subjectGroups = await groupSubject.getGroups({
-                include: [ClassArm]
+                include: [ClassArm],
             });
 
             for (let index = 0; index < subjectGroups.length; index++) {
                 const group = subjectGroups[index];
-                const armsIds = group.ClassArms.map(arm => arm.id);
+                const armsIds = group.ClassArms.map((arm) => arm.id);
                 if (
                     armsIds.length == groupArmIds.length &&
                     equal(armsIds, groupArmIds) &&
@@ -173,7 +192,7 @@ class LessonController {
                     for (let i = 0; i < groupLessons.length; i++) {
                         const lesson = groupLessons[i];
                         await lesson.update({
-                            GroupId: groupInstance.id
+                            GroupId: groupInstance.id,
                         });
                     }
                     // Delete current group
@@ -181,18 +200,21 @@ class LessonController {
                 }
             }
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
-
-
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.create,
+                data: groupInstance,
+            });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
     static async generateLessonWithGroup(req, res) {
-
         const groupID = req.params.id;
         const today = new Date();
         const threeDaysAhead = new Date();
@@ -202,12 +224,13 @@ class LessonController {
         req.body.end_date = threeDaysAhead;
 
         try {
+            const selectedGroup = await Group.findByPk(groupID, {
+                include: [ClassArm],
+            });
 
-
-
-            const selectedGroup = await Group.findByPk(groupID, { include: [ClassArm] });
-
-            const classarmsArray = selectedGroup.ClassArms.map((element) => element.id);
+            const classarmsArray = selectedGroup.ClassArms.map(
+                (element) => element.id
+            );
 
             const body = {
                 topic: req.body.topic,
@@ -222,17 +245,21 @@ class LessonController {
                 term: req.body.term,
                 class: selectedGroup.ref_cid,
                 class_arms: classarmsArray,
-                additional_instruction: req.body.additional_instruction
-            }
+                additional_instruction: req.body.additional_instruction,
+            };
 
             const lessonInstance = await Lesson.create(body);
-            const subjectInstance = await Subject.findByPk(selectedGroup.SubjectId);
+            const subjectInstance = await Subject.findByPk(
+                selectedGroup.SubjectId
+            );
 
             if (!subjectInstance) {
-                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: false,
+                    message: ResponseStatus.fail.not_found,
+                    data: {},
+                });
             }
-
-
 
             await subjectInstance.addLesson(lessonInstance);
 
@@ -244,7 +271,9 @@ class LessonController {
 
             const classInstance = await Class.findByPk(selectedGroup.ref_cid);
 
-            const classarmInstances = await ClassArm.findAll({ where: { id: classarmsArray } });
+            const classarmInstances = await ClassArm.findAll({
+                where: { id: classarmsArray },
+            });
 
             await subjectInstance.addChapter(chapterInstance);
 
@@ -252,26 +281,30 @@ class LessonController {
 
             await subjectInstance.addLesson(lessonInstance);
 
-            const instance1 = await lessonInstance.addClassArms(classarmInstances);
+            const instance1 = await lessonInstance.addClassArms(
+                classarmInstances
+            );
 
             await classInstance.addLesson(lessonInstance);
 
             await selectedGroup.addLesson(lessonInstance);
-            const instance2 = await selectedGroup.addClassArms(classarmInstances);
+            const instance2 = await selectedGroup.addClassArms(
+                classarmInstances
+            );
             const subjejctGroup = await subjectInstance.addGroup(selectedGroup);
 
-
             if (req.body.resources == 1) {
-
                 const body = {
-                    "topic": req.body.topic,
-                    "grade": classInstance.naming,
-                    "objectives": req.body.objective,
-                    "duration": req.body.duration,
-                    "extra": req.body.additional_instruction
-                }
+                    topic: req.body.topic,
+                    grade: classInstance.naming,
+                    objectives: req.body.objective,
+                    duration: req.body.duration,
+                    extra: req.body.additional_instruction,
+                };
 
-                const response = await LessonTemplateProvider.getenerateLesson(body);
+                const response = await LessonTemplateProvider.getenerateLesson(
+                    body
+                );
 
                 lessonInstance.generated = response.data.result;
                 lessonInstance.session_id = response.data.session_id;
@@ -284,25 +317,28 @@ class LessonController {
                     status: "success",
                     data: response.data.result,
                     session_id: response.data.session_id,
-                    id: lessonInstance.id
-                }
+                    id: lessonInstance.id,
+                };
 
                 return res.status(ResponseStatus.code.success).json(fulldata);
-
             }
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
-
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.create,
+                data: groupInstance,
+            });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
         }
     }
 
     static async updateLesson(req, res) {
-
         try {
-
             const lesson = await Lesson.findByPk(req.params.id);
 
             if (!lesson) {
@@ -315,7 +351,7 @@ class LessonController {
 
             const oldClassInstance = await lesson.getClass();
 
-            const classInstance = await armInstance[0].getClass()
+            const classInstance = await armInstance[0].getClass();
 
             if (oldClassInstance) {
                 //pass
@@ -327,46 +363,58 @@ class LessonController {
 
             const newInstance = await Lesson.findByPk(req.params.id);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update, data: newInstance });
-
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.update,
+                data: newInstance,
+            });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
-
     static async subjectGroupedLessons(req, res) {
-
         try {
+            const subjectInstance = await Subject.findByPk(
+                req.query.subject_id
+            );
 
-            const subjectInstance = await Subject.findByPk(req.query.subject_id);
-
-            const whereClause = req.query.class_id ? { ref_cid: req.query.class_id } : {};
+            const whereClause = req.query.class_id
+                ? { ref_cid: req.query.class_id }
+                : {};
 
             const lessonInstances = await subjectInstance.getGroups({
                 where: whereClause,
                 include: [
                     {
                         model: ClassArm,
-                        attributes: ['id', 'naming'],
+                        attributes: ["id", "naming"],
                         through: { attributes: [] },
-                    }, Lesson, Class]
+                    },
+                    Lesson,
+                    Class,
+                ],
             });
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
-
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: lessonInstances,
+            });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
-
     static async addLesson(req, res) {
-
         let filePaths = [];
         const today = new Date();
         const threeDaysAhead = new Date();
@@ -386,10 +434,13 @@ class LessonController {
         }
 
         try {
+            const selectedGroup = await Group.findByPk(req.query.group_id, {
+                include: [ClassArm],
+            });
 
-            const selectedGroup = await Group.findByPk(req.query.group_id, { include: [ClassArm] });
-
-            const classarms = selectedGroup.ClassArms.map((element) => element.id);
+            const classarms = selectedGroup.ClassArms.map(
+                (element) => element.id
+            );
 
             const body = {
                 topic: req.body.topic,
@@ -405,18 +456,20 @@ class LessonController {
                 term: req.body.term,
                 class: selectedGroup.ref_cid,
                 class_arms: classarms,
-                files: req.body.files
-            }
+                files: req.body.files,
+            };
 
             const lessonInstance = await Lesson.create(body);
 
             const subjectInstance = await Subject.findByPk(body.subject);
 
             if (!subjectInstance) {
-                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
-
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: false,
+                    message: ResponseStatus.fail.not_found,
+                    data: {},
+                });
             }
-
 
             await subjectInstance.addLesson(lessonInstance);
 
@@ -429,7 +482,9 @@ class LessonController {
 
             const classInstance = await Class.findByPk(body.class);
 
-            const classarmInstances = await ClassArm.findAll({ where: { id: [...body.class_arms] } });
+            const classarmInstances = await ClassArm.findAll({
+                where: { id: [...body.class_arms] },
+            });
 
             await subjectInstance.addChapter(chapterInstance);
 
@@ -437,7 +492,9 @@ class LessonController {
 
             await subjectInstance.addLesson(lessonInstance);
 
-            const instance1 = await lessonInstance.addClassArms(classarmInstances);
+            const instance1 = await lessonInstance.addClassArms(
+                classarmInstances
+            );
 
             await classInstance.addLesson(lessonInstance);
 
@@ -450,50 +507,55 @@ class LessonController {
             // const instance2 = await selectedGroup.addClassArms(classarmInstances);
             // const subjejctGroup = await subjectInstance.addGroup(groupInstance);
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: body });
-
-
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.create,
+                data: body,
+            });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
     static async subjectGroups(req, res) {
-
         try {
-
-            const subjectInstance = await Subject.findByPk(req.query.subject_id);
+            const subjectInstance = await Subject.findByPk(
+                req.query.subject_id
+            );
 
             const lessonInstances = await subjectInstance.getGroups({
                 include: [
                     {
                         model: ClassArm,
-                        attributes: ['id', 'naming'],
+                        attributes: ["id", "naming"],
                         through: { attributes: [] },
-                    }, Class]
+                    },
+                    Class,
+                ],
             });
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: lessonInstances });
-
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: lessonInstances,
+            });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
-
-
-
-
-
-
 
     /*-----------------------------------| NEXT WEEKS LESSON |-----------------------------------*/
 
     static async upcomingNextWeeksLessons(req, res) {
-
-        const { id } = req.userData
+        const { id } = req.userData;
         const account_id = req.query.account_id ? req.query.account_id : id;
 
         const today = new Date();
@@ -506,40 +568,41 @@ class LessonController {
         nextSunday.setDate(nextMonday.getDate() + daysUntilNextSunday);
 
         try {
-
             const accountInstance = await Account.findByPk(account_id);
 
             const studentInstance = await accountInstance.getStudent();
 
             const classInstance = await studentInstance.getClass();
 
-            const allLessons = await classInstance.getLessons({ attributes: ['topic', 'description', 'start_date', 'end_date'], });
+            const allLessons = await classInstance.getLessons({
+                attributes: ["topic", "description", "start_date", "end_date"],
+            });
 
             const lessonsWithinNextWeek = allLessons.filter((lesson) => {
                 const lessonStartDate = new Date(lesson.start_date);
                 const lessonEndDate = new Date(lesson.end_date);
                 // return lessonStartDate >= nextMonday && lessonStartDate <= nextSunday;
 
-                return lessonStartDate > today
+                return lessonStartDate > today;
             });
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.read, data: lessonsWithinNextWeek
+                message: ResponseStatus.pass.read,
+                data: lessonsWithinNextWeek,
             });
-
-
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
     /*-----------------------------------| NEXT WEEKS LESSON |-----------------------------------*/
 
     static async studentUpcomingNextWeeksLessons(req, res) {
-
         const today = new Date();
         const daysUntilNextMonday = (1 - today.getDay() + 7) % 7;
         const nextMonday = new Date(today);
@@ -550,7 +613,6 @@ class LessonController {
         nextSunday.setDate(nextMonday.getDate() + daysUntilNextSunday);
 
         try {
-
             const { id } = req.userData;
 
             const accountInstance = await Account.findByPk(id);
@@ -559,68 +621,77 @@ class LessonController {
 
             const classInstance = await studentInstance.getClass();
 
-            const allLessons = await classInstance.getLessons({ attributes: ['topic', 'description', 'start_date', 'end_date'], });
+            const allLessons = await classInstance.getLessons({
+                attributes: ["topic", "description", "start_date", "end_date"],
+            });
 
             const lessonsWithinNextWeek = allLessons.filter((lesson) => {
                 const lessonStartDate = new Date(lesson.start_date);
                 const lessonEndDate = new Date(lesson.end_date);
-                return lessonStartDate >= nextMonday && lessonStartDate <= nextSunday;
+                return (
+                    lessonStartDate >= nextMonday &&
+                    lessonStartDate <= nextSunday
+                );
             });
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.read, data: lessonsWithinNextWeek
+                message: ResponseStatus.pass.read,
+                data: lessonsWithinNextWeek,
             });
-
-
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
-
-
 
     /*-----------------------------------| FETCH SUBJECT LESSONS |-----------------------------------*/
 
     static async subjectLessons(req, res) {
-
         const { id } = req.params;
 
         try {
-
-            const subjectInstance = await Subject.findByPk(id, { include: [ClassArm, Lesson, Class] });
+            const subjectInstance = await Subject.findByPk(id, {
+                include: [ClassArm, Lesson, Class],
+            });
 
             const payload = {
                 id: 2,
                 naming: subjectInstance.naming,
                 description: subjectInstance.description,
                 SchoolManagementId: subjectInstance.SchoolManagementId,
-                classArms: subjectInstance.ClassArms.map(item => ({ id: item.id, naming: item.naming, classId: item.ClassId })),
-                classes: subjectInstance.Classes.map(item => ({ id: item.id, naming: item.naming })),
-                lessons: subjectInstance.Lessons
-            }
+                classArms: subjectInstance.ClassArms.map((item) => ({
+                    id: item.id,
+                    naming: item.naming,
+                    classId: item.ClassId,
+                })),
+                classes: subjectInstance.Classes.map((item) => ({
+                    id: item.id,
+                    naming: item.naming,
+                })),
+                lessons: subjectInstance.Lessons,
+            };
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.read, data: payload
+                message: ResponseStatus.pass.read,
+                data: payload,
             });
-
-
         } catch (error) {
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
     static async removeLessonFromGroup(req, res) {
-
         const { id } = req.params;
 
         try {
-
             const groupInstance = await Group.findByPk(id);
 
             const lessonInstance = await Lesson.findByPk(req.params.lesson);
@@ -633,122 +704,115 @@ class LessonController {
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
-                message: ResponseStatus.pass.removed
+                message: ResponseStatus.pass.removed,
             });
-
-
         } catch (error) {
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
     static async lessonTemplate(req, res) {
-
         const { id } = req.params;
 
         try {
-
             const lessonInstance = await Lesson.findByPk(id, {
                 include: [
                     {
                         model: LessonSlide,
-                        orderBy: { slide_index: "asc" }
-                    }, Subject
-                ]
+                        orderBy: { slide_index: "asc" },
+                    },
+                    Subject,
+                ],
             });
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read,
-                data: lessonInstance
+                data: lessonInstance,
             });
-
         } catch (error) {
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
     static async updateLessonStatus(req, res) {
-
         const { id } = req.params;
         const data = req.query;
 
         try {
-
             const lessonInstance = await Lesson.findByPk(id);
 
-            const response = await lessonInstance.update({ status: data.status });
+            const response = await lessonInstance.update({
+                status: data.status,
+            });
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read,
-                data: response
+                data: response,
             });
-
-
-
         } catch (error) {
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
     static async allLessons(req, res) {
-
         try {
-
             // const lessonInstance = await Lesson.findAll();
 
             const lessonInstance = await Lesson.findAll({
                 where: {
                     ClassId: {
-                        [Sequelize.Op.not]: null
-                    }
-                }
+                        [Sequelize.Op.not]: null,
+                    },
+                },
             });
 
-            const loads = await Promise.all(lessonInstance.map(async (lesson) => {
+            const loads = await Promise.all(
+                lessonInstance.map(async (lesson) => {
+                    const classInstance = await lesson.getClass();
 
-                const classInstance = await lesson.getClass();
+                    const studentInstances = await classInstance.getStudents({
+                        include: Account,
+                    });
 
-                const studentInstances = await classInstance.getStudents({ include: Account });
+                    const data = {
+                        lesson: lesson,
+                        student: studentInstances.map((item) => ({
+                            account: item.Account.id,
+                            email: item.Account.email,
+                        })),
+                    };
 
-
-                const data = {
-                    lesson: lesson,
-                    student: studentInstances.map((item) => ({ account: item.Account.id, email: item.Account.email }))
-                }
-
-                return data;
-
-            }));
+                    return data;
+                })
+            );
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read,
-                data: loads
+                data: loads,
             });
-
-
-
         } catch (error) {
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
-
-
 
     /*-----------------------------------| UPLOAD LESSON |-----------------------------------*/
 
-
-
     static async generateLesson(req, res) {
-
         let filePaths = [];
         const today = new Date();
         const threeDaysAhead = new Date();
@@ -757,17 +821,17 @@ class LessonController {
         req.body.start_date = today;
         req.body.end_date = threeDaysAhead;
 
-
         try {
-
             const lessonInstance = await Lesson.create(req.body);
             const subjectInstance = await Subject.findByPk(req.body.subject);
 
             if (!subjectInstance) {
-                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
-
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: false,
+                    message: ResponseStatus.fail.not_found,
+                    data: {},
+                });
             }
-
 
             await subjectInstance.addLesson(lessonInstance);
 
@@ -780,7 +844,9 @@ class LessonController {
 
             const classInstance = await Class.findByPk(req.body.class);
 
-            const classarmInstances = await ClassArm.findAll({ where: { id: req.body.class_arms } });
+            const classarmInstances = await ClassArm.findAll({
+                where: { id: req.body.class_arms },
+            });
 
             await subjectInstance.addChapter(chapterInstance);
 
@@ -788,13 +854,16 @@ class LessonController {
 
             await subjectInstance.addLesson(lessonInstance);
 
-            const instance1 = await lessonInstance.addClassArms(classarmInstances);
+            const instance1 = await lessonInstance.addClassArms(
+                classarmInstances
+            );
 
             await classInstance.addLesson(lessonInstance);
 
-
-            const group = await Group.findAll({ include: [ClassArm], where: { SubjectId: req.body.subject } });
-
+            const group = await Group.findAll({
+                include: [ClassArm],
+                where: { SubjectId: req.body.subject },
+            });
 
             let groupInstance;
             let groupId;
@@ -802,61 +871,55 @@ class LessonController {
             const arms = req.body.class_arms;
 
             for (let i = 0; i < group.length; i++) {
-
                 const data = group[i].ClassArms.map((element) => element.id);
 
                 if (arms.length == 1) {
-
                     if (arms[0] == data) {
-                        console.log('single found', arms, data, group[i].id);
+                        console.log("single found", arms, data, group[i].id);
                         groupId = group[i].id;
                     } else {
-                        console.log('single not found', arms, data);
+                        console.log("single not found", arms, data);
                     }
-
                 } else {
-
                     if (arms.every((arm) => data.includes(arm))) {
-                        console.log('found', arms, data, group[i].id);
+                        console.log("found", arms, data, group[i].id);
                         groupId = group[i].id;
                     } else {
-                        console.log('not found', arms, data);
+                        console.log("not found", arms, data);
                     }
-
                 }
             }
-
 
             if (groupId) {
                 groupInstance = await Group.findByPk(groupId);
             } else {
-
                 groupInstance = await Group.create({
                     naming: classInstance.naming,
-                    ref_cid: classInstance.id
+                    ref_cid: classInstance.id,
                 });
             }
 
-            console.log(groupId)
-
+            console.log(groupId);
 
             await groupInstance.addLesson(lessonInstance);
-            const instance2 = await groupInstance.addClassArms(classarmInstances);
+            const instance2 = await groupInstance.addClassArms(
+                classarmInstances
+            );
             const subjejctGroup = await subjectInstance.addGroup(groupInstance);
 
-
             if (req.body.resources == 1) {
-
                 const body = {
-                    "topic": req.body.topic,
-                    "grade": classInstance.naming,
-                    "objectives": req.body.objective,
-                    "duration": req.body.duration,
-                    "extra": req.body.additional_instruction,
-                    "subject": subjectInstance.naming
-                }
+                    topic: req.body.topic,
+                    grade: classInstance.naming,
+                    objectives: req.body.objective,
+                    duration: req.body.duration,
+                    extra: req.body.additional_instruction,
+                    subject: subjectInstance.naming,
+                };
 
-                const response = await LessonTemplateProvider.getenerateLesson(body);
+                const response = await LessonTemplateProvider.getenerateLesson(
+                    body
+                );
 
                 lessonInstance.generated = response.data.result;
 
@@ -870,46 +933,48 @@ class LessonController {
                     status: "success",
                     data: response.data.result,
                     session_id: response.data.session_id,
-                    id: lessonInstance.id
-                }
+                    id: lessonInstance.id,
+                };
 
                 return res.status(ResponseStatus.code.success).json(fulldata);
-
             }
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: groupInstance });
-
-
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.create,
+                data: groupInstance,
+            });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
-
     static async generateLessonWithExtra(req, res) {
-
         const { id } = req.params;
 
-
         try {
-
             const lessonInstance = await Lesson.findByPk(id);
 
             if (!lessonInstance) {
-                return res.status(ResponseStatus.code.not_found).json({ error: false, message: ResponseStatus.fail.not_found, data: {} });
-
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: false,
+                    message: ResponseStatus.fail.not_found,
+                    data: {},
+                });
             }
 
             const body = {
-                "query": req.body.query,
-                "session_id": req.body.session_id,
-                "lesson_id": lessonInstance.id
-            }
+                query: req.body.query,
+                session_id: req.body.session_id,
+                lesson_id: lessonInstance.id,
+            };
 
-            const response = await LessonTemplateProvider.getenerateLessonWithExtra(body);
-
+            const response =
+                await LessonTemplateProvider.getenerateLessonWithExtra(body);
 
             lessonInstance.generated = response.data.result;
 
@@ -923,26 +988,23 @@ class LessonController {
                 status: "success",
                 data: response.data.result,
                 session_id: response.data.session_id,
-                id: lessonInstance.id
-            }
+                id: lessonInstance.id,
+            };
 
             return res.status(ResponseStatus.code.success).json(fulldata);
-
-
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
-
     static async readGeneratedLesson(req, res) {
-
         const { id } = req.params;
 
         try {
-
             const lessonInstance = await Lesson.findByPk(id);
 
             return res.status(ResponseStatus.code.success).json({
@@ -950,55 +1012,59 @@ class LessonController {
                 message: ResponseStatus.pass.read,
                 data: lessonInstance,
             });
-
-
-
         } catch (error) {
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
     static async deleteLesson(req, res) {
-
         const { id } = req.params;
 
         try {
-
-            const lessonInstance = await Lesson.findByPk(id, { where: { library: true } });
+            const lessonInstance = await Lesson.findByPk(id, {
+                where: { library: true },
+            });
 
             if (!lessonInstance) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: true,
+                    message: ResponseStatus.fail.not_found,
+                });
             }
 
             const response = await lessonInstance.destroy();
 
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: response });
-
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.delete,
+                data: response,
+            });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
-
-
     static async updateGeneratedLesson(req, res) {
-
         const { id } = req.params;
 
         try {
-
             const lessonInstance = await Lesson.findByPk(id);
 
-
-            if (req.body.generated != '') {
-                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            if (req.body.generated != "") {
+                const uniqueSuffix =
+                    Date.now() + "-" + Math.round(Math.random() * 1e9);
                 const fileName = `generated_${uniqueSuffix}.docx`;
-                const absoluteFilesDirectory = path.resolve(`${appRoot}/public/lessons`, fileName)
+                const absoluteFilesDirectory = path.resolve(
+                    `${appRoot}/public/lessons`,
+                    fileName
+                );
 
                 const docxBuffer = await HtmlToDocx(req.body.generated);
 
@@ -1011,11 +1077,11 @@ class LessonController {
                 if (oldfile) {
                     fs.unlink(oldfile, (err) => {
                         if (err) {
-                            console.error('Error deleting file:', err);
+                            console.error("Error deleting file:", err);
                         } else {
-                            console.log('File deleted successfully.');
+                            console.log("File deleted successfully.");
                         }
-                    })
+                    });
                 }
             }
 
@@ -1024,22 +1090,17 @@ class LessonController {
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read,
-                data: response
+                data: response,
             });
-
-
-
         } catch (error) {
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
-
-
     static async updateTemplateImage(req, res) {
-
         let payload = [];
 
         let filePaths = [];
@@ -1051,83 +1112,74 @@ class LessonController {
         }
 
         try {
-
-
             if (filePaths.length > 0) {
-
                 for (var item of filePaths) {
-                    console.log("this is the item",item)
+                    console.log("this is the item", item);
                     const ImageResponse = await cloudinaryUploadImage(item);
                     payload.push(ImageResponse.secure_url);
                 }
-
             }
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.update,
-                data: payload
+                data: payload,
             });
-
-
         } catch (error) {
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
-
-
     static async updateLessonTemplate(req, res) {
-
         const { id } = req.params;
         const data = req.body;
 
         try {
-
             const lessonSlideInstance = await LessonSlide.findByPk(id);
 
-            const response = await lessonSlideInstance.update({ slide_data: data.slide_data });
+            const response = await lessonSlideInstance.update({
+                slide_data: data.slide_data,
+            });
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.update,
-                data: response
+                data: response,
             });
-
-
-
         } catch (error) {
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
     static async createLessonSlide(req, res) {
-
         const { id } = req.params;
         const data = req.body;
 
         try {
-
             const lessonSlideInstance = await LessonSlide.create({
-                LessonId : id,
-                slide_index : data.slide_index,
-                slide_data : data.slide_data
+                lesson_id: id,
+                slide_index: data.slide_index,
+                slide_data: data.slide_data,
             });
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.create,
-                data: lessonSlideInstance
+                data: lessonSlideInstance,
             });
-
         } catch (error) {
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
-
 }
 
 module.exports = LessonController;

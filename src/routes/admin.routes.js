@@ -26,6 +26,8 @@ const ErrorLogs = require('../controller/error.controller');
 const ExternalSchoolController = require('../controller/external_school/auth.controller');
 const TokenMiddleware = require('../middleware/token.middleware');
 const TextbookValidator = require('./validators/TextbookValidator');
+const LessonValidator = require('./validators/LessonValidator');
+const LessonController = require('../controller/lesson.controller');
 
 
 
@@ -126,6 +128,10 @@ const AdminRoutesGroup = (router) => {
     router.post('/library/textbooks/:id/lessons', [UploadService.uploadLesson.array('preview'), TextbookValidator.CreateTextbookLesson], AdminLibraryController.createTextbookLesson);
     router.put('/library/textbooks/:id/lessons/:lessonid', [UploadService.uploadLesson.array('preview'), TextbookValidator.CreateTextbookLesson], AdminLibraryController.updateTextbookLesson);
     router.delete('/library/textbooks/:id/lessons/:lessonid', AdminLibraryController.deleteTextbookLesson);
+
+
+    /* ------------------------------------------- LESSONS ------------------------------------------ */
+    router.post('/lessons/:id/slides', LessonController.createLessonSlide)
 
     // router.post('/library', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
     // router.get('/library', AdminLibraryController.read);
