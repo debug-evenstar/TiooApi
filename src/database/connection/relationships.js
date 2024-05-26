@@ -183,8 +183,8 @@ class Relationships {
 
         Group.belongsTo(Class, { foreignKey: "ref_cid" });
 
-        Subject.hasMany(Chapter, { foreignKey: "subject_id" });
-        Chapter.belongsTo(Subject, { foreignKey: "subject_id" });
+        Textbook.hasMany(Chapter, { foreignKey: "textbook_id" });
+        Chapter.belongsTo(Textbook, { foreignKey: "textbook_id" });
 
         Chapter.hasMany(Lesson, { foreignKey: "chapter_id" });
         Lesson.belongsTo(Chapter, { foreignKey: "chapter_id" });
@@ -203,37 +203,104 @@ class Relationships {
 
         //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 
-        Coupon.belongsToMany(Account, { through: "account_coupons" });
-        Account.belongsToMany(Coupon, { through: "account_coupons" });
+        Coupon.belongsToMany(Account, {
+            through: "account_coupons",
+            foreignKey: "coupon_id",
+        });
+        Account.belongsToMany(Coupon, {
+            through: "account_coupons",
+            foreignKey: "account_d",
+        });
 
-        Subject.belongsToMany(Teacher, { through: "subject_teachers" });
-        Teacher.belongsToMany(Subject, { through: "subject_teachers" });
+        Subject.belongsToMany(Teacher, {
+            through: "subject_teachers",
+            foreignKey: "subject_id",
+        });
+        Teacher.belongsToMany(Subject, {
+            through: "subject_teachers",
+            foreignKey: "teacher_id",
+        });
 
-        Class.belongsToMany(Subject, { through: "class_subjects" });
-        Subject.belongsToMany(Class, { through: "class_subjects" });
+        Class.belongsToMany(Subject, {
+            through: "class_subjects",
+            foreignKey: "class_id",
+        });
+        Subject.belongsToMany(Class, {
+            through: "class_subjects",
+            foreignKey: "subject_id",
+        });
 
-        ClassArm.belongsToMany(Subject, { through: "classarm_subjects" });
-        Subject.belongsToMany(ClassArm, { through: "classarm_subjects" });
+        ClassArm.belongsToMany(Subject, {
+            through: "classarm_subjects",
+            foreignKey: "class_arm_id",
+        });
+        Subject.belongsToMany(ClassArm, {
+            through: "classarm_subjects",
+            foreignKey: "subject_id",
+        });
 
-        Teacher.belongsToMany(Class, { through: "teacher_classes" });
-        Class.belongsToMany(Teacher, { through: "teacher_classes" });
+        Teacher.belongsToMany(Class, {
+            through: "teacher_classes",
+            foreignKey: "teacher_id",
+        });
+        Class.belongsToMany(Teacher, {
+            through: "teacher_classes",
+            foreignKey: "class_id",
+        });
 
-        Teacher.belongsToMany(ClassArm, { through: "teacher_classarms" });
-        ClassArm.belongsToMany(Teacher, { through: "teacher_classarms" });
+        Teacher.belongsToMany(ClassArm, {
+            through: "teacher_classarms",
+            foreignKey: "teacher_id",
+        });
+        ClassArm.belongsToMany(Teacher, {
+            through: "teacher_classarms",
+            foreignKey: "class_arm_id",
+        });
 
-        ClassArm.belongsToMany(Group, { through: "classarm_groups" });
-        Group.belongsToMany(ClassArm, { through: "classarm_groups" });
+        ClassArm.belongsToMany(Group, {
+            through: "classarm_groups",
+            foreignKey: "class_arm_id",
+        });
+        Group.belongsToMany(ClassArm, {
+            through: "classarm_groups",
+            foreignKey: "group_id",
+        });
 
-        Lesson.belongsToMany(ClassArm, { through: "classarm_lessons" });
-        ClassArm.belongsToMany(Lesson, { through: "classarm_lessons" });
+        Lesson.belongsToMany(ClassArm, {
+            through: "classarm_lessons",
+            foreignKey: "lesson_id",
+        });
+        ClassArm.belongsToMany(Lesson, {
+            through: "classarm_lessons",
+            foreignKey: "class_arm_id",
+        });
 
-        Textbook.belongsToMany(Account, { through: "account_textbooks" });
-        Account.belongsToMany(Textbook, { through: "account_textbooks" });
+        Textbook.belongsToMany(Account, {
+            through: "account_textbooks",
+            foreignKey: "textbook_id",
+        });
+        Account.belongsToMany(Textbook, {
+            through: "account_textbooks",
+            foreignKey: "account_id",
+        });
 
-        Textbook.belongsToMany(Class, { through: "class_textbooks" });
+        Textbook.belongsToMany(Class, {
+            through: "class_textbooks",
+            foreignKey: "textbook_id",
+        });
+        Class.belongsToMany(Textbook, {
+            through: "class_textbooks",
+            foreignKey: "class_id",
+        });
 
-        Lesson.belongsToMany(Textbook, { through: "textbook_lessons" });
-        Textbook.belongsToMany(Lesson, { through: "textbook_lessons" });
+        Lesson.belongsToMany(Textbook, {
+            through: "textbook_lessons",
+            foreignKey: "lesson_id",
+        });
+        Textbook.belongsToMany(Lesson, {
+            through: "textbook_lessons",
+            foreignKey: "textbook_id",
+        });
     }
 }
 module.exports = Relationships;
