@@ -18,22 +18,21 @@ class TioController {
 
     static async setup(req, res) {
         const tioData = {
-            email: ResponseStatus.tio.email,
             school_types: ["Level"],
             naming_types: "C",
             class_namings: [
-                { type: "custome", naming: "Grade 1", equivalent: "0" },
-                { type: "custome", naming: "Grade 2", equivalent: "0" },
-                { type: "custome", naming: "Grade 3", equivalent: "0" },
-                { type: "custome", naming: "Grade 4", equivalent: "0" },
-                { type: "custome", naming: "Grade 5", equivalent: "0" },
-                { type: "custome", naming: "Grade 6", equivalent: "0" },
-                { type: "custome", naming: "Grade 7", equivalent: "0" },
-                { type: "custome", naming: "Grade 8", equivalent: "0" },
-                { type: "custome", naming: "Grade 9", equivalent: "0" },
-                { type: "custome", naming: "Grade 10", equivalent: "0" },
-                { type: "custome", naming: "Grade 11", equivalent: "0" },
-                { type: "custome", naming: "Grade 12", equivalent: "0" },
+                { type: "custome", name: "Grade 1", equivalent: "0" },
+                { type: "custome", name: "Grade 2", equivalent: "0" },
+                { type: "custome", name: "Grade 3", equivalent: "0" },
+                { type: "custome", name: "Grade 4", equivalent: "0" },
+                { type: "custome", name: "Grade 5", equivalent: "0" },
+                { type: "custome", name: "Grade 6", equivalent: "0" },
+                { type: "custome", name: "Grade 7", equivalent: "0" },
+                { type: "custome", name: "Grade 8", equivalent: "0" },
+                { type: "custome", name: "Grade 9", equivalent: "0" },
+                { type: "custome", name: "Grade 10", equivalent: "0" },
+                { type: "custome", name: "Grade 11", equivalent: "0" },
+                { type: "custome", name: "Grade 12", equivalent: "0" },
             ],
         };
 
