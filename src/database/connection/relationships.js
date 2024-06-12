@@ -175,8 +175,8 @@ class Relationships {
         Class.hasMany(ClassArm, { foreignKey: "class_id" });
         ClassArm.belongsTo(Class, { foreignKey: "class_id" });
 
-        ClassArm.hasMany(Student, { foreignKey: "class_aram_id" });
-        Student.belongsTo(ClassArm, { foreignKey: "class_aram_id" });
+        ClassArm.hasMany(Student, { foreignKey: "class_arm_id" });
+        Student.belongsTo(ClassArm, { foreignKey: "class_arm_id" });
 
         Class.hasMany(Lesson, { foreignKey: "class_id" });
         Lesson.belongsTo(Class, { foreignKey: "class_id" });
@@ -186,10 +186,13 @@ class Relationships {
         Textbook.hasMany(Chapter, { foreignKey: "textbook_id" });
         Chapter.belongsTo(Textbook, { foreignKey: "textbook_id" });
 
+        Textbook.hasMany(Lesson, { foreignKey: "textbook_id" });
+        Lesson.belongsTo(Textbook, { foreignKey: "textbook_id" });
+
         Chapter.hasMany(Lesson, { foreignKey: "chapter_id" });
         Lesson.belongsTo(Chapter, { foreignKey: "chapter_id" });
 
-        Lesson.hasMany(LessonSlide, { foreignKey: "lesson_id" });
+        Lesson.hasMany(LessonSlide, { foreignKey: "lesson_id", as : "lesson_slides"});
         LessonSlide.belongsTo(Lesson, { foreignKey: "lesson_id" });
 
         Account.hasMany(Billing, { foreignKey: "account_id" });

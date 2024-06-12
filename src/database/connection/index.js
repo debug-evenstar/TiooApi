@@ -4,6 +4,7 @@ const Relationships = require("./relationships");
 const dbConfig = enviromentalConfig.development;
 
 const Sequelize = require("sequelize");
+const { formatRelationshipAliases } = require("./util");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,
     dialect: dbConfig.dialect,
@@ -154,6 +155,9 @@ const models = [
 ];
 
 Relationships.group(...models);
+
+formatRelationshipAliases(...models);
+
 
 module.exports = {
     db,

@@ -21,6 +21,7 @@ const Sequelize = require("sequelize");
 const LessonTemplateProvider = require("../providers/AI/lesson.template");
 const { equal } = require("../utils/array");
 const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
+const { getAllFuncs } = require("../utils/objects");
 
 class LessonController {
     /*-----------------------------------| UPLOAD LESSON |-----------------------------------*/
@@ -723,9 +724,10 @@ class LessonController {
                 include: [
                     {
                         model: LessonSlide,
+                        as : "lesson_slides",
                         orderBy: { slide_index: "asc" },
                     },
-                    Textbook,
+                    Textbook, Chapter
                 ],
             });
 
@@ -1163,7 +1165,9 @@ class LessonController {
         const data = req.body;
 
         try {
-            const lessonInstance = await Lesson.findByPk(id);
+            const lessonInstance = await Lesson.findByPk(id, {
+                include : [{ model : LessonSlide, as : "lesson_slides"}]
+            });
 
             if (!lessonInstance) {
                 return res.status(ResponseStatus.code.bad_request).json({
@@ -1176,7 +1180,7 @@ class LessonController {
                 slide_data: data.slide_data,
             });
 
-            await lessonInstance.addLessonSlide(lessonSlideInstance);
+            await lessonInstance.addLessonSlides([lessonSlideInstance]);
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
