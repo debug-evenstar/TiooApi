@@ -21,6 +21,7 @@ class AuthController {
     static async createAccount(req, res) {
 
         const otp = Math.floor(Math.random() * 900000) + 100000;
+
         const { email } = req.body;
         const errors = validationResult(req);
 
@@ -41,8 +42,10 @@ class AuthController {
 
 
             req.body.status = 'registered';
+            req.body.name = `${req.body.first_name} ${req.body.last_name}`;
 
             const registeredAccount = await Account.create(req.body);
+
             const newValidation = await Validation.create({ otp });
             const response = await registeredAccount.setValidation(newValidation);
 
@@ -52,12 +55,16 @@ class AuthController {
                 const registeredSchoolManagement = await SchoolManagement.create({
                     school_name: req.body.school
                 });
+
                 const { publicKey, privateKey } = HashUtils.generateKeyPair();
+                
                 const createKeypairs = await Keypairs.create({
                     public_key: crypto.randomBytes(20).toString('base64'),
                     private_key: crypto.randomBytes(20).toString('base64'),
                 });
+                
                 await registeredSchoolManagement.setKeypair(createKeypairs);
+                
                 await registeredAccount.setSchoolManagement(registeredSchoolManagement);
             }
 
@@ -267,7 +274,7 @@ class AuthController {
 
     static async verifyAccount(req, res) {
 
-        const { token } = req.body;
+        const { otp } = req.body;
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -275,8 +282,9 @@ class AuthController {
         }
 
         try {
-            const validation = await Validation.findOne({ where: { token } });
-
+            const validation = await Validation.findOne({ where: { otp } });
+            // return res.send(validation);
+            
             if (!validation) {
                 return res.status(ResponseStatus.code.forbidden).json({
                     error: true,
@@ -285,7 +293,7 @@ class AuthController {
             }
 
             const registerdAccount = await Account.findOne({
-                where: { id: validation.accountId },
+                where: { id: validation.account_id },
                 include: [SchoolManagement, Teacher, Student],
                 attributes: { exclude: ['password'] }
             });
@@ -312,7 +320,6 @@ class AuthController {
             await registerdAccount.update({ verification_status: 1, status: 'verified' });
 
             return res.status(ResponseStatus.code.success).json({ error: false, data: registerdAccount, message: ResponseStatus.pass.verify });
-
 
         } catch (error) {
             res.status(500).json({ error: 'server error', extra: error.message });
@@ -1229,7 +1236,8 @@ class AuthController {
     static async sendVerificationEmail(account) {
         const expiry = (new Date(Date.now() + 30 * 60 * 1000));
         const hash = MD5(account.id + expiry).toString();
-        const tokenRecord = await Validation.findOne({ where: { accountId: account.id } });
+        const tokenRecord = await Validation.findOne({ where: { account_id: account.id } });
+        const otp = tokenRecord.dataValues.otp;
 
         if (!tokenRecord) {
             const validate = new Validation();
@@ -1247,9 +1255,9 @@ class AuthController {
 
         const link = `${process.env.WEB_URL}/account/verify/${hash}`;
 
-        console.log(link, hash);
+        // console.log(link, hash);
 
-        Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { link }).send();
+        Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { otp }).send();
     }
 
 
