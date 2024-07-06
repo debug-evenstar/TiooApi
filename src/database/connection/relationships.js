@@ -1,3 +1,4 @@
+
 class Relationships {
     static group(
         Account,
@@ -18,12 +19,15 @@ class Relationships {
         Group,
         LessonSlide,
         Preference,
+        Shelf,
         Billing,
         Notification,
         Subscription,
         Keypairs,
         Textbook,
-        CartItem
+        CartItem,
+        OnboardingQuestion,
+        AccountType,
     ) {
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -198,6 +202,12 @@ class Relationships {
         Account.hasMany(Billing, { foreignKey: "account_id" });
         Billing.belongsTo(Account, { foreignKey: "account_id" });
 
+        // Account.hasMany(Shelf, { foreignKey: "account_id"});
+        Account.belongsToMany(Textbook, { through: 'shelves',foreignKey: 'account_id'});
+        Textbook.belongsToMany(Account, { through: 'shelves',foreignKey: 'textbook_id'});
+
+        
+
         Subject.hasMany(Textbook, { foreignKey: "subject_id" });
         Textbook.belongsTo(Subject, { foreignKey: "subject_id" });
 
@@ -304,6 +314,10 @@ class Relationships {
             through: "textbook_lessons",
             foreignKey: "textbook_id",
         });
+
+
+        // AccountType.hasMany(OnboardingQuestion, { foreignKey: 'account_type_id'});
+        // OnboardingQuestion.belongsTo(AccountType,{ foreignKey: 'account_type_id'});
     }
 }
 module.exports = Relationships;

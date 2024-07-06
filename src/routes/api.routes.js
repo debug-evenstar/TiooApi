@@ -38,7 +38,7 @@ const BillingController = require('../controller/billing.controller');
 const NotificationController = require('../controller/notification.controller');
 const SchoolFront = require('../controller/schoolfront.controller');
 const CartController = require('../controller/cart.controller');
-
+const StudentFront = require('../controller/studentfront.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -49,6 +49,7 @@ const { Authorization } = require('../database/connection');
 const ErrorLogs = require('../controller/error.controller');
 const ExternalSchoolController = require('../controller/external_school/auth.controller');
 const TokenMiddleware = require('../middleware/token.middleware');
+const OnboardingController = require('../controller/onboarding.controller');
 
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
@@ -242,12 +243,29 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.get('/student/network', StudentController.independentStudentNetwork);
     router.get('/student/:id', StudentController.fetchStudent);
+
+
+
     router.get('/front/material/:id/lessons', SchoolFront.readLibraryLessons);
     router.post('/front/textbook/addtoschool', SchoolFront.addLibraryMaterialTextBookToSchool);
     router.get('/front/school/librarytextbooks', SchoolFront.readSchoolLibraryMaterialTextBooks);
     router.get('/front/school/librarytextbooks/:sid', SchoolFront.readSchoolLibraryMaterialTextBooksBySubject);
     router.delete('/front/librarytextbooks/:id/remove', SchoolFront.removeTextbookFromSchool);
 
+
+
+
+
+
+    /* --------------------------------- NEW STUDENT FRONT   -------------------------------- */
+    
+    router.get('/front/student/textbook/librarytextbooks', StudentFront.getLibraryTextbooks )
+    router.get('/front/student/shelf/librarytextbooks', StudentFront.getLibraryTextbooks )
+    router.post('/front/student/shelf/add-book',StudentFront.addTextbookToShelf);
+    router.get('/front/student/shelf/get-books',StudentFront.getStudentShelf);
+    
+    
+    
     /* --------------------------------- LESSON -------------------------------- */
 
     router.get('/lesson/alllessons', LessonController.allLessons);
@@ -308,6 +326,20 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/cart/read', CartController.read);
     router.delete('/cart/clear', CartController.clearCart);
 
+
+
+
+
+    
+    /* ---------------------------- Onboarding Routes -----------------------------*/
+
+
+    router.get('/onboarding/questions',OnboardingController.getOnboardingQuestions);
+    router.get('/onboarding/questions/seed',OnboardingController.seedQuestions);
+    router.post('/onboarding/account-types',OnboardingController.addAccountType)
+    router.post('/onboarding/account-type/:id/questions',OnboardingController.addAccountQuestion);
+    router.get('/onboarding/account-type/:id/questions',OnboardingController.getAccountQuestions);
+    router.post('/onboarding/save-metadata/',OnboardingController.saveMetaData);
 
     /* ---------------------------- External Schools ---------------------------- */
     router.post('/resetpassword/account/student/external', ExternalSchoolController.ResetPassword);

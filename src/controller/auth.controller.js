@@ -21,6 +21,7 @@ class AuthController {
     static async createAccount(req, res) {
 
         const otp = Math.floor(Math.random() * 900000) + 100000;
+
         const { email } = req.body;
         const errors = validationResult(req);
 
@@ -41,35 +42,41 @@ class AuthController {
 
 
             req.body.status = 'registered';
+            req.body.name = `${req.body.first_name} ${req.body.last_name}`;
 
             const registeredAccount = await Account.create(req.body);
+
             const newValidation = await Validation.create({ otp });
             const response = await registeredAccount.setValidation(newValidation);
 
             // Create school record if account type is school
-            if (req.body.account_type === "school") {
+            // if (req.body.account_type === "school") {
 
-                const registeredSchoolManagement = await SchoolManagement.create({
-                    school_name: req.body.school
-                });
-                const { publicKey, privateKey } = HashUtils.generateKeyPair();
-                const createKeypairs = await Keypairs.create({
-                    public_key: crypto.randomBytes(20).toString('base64'),
-                    private_key: crypto.randomBytes(20).toString('base64'),
-                });
-                await registeredSchoolManagement.setKeypair(createKeypairs);
-                await registeredAccount.setSchoolManagement(registeredSchoolManagement);
-            }
+            //     const registeredSchoolManagement = await SchoolManagement.create({
+            //         school_name: req.body.school
+            //     });
 
-            if (req.body.account_type === "freelancer") {
-                const registeredSchoolManagement = await SchoolManagement.create({
-                    school_name: req.body.school,
-                    school_types: '["Custome"]',
-                    naming_types: 'C'
-                });
+            //     const { publicKey, privateKey } = HashUtils.generateKeyPair();
+                
+            //     const createKeypairs = await Keypairs.create({
+            //         public_key: crypto.randomBytes(20).toString('base64'),
+            //         private_key: crypto.randomBytes(20).toString('base64'),
+            //     });
+                
+            //     await registeredSchoolManagement.setKeypair(createKeypairs);
+                
+            //     await registeredAccount.setSchoolManagement(registeredSchoolManagement);
+            // }
 
-                await registeredAccount.setSchoolManagement(registeredSchoolManagement);
-            }
+            // if (req.body.account_type === "freelancer") {
+            //     const registeredSchoolManagement = await SchoolManagement.create({
+            //         school_name: req.body.school,
+            //         school_types: '["Custome"]',
+            //         naming_types: 'C'
+            //     });
+
+            //     await registeredAccount.setSchoolManagement(registeredSchoolManagement);
+            // }
 
 
             const userData = {
@@ -267,7 +274,7 @@ class AuthController {
 
     static async verifyAccount(req, res) {
 
-        const { token } = req.body;
+        const { otp } = req.body;
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -275,17 +282,18 @@ class AuthController {
         }
 
         try {
-            const validation = await Validation.findOne({ where: { token } });
-
+            const validation = await Validation.findOne({ where: { otp } });
+            // return res.send(validation);
+            
             if (!validation) {
                 return res.status(ResponseStatus.code.forbidden).json({
                     error: true,
-                    message: ResponseStatus.fail.forbidden
+                    message: 'Invalid OTP Code'
                 });
             }
 
             const registerdAccount = await Account.findOne({
-                where: { id: validation.accountId },
+                where: { id: validation.account_id },
                 include: [SchoolManagement, Teacher, Student],
                 attributes: { exclude: ['password'] }
             });
@@ -299,20 +307,19 @@ class AuthController {
 
             const isExpired = await validation.compareExpiryDate();
 
-            const isTokenValid = await validation.isTokenValid(token);
+            const isOTPValid = await validation.compareOTP(otp);
 
             if (isExpired) {
                 return res.status(ResponseStatus.code.bad_request).json({ error: true, message: ResponseStatus.fail.expired_token });
             }
 
-            if (!isTokenValid) {
+            if (!isOTPValid) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.forbidden });
             }
 
             await registerdAccount.update({ verification_status: 1, status: 'verified' });
 
             return res.status(ResponseStatus.code.success).json({ error: false, data: registerdAccount, message: ResponseStatus.pass.verify });
-
 
         } catch (error) {
             res.status(500).json({ error: 'server error', extra: error.message });
@@ -437,7 +444,8 @@ class AuthController {
         }
 
         try {
-            const user = await Account.findOne({ where: { email: email }, include: [SchoolManagement] });
+            // const user = await Account.findOne({ where: { email: email }, include: [SchoolManagement] });
+            const user = await Account.findOne({ where: { email: email } });
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
             }
@@ -473,67 +481,68 @@ class AuthController {
                 status: user.status === null ? "undefined" : user.status,
                 phone: user.phone,
                 account_type: user.account_type,
+                onboarded: user.onboarded,
                 verification_status: user.verification_status,
                 flag: user.flag,
             }
 
-            if (user.account_type === "school") {
-                payload.school = user.SchoolManagement.school_name;
-                payload.redirect = `${process.env.SCHOOL_DASHBOARD_URL}/auth`;
-            }
+            // if (user.account_type === "school") {
+            //     payload.school = user.SchoolManagement.school_name;
+            //     payload.redirect = `${process.env.SCHOOL_DASHBOARD_URL}/auth`;
+            // }
 
-            if (user.account_type === "freelancer") {
-                payload.school = user.SchoolManagement.school_name;
-                payload.redirect = `${process.env.SCHOOL_DASHBOARD_URL}/auth`;
-            }
+            // if (user.account_type === "freelancer") {
+            //     payload.school = user.SchoolManagement.school_name;
+            //     payload.redirect = `${process.env.SCHOOL_DASHBOARD_URL}/auth`;
+            // }
 
-            if (user.account_type === "teacher") {
-                const profile = await user.getTeacher();
-                payload.profileId = profile.id;
-                payload.teacher_type = profile.teacher_type;
-                payload.schoolManagement = profile.SchoolManagementId;
-                payload.redirect = `${process.env.SCHOOL_DASHBOARD_URL}/auth`;
+            // if (user.account_type === "teacher") {
+            //     const profile = await user.getTeacher();
+            //     payload.profileId = profile.id;
+            //     payload.teacher_type = profile.teacher_type;
+            //     payload.schoolManagement = profile.SchoolManagementId;
+            //     payload.redirect = `${process.env.SCHOOL_DASHBOARD_URL}/auth`;
 
-            } else if (user.account_type === 'student') {
+            // } else if (user.account_type === 'student') {
 
-                const profile = await user.getStudent();
-                const schoolManagementId = profile.SchoolManagementId;
-
-
-                const school = await profile.getSchoolManagement({include: [Account]});
-
-                console.log(profile);
-
-                if (schoolManagementId) {
-                    const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
-                    const studentSchoolAccount = await studentSchool.getAccount();
-                    const classData = await profile.getClass();
-                    const classArmData = await profile.getClassArm();
-                    const studentSubject = await classData.getSubjects();
-                    const classSubject = await classData.getSubjects();
-
-                    payload.schoolName = studentSchoolAccount.name;
-
-                    payload.studentClass = classData.naming;
-                    payload.studentClassArm = classArmData.naming;
-
-                    payload.subjectsCount = studentSubject.length;
-                    payload.schoolStudent = true;
-                    payload.student_type = profile.student_type;
+            //     const profile = await user.getStudent();
+            //     const schoolManagementId = profile.SchoolManagementId;
 
 
-                } else {
-                    payload.schoolStudent = false;
-                    payload.schoolName = profile.school;
-                    payload.studentClass = profile.class;
-                }
-                payload.term = "undefined";
-                payload.redirect = `${process.env.STUDENT_AREA_URL}/auth`;
+            //     const school = await profile.getSchoolManagement({include: [Account]});
 
-            } else {
+            //     console.log(profile);
 
-                payload.admin = user.admin;
-            }
+            //     if (schoolManagementId) {
+            //         const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
+            //         const studentSchoolAccount = await studentSchool.getAccount();
+            //         const classData = await profile.getClass();
+            //         const classArmData = await profile.getClassArm();
+            //         const studentSubject = await classData.getSubjects();
+            //         const classSubject = await classData.getSubjects();
+
+            //         payload.schoolName = studentSchoolAccount.name;
+
+            //         payload.studentClass = classData.naming;
+            //         payload.studentClassArm = classArmData.naming;
+
+            //         payload.subjectsCount = studentSubject.length;
+            //         payload.schoolStudent = true;
+            //         payload.student_type = profile.student_type;
+
+
+            //     } else {
+            //         payload.schoolStudent = false;
+            //         payload.schoolName = profile.school;
+            //         payload.studentClass = profile.class;
+            //     }
+            //     payload.term = "undefined";
+            //     payload.redirect = `${process.env.STUDENT_AREA_URL}/auth`;
+
+            // } else {
+
+            //     payload.admin = user.admin;
+            // }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
 
@@ -582,22 +591,22 @@ class AuthController {
 
             if (payload.account_type === 'student') {
 
-                const profile = await user.getStudent();
-                const schoolManagementId = profile.SchoolManagementId;
+                // const profile = await user.getStudent();
+                // const schoolManagementId = profile.SchoolManagementId;
 
-                const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
-                const studentSchoolAccount = await studentSchool.getAccount();
-                const classData = await profile.getClass();
-                const classArmData = await profile.getClassArm();
-                const studentSubject = await classData.getSubjects();
+                // const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
+                // const studentSchoolAccount = await studentSchool.getAccount();
+                // const classData = await profile.getClass();
+                // const classArmData = await profile.getClassArm();
+                // const studentSubject = await classData.getSubjects();
 
-                payload.schoolName = studentSchool.school_name;
-                payload.studentClass = classData.naming;
-                payload.studentClassArm = classArmData.naming;
-                payload.subjectsCount = studentSubject.length;
-                payload.term = "undefined";
+                // payload.schoolName = studentSchool.school_name;
+                // payload.studentClass = classData.naming;
+                // payload.studentClassArm = classArmData.naming;
+                // payload.subjectsCount = studentSubject.length;
+                // payload.term = "undefined";
 
-                payload.status = payload.flag === 'active' ? "On Track" : "??";
+                // payload.status = payload.flag === 'active' ? "On Track" : "??";
 
             }
 
@@ -683,6 +692,8 @@ class AuthController {
 
         const { id } = req.userData;
 
+        // return res.send(req.userData);
+
         try {
 
             const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' }, include: [SchoolManagement] });
@@ -693,22 +704,22 @@ class AuthController {
 
             const payload = { ...user.dataValues };
 
-            if (payload.account_type === "school") {
-                payload.school = user.SchoolManagement.school_name;
-            }
+            // if (payload.account_type === "school") {
+            //     payload.school = user.SchoolManagement.schoolName;
+            // }
 
-            if (payload.account_type === "freelancer") {
-                payload.school = user.SchoolManagement.school_name;
-            }
+            // if (payload.account_type === "freelancer") {
+            //     payload.school = user.SchoolManagement.schoolName;
+            // }
 
-            if (payload.account_type === "teacher") {
-                const profile = await user.getTeacher();
-                const schoolManagement = await profile.getSchoolManagement();
-                payload.profileId = profile.id;
-                payload.teacher_type = profile.teacher_type;
-                payload.schoolManagement = schoolManagement.id;
-                payload.school = schoolManagement.school_name;
-            }
+            // if (payload.account_type === "teacher") {
+            //     const profile = await user.getTeacher();
+            //     const schoolManagement = await profile.getSchoolManagement();
+            //     payload.profileId = profile.id;
+            //     payload.teacher_type = profile.teacher_type;
+            //     payload.schoolManagement = schoolManagement.id;
+            //     payload.school = schoolManagement.schoolName;
+            // }
 
             if (payload.account_type === 'student') {
                 const profile = await user.getStudent();
@@ -720,7 +731,7 @@ class AuthController {
                     const classArmData = await profile.getClassArm();
                     const studentSubject = await classData.getSubjects();
 
-                    payload.schoolName = studentSchool.school_name;
+                    payload.schoolName = studentSchool.schoolName;
                     payload.studentClass = classData.naming;
                     payload.studentClassArm = classArmData.naming;
 
@@ -1229,7 +1240,8 @@ class AuthController {
     static async sendVerificationEmail(account) {
         const expiry = (new Date(Date.now() + 30 * 60 * 1000));
         const hash = MD5(account.id + expiry).toString();
-        const tokenRecord = await Validation.findOne({ where: { accountId: account.id } });
+        const tokenRecord = await Validation.findOne({ where: { account_id: account.id } });
+        const otp = tokenRecord.dataValues.otp;
 
         if (!tokenRecord) {
             const validate = new Validation();
@@ -1247,9 +1259,9 @@ class AuthController {
 
         const link = `${process.env.WEB_URL}/account/verify/${hash}`;
 
-        console.log(link, hash);
+        // console.log(link, hash);
 
-        Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { link }).send();
+        Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { otp }).send();
     }
 
 
