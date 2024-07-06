@@ -29,9 +29,9 @@ class SequelizeCliHelper {
         }catch(err){}
         if (!existingConfig || existingConfig.toString() !== configData ){
             //Write config
-            // fs.writeFile(configFilePath, configData, (err) => {
-            //     console.log(err)
-            // })
+            fs.writeFile(configFilePath, configData, (err) => {
+                console.log(err)
+            })
         }
 
     }
