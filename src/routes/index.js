@@ -6,26 +6,28 @@ class Routes {
 
         constructor(app) {
             this.app = app;
-
-               const bodyParser = require("body-parser");
-               const express = require("express");
-               app.use(bodyParser.urlencoded({ extended: false }));
-               app.use(bodyParser.json());
-               app.use(express.static('public'));
+            const bodyParser = require("body-parser");
+            const express = require("express");
+            app.use(bodyParser.urlencoded({ extended: false }));
+            app.use(bodyParser.json());
+            app.use(express.static('public'));
         }
 
         applyRouteGroups(routerGroups) {
-            routerGroups.forEach((routerGroup) => {
-                routerGroup();
-            });
+            for (let i = 0; i < routerGroups.length; i++) {
+                routerGroups[i]();
+            }
+            // routerGroups.forEach((routerGroup) => {
+            //     routerGroup();
+            // });
         }
 
         register(){
             let instance = this;
-            let routersToUse = [ globalRoute, adminRoute ];
+            let routersToUse = [ globalRoute, adminRoute];
             // Apply open route groups first, then authorized
-            this.applyRouteGroups(routersToUse.map((router) => router.open));
-            this.applyRouteGroups(routersToUse.map((router) => router.authorized));
+            this.applyRouteGroups(routersToUse.map((router) => () => router.open(router.router)));
+            this.applyRouteGroups(routersToUse.map((router) => () => router.authorized(router.router)));
             // Use routers
             routersToUse.forEach((router) => {
                 instance.app.use(router.path, router.router);

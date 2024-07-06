@@ -115,7 +115,6 @@ const OpenRoutesGroup = (router) => {
     router.put('/open/lesson/templateimage/:id',  UploadService.uploadTemplateImage.array('image'), LessonController.updateTemplateImage);
     router.get('/open/pricing/', SchoolFront.openPricing);
 
-
 };
 
 
@@ -349,13 +348,14 @@ const AuthorizedRoutesGroup = (router) => {
 
 
 
-
+// OpenRoutesGroup(router);
+// AuthorizedRoutesGroup(router);
 
 
 module.exports = {
     router,
     path : "/",
-    open : () => OpenRoutesGroup(router),
-    authorized : () =>  AuthorizedRoutesGroup(router),
+    open : (routerInstance) => OpenRoutesGroup(routerInstance),
+    authorized : (routerInstance) =>  AuthorizedRoutesGroup(routerInstance),
 };
 
