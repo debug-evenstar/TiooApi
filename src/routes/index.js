@@ -14,10 +14,22 @@ class Routes {
                app.use(express.static('public'));
         }
 
+        applyRouteGroups(routerGroups) {
+            routerGroups.forEach((routerGroup) => {
+                routerGroup();
+            });
+        }
+
         register(){
-            let instance = this
-            instance.app.use('/', globalRoute);
-            instance.app.use('/admin', adminRoute);
+            let instance = this;
+            let routersToUse = [ globalRoute, adminRoute ];
+            // Apply open route groups first, then authorized
+            this.applyRouteGroups(routersToUse.map((router) => router.open));
+            this.applyRouteGroups(routersToUse.map((router) => router.authorized));
+            // Use routers
+            routersToUse.forEach((router) => {
+                instance.app.use(router.path, router.router);
+            });
         }
 }
 

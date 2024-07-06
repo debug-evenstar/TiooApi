@@ -94,8 +94,6 @@ const OpenRoutesGroup = (router) => {
     router.post('/invites/student/accept', InviteController.studentAccept);
     router.post('/invites/teacher/accept', InviteController.teacherAccept);
 
-    router.post('/admin/login', AuthorizationController.login);
-
     router.post('/tio/setup', TioController.setup);
     router.get('/tio/classes', TioController.classes);
     router.get('/tio/subjects', TioController.subjects);
@@ -319,19 +317,13 @@ const AuthorizedRoutesGroup = (router) => {
 
 
 
-// const ExternalSchoolRoutesGroup = (router) => {
-
-//     router.use(AuthenticationMiddleware.externalSchool) //--use middleware--//
-
-// };
 
 
 
-
-OpenRoutesGroup(router);
-AuthorizedRoutesGroup(router);
-
-
-
-module.exports = router;
+module.exports = {
+    router,
+    path : "/",
+    open : () => OpenRoutesGroup(router),
+    authorized : () =>  AuthorizedRoutesGroup(router),
+};
 

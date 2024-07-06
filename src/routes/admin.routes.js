@@ -33,6 +33,9 @@ const TeacherController = require('../controller/teacher.controller');
 
 
 
+const OpenRoutesGroup = (router) => {
+    router.post('/login', AuthorizationController.login);
+};
 /*------------------------------| Admin ROUTES |------------------------------*/
 
 const AdminRoutesGroup = (router) => {
@@ -165,7 +168,13 @@ const AdminRoutesGroup = (router) => {
 };
 
 
-AdminRoutesGroup(router);
+// OpenRoutesGroup(router);
+// AdminRoutesGroup(router);
 
 
-module.exports = router;
+module.exports = {
+    router,
+    path : "/admin",
+    open : () => OpenRoutesGroup(router),
+    authorized : () => AdminRoutesGroup(router),
+};
