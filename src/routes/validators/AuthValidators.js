@@ -41,6 +41,7 @@ module.exports = {
 
   VerifyAccountValidator: [
     body("otp").notEmpty().withMessage("otp is required"),
+    body("email").notEmpty().withMessage("email is required"),
   ],
   RegisterExternalStudentValidator: [
     body("public_key").notEmpty().withMessage("Public_key is required"),
