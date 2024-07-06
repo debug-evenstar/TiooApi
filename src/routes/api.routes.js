@@ -348,14 +348,9 @@ const AuthorizedRoutesGroup = (router) => {
 
 
 
-// OpenRoutesGroup(router);
-// AuthorizedRoutesGroup(router);
+OpenRoutesGroup(router);
+AuthorizedRoutesGroup(router);
 
 
-module.exports = {
-    router,
-    path : "/",
-    open : (routerInstance) => OpenRoutesGroup(routerInstance),
-    authorized : (routerInstance) =>  AuthorizedRoutesGroup(routerInstance),
-};
+module.exports = router;
 
