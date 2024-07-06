@@ -12,6 +12,7 @@ const AutoMigrate = require("../migrations/automigrate");
 const AuthorizationSeed = require("../seeders/seed.authorization");
 const Logger = require("../middleware/logger.middleware");
 const path = require("path");
+const SequelizeCliHelper = require("../database/connection/cli");
 
 class Server {
     static boot() {
@@ -33,7 +34,8 @@ class Server {
             })
         );
 
-        // app.use("/images", express.static("../public/lesson"));
+        // Create Sequelize CLI Config
+        SequelizeCliHelper.createDBConfig();
 
         //=============== INITIALIZE DATABASE ================//
         //{force : true}

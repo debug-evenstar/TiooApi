@@ -16,3 +16,4 @@ misc
 .DS_Store
 /public
 process.json
+/config/config.json
