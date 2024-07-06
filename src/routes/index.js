@@ -21,7 +21,7 @@ class Routes {
 
         register(){
             let instance = this;
-            let routersToUse = [ globalRoute, adminRoute];
+            let routersToUse = [ adminRoute, globalRoute ];
             // Apply open route groups first, then authorized
             this.applyRouteGroups(routersToUse.map((router) => () => router.open(router.router)));
             this.applyRouteGroups(routersToUse.map((router) => () => router.authorized(router.router)));

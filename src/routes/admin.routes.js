@@ -169,13 +169,10 @@ const AdminRoutesGroup = (router) => {
 };
 
 
-// OpenRoutesGroup(router);
-// AdminRoutesGroup(router);
-
 
 module.exports = {
     router,
     path : "/admin",
-    open : () => OpenRoutesGroup(router),
-    authorized : () => AdminRoutesGroup(router),
+    open : (routerInstance) => OpenRoutesGroup(routerInstance),
+    authorized : (routerInstance) =>  AdminRoutesGroup(routerInstance),
 };
