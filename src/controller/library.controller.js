@@ -1,7 +1,7 @@
 // import { Textbook } from "../database/connection";
 const { Op } = require("sequelize");
 const { Textbook, Account, Shelf } = require("../database/connection");
-class StudentFront {
+class LibraryController {
   static async getLibraryTextbooks(req, res) {
     const textbooks = await Textbook.findAll({});
 
@@ -66,4 +66,4 @@ class StudentFront {
   }
 }
 
-module.exports = StudentFront;
+module.exports = LibraryController;

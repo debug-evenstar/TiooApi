@@ -30,6 +30,7 @@ const LessonValidator = require('./validators/LessonValidator');
 const LessonController = require('../controller/lesson.controller');
 const TextbookController = require('../controller/admin/management/textbook.controller');
 const TeacherController = require('../controller/teacher.controller');
+const LibraryController = require('../controller/library.controller');
 
 
 
@@ -119,7 +120,7 @@ const AdminRoutesGroup = (router) => {
     /* ---------------------------------------------------------------------------------------------- */
     /*                                             LIBRARY                                            */
     /* ---------------------------------------------------------------------------------------------- */
-
+    router.get('/shelf', LibraryController.getStudentShelf);
 
 
    /* ------------------------------------------ TEXTBOOKS ----------------------------------------- */

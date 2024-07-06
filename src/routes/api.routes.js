@@ -38,7 +38,7 @@ const BillingController = require('../controller/billing.controller');
 const NotificationController = require('../controller/notification.controller');
 const SchoolFront = require('../controller/schoolfront.controller');
 const CartController = require('../controller/cart.controller');
-const StudentFront = require('../controller/studentfront.controller');
+const Library = require('../controller/library.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -259,10 +259,10 @@ const AuthorizedRoutesGroup = (router) => {
 
     /* --------------------------------- NEW STUDENT FRONT   -------------------------------- */
     
-    router.get('/front/student/textbook/librarytextbooks', StudentFront.getLibraryTextbooks )
-    router.get('/front/student/shelf/librarytextbooks', StudentFront.getLibraryTextbooks )
-    router.post('/front/student/shelf/add-book',StudentFront.addTextbookToShelf);
-    router.get('/front/student/shelf/get-books',StudentFront.getStudentShelf);
+    router.get('/front/student/textbook/librarytextbooks', Library.getLibraryTextbooks )
+    router.get('/front/student/shelf/librarytextbooks', Library.getLibraryTextbooks )
+    router.post('/front/student/shelf/add-book',Library.addTextbookToShelf);
+    router.get('/front/student/shelf/get-books',Library.getStudentShelf);
     
     
     
