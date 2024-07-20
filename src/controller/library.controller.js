@@ -1,6 +1,8 @@
 // import { Textbook } from "../database/connection";
 const { Op } = require("sequelize");
-const { Textbook, Account, Shelf } = require("../database/connection");
+const { Textbook, Account, Shelf, Chapter, Subject, Lesson, LessonSlide } = require("../database/connection");
+const ResponseStatus = require("../config/message.config");
+
 class LibraryController {
   static async getLibraryTextbooks(req, res) {
     const textbooks = await Textbook.findAll({});
@@ -11,9 +13,39 @@ class LibraryController {
     });
   }
 
-  async getStudentTextbooks(){
+  static async getLibraryTextbook(req, res) {
+      try {
 
+          const textbookInstance = await Textbook.findByPk(req.params.id,{
+              include: [{ 
+                model: Chapter,
+                as : "chapters",
+                include : [{ 
+                  model : Lesson, 
+                  as : "lessons",
+                  include : [{model : LessonSlide, as : "lesson_slides"}]
+                }]
+              },Subject],
+          });
+
+          // ------------------------------------------
+
+          return res.status(ResponseStatus.code.success).json({
+              error: false,
+              message: ResponseStatus.pass.read,
+              data: textbookInstance,
+          });
+      } catch (error) {
+          res.status(500).json({
+              error: "server error",
+              extra: error.message,
+          });
+      }
   }
+
+  // async getStudentTextbooks(){
+
+  // }
 
   static async getStudentShelf(req, res) {
     const { id } = req.userData;

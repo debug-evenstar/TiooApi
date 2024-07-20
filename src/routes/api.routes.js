@@ -114,6 +114,7 @@ const OpenRoutesGroup = (router) => {
     router.post('/open/lesson/:id/slide', LessonController.createLessonSlide);
     router.put('/open/lesson/templateimage/:id',  UploadService.uploadTemplateImage.array('image'), LessonController.updateTemplateImage);
     router.get('/open/pricing/', SchoolFront.openPricing);
+    router.get('/open/textbook/:id', Library.getLibraryTextbook );
 
 };
 
@@ -262,6 +263,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/front/student/shelf/librarytextbooks', Library.getLibraryTextbooks )
     router.post('/front/student/shelf/add-book',Library.addTextbookToShelf);
     router.get('/front/student/shelf/get-books',Library.getStudentShelf);
+    router.get('/front/student/textbook/:id', Library.getLibraryTextbook );
     
     
     

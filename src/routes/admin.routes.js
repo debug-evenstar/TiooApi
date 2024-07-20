@@ -65,6 +65,13 @@ const AdminRoutesGroup = (router) => {
     router.put('/subjects/:id', SubjectValidator.UpdateSubject, SubjectController.update);
     router.delete('/subjects/:id', SubjectController.delete);
     router.get('/subjects',SubjectController.readAll);
+    router.get('/subjects/:id/topics',SubjectController.getTopics);
+    router.post('/subjects/:id/topics',SubjectController.addSubjectTopic);
+
+    /* --------------------------------- TOPICS --------------------------------- */
+    router.delete('/topics/:id',SubjectController.deleteTopic);
+
+
 
     /* --------------------------------- PRICING -------------------------------- */
 
@@ -142,7 +149,11 @@ const AdminRoutesGroup = (router) => {
 
 
     /* ------------------------------------------- LESSONS ------------------------------------------ */
+    router.get('/lessons/:id', LessonController.lessonTemplate)
     router.post('/lessons/:id/slides', LessonController.createLessonSlide)
+
+
+    router.get('/lessons/check', LessonController.subjectGroupedLessons);
 
     // router.post('/library', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
     // router.get('/library', AdminLibraryController.read);
