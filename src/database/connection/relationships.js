@@ -1,4 +1,4 @@
-const { Topic } = require(".");
+const { Topic, Question } = require(".");
 
 class Relationships {
     static group(
@@ -29,7 +29,8 @@ class Relationships {
         CartItem,
         OnboardingQuestion,
         AccountType,
-        Topic
+        Topic,
+        Question
     ) {
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -318,6 +319,16 @@ class Relationships {
         Textbook.belongsToMany(Lesson, {
             through: "textbook_lessons",
             foreignKey: "textbook_id",
+        });
+
+        Topic.belongsToMany(Question, {
+            through: "topic_questions",
+            foreignKey: "topic_id",
+        });
+
+        Question.belongsToMany(Topic, {
+            through: "topic_questions",
+            foreignKey: "question_id",
         });
 
 

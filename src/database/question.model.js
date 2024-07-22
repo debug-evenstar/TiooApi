@@ -13,12 +13,16 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             media: {
+                type: DataTypes.JSON,
+                allowNull: true,
+            },
+            hash: {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
         },
-        { timestamps: false }
+        { timestamps: true }
     );
 
-    return Group;
+    return Question;
 };

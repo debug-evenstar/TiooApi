@@ -115,7 +115,7 @@ const OpenRoutesGroup = (router) => {
     router.put('/open/lesson/templateimage/:id',  UploadService.uploadTemplateImage.array('image'), LessonController.updateTemplateImage);
     router.get('/open/pricing/', SchoolFront.openPricing);
     router.get('/open/textbook/:id', Library.getLibraryTextbook );
-
+    router.get('/open/subjects/:id/topics',SubjectController.getTopics);
 };
 
 

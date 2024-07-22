@@ -145,6 +145,10 @@ const Topic = (db.topic = require("../topic.model"))(
   sequelize,Sequelize
 )
 
+const Question = (db.question = require("../question.model"))(
+  sequelize,Sequelize
+)
+
 const models = [
   Account,
   Validation,
@@ -173,7 +177,8 @@ const models = [
   CartItem,
   OnboardingQuestion,
   AccountType,
-  Topic
+  Topic,
+  Question
 ];
 
 Relationships.group(...models);
@@ -214,5 +219,6 @@ module.exports = {
   CartItem,
   OnboardingQuestion,
   AccountType,
-  Topic
+  Topic,
+  Question
 };
