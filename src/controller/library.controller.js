@@ -11,9 +11,7 @@ class LibraryController {
     });
   }
 
-  async getStudentTextbooks(){
-
-  }
+  async getStudentTextbooks() {}
 
   static async getStudentShelf(req, res) {
     const { id } = req.userData;
@@ -21,22 +19,48 @@ class LibraryController {
       where: {
         account_id: id,
       },
-      attributes: ['textbook_id']
-    })
+      attributes: ["textbook_id"],
+    });
 
     const book_ids = shelfRecords.map((sr) => sr.textbook_id);
 
-
     const books = await Textbook.findAll({
       where: {
-        id: book_ids
-      }
-    })
+        id: book_ids,
+      },
+    });
 
     return res.send({
       error: false,
       data: books,
     });
+  }
+
+  static async removeTextbookFromShelf(req, res) {
+    const { id } = req.userData;
+    const { textbook_id } = req.body;
+
+    const shelfRecord = await Shelf.findOne({
+      where: {
+        textbook_id,
+        account_id: id,
+      },
+    });
+    
+    if (shelfRecord) {
+      shelfRecord.delete();
+
+      return res.send({
+        error: false,
+        message: "Removed textbook from shelf",
+      });
+    }
+
+    return res.send({
+      error: true,
+      message: "Textbook not in shelf",
+    });
+
   }
 
   static async addTextbookToShelf(req, res) {

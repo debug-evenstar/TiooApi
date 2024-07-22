@@ -262,6 +262,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/front/student/shelf/librarytextbooks', Library.getLibraryTextbooks )
     router.post('/front/student/shelf/add-book',Library.addTextbookToShelf);
     router.get('/front/student/shelf/get-books',Library.getStudentShelf);
+    router.post('/front/student/shelf/remove-book', Library.removeTextbookFromShelf);
     
     
     
