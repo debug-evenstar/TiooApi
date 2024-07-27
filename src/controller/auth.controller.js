@@ -723,7 +723,7 @@ class AuthController {
 
             if (payload.account_type === 'student') {
                 const profile = await user.getStudent();
-                const schoolManagementId = profile.SchoolManagementId;
+                const schoolManagementId = profile?.SchoolManagementId;
                 if (schoolManagementId) {
                     const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
                     const studentSchoolAccount = await studentSchool.getAccount();
@@ -740,9 +740,9 @@ class AuthController {
                     payload.student_type = profile.student_type;
                 } else {
                     payload.schoolStudent = false;
-                    payload.schoolName = profile.school;
-                    payload.studentClass = profile.class;
-                    payload.student_type = profile.student_type;
+                    payload.schoolName = profile?.school;
+                    payload.studentClass = profile?.class;
+                    payload.student_type = profile?.student_type;
                 }
                 payload.term = "undefined";
                 payload.status = payload.flag === 'active' ? "On Track" : "??";

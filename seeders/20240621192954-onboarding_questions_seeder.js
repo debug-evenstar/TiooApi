@@ -25,7 +25,7 @@ module.exports = {
         },
         {
           parent_id: 7,
-          parent_answer: "JAMB",
+          parent_answer: "UTME(JAMB)",
           question: "Which subjects are you most interested in?",
           type: "multi-select",
           options: JSON.stringify([
@@ -39,33 +39,32 @@ module.exports = {
         },
         {
           parent_id: 7,
-          parent_answer: "JAMB",
+          parent_answer: "UTME(JAMB)",
           question: "How many hours per week can you dedicate to studying?",
           type: "single-select",
           options: JSON.stringify(["< 7 hours", "7 hours", "> 7 hours"]),
         },
         {
           parent_id: 7,
-          parent_answer: "JAMB\n",
+          parent_answer: "UTME(JAMB)",
           question: "Would you like an online coach?",
           type: "single-select",
           options: JSON.stringify(["Yes", "No"]),
         },
-        {
-          parent_id: 7,
-          parent_answer: "JAMB",
-          question: "How would you like to track your progress?",
-          type: "single-select",
-          options: JSON.stringify(["Quizes", "Assignment", "Self-assesment"]),
-        },
+        // {
+        //   parent_id: 7,
+        //   parent_answer: "UTME(JAMB)",
+        //   question: "How would you like to track your progress?",
+        //   type: "single-select",
+        //   options: JSON.stringify(["Quizes", "Assignment", "Self-assesment"]),
+        // },
         {
           parent_id: 2,
           parent_answer: "Exam Preparation",
           question: "What exams are you preparing for?",
           type: "single-select",
           options: JSON.stringify([
-            "UTME",
-            "JAMB",
+            "UTME(JAMB)",
             "WAEC",
             "NECO",
             "GRE",
