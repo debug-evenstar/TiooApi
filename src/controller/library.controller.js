@@ -15,73 +15,75 @@ class LibraryController {
 
   static async getStudentShelf(req, res) {
     const { id } = req.userData;
-    const shelfRecords = await Shelf.findAll({
-      where: {
-        account_id: id,
-      },
-      attributes: ["textbook_id"],
+    const account = await Account.findByPk(id, {
+      include: Shelf,
     });
+    console.log(account);
+    const books = account;
+    if (account.Shelf) {
+      const books = await Textbook.findAll({
+        where: {
+          id: account.Shelf?.shelf ?? [],
+        },
+      });
 
-    const book_ids = shelfRecords.map((sr) => sr.textbook_id);
+      return res.send({
+        error: false,
+        data: books,
+      });
+    }
+    // const shelfRecords = await Shelf.findAll({
+    //   where: {
+    //     account_id: id,
+    //   },
+    //   attributes: ["textbook_id"],
+    // });
 
-    const books = await Textbook.findAll({
-      where: {
-        id: book_ids,
-      },
-    });
+    // const book_ids = shelfRecords.map((sr) => sr.textbook_id);
 
     return res.send({
       error: false,
-      data: books,
+      data: [],
     });
   }
 
   static async removeTextbookFromShelf(req, res) {
     const { id } = req.userData;
     const { textbook_id } = req.body;
-
-    const shelfRecord = await Shelf.findOne({
-      where: {
-        textbook_id,
-        account_id: id,
-      },
+    const account = await Account.findByPk(id, {
+      include: Shelf,
     });
-    
-    if (shelfRecord) {
-      shelfRecord.delete();
 
-      return res.send({
-        error: false,
-        message: "Removed textbook from shelf",
-      });
-    }
+    await account.Shelf.update({
+      shelf: account.Shelf.shelf.filter((id) => id != textbook_id),
+    });
 
     return res.send({
-      error: true,
-      message: "Textbook not in shelf",
+      error: false,
+      message: "Removed textbook from shelf",
     });
-
   }
 
   static async addTextbookToShelf(req, res) {
     const { id } = req.userData;
     const { textbook_id } = req.body;
 
-    const account = await Account.findByPk(id);
-    const textbook = await Textbook.findByPk(textbook_id);
-
-    const count = await Shelf.count({
-      where: { account_id: id, textbook_id: textbook_id },
+    const account = await Account.findByPk(id, {
+      include: Shelf,
     });
 
-    if (count) {
-      return res.send({
-        error: true,
-        message: "Already added book to shelf",
+    if (!account.Shelf) {
+      // create a shelf for the user
+      const shelf = await account.createShelf({
+        account_id: id,
+        shelf: [textbook_id],
+      });
+    } else {
+      await account.Shelf.update({
+        shelf: [...new Set([...account.Shelf.shelf, textbook_id])],
       });
     }
-
-    await account.addTextbook(textbook);
+    // const textbook = await Textbook.findByPk(textbook_id);
 
     return res.send({
       error: false,

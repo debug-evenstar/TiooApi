@@ -35,11 +35,23 @@ class Relationships {
             foreignKey: "account_id",
             as: "validation",
         });
+
+
+        
         Validation.belongsTo(Account, {
             foreignKey: "account_id",
             as: "account",
         });
 
+        Account.hasOne(Shelf, {
+            foreignKey: 'account_id',
+            // as: 'shelf_ids'
+        })
+
+        Shelf.belongsTo(Account, {
+            foreignKey: 'account_id',
+            // as: 'account'
+        })
         Account.hasOne(SchoolManagement, {
             allowNull: true,
             onDelete: "CASCADE",
@@ -203,8 +215,8 @@ class Relationships {
         Billing.belongsTo(Account, { foreignKey: "account_id" });
 
         // Account.hasMany(Shelf, { foreignKey: "account_id"});
-        Account.belongsToMany(Textbook, { through: 'shelves',foreignKey: 'account_id'});
-        Textbook.belongsToMany(Account, { through: 'shelves',foreignKey: 'textbook_id'});
+        // Account.belongsToMany(Textbook, { through: 'shelves',foreignKey: 'account_id'});
+        // Textbook.belongsToMany(Account, { through: 'shelves',foreignKey: 'textbook_id'});
 
         
 
