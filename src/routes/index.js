@@ -14,12 +14,9 @@ class Routes {
         }
 
         applyRouteGroups(routerGroups) {
-            for (let i = 0; i < routerGroups.length; i++) {
-                routerGroups[i]();
-            }
-            // routerGroups.forEach((routerGroup) => {
-            //     routerGroup();
-            // });
+            routerGroups.forEach((routerGroup) => {
+                routerGroup();
+            });
         }
 
         register(){
