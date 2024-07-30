@@ -39,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
         this.setDataValue('options',JSON.stringify(value));
       }
     },
-  });
+  }, { timestamps: false });
 
   return OnboardingQuestion;
 };

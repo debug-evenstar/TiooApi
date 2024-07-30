@@ -1,3 +1,4 @@
+const { Topic, Question } = require(".");
 
 class Relationships {
     static group(
@@ -28,6 +29,8 @@ class Relationships {
         CartItem,
         OnboardingQuestion,
         AccountType,
+        Topic,
+        Question
     ) {
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -199,13 +202,13 @@ class Relationships {
 
         Group.belongsTo(Class, { foreignKey: "ref_cid" });
 
-        Textbook.hasMany(Chapter, { foreignKey: "textbook_id" });
+        Textbook.hasMany(Chapter, { foreignKey: "textbook_id", as : "chapters" });
         Chapter.belongsTo(Textbook, { foreignKey: "textbook_id" });
 
         Textbook.hasMany(Lesson, { foreignKey: "textbook_id" });
         Lesson.belongsTo(Textbook, { foreignKey: "textbook_id" });
 
-        Chapter.hasMany(Lesson, { foreignKey: "chapter_id" });
+        Chapter.hasMany(Lesson, { foreignKey: "chapter_id" , as : "lessons"});
         Lesson.belongsTo(Chapter, { foreignKey: "chapter_id" });
 
         Lesson.hasMany(LessonSlide, { foreignKey: "lesson_id", as : "lesson_slides"});
@@ -218,10 +221,14 @@ class Relationships {
         // Account.belongsToMany(Textbook, { through: 'shelves',foreignKey: 'account_id'});
         // Textbook.belongsToMany(Account, { through: 'shelves',foreignKey: 'textbook_id'});
 
-        
+        Account.hasMany(Textbook, {foreignKey : "account_id"});
+        Textbook.belongsTo(Account, {foreignKey : "account_id"});
 
         Subject.hasMany(Textbook, { foreignKey: "subject_id" });
         Textbook.belongsTo(Subject, { foreignKey: "subject_id" });
+
+        Subject.hasMany(Topic, { foreignKey: "subject_id" });
+        Topic.belongsTo(Subject, { foreignKey: "subject_id" });
 
         Account.hasMany(CartItem, { foreignKey: "account_id" });
         CartItem.belongsTo(Account, { foreignKey: "account_id" });
@@ -325,6 +332,16 @@ class Relationships {
         Textbook.belongsToMany(Lesson, {
             through: "textbook_lessons",
             foreignKey: "textbook_id",
+        });
+
+        Topic.belongsToMany(Question, {
+            through: "topic_questions",
+            foreignKey: "topic_id",
+        });
+
+        Question.belongsToMany(Topic, {
+            through: "topic_questions",
+            foreignKey: "question_id",
         });
 
 

@@ -10,6 +10,8 @@ const {
     LessonSlide,
     Account,
     Textbook,
+    Question,
+    Topic,
 } = require("../database/connection");
 
 const fs = require("fs-extra");
@@ -22,6 +24,7 @@ const LessonTemplateProvider = require("../providers/AI/lesson.template");
 const { equal } = require("../utils/array");
 const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
 const { getAllFuncs } = require("../utils/objects");
+const { randomString } = require("../utils/string");
 
 class LessonController {
     /*-----------------------------------| UPLOAD LESSON |-----------------------------------*/
@@ -724,10 +727,11 @@ class LessonController {
                 include: [
                     {
                         model: LessonSlide,
-                        as : "lesson_slides",
+                        as: "lesson_slides",
                         orderBy: { slide_index: "asc" },
                     },
-                    Textbook, Chapter
+                    Textbook,
+                    Chapter,
                 ],
             });
 
@@ -1143,8 +1147,12 @@ class LessonController {
         try {
             const lessonSlideInstance = await LessonSlide.findByPk(id);
 
+            const slide_data = await LessonController.processQuestions(
+                data.slide_data
+            );
+
             const response = await lessonSlideInstance.update({
-                slide_data: data.slide_data,
+                slide_data: slide_data,
             });
 
             return res.status(ResponseStatus.code.success).json({
@@ -1166,7 +1174,7 @@ class LessonController {
 
         try {
             const lessonInstance = await Lesson.findByPk(id, {
-                include : [{ model : LessonSlide, as : "lesson_slides"}]
+                include: [{ model: LessonSlide, as: "lesson_slides" }],
             });
 
             if (!lessonInstance) {
@@ -1175,9 +1183,13 @@ class LessonController {
                     message: ResponseStatus.fail.not_found,
                 });
             }
+
+            const slide_data = await LessonController.processQuestions(
+                data.slide_data, true
+            );
             const lessonSlideInstance = await LessonSlide.create({
                 slide_index: data.slide_index,
-                slide_data: data.slide_data,
+                slide_data: slide_data,
             });
 
             await lessonInstance.addLessonSlides([lessonSlideInstance]);
@@ -1193,6 +1205,68 @@ class LessonController {
                 extra: error.message,
             });
         }
+    }
+
+    static async processQuestions(slideData, isNew = false) {
+        for (
+            let componentIndex = 0;
+            componentIndex < slideData.length;
+            componentIndex++
+        ) {
+            const componentData = slideData[componentIndex];
+            if (componentData.component == "Questions") {
+                const questions = componentData.data ?? [];
+                for (
+                    let questionIndex = 0;
+                    questionIndex < questions.length;
+                    questionIndex++
+                ) {
+                    const question = questions[questionIndex];
+                    let questionHash = question.hash;
+                    let existingHash = true;
+                    // Generate new hash for question if hash exists already in DB
+                    while (existingHash && isNew) {
+                        existingHash = await Question.findOne({
+                            where: { hash: questionHash },
+                        });
+                        if (existingHash) {
+                            questionHash = randomString(10);
+                            question.hash = questionHash;
+                        }
+                    }
+                    const { title, query, hash, media } = question;
+                    const topicIds = question.topics ?? [];
+                    const topics = await Topic.findAll({
+                        where: { id: topicIds },
+                    });
+                    if (isNew) {
+                        const newQuestion = await Question.create({
+                            title,
+                            query,
+                            hash,
+                            media,
+                        });
+                        topics && (await newQuestion.addTopics(topics));
+                    } else {
+                        const existingQuestion = await Question.findOne({
+                            where: { hash: questionHash },
+                        });
+                        if (existingQuestion) {
+                            await existingQuestion.update({
+                                title,
+                                query,
+                                media,
+                            });
+                            await existingQuestion.removeTopics();
+                            topics && (await existingQuestion.addTopics(topics));
+                        }
+                    }
+                    componentData.data[questionIndex] = question;
+                }
+                slideData[componentIndex] = componentData;
+            }
+        }
+        return slideData;
     }
 }
 

@@ -1045,7 +1045,6 @@ class AuthController {
             const availability = await TempValidation.findOne({ where: { email: email } });
 
             if (!availability) {
-
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
 
