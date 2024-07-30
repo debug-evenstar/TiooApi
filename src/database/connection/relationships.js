@@ -206,10 +206,11 @@ class Relationships {
         Billing.belongsTo(Account, { foreignKey: "account_id" });
 
         // Account.hasMany(Shelf, { foreignKey: "account_id"});
-        Account.belongsToMany(Textbook, { through: 'shelves',foreignKey: 'account_id'});
-        Textbook.belongsToMany(Account, { through: 'shelves',foreignKey: 'textbook_id'});
+        // Account.belongsToMany(Textbook, { through: 'shelves',foreignKey: 'account_id'});
+        // Textbook.belongsToMany(Account, { through: 'shelves',foreignKey: 'textbook_id'});
 
-        
+        Account.hasMany(Textbook, {foreignKey : "account_id"});
+        Textbook.belongsTo(Account, {foreignKey : "account_id"});
 
         Subject.hasMany(Textbook, { foreignKey: "subject_id" });
         Textbook.belongsTo(Subject, { foreignKey: "subject_id" });

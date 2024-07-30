@@ -39,6 +39,7 @@ const NotificationController = require('../controller/notification.controller');
 const SchoolFront = require('../controller/schoolfront.controller');
 const CartController = require('../controller/cart.controller');
 const Library = require('../controller/library.controller');
+const TextbookController = require('../controller/textbook.controller');
 
 /*---------------------------------| MIDDLEWARE |---------------------------------*/
 
@@ -50,6 +51,8 @@ const ErrorLogs = require('../controller/error.controller');
 const ExternalSchoolController = require('../controller/external_school/auth.controller');
 const TokenMiddleware = require('../middleware/token.middleware');
 const OnboardingController = require('../controller/onboarding.controller');
+const TextbookValidator = require('./validators/TextbookValidator');
+const LibraryController = require('../controller/library.controller');
 
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
@@ -158,40 +161,43 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/school/admin/:id/deactivate', SchoolManagementController.deactivateAdmin);
 
     /* ---------------------------------- CLASS --------------------------------- */
-    router.post('/class/create', ClassController.create);
-    router.post('/class/create_bulk', ClassController.bulkCreate);
-    router.get('/class/read', ClassController.readAll);
-    router.get('/class/readwitharms', ClassController.readAllWithArms);
-    router.get('/class/students/teachers/:id', ClassController.readStudentsTeachers);
-    router.get('/class/readwitharms/:classId', ClassController.readClassWithArms);
-    router.get('/class/read/:id', ClassController.read);
-    router.get('/class/subjects/read/:id', ClassController.readClassWithSubjects);
-    router.get('/class/teachers/read/:id', ClassController.readClassWithTeachers);
-    router.put('/class/update/:id', ClassController.update);
-    router.get('/class/students/:id', ClassController.classStudent);
-    router.delete('/class/delete/:id', ClassController.delete);
-    router.post('/class/student', ClassController.addStudentToClass);
-    router.post('/class/remove/student', ClassController.removeStudentFromClass);
-    router.post('/class/teacher', ClassController.addTeacherToClass);
-    router.post('/class/addSubject', ClassController.addSubjectToClass)
-    router.post('/class/remove/subject', ClassController.removeSubjectFromClass)
+    
+    router.post('/classes/create', ClassController.create);
+    router.post('/classes/create_bulk', ClassController.bulkCreate);
+    router.get('/classes', ClassController.readAll);
+    router.get('/classes/readwitharms', ClassController.readAllWithArms);
+    router.get('/classes/students/teachers/:id', ClassController.readStudentsTeachers);
+    router.get('/classes/readwitharms/:classId', ClassController.readClassWithArms);
+    router.get('/classes/:id', ClassController.read);
+    router.get('/classes/subjects/read/:id', ClassController.readClassWithSubjects);
+    router.get('/classes/teachers/read/:id', ClassController.readClassWithTeachers);
+    router.put('/classes/update/:id', ClassController.update);
+    router.get('/classes/students/:id', ClassController.classStudent);
+    router.delete('/classes/delete/:id', ClassController.delete);
+    router.post('/classes/student', ClassController.addStudentToClass);
+    router.post('/classes/remove/student', ClassController.removeStudentFromClass);
+    router.post('/classes/teacher', ClassController.addTeacherToClass);
+    router.post('/classes/addSubject', ClassController.addSubjectToClass)
+    router.post('/classes/remove/subject', ClassController.removeSubjectFromClass)
+
+
     /* --------------------------------- CLASS ARMS -------------------------------- */
-    router.post('/class/arms/create', ClassArmsController.create);
-    router.post('/class/arms/create_bulk', ClassArmsController.createBulk);
-    router.get('/class/arms/read', ClassArmsController.readAll);
-    router.get('/class/:id/arms', ClassArmsController.readAllByClass);
-    router.get('/class/arms/read/:id', ClassArmsController.readById);
-    router.get('/class/arms/students/:id', ClassArmsController.classArmStudents);
-    router.get('/class/arms/teachers/:id', ClassArmsController.classArmTeachers);
-    router.get('/class/arms/:id/subjects', ClassArmsController.classArmSubjects); // This is the a better route format /entity/:entityId/relationship
-    router.put('/class/arms/update/:id', ClassArmsController.updateById);
-    router.get('/class/classarms', ClassArmsController.classArmsByClass)
-    router.delete('/class/arms/delete/:id', ClassArmsController.deleteArmById);
+    router.post('/classes/arms/create', ClassArmsController.create);
+    router.post('/classes/arms/create_bulk', ClassArmsController.createBulk);
+    router.get('/classes/arms/read', ClassArmsController.readAll);
+    router.get('/classes/:id/arms', ClassArmsController.readAllByClass);
+    router.get('/classes/arms/read/:id', ClassArmsController.readById);
+    router.get('/classes/arms/students/:id', ClassArmsController.classArmStudents);
+    router.get('/classes/arms/teachers/:id', ClassArmsController.classArmTeachers);
+    router.get('/classes/arms/:id/subjects', ClassArmsController.classArmSubjects); // This is the a better route format /entity/:entityId/relationship
+    router.put('/classes/arms/update/:id', ClassArmsController.updateById);
+    router.get('/classes/classarms', ClassArmsController.classArmsByClass);
+    router.delete('/classes/arms/delete/:id', ClassArmsController.deleteArmById);
 
     /* -------------------------------- SUBJECTS -------------------------------- */
 
     router.post('/subjects/create', SubjectController.create);
-    router.get('/subjects/read', SubjectController.readAll);
+    router.get('/subjects', SubjectController.readAll);
     router.get('/subjects/school/read/:id', SubjectController.readSchoolSubjects);
     router.get('/subjects/school/lessons/:id', SubjectController.schoolSubjectLessons);
     router.get('/subjects/classes', SubjectController.subjectClasses);
@@ -199,7 +205,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/subjects/classes/add', SubjectController.addClassesToSubjects);
     router.get('/subjects/teachers/read/:id', SubjectController.subjectTeachers);
     router.get('/subjects/students/read/:id', SubjectController.subjectStudents);
-    router.get('/subjects/read/:id', SubjectController.readBySubjectId);
+    router.get('/subjects/:id', SubjectController.readBySubjectId);
     router.put('/subjects/update', SubjectController.update);
     router.get('/subjects/lessons/', SubjectController.subjectsWithLessons);
     router.get('/subjects/lessons/count', SubjectController.subjectsWithLessonCount);
@@ -267,6 +273,26 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/front/student/shelf/remove-book', Library.removeTextbookFromShelf);
     
     
+    /* -------------------------------- TEXTBOOKS ------------------------------- */ 
+
+    router.get('/library/textbooks', LibraryController.fetchLibraryTextbooks);
+    router.post('/library/textbooks', [UploadService.uploadLesson.single('cover'), TextbookValidator.CreateTextbook], LibraryController.createLibraryTextbook);
+    router.put('/library/textbooks/:id',[UploadService.uploadLesson.single('cover'), TextbookValidator.UpdateTextbook],LibraryController.updateLibraryTextbook);
+    router.delete('/library/textbooks/:id', LibraryController.deleteTextbook);
+    router.post('/library/textbooks/:id/publish', LibraryController.togglePublishLibraryTextbook);
+    router.post('/library/textbooks/:id/unpublish', LibraryController.togglePublishLibraryTextbook);
+
+
+
+    router.get('/library/textbooks/:id/chapters', TextbookController.fetchChapters);
+    router.post('/library/textbooks/:id/chapters', TextbookValidator.CreateTextbookChapter, TextbookController.createChapter);
+    router.put('/library/textbooks/:id/chapters/:chapterid', TextbookValidator.CreateTextbookChapter, TextbookController.updateChapter);
+    router.delete('/library/textbooks/:id/chapters/:chapterid', TextbookController.deleteChapter);
+
+    router.get('/library/textbooks/:id/lessons', TextbookController.fetchTextbookLessons);
+    router.post('/library/textbooks/:id/lessons', [UploadService.uploadLesson.array('preview'), TextbookValidator.CreateTextbookLesson], TextbookController.createTextbookLesson);
+    router.put('/library/textbooks/:id/lessons/:lessonid', [UploadService.uploadLesson.array('preview'), TextbookValidator.CreateTextbookLesson], TextbookController.updateTextbookLesson);
+    router.delete('/library/textbooks/:id/lessons/:lessonid', TextbookController.deleteTextbookLesson);
     
     /* --------------------------------- LESSON -------------------------------- */
 
@@ -293,6 +319,10 @@ const AuthorizedRoutesGroup = (router) => {
     router.put('/lesson/template/:id', LessonController.updateLessonTemplate);
     router.post('/lesson/:id/slide', LessonController.createLessonSlide);
     router.put('/lesson/templateimage/:id', UploadService.uploadTemplateImage.single('image'), LessonController.updateTemplateImage);
+
+    router.get('/lessons/:id', LessonController.lessonTemplate)
+    router.post('/lessons/:id/slides', LessonController.createLessonSlide)
+    router.get('/lessons/check', LessonController.subjectGroupedLessons);
 
     router.get('/chapter/subject/:id', ChapterController.read);
 

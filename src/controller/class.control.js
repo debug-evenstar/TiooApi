@@ -77,6 +77,25 @@ class ClassController {
 
         try {
 
+            // Handle fetch default classes
+            if ( req.query?.default ) {
+                const ClassInstances = await Class.findAll({
+                    where: { default: 1 },
+                });
+    
+                ClassInstances.sort((a, b) => {
+                    const gradeA = parseInt(a.naming, 12);
+                    const gradeB = parseInt(b.naming, 12);
+                    return gradeA - gradeB;
+                });
+
+                return res.status(ResponseStatus.code.success).json({
+                    error: false,
+                    message: ResponseStatus.pass.read,
+                    data: ClassInstances,
+                });
+            }
+
             const AccountInstance = await Account.findByPk(req.userData.id, { include: [SchoolManagement] });
             if (!AccountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });

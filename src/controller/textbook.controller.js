@@ -1,6 +1,6 @@
-const AuthController = require("../../auth.controller");
+const AuthController = require("./auth.controller");
 const { validationResult } = require("express-validator");
-const ResponseStatus = require("../../../config/message.config");
+const ResponseStatus = require("../config/message.config");
 const {
     Account,
     Authorization,
@@ -17,14 +17,14 @@ const {
     Group,
     Textbook,
     Chapter,
-} = require("../../../database/connection");
+} = require("../database/connection");
 const { use } = require("chai");
-const AuthorizationSeed = require("../../../seeders/seed.authorization");
-const TokenMiddleware = require("../../../middleware/token.middleware");
-const LessonTemplateProvider = require("../../../providers/AI/lesson.template");
+const AuthorizationSeed = require("../seeders/seed.authorization");
+const TokenMiddleware = require("../middleware/token.middleware");
+const LessonTemplateProvider = require("../providers/AI/lesson.template");
 const e = require("express");
-const cloudinaryUploadImage = require("../../../utils/cloudinary.utilities");
-const AdminLibraryController = require("./library.controller");
+const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
+const AdminLibraryController = require("./admin/management/library.controller");
 
 class TextbookController {
     /* ---------------------------------------------------------------------------------------------- */

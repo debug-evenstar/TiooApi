@@ -28,7 +28,7 @@ const TokenMiddleware = require('../middleware/token.middleware');
 const TextbookValidator = require('./validators/TextbookValidator');
 const LessonValidator = require('./validators/LessonValidator');
 const LessonController = require('../controller/lesson.controller');
-const TextbookController = require('../controller/admin/management/textbook.controller');
+const TextbookController = require('../controller/textbook.controller');
 const TeacherController = require('../controller/teacher.controller');
 const LibraryController = require('../controller/library.controller');
 
@@ -46,7 +46,7 @@ const AdminRoutesGroup = (router) => {
     /* ------------------------------- TIOO ROUTES ------------------------------ */
 
     router.post('/tio/setup', TioController.setup);
-    router.get('/tio/classes', TioController.classes);
+    router.get('/classes', TioController.classes);
     router.get('/tio/subjects', TioController.subjects);
     router.get('/tio/subjectslessons', TioController.subjectsLessons);
 
@@ -136,6 +136,8 @@ const AdminRoutesGroup = (router) => {
     router.post('/library/textbooks', [UploadService.uploadLesson.single('cover'), TextbookValidator.CreateTextbook], AdminLibraryController.createLibraryTextbook);
     router.put('/library/textbooks/:id',[UploadService.uploadLesson.single('cover'), TextbookValidator.UpdateTextbook],AdminLibraryController.updateLibraryTextbook);
     router.delete('/library/textbooks/:id', AdminLibraryController.deleteTextbook);
+    router.post('/library/textbooks/:id/publish', LibraryController.togglePublishLibraryTextbook);
+    router.post('/library/textbooks/:id/unpublish', LibraryController.togglePublishLibraryTextbook);
 
     router.get('/library/textbooks/:id/chapters', TextbookController.fetchChapters);
     router.post('/library/textbooks/:id/chapters', TextbookValidator.CreateTextbookChapter, TextbookController.createChapter);
