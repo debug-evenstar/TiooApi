@@ -252,10 +252,6 @@ const AuthorizedRoutesGroup = (router) => {
     router.delete('/front/librarytextbooks/:id/remove', SchoolFront.removeTextbookFromSchool);
 
 
-
-
-
-
     /* --------------------------------- NEW STUDENT FRONT   -------------------------------- */
     
     router.get('/front/student/textbook/librarytextbooks', Library.getLibraryTextbooks )
