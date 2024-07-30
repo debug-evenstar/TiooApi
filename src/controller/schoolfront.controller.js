@@ -62,8 +62,6 @@ class SchoolFront {
 
                 await subjectInstance.addTextbook(textbookInstance)
 
-                console.log(subjectInstance);
-
             }
 
             await CartItem.destroy({

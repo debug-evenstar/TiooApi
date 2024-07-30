@@ -99,8 +99,6 @@ class StudentController {
             const hashedUser = HashUtils.encrypt(registeredStudent.id.toString());
             const link = `${process.env.WEB_URL}/student/${hashedUser}`;
 
-            console.log('this is the invite link url', link);
-
             //TODO: Create a Proper Invitation mail Template;
 
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteStudent", { name: data.name, school: schoolInstance.school_name, Link: link }).send();
@@ -294,7 +292,6 @@ class StudentController {
 
             const accountInstance = await Account.findByPk(Number(decryptedId), { attributes: { exclude: ['password'] } });
 
-            console.log(accountInstance)
             if (!accountInstance) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
@@ -380,7 +377,6 @@ class StudentController {
     static async invitedStudents(req, res) {
         const { id } = req.params;
         try {
-            console.log(id)
             const studentAccount = await Account.findOne({
                 id,
                 attributes: { exclude: ['password'] },
@@ -437,7 +433,6 @@ class StudentController {
             });
 
             const student = await classInstance.getStudents({ joinTableAttributes: [] });
-            console.log(student)
         } catch (error) {
             console.log(error);
             res.status(500).json({ error: 'server error', extra: error.message });
@@ -946,8 +941,6 @@ class StudentController {
 
             const { id } = req.userData
             const account_id = req.query.account_id ? req.query.account_id : id;
-
-            console.log(req.query);
 
             const accountInstance = await Account.findByPk(account_id);
 

@@ -31,7 +31,6 @@ class BillingController {
                 pricing = payload.schools;
             }
 
-            console.log(priceInstance)
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: pricing });
 
@@ -69,8 +68,6 @@ class BillingController {
 
             payload.freelancers = freelancerPricing[0];
             payload.exceptionedFreelancers = exceptionedF;
-
-            console.log(payload.freelancers);
 
             const exceptionedFreelancer = payload.exceptionedFreelancers.filter(item => item.accounts == account_id);
 
@@ -118,8 +115,6 @@ class BillingController {
 
             payload.freelancers = freelancerPricing[0];
             payload.exceptionedFreelancers = exceptionedF;
-
-            console.log(payload.freelancers);
 
             const exceptionedFreelancer = payload.exceptionedFreelancers.filter(item => item.accounts == account_id);
 
@@ -238,8 +233,6 @@ class BillingController {
                     };
                 }
             }
-
-            console.log(schoolInstance)
 
 
 

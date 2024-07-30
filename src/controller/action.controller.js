@@ -14,9 +14,6 @@ class ActionController {
 
     static async syncDB(req, res) {
 
-
-        console.log();
-
         if (req.headers['actionkey'] !== ActionController.actionKey.key) {
             return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: 'Invalid action key' });
         }
@@ -79,8 +76,6 @@ class ActionController {
             const authorization = await Authorization.create(authorizationData);
 
             authorization.setAdmin(registeredAdmin);
-
-            console.log(password);
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,

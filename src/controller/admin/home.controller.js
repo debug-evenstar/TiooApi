@@ -82,7 +82,6 @@ class HomeController {
       ['school', 'freelancer', 'teacher', 'student'].forEach((accountType) => {
         countDifference[accountType] = countsOneWeekAgo[accountType] - countsTwoWeeksAgo[accountType];
 
-        console.log(countDifference[accountType]);
 
         if (countsOneWeekAgo[accountType] === 0 && countsTwoWeeksAgo[accountType] !== 0) {
 

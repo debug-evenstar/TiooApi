@@ -20,8 +20,6 @@ class FreelancerController {
 
             const userExist = await Validation.findOne({where: {token: req.body.token}});
 
-            console.log(userExist);
-
             const registeredAccount = await userExist.getAccount();
 
             if (!userExist) {
