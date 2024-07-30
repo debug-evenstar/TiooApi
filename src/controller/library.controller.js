@@ -17,9 +17,9 @@ class LibraryController {
   static async getLibraryTextbooks(req, res) {
     const { id } = req.userData;
     const textbooks = await Textbook.findAll({
-      where: {
-        published: 1,
-      },
+      // where: {
+      //   published: 1,
+      // },
     });
 
     const account = await Account.findByPk(id, {
