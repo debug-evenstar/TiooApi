@@ -2,12 +2,34 @@
 const { Op } = require("sequelize");
 const { Textbook, Account, Shelf } = require("../database/connection");
 class LibraryController {
+
   static async getLibraryTextbooks(req, res) {
+    const { id } = req.userData;
     const textbooks = await Textbook.findAll({});
+
+    const account = await Account.findByPk(id, {
+      include: Shelf,
+    });
+
+    // return res.send({
+    //   shelf: account.Shelf.shelf
+    // });
+
+    let response = textbooks;
+
+    console.log(account.Shelf.shelf)
+
+    response = textbooks.map((textbook) => {
+      const inShelf = account.Shelf.shelf.includes(textbook.id);
+      return {
+        ...textbook.get({plain: true}),
+        inShelf
+      };
+    })
 
     return res.send({
       error: false,
-      data: textbooks,
+      data: response
     });
   }
 
@@ -18,8 +40,8 @@ class LibraryController {
     const account = await Account.findByPk(id, {
       include: Shelf,
     });
-    console.log(account);
-    const books = account;
+
+
     if (account.Shelf) {
       const books = await Textbook.findAll({
         where: {
@@ -32,14 +54,6 @@ class LibraryController {
         data: books,
       });
     }
-    // const shelfRecords = await Shelf.findAll({
-    //   where: {
-    //     account_id: id,
-    //   },
-    //   attributes: ["textbook_id"],
-    // });
-
-    // const book_ids = shelfRecords.map((sr) => sr.textbook_id);
 
     return res.send({
       error: false,
@@ -83,8 +97,8 @@ class LibraryController {
         shelf: [...new Set([...account.Shelf.shelf, textbook_id])],
       });
     }
-    // const textbook = await Textbook.findByPk(textbook_id);
 
+    // const textbook = await Textbook.findByPk(textbook_id);
     return res.send({
       error: false,
       message: "Added book to shelf",
