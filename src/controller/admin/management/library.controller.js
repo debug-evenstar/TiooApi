@@ -428,8 +428,6 @@ class AdminLibraryController {
 
         if (req.file) {
             req.body.files = [req.file.path];
-
-            console.log(req.body.files);
         }
 
         req.body.start_date = today;
@@ -749,8 +747,6 @@ class AdminLibraryController {
             if (req.file) {
                 payload.files = [req.file.path];
                 filePath = req.file.path;
-
-                console.log(payload.files);
             }
 
             payload.start_date = today;
@@ -876,8 +872,6 @@ class AdminLibraryController {
                     message: ResponseStatus.fail.not_found,
                 });
             }
-
-            console.log(libraryInstance);
 
             libraryInstance.library_status =
                 libraryInstance.library_status == "unpublished"

@@ -32,8 +32,6 @@ class InviteController {
 
             const inviteInstance = await Invite.create(req.body);
 
-            console.log(inviteInstance);
-
             const link = `${process.env.WEB_URL}/${req.body.account_type}/${inviteInstance.code}`;
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: { link } });
@@ -186,8 +184,6 @@ class InviteController {
                  invitedClasses = inviteInstance.classes;
                  invitedClassArms = inviteInstance.classarms;
             }
-
-            console.log(inviteInstance)
 
             const subjects = await Subject.findAll({ where: { id: [...inviteInstance.subjects] }, attributes: { exclude: ["SchoolManagementId"] } });
 

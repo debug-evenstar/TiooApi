@@ -169,8 +169,6 @@ class TokenMiddleware {
 
             const authorization = await Authorization.findByPk(data.id);
 
-            console.log(authorization.permissions);
-
             const userAuthorizations = authorization.permissions || [];
 
             const hasAuthorization = requiredAuthorizations.some((authorization) =>

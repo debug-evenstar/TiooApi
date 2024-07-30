@@ -98,7 +98,7 @@ class AdminController {
                 let freelancer = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residential_address }
 
                 const classInstances = await schoolInstance.getClasses();
-                console.log(classInstances)
+
                 const subjectInstances = await schoolInstance.getSubjects();
                 const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['nationality', 'residential_address', 'passportNumber', 'dob', 'gender', 'parent', 'class', 'school', 'age'] }, include: Account });
                 payload.freelancer = freelancer;
@@ -138,7 +138,6 @@ class AdminController {
                 let freelancer = { ...account.dataValues, school_name: schoolInstance.school_name, address: schoolInstance.residential_address }
 
                 const classInstances = await schoolInstance.getClasses();
-                console.log(classInstances)
                 const subjectInstances = await schoolInstance.getSubjects();
                 const studentInstances = await schoolInstance.getStudents({ attributes: { exclude: ['nationality', 'residential_address', 'passportNumber', 'dob', 'gender', 'parent', 'class', 'school', 'age'] }, include: Account });
                 payload.freelancer = freelancer;

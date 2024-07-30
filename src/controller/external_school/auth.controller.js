@@ -9,7 +9,6 @@ class ExternalSchoolController {
 
     /* ------------------- ResetPassword------------------ */
     static async ResetPassword(req, res) {
-        console.log(req.schoolKey)
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -42,9 +41,6 @@ class ExternalSchoolController {
             const hashPassword = await user.hashPassword(decoded.userdata.password);
             const update = await user.update({ password: hashPassword });
 
-            if (update) {
-                console.log("update user password");
-            }
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update });
         } catch (error) {
             console.log(error)
@@ -94,8 +90,6 @@ class ExternalSchoolController {
             } else {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseMessage.student })
             }
-
-            console.log(user)
 
         } catch (error) {
 

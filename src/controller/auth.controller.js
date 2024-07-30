@@ -113,7 +113,7 @@ class AuthController {
             }
 
             const email = req.params.email
-            console.log(email)
+
             if (email == undefined) {
                 return res.status(ResponseStatus.code.conflict).json({
                     error: true, message:
@@ -135,7 +135,6 @@ class AuthController {
                 exists: emailExist.pass,
             });
 
-            console.log(emailExist)
 
         } catch (error) {
             console.log(error)
@@ -181,7 +180,7 @@ class AuthController {
                         ResponseStatus.fail.account_conflict
                 });
             }
-            console.log(decoded.userdata.first_name + " " + decoded.userdata.last_name)
+
             const account = await Account.create({
                 name: decoded.userdata.first_name + " " + decoded.userdata.last_name,
                 email: decoded.userdata.email,
@@ -377,7 +376,6 @@ class AuthController {
 
         resetValidation.otp = otp;
 
-        console.log(otp);
 
         await resetValidation.save();
 
@@ -774,7 +772,6 @@ class AuthController {
 
             await user.update(req.body, { exclude: ['password'] });
 
-            console.log(user);
 
             const { name, email, phone, account_type, verification_status, flag } = user;
 
@@ -805,8 +802,6 @@ class AuthController {
             }
 
             await user.update(req.body, { exclude: ['password', 'verification_status'] });
-
-            console.log(user);
 
             const { name, email, phone, account_type, verification_status, flag } = user;
 
@@ -1114,7 +1109,6 @@ class AuthController {
 
             Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Reset Passord").template("emails.RestPassword", { resetLink: link }).send();
 
-            console.log(link);
 
             return res.status(ResponseStatus.code.success).json({
                 error: false, message: ResponseStatus.pass.sucess,

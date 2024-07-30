@@ -461,9 +461,6 @@ class SubjectController {
 
              const classes = rawClasses.map((element)=> ({ id: element.id, naming: element.naming, type: element.type }));
 
-             console.log(classes);
-
-
              delete element.dataValues.Lessons;
 
              return {...element.dataValues, classes: classes}

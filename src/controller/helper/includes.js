@@ -24,7 +24,6 @@ class IncludeManager {
                 includes.push(IncludeManager.queryMap()[param]);
             }
         });
-        console.log(includes);
         return includes;
     }
 }

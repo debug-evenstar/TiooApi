@@ -882,17 +882,11 @@ class LessonController {
 
                 if (arms.length == 1) {
                     if (arms[0] == data) {
-                        console.log("single found", arms, data, group[i].id);
                         groupId = group[i].id;
-                    } else {
-                        console.log("single not found", arms, data);
                     }
                 } else {
                     if (arms.every((arm) => data.includes(arm))) {
-                        console.log("found", arms, data, group[i].id);
                         groupId = group[i].id;
-                    } else {
-                        console.log("not found", arms, data);
                     }
                 }
             }
@@ -905,8 +899,6 @@ class LessonController {
                     ref_cid: classInstance.id,
                 });
             }
-
-            console.log(groupId);
 
             await groupInstance.addLesson(lessonInstance);
             const instance2 = await groupInstance.addClassArms(
@@ -1082,13 +1074,7 @@ class LessonController {
                 const oldfile = lessonInstance.files[0];
 
                 if (oldfile) {
-                    fs.unlink(oldfile, (err) => {
-                        if (err) {
-                            console.error("Error deleting file:", err);
-                        } else {
-                            console.log("File deleted successfully.");
-                        }
-                    });
+                    fs.unlink(oldfile, (err) => {});
                 }
             }
 
@@ -1112,8 +1098,6 @@ class LessonController {
 
         let filePaths = [];
 
-        console.log(req.files);
-
         if (req.files && req.files.length > 0) {
             filePaths = req.files.map((file) => file.path);
         }
@@ -1121,7 +1105,6 @@ class LessonController {
         try {
             if (filePaths.length > 0) {
                 for (var item of filePaths) {
-                    console.log("this is the item", item);
                     const ImageResponse = await cloudinaryUploadImage(item);
                     payload.push(ImageResponse.secure_url);
                 }

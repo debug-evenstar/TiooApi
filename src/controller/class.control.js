@@ -202,8 +202,6 @@ class ClassController {
 
             const foundClass = await Class.findByPk(id);
 
-            console.log(foundClass);
-
             if (!foundClass) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
@@ -228,8 +226,6 @@ class ClassController {
         try {
 
             const foundClass = await Class.findByPk(id);
-
-            console.log(foundClass);
 
             if (!foundClass) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
@@ -307,8 +303,6 @@ class ClassController {
                 const subjectInstance = await Subject.findByPk(subjectId);
     
                 const response = await classSubjects.removeSubject(subjectInstance);
-
-                console.log(response);
 
                 return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed });
     
@@ -405,7 +399,6 @@ class ClassController {
                 await classInstance.addStudent(studentInstance);
 
                 await classarmInstance.addStudent(studentInstance);
-                console.log([studentInstance,])
 
                 const classStudentArray = await classInstance.getStudents({
                     where: { id: studentInstance.id }, include: { model: Account, attributes: { exclude: ['password', 'createdAt', 'updatedAt'] } }

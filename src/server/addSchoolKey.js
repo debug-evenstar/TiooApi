@@ -28,7 +28,6 @@ class AddKeys {
 
             console.log(`school: ${school}`);
         });
-        console.log(allSchools)
     }
 }
 AddKeys.addKeys();

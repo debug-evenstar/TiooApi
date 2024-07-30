@@ -227,13 +227,9 @@ class AuthorizationController {
 
         const { admin_id } = req.query;
 
-        console.log(admin_id);
-
 
         try {
             const user = await Admin.findOne({ where: { id: admin_id } });
-
-            console.log(user);
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });

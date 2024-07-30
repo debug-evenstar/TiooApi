@@ -59,8 +59,6 @@ class TeacherController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: "School is not tied to account" });
             }
 
-            console.log(hashedUser);
-
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Invitation").template("emails.InviteTeacher", { name: data.name, school: schoolInstance.school_name, Link: link }).send();
 
             return res.status(ResponseStatus.code.success).json({
@@ -526,9 +524,6 @@ class TeacherController {
                 return subjectObj;
               });
               
-            
-
-            console.log(subjectsWithLessonCount);
 
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: subjectsWithLessonCount });
@@ -602,8 +597,6 @@ class TeacherController {
             }
 
             const removalResponse = await teacherInstance.removeSubject(subjectInstance);
-
-            console.log(removalResponse);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.removed });
 
