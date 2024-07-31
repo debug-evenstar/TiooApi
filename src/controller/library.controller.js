@@ -17,9 +17,9 @@ class LibraryController {
   static async getLibraryTextbooks(req, res) {
     const { id } = req.userData;
     const textbooks = await Textbook.findAll({
-      // where: {
-      //   published: 1,
-      // },
+      where: {
+        published: 1,
+      },
     });
 
     const account = await Account.findByPk(id, {
@@ -30,7 +30,7 @@ class LibraryController {
 
     if (!account.Shelf) {
       // create a shelf for the user
-      const shelf = await account.createShelf({
+      await account.createShelf({
         account_id: id,
         shelf: [],
       });

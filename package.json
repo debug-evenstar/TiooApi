@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@Praxeum-ai/LearnBlocks": "https://github.com/Praxeum-ai/LearnBlocks#1.0.0-beta",
     "@treblle/express": "^0.0.5",
     "@vinejs/vine": "^2.0.0",
     "amqplib": "^0.10.3",
