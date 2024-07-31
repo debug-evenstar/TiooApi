@@ -38,11 +38,23 @@ class Relationships {
             foreignKey: "account_id",
             as: "validation",
         });
+
+
+        
         Validation.belongsTo(Account, {
             foreignKey: "account_id",
             as: "account",
         });
 
+        Account.hasOne(Shelf, {
+            foreignKey: 'account_id',
+            // as: 'shelf_ids'
+        })
+
+        Shelf.belongsTo(Account, {
+            foreignKey: 'account_id',
+            // as: 'account'
+        })
         Account.hasOne(SchoolManagement, {
             allowNull: true,
             onDelete: "CASCADE",

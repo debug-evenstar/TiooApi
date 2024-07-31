@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
             },
+            account_id: {
+                type: DataTypes.INTEGER,
+                allowNull: true
+            }
         },
         { timestamps: true, paranoid : true }
     );

@@ -725,8 +725,8 @@ class AuthController {
                 if (schoolManagementId) {
                     const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
                     const studentSchoolAccount = await studentSchool.getAccount();
-                    const classData = await profile.getClass();
-                    const classArmData = await profile.getClassArm();
+                    const classData = await profile?.getClass();
+                    const classArmData = await profile?.getClassArm();
                     const studentSubject = await classData.getSubjects();
 
                     payload.schoolName = studentSchool.schoolName;
@@ -735,7 +735,7 @@ class AuthController {
 
                     payload.subjectsCount = studentSubject.length;
                     payload.schoolStudent = true;
-                    payload.student_type = profile.student_type;
+                    payload.student_type = profile?.student_type;
                 } else {
                     payload.schoolStudent = false;
                     payload.schoolName = profile?.school;

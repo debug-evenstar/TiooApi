@@ -20,6 +20,10 @@ module.exports = (sequelize, Sequelize) => {
       onboarded: {
         type: Sequelize.BOOLEAN
       },
+      country:{
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       shelf: {
         type: Sequelize.JSON,
       },

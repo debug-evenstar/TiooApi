@@ -39,16 +39,16 @@ class Server {
 
         //=============== INITIALIZE DATABASE ================//
         //{force : true}
-        db.sequelize
-            .sync()
-            .then(async () => {
-                // AutoMigrate.validateModelsIntegrity();
-                // AuthorizationSeed.permission();
-                console.log("Synced db.");
-            })
-            .catch((err) => {
-                console.log("Failed to sync db: " + err.message);
-            });
+        // db.sequelize
+        //     .sync()
+        //     .then(async () => {
+        //         // AutoMigrate.validateModelsIntegrity();
+        //         // AuthorizationSeed.permission();
+        //         console.log("Synced db.");
+        //     })
+        //     .catch((err) => {
+        //         console.log("Failed to sync db: " + err.message);
+        //     });
 
         app.use(express.static(path.join(__dirname, "../../public")));
 
@@ -60,7 +60,6 @@ class Server {
         const jwt = require("jsonwebtoken");
         const server = app.listen(PORT, "0.0.0.0", () => {
             //  console.log([randomPrivateKey, randomPublicKey, token]);
-
             console.log(`NIMO SERVER RUNNING @ http://127.0.0.1:${PORT}/api`);
         });
     }

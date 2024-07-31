@@ -16,12 +16,8 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
     },
 
-    textbook_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'textbooks', key: 'id',
-      },
-      onDelete: 'CASCADE',
+    shelf: {
+      type: DataTypes.JSON,
     },
     created_at: {
       type: Sequelize.DATE,
