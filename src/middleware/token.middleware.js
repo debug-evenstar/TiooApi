@@ -123,15 +123,17 @@ class TokenMiddleware {
             const decoded = jwt.verify(token, process.env.JWT_SECRETE);
             const email = decoded.userdata.email;
 
+
             Admin.findOne({ where: { email: email } }).then((user) => {
 
                 if (!user) {
                     return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.adminUnauthorized });
                 }
-
-                if (user.account_type !== 'admin') {
-                    return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.adminUnauthorized });
-                }
+    
+                // if (user.account_type !== 'admin') {
+                //     return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.adminUnauthorized });
+                // }
+                
 
                 const encryptedData = decoded.userData;
                 const fetchedData = user.dataValues;
