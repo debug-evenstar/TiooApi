@@ -194,7 +194,6 @@ const OpenRoutesGroup = (router) => {
   router.post("/tio/bulkcreate", TioController.bulkClassCreate);
 
   router.post("/actions/superadmin", ActionController.superAdmin);
-  router.post("/actions/sync", ActionController.syncDB);
   router.delete("/actions/superadmin", ActionController.cleanAdmin);
 
   router.post("/coupon/apply", CouponController.apply);
