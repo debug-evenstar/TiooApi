@@ -27,28 +27,15 @@ class Server {
 
         app.use(cors(corsOptions));
 
-        app.use(
-            treblle({
-                apiKey: process.env.TREBLLE_API_KEY,
-                projectId: process.env.TREBLLE_PROJECT_ID,
-            })
-        );
+        // app.use(
+        //     treblle({
+        //         apiKey: process.env.TREBLLE_API_KEY,
+        //         projectId: process.env.TREBLLE_PROJECT_ID,
+        //     })
+        // );
 
         // Create Sequelize CLI Config
         SequelizeCliHelper.createDBConfig();
-
-        //=============== INITIALIZE DATABASE ================//
-        //{force : true}
-        // db.sequelize
-        //     .sync()
-        //     .then(async () => {
-        //         // AutoMigrate.validateModelsIntegrity();
-        //         // AuthorizationSeed.permission();
-        //         console.log("Synced db.");
-        //     })
-        //     .catch((err) => {
-        //         console.log("Failed to sync db: " + err.message);
-        //     });
 
         app.use(express.static(path.join(__dirname, "../../public")));
 
