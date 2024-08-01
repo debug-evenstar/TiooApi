@@ -1,37 +1,12 @@
 const { validationResult, body } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
 const { Account, Validation, SchoolManagement, Permission, Admin, Authorization, } = require('../database/connection');
-const SyncDB = require('../server/syncDatabase');
 const AuthorizationSeed = require('../seeders/seed.authorization');
 
 class ActionController {
 
     static actionKey = {
         key: 'nR5cCI6IkpXVCJ9'
-    };
-
-    /*-----------------------------------| SETUP SCHOOL |-----------------------------------*/
-
-    static async syncDB(req, res) {
-
-
-        console.log();
-
-        if (req.headers['actionkey'] !== ActionController.actionKey.key) {
-            return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: 'Invalid action key' });
-        }
-
-        try {
-
-            await SyncDB.run();
-
-            return res.status(ResponseStatus.code.success).json({ error: false, message: 'DB Synced' });
-
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
     };
 
 
@@ -79,8 +54,6 @@ class ActionController {
             const authorization = await Authorization.create(authorizationData);
 
             authorization.setAdmin(registeredAdmin);
-
-            console.log(password);
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,

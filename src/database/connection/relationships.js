@@ -1,3 +1,5 @@
+const { Topic, Question } = require(".");
+
 class Relationships {
     static group(
         Account,
@@ -18,12 +20,16 @@ class Relationships {
         Group,
         LessonSlide,
         Preference,
+        Shelf,
         Billing,
         Notification,
         Subscription,
         Keypairs,
         Textbook,
-        CartItem
+        CartItem,
+        OnboardingQuestion,
+        Topic,
+        Question
     ) {
         //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -31,11 +37,23 @@ class Relationships {
             foreignKey: "account_id",
             as: "validation",
         });
+
+
+        
         Validation.belongsTo(Account, {
             foreignKey: "account_id",
             as: "account",
         });
 
+        Account.hasOne(Shelf, {
+            foreignKey: 'account_id',
+            // as: 'shelf_ids'
+        })
+
+        Shelf.belongsTo(Account, {
+            foreignKey: 'account_id',
+            // as: 'account'
+        })
         Account.hasOne(SchoolManagement, {
             allowNull: true,
             onDelete: "CASCADE",
@@ -183,13 +201,13 @@ class Relationships {
 
         Group.belongsTo(Class, { foreignKey: "ref_cid" });
 
-        Textbook.hasMany(Chapter, { foreignKey: "textbook_id" });
+        Textbook.hasMany(Chapter, { foreignKey: "textbook_id", as : "chapters" });
         Chapter.belongsTo(Textbook, { foreignKey: "textbook_id" });
 
         Textbook.hasMany(Lesson, { foreignKey: "textbook_id" });
         Lesson.belongsTo(Textbook, { foreignKey: "textbook_id" });
 
-        Chapter.hasMany(Lesson, { foreignKey: "chapter_id" });
+        Chapter.hasMany(Lesson, { foreignKey: "chapter_id" , as : "lessons"});
         Lesson.belongsTo(Chapter, { foreignKey: "chapter_id" });
 
         Lesson.hasMany(LessonSlide, { foreignKey: "lesson_id", as : "lesson_slides"});
@@ -198,8 +216,18 @@ class Relationships {
         Account.hasMany(Billing, { foreignKey: "account_id" });
         Billing.belongsTo(Account, { foreignKey: "account_id" });
 
+        // Account.hasMany(Shelf, { foreignKey: "account_id"});
+        // Account.belongsToMany(Textbook, { through: 'shelves',foreignKey: 'account_id'});
+        // Textbook.belongsToMany(Account, { through: 'shelves',foreignKey: 'textbook_id'});
+
+        Account.hasMany(Textbook, {foreignKey : "account_id"});
+        Textbook.belongsTo(Account, {foreignKey : "account_id"});
+
         Subject.hasMany(Textbook, { foreignKey: "subject_id" });
         Textbook.belongsTo(Subject, { foreignKey: "subject_id" });
+
+        Subject.hasMany(Topic, { foreignKey: "subject_id" });
+        Topic.belongsTo(Subject, { foreignKey: "subject_id" });
 
         Account.hasMany(CartItem, { foreignKey: "account_id" });
         CartItem.belongsTo(Account, { foreignKey: "account_id" });
@@ -304,6 +332,20 @@ class Relationships {
             through: "textbook_lessons",
             foreignKey: "textbook_id",
         });
+
+        Topic.belongsToMany(Question, {
+            through: "topic_questions",
+            foreignKey: "topic_id",
+        });
+
+        Question.belongsToMany(Topic, {
+            through: "topic_questions",
+            foreignKey: "question_id",
+        });
+
+
+        // AccountType.hasMany(OnboardingQuestion, { foreignKey: 'account_type_id'});
+        // OnboardingQuestion.belongsTo(AccountType,{ foreignKey: 'account_type_id'});
     }
 }
 module.exports = Relationships;

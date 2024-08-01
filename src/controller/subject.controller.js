@@ -1,4 +1,4 @@
-const { Subject, Class, Teacher, Account, Lesson, ClassArm, SchoolManagement, LessonSlide } = require('../database/connection/');
+const { Subject, Class, Teacher, Account, Lesson, ClassArm, SchoolManagement, LessonSlide, Topic } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 const Sequelize = require('sequelize');
 const IncludeManager = require('./helper/includes');
@@ -461,9 +461,6 @@ class SubjectController {
 
              const classes = rawClasses.map((element)=> ({ id: element.id, naming: element.naming, type: element.type }));
 
-             console.log(classes);
-
-
              delete element.dataValues.Lessons;
 
              return {...element.dataValues, classes: classes}
@@ -480,6 +477,77 @@ class SubjectController {
 
     }
 
+
+    static async getTopics(req, res) {
+
+        try {
+
+            const subjectId = req.params.id;
+
+            const subjectInstance = await Subject.findByPk(subjectId);
+
+            if (!subjectInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Subject not found"});
+            }
+
+            const topics = await subjectInstance.getTopics();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: topics });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+    }
+
+
+    static async addSubjectTopic(req, res) {
+
+        try {
+
+            const subjectId = req.params.id;
+
+            const subjectInstance = await Subject.findByPk(subjectId);
+
+            if (!subjectInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Subject not found"});
+            }
+
+            const name = req.body.topic;
+
+            const topicInstance = await Topic.create({ name });
+
+            await subjectInstance.addTopic(topicInstance);
+
+            const topics = await subjectInstance.getTopics();
+            
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: topics });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+    }
+
+
+    static async deleteTopic(req, res) {
+
+        try {
+
+            const topicId = req.params.id;
+
+            const topicInstance = await Topic.findByPk(topicId);
+
+            if (!topicInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Topic not found"});
+            }
+
+            await topicInstance.destroy();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error' ,  extra: error.message });
+        };
+    }
 
 }
 

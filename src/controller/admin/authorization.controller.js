@@ -81,7 +81,7 @@ class AuthorizationController {
 
         try {
 
-            const authorization = await Authorization.findAll({ where: { AccountId: null } });
+            const authorization = await Authorization.findAll({ where: { account_id: null } });
 
             const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
                 const userdata = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'] } });
@@ -115,7 +115,7 @@ class AuthorizationController {
     /*-----------------------------------| SIGNIN ACCOUNT |-----------------------------------*/
 
     static async login(req, res) {
-
+        
         const { email, password } = req.body;
         const errors = validationResult(req);
 
@@ -227,13 +227,9 @@ class AuthorizationController {
 
         const { admin_id } = req.query;
 
-        console.log(admin_id);
-
 
         try {
             const user = await Admin.findOne({ where: { id: admin_id } });
-
-            console.log(user);
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });

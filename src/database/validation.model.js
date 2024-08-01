@@ -17,11 +17,11 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.TEXT,
                 allowNull: true,
             },
-            createdAt: {
-                type: Sequelize.DATE,
-                allowNull: false,
-                defaultValue: Sequelize.NOW,
-            },
+            // createdAt: {
+            //     type: Sequelize.DATE,
+            //     allowNull: false,
+            //     defaultValue: Sequelize.NOW,
+            // },
             expires_at: {
                 type: Sequelize.DATE,
                 allowNull: false,

@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: false,
             },
         },
-        { timestamps: true, paranoid : true }
+        { timestamps: true }
     );
 
     return Subject;
