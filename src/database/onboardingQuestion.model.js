@@ -1,5 +1,3 @@
-const { twipsMeasureValue } = require("docx");
-const AccountTypeModel = require("./accountType.model");
 
 module.exports = (sequelize, DataTypes) => {
   const OnboardingQuestion = sequelize.define("onboarding_question", {
@@ -14,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     },
 
     parent_answer: {
-      allowNull: twipsMeasureValue,
+      allowNull: true,
       type: DataTypes.STRING,
     },
 

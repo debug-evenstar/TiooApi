@@ -28,7 +28,6 @@ class Relationships {
         Textbook,
         CartItem,
         OnboardingQuestion,
-        AccountType,
         Topic,
         Question
     ) {

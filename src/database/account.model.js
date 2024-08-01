@@ -9,30 +9,8 @@ module.exports = (sequelize, Sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      metadata: {
-        type: Sequelize.JSON,
-        allowNull: true,
-        get(){
-          const data = this.getDataValue('metadata');
-          return JSON.parse(data);
-        },
-      },
-      onboarded: {
-        type: Sequelize.BOOLEAN
-      },
-      country:{
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      shelf: {
-        type: Sequelize.JSON,
-      },
       name: {
         type: Sequelize.STRING,
-      },
-      admin: {
-        type: Sequelize.STRING,
-        defaultValue: "undefined",
       },
       email: {
         type: Sequelize.STRING,
@@ -54,23 +32,22 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: 0,
       },
       status: {
-        type: Sequelize.STRING,
-        defaultValue: "registered",
-      },
-      flag: {
         type: Sequelize.ENUM(
           "active",
           "banned",
           "inactive",
           "invited",
-          "registered",
-          "verified"
+          "pending",
         ),
-        defaultValue: "registered",
+        defaultValue: "pending",
       },
       password: {
         type: Sequelize.STRING,
         allowNull: false,
+      },
+      metadata: {
+        type: Sequelize.JSON,
+        allowNull: true,
       },
     },
     {

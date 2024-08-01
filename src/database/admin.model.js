@@ -15,26 +15,16 @@ module.exports = (sequelize, Sequelize) => {
             email: {
                 type: Sequelize.STRING,
             },
-            account_type: {
-                type: Sequelize.STRING,
-                defaultValue: "admin",
-            },
             verification_status: {
                 type: Sequelize.INTEGER,
                 defaultValue: 1,
             },
             status: {
-                type: Sequelize.STRING,
-                defaultValue: "active",
-            },
-            flag: {
                 type: Sequelize.ENUM(
                     "active",
                     "banned",
                     "inactive",
                     "invited",
-                    "registered",
-                    "verified"
                 ),
                 defaultValue: "active",
             },

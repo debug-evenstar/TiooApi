@@ -115,7 +115,7 @@ class AuthorizationController {
     /*-----------------------------------| SIGNIN ACCOUNT |-----------------------------------*/
 
     static async login(req, res) {
-
+        
         const { email, password } = req.body;
         const errors = validationResult(req);
 
