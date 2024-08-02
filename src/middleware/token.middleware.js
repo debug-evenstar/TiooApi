@@ -68,9 +68,9 @@ class TokenMiddleware {
                 error_code: "401",
             });
 
+            console.log(err);
             if (logError) {
                 return res.status(401).json({ message: 'Authentication failed. Token invalid.' });
-
             }
         }
     }

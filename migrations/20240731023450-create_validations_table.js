@@ -9,6 +9,14 @@ module.exports = {
                 primaryKey: true,
                 autoIncrement: true,
             },
+            account_id: {
+                type: Sequelize.INTEGER,
+                allowNull: true
+            },
+            admin_id: {
+                type: Sequelize.INTEGER,
+                allowNull: true,
+            },
             otp: {
                 type: Sequelize.STRING(6),
                 allowNull: true,

@@ -81,7 +81,7 @@ class TioController {
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.read,
-                data: ClassInstances,
+                data: ClassInstances ,
             });
         } catch (error) {
             console.log(error);
