@@ -41,12 +41,12 @@ class AuthController {
             }
 
 
-            req.body.status = 'registered';
+            // req.body.status = 'registered';
             req.body.name = `${req.body.first_name} ${req.body.last_name}`;
 
             const registeredAccount = await Account.create(req.body);
 
-            const newValidation = await Validation.create({ otp });
+            const newValidation = await Validation.create({ otp, account_id: registeredAccount.id });
             const response = await registeredAccount.setValidation(newValidation);
 
             // Create school record if account type is school
@@ -293,7 +293,8 @@ class AuthController {
 
             const registerdAccount = await Account.findOne({
                 where: { id: validation.account_id },
-                include: [SchoolManagement, Teacher, Student],
+                // include: [SchoolManagement, Teacher, Student],
+                include: [],
                 attributes: { exclude: ['password'] }
             });
 
@@ -316,7 +317,8 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.forbidden });
             }
 
-            await registerdAccount.update({ verification_status: 1, status: 'verified' });
+            // await registerdAccount.update({ verification_status: 1, status: 'verified' });
+            await registerdAccount.update({ verification_status: 1 });
 
             return res.status(ResponseStatus.code.success).json({ error: false, data: registerdAccount, message: ResponseStatus.pass.verify });
 
@@ -405,7 +407,7 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
 
-            const validation = await Validation.findOne({ where: { accountId: emailExist.data.id } });
+            const validation = await Validation.findOne({ where: { account_id: emailExist.data.id } });
 
             const isValidOTP = await validation.compareOTP(otp);
 
@@ -694,7 +696,8 @@ class AuthController {
 
         try {
 
-            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' }, include: [SchoolManagement] });
+            // const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' }, include: [SchoolManagement] });
+            const user = await Account.findByPk(id, { attributes: { exclude: ['password', 'createdAt'], include: '' }, include: [] });
 
             if (!user) {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
@@ -721,29 +724,29 @@ class AuthController {
 
             if (payload.account_type === 'student') {
                 const profile = await user.getStudent();
-                const schoolManagementId = profile?.SchoolManagementId;
-                if (schoolManagementId) {
-                    const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
-                    const studentSchoolAccount = await studentSchool.getAccount();
-                    const classData = await profile?.getClass();
-                    const classArmData = await profile?.getClassArm();
-                    const studentSubject = await classData.getSubjects();
+                // const schoolManagementId = profile?.SchoolManagementId;
+                // if (schoolManagementId) {
+                //     const studentSchool = await SchoolManagement.findByPk(schoolManagementId);
+                //     const studentSchoolAccount = await studentSchool.getAccount();
+                //     const classData = await profile?.getClass();
+                //     const classArmData = await profile?.getClassArm();
+                //     const studentSubject = await classData.getSubjects();
 
-                    payload.schoolName = studentSchool.schoolName;
-                    payload.studentClass = classData.naming;
-                    payload.studentClassArm = classArmData.naming;
+                //     payload.schoolName = studentSchool.schoolName;
+                //     payload.studentClass = classData.naming;
+                //     payload.studentClassArm = classArmData.naming;
 
-                    payload.subjectsCount = studentSubject.length;
-                    payload.schoolStudent = true;
-                    payload.student_type = profile?.student_type;
-                } else {
-                    payload.schoolStudent = false;
-                    payload.schoolName = profile?.school;
-                    payload.studentClass = profile?.class;
-                    payload.student_type = profile?.student_type;
-                }
-                payload.term = "undefined";
-                payload.status = payload.flag === 'active' ? "On Track" : "??";
+                //     payload.subjectsCount = studentSubject.length;
+                //     payload.schoolStudent = true;
+                //     payload.student_type = profile?.student_type;
+                // } else {
+                //     payload.schoolStudent = false;
+                //     payload.schoolName = profile?.school;
+                //     payload.studentClass = profile?.class;
+                //     payload.student_type = profile?.student_type;
+                // }
+                // payload.term = "undefined";
+                // payload.status = payload.flag === 'active' ? "On Track" : "??";
 
             }
 

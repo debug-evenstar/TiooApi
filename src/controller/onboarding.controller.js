@@ -42,16 +42,16 @@ class OnboardingController {
     return res.send("user not found");
   }
 
-  static async getAccountTypes(req, res) {
-    const accounts = await AccountType.findAll({ include: OnboardingQuestion, order: [
-      [OnboardingQuestion, 'id',"ASC"]
-    ]});
-    return res.status(ResponseStatus.code.success).json({
-      error: false,
-      message: ResponseMessage.pass.read,
-      data: accounts,
-    });
-  }
+  // static async getAccountTypes(req, res) {
+  //   const accounts = await AccountType.findAll({ include: OnboardingQuestion, order: [
+  //     [OnboardingQuestion, 'id',"ASC"]
+  //   ]});
+  //   return res.status(ResponseStatus.code.success).json({
+  //     error: false,
+  //     message: ResponseMessage.pass.read,
+  //     data: accounts,
+  //   });
+  // }
 
   static async addAccountType(req, res) {
     const { name } = req.body;

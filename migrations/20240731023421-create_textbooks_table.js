@@ -17,6 +17,15 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: true,
             },
+            subject_id: {
+                type: Sequelize.INTEGER,
+                allowNull: true,
+                references: {
+                    model: 'subjects',
+                    key: 'id',
+                    onDelete: 'CASCADE',
+                }
+            },
             cover_photo: {
                 type: Sequelize.STRING,
                 allowNull: true,
