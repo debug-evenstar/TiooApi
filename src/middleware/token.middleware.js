@@ -60,18 +60,18 @@ class TokenMiddleware {
 
 
         } catch (err) {
-            var logError = await ErrorLog.create({
-                error_name: "Error at Verify Middleware",
-                error_description: err.toString(),
-                route: `${req.originalUrl}`,
-                method: `${req.method}`,
-                error_code: "401",
-            });
+            // var logError = await ErrorLog.create({
+            //     error_name: "Error at Verify Middleware",
+            //     error_description: err.toString(),
+            //     route: `${req.originalUrl}`,
+            //     method: `${req.method}`,
+            //     error_code: "401",
+            // });
 
-            if (logError) {
+            // console.log(err);
+            // if (logError) {
                 return res.status(401).json({ message: 'Authentication failed. Token invalid.' });
-
-            }
+            // }
         }
     }
 
