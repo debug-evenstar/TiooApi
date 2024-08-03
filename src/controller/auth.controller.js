@@ -481,7 +481,7 @@ class AuthController {
                 status: user.status === null ? "undefined" : user.status,
                 phone: user.phone,
                 account_type: user.account_type,
-                onboarded: user.metadata != null,
+                onboarded: user.metadata !== null,
                 verification_status: user.verification_status,
                 flag: user.flag,
             }
