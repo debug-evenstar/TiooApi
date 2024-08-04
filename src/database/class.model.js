@@ -22,12 +22,16 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 defaultValue: 0,
             },
+            school_management_id: {
+                type: DataTypes.INTEGER,
+                allowNull:true,
+            },
             default: {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
             },
         },
-        { timestamps: true }
+        { timestamps: true , tableName: 'classes'}
     );
 
     return Class;

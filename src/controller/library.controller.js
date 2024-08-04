@@ -17,25 +17,28 @@ class LibraryController {
   static async getLibraryTextbooks(req, res) {
     const { id } = req.userData;
     const textbooks = await Textbook.findAll({
-      // where: {
-      //   published: 1,
-      // },
+      where: {
+        published: 1,
+      },
     });
 
     const account = await Account.findByPk(id, {
       include: Shelf,
     });
 
-    // return res.send({
-    //   shelf: account.Shelf.shelf
-    // });
-
     let response = textbooks;
 
-    console.log(account.Shelf.shelf);
+    if (!account.Shelf) {
+      // create a shelf for the user
+      await account.createShelf({
+        account_id: id,
+        shelf: [],
+      });
+      await account.reload();
+    }
 
     response = textbooks.map((textbook) => {
-      const inShelf = account.Shelf.shelf.includes(textbook.id);
+      const inShelf = account.Shelf?.shelf?.includes(textbook.id);
       return {
         ...textbook.get({ plain: true }),
         inShelf,
@@ -57,7 +60,7 @@ class LibraryController {
     });
 
     if (account.Shelf) {
-      const books = await Textbook.findAll({
+      const books = await Textbook.findAll({  
         where: {
           id: account.Shelf?.shelf ?? [],
         },

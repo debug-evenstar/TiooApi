@@ -1,256 +1,276 @@
-const AuthController = require('../auth.controller');
-const { validationResult } = require('express-validator');
+const AuthController = require("../auth.controller");
+const { validationResult } = require("express-validator");
 const ResponseStatus = require("../../config/message.config");
-const { Account, Authorization, Permission, Validation, Admin } = require('../../database/connection');
-const { use } = require('chai');
-const HashUtils = require('../../utils/hash.utilities');
+const {
+  Account,
+  Authorization,
+  Permission,
+  Validation,
+  Admin,
+  db,
+} = require("../../database/connection");
+const { use } = require("chai");
+const HashUtils = require("../../utils/hash.utilities");
 const AuthorizationSeed = require("../../seeders/seed.authorization");
-const TokenMiddleware = require('../../middleware/token.middleware');
-const Mailer = require('../../services/mailer');
-
-
-
+const TokenMiddleware = require("../../middleware/token.middleware");
+const Mailer = require("../../services/mailer");
 
 class AuthorizationController {
+  /*-----------------------------------| ADD ADMIN USER |-----------------------------------*/
 
-    /*-----------------------------------| ADD ADMIN USER |-----------------------------------*/
+  static async addAdminUser(req, res) {
+    const otp = Math.floor(Math.random() * 900000) + 100000;
+    const data = req.body;
+    const errors = validationResult(req);
 
-    static async addAdminUser(req, res) {
+    const password = HashUtils.generateRandomPassword(6);
 
-        const otp = Math.floor(Math.random() * 900000) + 100000;
-        const data = req.body;
-        const errors = validationResult(req);
-
-        const password = HashUtils.generateRandomPassword(6)
-
-        if (!errors.isEmpty()) {
-            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
-        }
-
-        try {
-
-            const adminInstance = await Admin.findOne({ where: { email: data.email } });
-
-            if (adminInstance) {
-                return res.status(ResponseStatus.code.conflict).json({ error: true, message: "Already an admin user" });
-            }
-
-            data.password = password;
-            const registeredAdmin = await Admin.create(req.body);
-            const newValidation = await Validation.create({ otp });
-            await registeredAdmin.setValidation(newValidation);
-
-
-            let permissions = await Permission.findAll({ where: { id: data.permissions } });
-
-            if (permissions.length === 0) {
-                await AuthorizationSeed.permission();
-                permissions = await Permission.findAll({ where: { id: data.permissions } });
-            }
-
-            const permission_code = permissions.map((permission) => permission.code);
-
-            const authorizationData = {
-                position: data.position,
-                role: data.role,
-                permissions: permission_code
-            };
-
-            const authorization = await Authorization.create(authorizationData);
-
-            await authorization.setAdmin(registeredAdmin);
-
-            Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
-
-            return res.status(ResponseStatus.code.success).json({
-                error: false,
-                message: ResponseStatus.pass.added,
-            });
-
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+    if (!errors.isEmpty()) {
+      return res
+        .status(ResponseStatus.code.bad_request)
+        .json({ errors: errors.array() });
     }
 
+    try {
+      const adminInstance = await Admin.findOne({
+        where: { email: data.email },
+      });
 
-    /*-----------------------------------| READ ADMIN USER |-----------------------------------*/
+      if (adminInstance) {
+        return res
+          .status(ResponseStatus.code.conflict)
+          .json({ error: true, message: "Already an admin user" });
+      }
 
-    static async readAdminUser(req, res) {
+      data.password = password;
+      const registeredAdmin = await Admin.create(req.body);
+      const newValidation = await Validation.create({ otp });
+      await registeredAdmin.setValidation(newValidation);
 
-        try {
+      let permissions = await Permission.findAll({
+        where: { id: data.permissions },
+      });
 
-            const authorization = await Authorization.findAll({ where: { account_id: null } });
+      if (permissions.length === 0) {
+        await AuthorizationSeed.permission();
+        permissions = await Permission.findAll({
+          where: { id: data.permissions },
+        });
+      }
 
-            const authoorizedUsers = await Promise.all(authorization.map(async (auth) => {
-                const userdata = await auth.getAdmin({ attributes: { exclude: ['password', 'createdAt'] } });
-                let payload = {};
-                payload.id = userdata.dataValues.id;
-                payload.fullname = userdata.dataValues.name;
-                payload.email = userdata.dataValues.email;
-                payload.status = auth.status;
-                payload.role = auth.role;
-                payload.permissions = auth.permissions;
-                payload.authorizationId = auth.id;
-                payload.adminId = userdata.dataValues.id;
-                return payload;
+      const permission_code = permissions.map((permission) => permission.code);
 
-            }));
+      const authorizationData = {
+        position: data.position,
+        role: data.role,
+        permissions: permission_code,
+      };
 
-            return res.status(ResponseStatus.code.success).json({
-                error: false,
-                message: ResponseStatus.pass.read,
-                data: authoorizedUsers
-            });
+      const authorization = await Authorization.create(authorizationData);
 
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
+      await authorization.setAdmin(registeredAdmin);
 
+      Mailer()
+        .to(data.email)
+        .from(process.env.MAIL_FROM, "Praxeum")
+        .subject("Admin Access")
+        .template("emails.InviteAdmin", {
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        })
+        .send();
+
+      return res.status(ResponseStatus.code.success).json({
+        error: false,
+        message: ResponseStatus.pass.added,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "server error", extra: error.message });
+    }
+  }
+
+  /*-----------------------------------| READ ADMIN USER |-----------------------------------*/
+
+  static async readAdminUser(req, res) {
+    try {
+      const authorization = await Authorization.findAll({
+        where: { account_id: null },
+      });
+
+      const authoorizedUsers = await Promise.all(
+        authorization.map(async (auth) => {
+          const userdata = await auth.getAdmin({
+            attributes: { exclude: ["password", "createdAt"] },
+          });
+          let payload = {};
+          payload.id = userdata.dataValues.id;
+          payload.fullname = userdata.dataValues.name;
+          payload.email = userdata.dataValues.email;
+          payload.status = auth.status;
+          payload.role = auth.role;
+          payload.permissions = auth.permissions;
+          payload.authorizationId = auth.id;
+          payload.adminId = userdata.dataValues.id;
+          return payload;
+        })
+      );
+
+      return res.status(ResponseStatus.code.success).json({
+        error: false,
+        message: ResponseStatus.pass.read,
+        data: authoorizedUsers,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "server error", extra: error.message });
+    }
+  }
+
+  /*-----------------------------------| SIGNIN ACCOUNT |-----------------------------------*/
+
+  static async login(req, res) {
+    const { email, password } = req.body;
+    const errors = validationResult(req);
+
+    const { QueryTypes } = require("sequelize");
+    const admins = await db.sequelize.query("SELECT * FROM `admins`", {
+      type: QueryTypes.SELECT,
+    });
+
+    // console.log(admins);
+
+    if (!errors.isEmpty()) {
+      return res
+        .status(ResponseStatus.code.bad_request)
+        .json({ errors: errors.array() });
     }
 
+    try {
+      const user = await Admin.findOne({ where: { email } });
 
-    /*-----------------------------------| SIGNIN ACCOUNT |-----------------------------------*/
+      if (!user) {
+        return res.status(ResponseStatus.code.not_found).json({
+          error: true,
+          message: "no email " + ResponseStatus.fail.login,
+        });
+      }
 
-    static async login(req, res) {
-        
-        const { email, password } = req.body;
-        const errors = validationResult(req);
+      const isValidPassword = await user.comparePassword(password);
 
-        if (!errors.isEmpty()) {
-            return res.status(ResponseStatus.code.bad_request).json({ errors: errors.array() });
-        }
+      if (!isValidPassword) {
+        return res
+          .status(ResponseStatus.code.not_found)
+          .json({ error: true, message: ResponseStatus.fail.login });
+      }
 
-        try {
-            const user = await Admin.findOne({ where: { email: email } });
+      const userData = {
+        id: user.dataValues.id,
+        email: user.dataValues.email,
+        account_type: user.dataValues.account_type,
+      };
 
-            if (!user) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
-            }
+      const generatedToken = TokenMiddleware.generate(userData);
 
-            const isValidPassword = await user.comparePassword(password);
+      const authorization = await user.getAuthorization();
 
-            if (!isValidPassword) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.login });
-            }
+      
+      const payload = {
+        AccountId: user.id,
+        name: user.name,
+        email: user.email,
+        status: user.status === null ? "undefined" : user.status,
+        phone: user.phone,
+        account_type: user.account_type,
+        verification_status: user.verification_status,
+        flag: user.flag,
+        authorization: authorization.dataValues.permissions,
+      };
 
-            const userData = {
-                id: user.dataValues.id,
-                email: user.dataValues.email,
-                account_type: user.dataValues.account_type,
-            };
-
-            const generatedToken = TokenMiddleware.generate(userData);
-
-            const authorization = await user.getAuthorization();
-
-            const payload = {
-                AccountId: user.id,
-                name: user.name,
-                email: user.email,
-                status: user.status === null ? "undefined" : user.status,
-                phone: user.phone,
-                account_type: user.account_type,
-                verification_status: user.verification_status,
-                flag: user.flag,
-                authorization: authorization.dataValues.permissions
-            }
-
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.login, profile: payload, token: generatedToken });
-
-
-        } catch (error) {
-            console.log(error)
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+      return res.status(ResponseStatus.code.success).json({
+        error: false,
+        message: ResponseStatus.pass.login,
+        profile: payload,
+        token: generatedToken,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "server error", extra: error.message });
     }
+  }
 
-    /*-----------------------------------| READ PERMISSIONS |-----------------------------------*/
+  /*-----------------------------------| READ PERMISSIONS |-----------------------------------*/
 
-    static async readPermissions(req, res) {
+  static async readPermissions(req, res) {
+    try {
+      let permissions = await Permission.findAll();
 
-        try {
+      if (permissions.length === 0) {
+        await AuthorizationSeed.permission();
+        permissions = await Permission.findAll();
+      }
 
-            let permissions = await Permission.findAll();
+      const filteredPermissions = permissions.filter((permission) => {
+        return permission.account !== "school"; // Not equal to 'school'
+      });
 
-            if (permissions.length === 0) {
-                await AuthorizationSeed.permission();
-                permissions = await Permission.findAll();
-            }
-
-            const filteredPermissions = permissions.filter(permission => {
-                return permission.account !== 'school'; // Not equal to 'school'
-            });
-
-            return res.status(ResponseStatus.code.success).json({
-                error: false,
-                message: ResponseStatus.pass.read,
-                data: filteredPermissions
-            });
-
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+      return res.status(ResponseStatus.code.success).json({
+        error: false,
+        message: ResponseStatus.pass.read,
+        data: filteredPermissions,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "server error", extra: error.message });
     }
+  }
 
+  /*-----------------------------------| READ ADD PERMISSIONS |-----------------------------------*/
 
+  static async createPermissions(req, res) {
+    try {
+      const permissionInstance = await Permission.create(req.body);
 
-    /*-----------------------------------| READ ADD PERMISSIONS |-----------------------------------*/
-
-    static async createPermissions(req, res) {
-
-        try {
-
-            const permissionInstance = await Permission.create(req.body);
-
-            return res.status(ResponseStatus.code.success).json({
-                error: false,
-                message: ResponseStatus.pass.added,
-                data: permissionInstance
-            });
-
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+      return res.status(ResponseStatus.code.success).json({
+        error: false,
+        message: ResponseStatus.pass.added,
+        data: permissionInstance,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "server error", extra: error.message });
     }
+  }
 
-    /*-----------------------------------| DELETE ADMIN |-----------------------------------*/
+  /*-----------------------------------| DELETE ADMIN |-----------------------------------*/
 
-    static async deleteAdmin(req, res) {
+  static async deleteAdmin(req, res) {
+    const { admin_id } = req.query;
 
-        const { admin_id } = req.query;
+    try {
+      const user = await Admin.findOne({ where: { id: admin_id } });
 
+      if (!user) {
+        return res
+          .status(ResponseStatus.code.not_found)
+          .json({ error: true, message: ResponseStatus.fail.not_found });
+      }
 
-        try {
-            const user = await Admin.findOne({ where: { id: admin_id } });
+      const authorization = await user.getAuthorization();
+      const deletedAuthorization = await authorization.destroy();
+      const deletedAdmin = await user.destroy();
 
-            if (!user) {
-                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
-            }
-
-            const authorization = await user.getAuthorization();
-            const deletedAuthorization = await authorization.destroy();
-            const deletedAdmin = await user.destroy();
-
-            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete, data: deletedAdmin });
-
-
-        } catch (error) {
-            console.log(error)
-            res.status(500).json({ error: 'server error', extra: error.message });
-        };
-
+      return res.status(ResponseStatus.code.success).json({
+        error: false,
+        message: ResponseStatus.pass.delete,
+        data: deletedAdmin,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "server error", extra: error.message });
     }
-
-
+  }
 }
-
 
 module.exports = AuthorizationController;

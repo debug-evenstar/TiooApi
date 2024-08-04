@@ -1,6 +1,6 @@
-const server = require('./src/server');
+const server = require("./src/server");
 
-const path = require('path');
+const path = require("path");
 global.appRoot = path.resolve(__dirname);
 
 server.boot();
