@@ -1,4 +1,4 @@
-const { Topic, Question } = require(".");
+const { Topic, Question, BookCategory } = require(".");
 
 class Relationships {
   static group(
@@ -29,6 +29,7 @@ class Relationships {
     CartItem,
     OnboardingQuestion,
     Topic,
+    BookCategory,
     Question
   ) {
     //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
@@ -41,6 +42,19 @@ class Relationships {
     Validation.belongsTo(Account, {
       foreignKey: "account_id",
       as: "account",
+    });
+
+
+    Textbook.hasOne(BookCategory, {
+      foreignKey: "textbook_id",
+      // as: "category",
+      unique: true,
+    });
+
+
+    BookCategory.belongsTo(Textbook,{
+      foreignKey: 'textbook_id',
+      // as: "textbook"
     });
 
     Account.hasOne(Shelf, {

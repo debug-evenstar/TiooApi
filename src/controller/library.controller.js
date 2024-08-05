@@ -9,6 +9,7 @@ const {
   Lesson,
   LessonSlide,
   Class,
+  BookCategory,
 } = require("../database/connection");
 const ResponseStatus = require("../config/message.config");
 const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
@@ -20,6 +21,7 @@ class LibraryController {
       where: {
         published: 1,
       },
+      include: BookCategory
     });
 
     const account = await Account.findByPk(id, {

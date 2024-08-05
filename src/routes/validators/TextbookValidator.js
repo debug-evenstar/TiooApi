@@ -11,6 +11,7 @@ module.exports = {
                 vine.array(vine.number()).minLength(1),
                 vine.string(),
             ]),
+            plan: vine.string().optional()
         })
     ),
     UpdateTextbook: createValidator((vine) =>
