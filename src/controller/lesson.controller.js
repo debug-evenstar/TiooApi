@@ -1127,7 +1127,7 @@ class LessonController {
         const { id } = req.params;
         const data = req.body;
 
-        try {
+        // try {
             const lessonSlideInstance = await LessonSlide.findByPk(id);
 
             const slide_data = await LessonController.processQuestions(
@@ -1141,14 +1141,14 @@ class LessonController {
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.update,
-                data: response,
+                data: response ?? [],
             });
-        } catch (error) {
-            res.status(500).json({
-                error: "server error",
-                extra: error.message,
-            });
-        }
+        // } catch (error) {
+        //     res.status(500).json({
+        //         error: "server error",
+        //         extra: error.message,
+        //     });
+        // }
     }
 
     static async createLessonSlide(req, res) {
@@ -1173,6 +1173,7 @@ class LessonController {
             const lessonSlideInstance = await LessonSlide.create({
                 slide_index: data.slide_index,
                 slide_data: slide_data,
+                lesson_id: id,
             });
 
             await lessonInstance.addLessonSlides([lessonSlideInstance]);

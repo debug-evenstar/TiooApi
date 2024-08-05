@@ -17,6 +17,7 @@ const {
     Group,
     Textbook,
     Chapter,
+    BookCategory,
 } = require("../../../database/connection");
 const { use } = require("chai");
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
@@ -45,7 +46,7 @@ class AdminLibraryController {
         try {
             let classes = JSON.parse(req.body.classes);
             req.body.classes = classes;
-        } catch (err) {}
+        } catch (err) { }
 
         try {
             const classInstance = await Class.findAll({
@@ -64,6 +65,11 @@ class AdminLibraryController {
             const textbookInstance = await Textbook.create(req.body);
 
             const subjectInstance = await Subject.findByPk(req.body.subject_id);
+
+            const bookCategory = await BookCategory.create({
+                textbook_id: textbookInstance.dataValues.id,
+                category: req.body.plan
+            });
 
             await textbookInstance.addClasses(classInstance);
 
@@ -241,7 +247,7 @@ class AdminLibraryController {
                     preview.push(ImageResponse.secure_url);
                 }
             } else {
-                if (req.files) {
+                if (req.files && req.files.length > 0) {
                     const filePath = req.files[0].path;
                     const ImageResponse = await cloudinaryUploadImage(filePath);
                     preview.push(ImageResponse.secure_url);

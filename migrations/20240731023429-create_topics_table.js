@@ -9,6 +9,12 @@ module.exports = {
                 primaryKey: true,
                 autoIncrement: true,
             },
+
+            subject_id: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+            },
+
             name: {
                 type: Sequelize.STRING,
                 allowNull: false,
