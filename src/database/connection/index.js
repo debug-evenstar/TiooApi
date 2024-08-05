@@ -142,6 +142,8 @@ const Topic = (db.topic = require("../topic.model"))(
   sequelize,Sequelize
 )
 
+const BookCategory = (db.bookcategory = require("../bookcategory.model"))(sequelize,Sequelize);
+
 const Question = (db.question = require("../question.model"))(
   sequelize,Sequelize
 )
@@ -174,6 +176,7 @@ const models = [
   CartItem,
   OnboardingQuestion,
   Topic,
+  BookCategory,
   Question
 ];
 
@@ -215,5 +218,6 @@ module.exports = {
   CartItem,
   OnboardingQuestion,
   Topic,
+  BookCategory,
   Question
 };

@@ -46,7 +46,7 @@ class TextbookController {
         try {
             let classes = JSON.parse(req.body.classes);
             req.body.classes = classes;
-        } catch (err) {}
+        } catch (err) { }
 
         try {
             const classInstance = await Class.findAll({
@@ -121,6 +121,13 @@ class TextbookController {
                 );
                 await previousSubjectInstance.removeTextbook(textbookInstance);
                 await subjectInstance.addTextbook(textbookInstance);
+            }
+
+            if (req.body.plan) {
+                const cat = await BookCategory.update(
+                    { category: req.body.plan },
+                    { where: { textbook_id: id, } }
+                );
             }
 
             // ------------------------------------------
