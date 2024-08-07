@@ -123,6 +123,7 @@ class AdminLibraryController {
 
 
 
+
             if (req.body.subject_id) {
                 const subjectInstance = await Subject.findByPk(
                     req.body.subject_id
@@ -154,7 +155,8 @@ class AdminLibraryController {
             // const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
             const textbookInstance = await Textbook.findAll({
-                include: [{ model: Lesson }],
+                // include: [{ model: Lesson }],
+                include: Lesson,
             });
 
             const response = await Promise.all(
