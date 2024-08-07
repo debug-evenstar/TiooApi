@@ -62,14 +62,12 @@ class AdminLibraryController {
 
             const classIds = classInstance.map((element) => element.id);
 
+            req.body.is_premium = req.body.plan.toLowerCase() != "basic"
+
             const textbookInstance = await Textbook.create(req.body);
 
             const subjectInstance = await Subject.findByPk(req.body.subject_id);
 
-            const bookCategory = await BookCategory.create({
-                textbook_id: textbookInstance.dataValues.id,
-                category: req.body.plan
-            });
 
             await textbookInstance.addClasses(classInstance);
 
@@ -92,8 +90,6 @@ class AdminLibraryController {
     }
 
     static async updateLibraryTextbook(req, res) {
-        const data = req.body;
-
         const { id } = req.params;
 
         try {
@@ -109,16 +105,23 @@ class AdminLibraryController {
                 textbook.subject_id
             );
 
+
+            req.body.is_premium = req.body.plan.toLowerCase() != "basic"
+
             const textbookInstance = await textbook.update(req.body);
 
             if (req.body.classes) {
+                
                 const classInstance = await Class.findAll({
                     where: { id: [...req.body.classes] },
                 });
+
                 const classIds = classInstance.map((element) => element.id);
                 await textbookInstance.removeClasses();
                 await textbookInstance.addClasses(classInstance);
             }
+
+
 
             if (req.body.subject_id) {
                 const subjectInstance = await Subject.findByPk(
@@ -300,20 +303,20 @@ class AdminLibraryController {
     static async updateLesson(req, res) {
         try {
             let preview = [];
-            if (req.files["preview"] && req.files["preview"].length > 0) {
-                for (var item of req.files["preview"]) {
-                    const ImageResponse = await cloudinaryUploadImage(
-                        item.path
-                    );
-                    preview.push(ImageResponse.secure_url);
-                }
-            } else {
-                if (req.files) {
-                    const filePath = req.files[0].path;
-                    const ImageResponse = await cloudinaryUploadImage(filePath);
-                    preview.push(ImageResponse.secure_url);
-                }
-            }
+            // if (req.files["preview"] && req.files["preview"].length > 0) {
+            //     for (var item of req.files["preview"]) {
+            //         const ImageResponse = await cloudinaryUploadImage(
+            //             item.path
+            //         );
+            //         preview.push(ImageResponse.secure_url);
+            //     }
+            // } else {
+            //     if (req.files) {
+            //         const filePath = req.files[0].path;
+            //         const ImageResponse = await cloudinaryUploadImage(filePath);
+            //         preview.push(ImageResponse.secure_url);
+            //     }
+            // }
 
             const textbookInstance = await Textbook.findByPk(req.params.id);
 
@@ -331,6 +334,8 @@ class AdminLibraryController {
                 ? preview
                 : lessonInstance.preview;
 
+            delete req.body.chapter_id;
+            
             await lessonInstance.update(req.body);
 
             if (req.body.class) {

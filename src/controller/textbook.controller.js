@@ -357,7 +357,7 @@ class TextbookController {
         return AdminLibraryController.updateLesson(req, res);
     }
 
-    static async deleteTextbookLesson(req, res) {
+    static async    deleteTextbookLesson(req, res) {
         req.query.material_type = "textbook";
         return AdminLibraryController.deleteLesson(req, res);
     }

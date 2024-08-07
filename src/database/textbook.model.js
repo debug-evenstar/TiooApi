@@ -27,6 +27,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
             },
+            is_premium: {
+                type: DataTypes.BOOLEAN,
+                allowNull: true,
+            },
             account_id: {
                 type: DataTypes.INTEGER,
                 allowNull: true
