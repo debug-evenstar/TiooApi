@@ -14,6 +14,7 @@ const {
   VerifyResetPasswordValidator,
   RegisterExternalStudentValidator,
   EmailValidator,
+  LegacyResetPasswordValidator,
 } = require("./validators/AuthValidators");
 
 /*-----------------------------------| HOME |-----------------------------------*/
@@ -119,6 +120,9 @@ const OpenRoutesGroup = (router) => {
     ChangePasswordValidator,
     AuthenicationController.changePassword
   );
+
+
+
   router.post(
     "/account/resetpassword",
     ResetPasswordValidator,
@@ -220,14 +224,24 @@ const AuthorizedRoutesGroup = (router) => {
   /* --------------------------------- ACCOUNT -------------------------------- */
 
   router.use(AuthenticationMiddleware.verify); //--use middleware--//
+
   router.get("/account/read_all", AuthenicationController.accounts);
   router.get("/account/read", AuthenicationController.accountProfile);
   router.put("/account/update", AuthenicationController.updateAccount);
   router.put("/account/flag", AuthenicationController.flagAccount);
+
+  router.post(
+    "/account/legacy-resetpassword",
+    // LegacyResetPasswordValidator,
+    AuthenicationController.legacyPasswordReset
+  );
+
+
   router.post(
     "/account/auth/resetpassword",
     AuthenicationController.resetAuthPassword
   );
+
   router.get("/account/auth/account", AuthenicationController.authAccountByID);
   router.put("/account/update/:id", AuthenicationController.updateAccountById);
   router.get("/account/read/:id", AuthenicationController.accountByID);

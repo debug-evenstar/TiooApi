@@ -1123,10 +1123,41 @@ class AuthController {
             res.status(500).json({ error: 'server error', extra: error.message });
         }
 
-
-
-
     }
+
+    /* -------------------------- LEGACY RESET PASSWORD ------------------------- */
+    static async legacyPasswordReset(req,res) {
+        const { new_password, password_confirmation , password } = req.body;
+        const { id } = req.userData;
+
+        if(password_confirmation != new_password){
+            return res.send({
+                error: true,
+                message: "passwords do not match",
+            });
+        }
+
+
+        const account = await Account.findByPk(id);
+        const isValidPassword = await account.comparePassword(password);
+
+        // return res.json({ password, isValidPassword});
+
+        if(!isValidPassword){
+            return res.send({
+                error: true, 
+                message: "Invalid password"
+            });
+        }
+
+
+        const hashPassword = await account.hashPassword(new_password);
+
+        await account.update({ password: hashPassword });
+        
+        return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update });
+    }
+
 
     /* -------------------------- VERIFY RESET PASSWORD ------------------------- */
 
