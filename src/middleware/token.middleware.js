@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { Account, Admin, ErrorLog, Keypairs, Authorization } = require('../database/connection');
+const { Account, Admin, Keypairs, Authorization } = require('../database/connection');
 const ResponseMessage = require('../config/message.config');
 const { school } = require('../controller/billing.controller');
 
@@ -60,14 +60,6 @@ class TokenMiddleware {
 
 
         } catch (err) {
-            // var logError = await ErrorLog.create({
-            //     error_name: "Error at Verify Middleware",
-            //     error_description: err.toString(),
-            //     route: `${req.originalUrl}`,
-            //     method: `${req.method}`,
-            //     error_code: "401",
-            // });
-
             // console.log(err);
             // if (logError) {
                 return res.status(401).json({ message: 'Authentication failed. Token invalid.' });
@@ -98,14 +90,6 @@ class TokenMiddleware {
 
     //     } catch (err) {
     //         console.log(err)
-    //         var logError = await ErrorLog.create({
-    //             error_name: "Error at Admin Middleware",
-    //             error_description: err.toString(),
-    //             route: `${req.originalUrl}`,
-    //             method: `${req.method}`,
-    //             error_code: "401",
-    //         });
-
     //         if (logError) {
     //             return res.status(401).json({ message: 'Authentication failed. Public Key invalid.' });
     //         }
@@ -147,18 +131,9 @@ class TokenMiddleware {
             });
 
         } catch (err) {
-            console.log(err)
-            var logError = await ErrorLog.create({
-                error_name: "Error at Admin Middleware",
-                error_description: err.toString(),
-                route: `${req.originalUrl}`,
-                method: `${req.method}`,
-                error_code: "401",
-            });
-
-            if (logError) {
-                return res.status(401).json({ message: 'Authentication failed. Token invalid.' });
-            }
+            console.log(err);
+            return res.status(401).json({ message: 'Authentication failed. Token invalid.' });
+            
         }
     }
 
