@@ -151,13 +151,21 @@ class AdminLibraryController {
             // const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
             const textbookInstance = await Textbook.findAll({
-                include: [{ model: Lesson }],
+                include: [{ 
+                    model: Chapter, as : "chapters",
+                    include : [
+                        { model : Lesson, as : "lessons"}
+                    ]
+                }],
             });
 
             const response = await Promise.all(
                 textbookInstance.map(async (element) => {
                     const rawClasses = await element.getClasses();
-                    const lessonCount = element.Lessons.length;
+                    // [1, 2, 3, 4].reduce((a, b) => a + b, 0)
+                    const lessonCount = element.chapters.map(
+                        (ch) => ch.lessons.length
+                    ).reduce((a, b) => a + b, 0);
 
                     const classes = rawClasses.map((element) => ({
                         id: element.id,
@@ -165,7 +173,7 @@ class AdminLibraryController {
                         type: element.type,
                     }));
 
-                    delete element.dataValues.Lessons;
+                    delete element.dataValues.chapters;
 
                     return { ...element.dataValues, classes, lessonCount };
                 })
