@@ -20,6 +20,9 @@ class LibraryController {
       where: {
         published: 1,
       },
+      include: [
+        Account
+      ]
     });
 
     const account = await Account.findByPk(id, {
@@ -56,7 +59,7 @@ class LibraryController {
   static async getStudentShelf(req, res) {
     const { id } = req.userData;
     const account = await Account.findByPk(id, {
-      include: Shelf,
+      include: [ Shelf]
     });
 
     if (account.Shelf) {
@@ -64,6 +67,7 @@ class LibraryController {
         where: {
           id: account.Shelf?.shelf ?? [],
         },
+        include: [Account]
       });
 
       return res.send({

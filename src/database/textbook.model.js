@@ -34,6 +34,12 @@ module.exports = (sequelize, DataTypes) => {
             account_id: {
                 type: DataTypes.INTEGER,
                 allowNull: true
+            },
+            author: {
+                type: DataTypes.VIRTUAL,
+                get() {
+                    return this.getDataValue('Account') ? this.getDataValue('Account').name : null;
+                }
             }
         },
         { timestamps: true, paranoid : true }
