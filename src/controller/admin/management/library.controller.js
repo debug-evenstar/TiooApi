@@ -50,7 +50,7 @@ class AdminLibraryController {
 
         try {
             const classInstance = await Class.findAll({
-                where: { id: [...req.body.classes] },
+                where: { id: [...req.body.classes]},
             });
 
             if (!classInstance) {
@@ -64,7 +64,7 @@ class AdminLibraryController {
 
             req.body.is_premium = req.body.plan.toLowerCase() != "basic"
 
-            const textbookInstance = await Textbook.create({ ... req.body, account_id: userData.id } );
+            const textbookInstance = await Textbook.create({ ... req.body, account_id: user.id } );
 
             const subjectInstance = await Subject.findByPk(req.body.subject_id);
 
