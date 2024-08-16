@@ -32,9 +32,7 @@ class AdminLibraryController {
     /* ---------------------------------------------------------------------------------------------- */
     static async createLibraryTextbook(req, res) {
         const data = req.body;
-        const user = req.userData;
         data.library = true;
-
         let cover = "";
 
         if (req.file) {
@@ -64,12 +62,13 @@ class AdminLibraryController {
 
             req.body.is_premium = req.body.plan.toLowerCase() != "basic"
 
-            const textbookInstance = await Textbook.create({ ... req.body, account_id: user.id } );
+            const textbookInstance = await Textbook.create({ ... req.body } );
 
             const subjectInstance = await Subject.findByPk(req.body.subject_id);
 
 
             await textbookInstance.addClasses(classInstance);
+
 
             await subjectInstance.addTextbook(textbookInstance);
 

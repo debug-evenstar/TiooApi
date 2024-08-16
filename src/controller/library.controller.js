@@ -19,10 +19,7 @@ class LibraryController {
     const textbooks = await Textbook.findAll({
       where: {
         published: 1,
-      },
-      include: [
-        Account
-      ]
+      }
     });
 
     const account = await Account.findByPk(id, {

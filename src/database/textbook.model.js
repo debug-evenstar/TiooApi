@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
             },
+        
             is_premium: {
                 type: DataTypes.BOOLEAN,
                 allowNull: true,
@@ -36,10 +37,8 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true
             },
             author: {
-                type: DataTypes.VIRTUAL,
-                get() {
-                    return this.getDataValue('Account') ? this.getDataValue('Account').name : null;
-                }
+                type: DataTypes.STRING,
+                allowNull: true,
             }
         },
         { timestamps: true, paranoid : true }
