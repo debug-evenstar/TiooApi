@@ -33,12 +33,18 @@ class AdminLibraryController {
     static async createLibraryTextbook(req, res) {
         const data = req.body;
         data.library = true;
-        let cover = "";
 
         if (req.file) {
             const filePath = req.file.path;
-            const ImageResponse = await cloudinaryUploadImage(filePath);
-            req.body.cover_photo = ImageResponse.secure_url;
+            try{
+                const ImageResponse = await cloudinaryUploadImage(filePath);
+                req.body.cover_photo = ImageResponse.secure_url;
+            }catch(error){
+                res.status(500).json({
+                    error: "server error",
+                    extra: error,
+                });
+            }
         }
 
         try {
