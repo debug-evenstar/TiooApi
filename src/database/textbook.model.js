@@ -27,10 +27,11 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
             },
-        
+
             is_premium: {
                 type: DataTypes.BOOLEAN,
-                allowNull: true,
+                allowNull: false,
+                defaultValue: false,
             },
             account_id: {
                 type: DataTypes.INTEGER,
@@ -41,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: true,
             }
         },
-        { timestamps: true, paranoid : true }
+        { timestamps: true, paranoid: true }
     );
 
     return Textbook;

@@ -2,7 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     /**
      * Add altering commands here.
      *
@@ -10,19 +10,20 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
 
-    await queryInterface.addColumn('textbooks','is_premium', {
+    await queryInterface.addColumn('textbooks', 'is_premium', {
       type: Sequelize.BOOLEAN,
-      allowNull: true,
+      allowNull: false,
+      defaultValue: false,
     })
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     /**
      * Add reverting commands here.
      *
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropColumn('textbooks','is_premium');
+    await queryInterface.dropColumn('textbooks', 'is_premium');
   }
 };

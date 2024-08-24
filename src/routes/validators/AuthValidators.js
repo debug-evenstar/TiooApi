@@ -1,5 +1,6 @@
 const { body } = require("express-validator");
 
+// import { createValidator } from "./Base";
 /* ----------------------- THIS IS FOR AUTH VALIDATION ---------------------- */
 
 module.exports = {
