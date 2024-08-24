@@ -483,7 +483,7 @@ class AuthController {
                 account_type: user.account_type,
                 onboarded: user.metadata !== null,
                 verification_status: user.verification_status,
-                flag: user.flag,
+                flag: user.status,
             }
 
             // if (user.account_type === "school") {

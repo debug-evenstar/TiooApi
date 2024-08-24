@@ -21,6 +21,7 @@ const docx = require("docx");
 const HtmlToDocx = require("html-to-docx");
 const Sequelize = require("sequelize");
 const LessonTemplateProvider = require("../providers/AI/lesson.template");
+const AITutorProvider = require("../providers/AI/tutor");
 const { equal } = require("../utils/array");
 const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
 const { getAllFuncs } = require("../utils/objects");
@@ -730,7 +731,7 @@ class LessonController {
                         orderBy: { slide_index: "asc" },
                     },
                     Textbook,
-                    Chapter,
+                    Chapter
                 ],
             });
 
@@ -1181,6 +1182,46 @@ class LessonController {
                 error: false,
                 message: ResponseStatus.pass.create,
                 data: lessonSlideInstance,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
+
+    static async askAITutor(req, res) {
+        const data = req.body;
+        try {
+            const lessonInstance = await Lesson.findByPk(data.lesson_id, {
+                include: [
+                    {
+                        model: LessonSlide,
+                        as: "lesson_slides",
+                        orderBy: { slide_index: "asc" },
+                    },
+                    Textbook,
+                    Chapter,
+                    Class
+                ],
+            });
+
+            if (!lessonInstance) {
+                return res.status(ResponseStatus.code.bad_request).json({
+                    error: true,
+                    message: ResponseStatus.fail.not_found,
+                });
+            }
+
+            const response = await AITutorProvider.queryAITutor(
+                lessonInstance.dataValues, data.slide_id, data.conversation
+            );
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: response.data,
             });
         } catch (error) {
             res.status(500).json({

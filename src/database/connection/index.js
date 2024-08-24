@@ -83,10 +83,7 @@ const Library = (db.Libraries = require("../library.model")(
   sequelize,
   Sequelize
 ));
-const ErrorLog = (db.errors = require("../errorLog.model")(
-  sequelize,
-  Sequelize
-));
+
 const Coupon = (db.coupons = require("../coupon.model")(sequelize, Sequelize));
 
 const TotalLog = (db.totallogs = require("../totallog.model")(
@@ -205,7 +202,6 @@ module.exports = {
   Admin,
   Coupon,
   Library,
-  ErrorLog,
   TotalLog,
   Group,
   LessonSlide,

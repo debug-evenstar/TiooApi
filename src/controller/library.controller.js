@@ -147,6 +147,7 @@ class LibraryController {
           Subject,
         ],
         order: [
+          [ { model: Chapter, as: "chapters" }, "id", "ASC" ],
           [
             { model: Chapter, as: "chapters" },
             { model: Lesson, as: "lessons" },
