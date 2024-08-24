@@ -220,6 +220,7 @@ const OpenRoutesGroup = (router) => {
     router.get("/open/pricing/", SchoolFront.openPricing);
     router.get("/open/textbook/:id", Library.getLibraryTextbook);
     router.get("/open/subjects/:id/topics", SubjectController.getTopics);
+    router.post("/open/lesson/asktutor", LessonController.askAITutor);
 };
 
 /*------------------------------| AUTHORIZED ROUTES |------------------------------*/
