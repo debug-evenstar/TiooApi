@@ -24,7 +24,7 @@ module.exports = {
     CreateTextbookLesson: createValidator((vine) =>
         vine.object({
             topic: vine.string(),
-            description: vine.string(),
+            description: vine.string().optional(),
             objectives: vine.string().optional(),
             curriculum: vine.string().optional(),
             duration: vine.string().optional(),

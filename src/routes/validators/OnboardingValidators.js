@@ -10,8 +10,6 @@ module.exports = {
             classArms : vine.array(vine.number()).optional()
         })
     )),
-
-
     
 
 

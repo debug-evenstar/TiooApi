@@ -9,19 +9,18 @@ const {
   Lesson,
   LessonSlide,
   Class,
-  BookCategory,
 } = require("../database/connection");
 const ResponseStatus = require("../config/message.config");
 const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
 
 class LibraryController {
   static async getLibraryTextbooks(req, res) {
-    const { id } = req.userData;
+    const id = req.userData?.id || 0;
+
     const textbooks = await Textbook.findAll({
       where: {
         published: 1,
-      },
-      include: BookCategory
+      }
     });
 
     const account = await Account.findByPk(id, {
@@ -30,7 +29,7 @@ class LibraryController {
 
     let response = textbooks;
 
-    if (!account.Shelf) {
+    if (account && !account.Shelf) {
       // create a shelf for the user
       await account.createShelf({
         account_id: id,
@@ -40,7 +39,7 @@ class LibraryController {
     }
 
     response = textbooks.map((textbook) => {
-      const inShelf = account.Shelf?.shelf?.includes(textbook.id);
+      const inShelf = account?.Shelf?.shelf?.includes(textbook.id) ?? false;
       return {
         ...textbook.get({ plain: true }),
         inShelf,
@@ -53,19 +52,20 @@ class LibraryController {
     });
   }
 
-  async getStudentTextbooks() {}
+  async getStudentTextbooks() { }
 
   static async getStudentShelf(req, res) {
     const { id } = req.userData;
     const account = await Account.findByPk(id, {
-      include: Shelf,
+      include: [Shelf]
     });
 
     if (account.Shelf) {
-      const books = await Textbook.findAll({  
+      const books = await Textbook.findAll({
         where: {
           id: account.Shelf?.shelf ?? [],
         },
+        include: [Account]
       });
 
       return res.send({
@@ -193,7 +193,7 @@ class LibraryController {
     try {
       let classes = JSON.parse(req.body.classes);
       req.body.classes = classes;
-    } catch (err) {}
+    } catch (err) { }
 
     try {
       const classInstance = await Class.findAll({

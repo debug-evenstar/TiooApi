@@ -1,5 +1,6 @@
 const { body } = require("express-validator");
 
+// import { createValidator } from "./Base";
 /* ----------------------- THIS IS FOR AUTH VALIDATION ---------------------- */
 
 module.exports = {
@@ -58,6 +59,12 @@ module.exports = {
 
   ChangePasswordValidator: [
     body("password").notEmpty().withMessage("password field is required"),
+  ],
+
+  LegacyResetPasswordValidator: [
+    body("password").notEmpty().withMessage("password field is required"),
+    body("new_password").notEmpty().withMessage("password field is required"),
+    body("password_confirmation").notEmpty().withMessage("password field is required"),
   ],
   EmailValidator: [
     body("password").notEmpty().withMessage("password field is required"),

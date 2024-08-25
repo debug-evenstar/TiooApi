@@ -514,9 +514,9 @@ class SubjectController {
 
             const name = req.body.topic;
 
-            const topicInstance = await Topic.create({ name });
+            const topicInstance = await Topic.create({ name, subject_id: subjectInstance.dataValues.id });
 
-            await subjectInstance.addTopic(topicInstance);
+            // await subjectInstance.addTopic(topicInstance);
 
             const topics = await subjectInstance.getTopics();
             
