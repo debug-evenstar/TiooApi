@@ -4,16 +4,17 @@ router = express.Router();
 /* -------------------------------| Validators |------------------------------- */
 
 const {
-    SigninValidator,
-    SignupValidator,
-    VerifyAccountValidator,
-    SendOTPValidator,
-    ChangePasswordValidator,
-    SchoolSetupValidator,
-    ResetPasswordValidator,
-    VerifyResetPasswordValidator,
-    RegisterExternalStudentValidator,
-    EmailValidator,
+  SigninValidator,
+  SignupValidator,
+  VerifyAccountValidator,
+  SendOTPValidator,
+  ChangePasswordValidator,
+  SchoolSetupValidator,
+  ResetPasswordValidator,
+  VerifyResetPasswordValidator,
+  RegisterExternalStudentValidator,
+  EmailValidator,
+  LegacyResetPasswordValidator,
 } = require("./validators/AuthValidators");
 
 /*-----------------------------------| HOME |-----------------------------------*/
@@ -228,35 +229,39 @@ const OpenRoutesGroup = (router) => {
 const AuthorizedRoutesGroup = (router) => {
     /* --------------------------------- ACCOUNT -------------------------------- */
 
-    router.use(AuthenticationMiddleware.verify); //--use middleware--//
-    router.get("/account/read_all", AuthenicationController.accounts);
-    router.get("/account/read", AuthenicationController.accountProfile);
-    router.put("/account/update", AuthenicationController.updateAccount);
-    router.put("/account/flag", AuthenicationController.flagAccount);
-    router.post(
-        "/account/auth/resetpassword",
-        AuthenicationController.resetAuthPassword
-    );
-    router.get(
-        "/account/auth/account",
-        AuthenicationController.authAccountByID
-    );
-    router.put(
-        "/account/update/:id",
-        AuthenicationController.updateAccountById
-    );
-    router.get("/account/read/:id", AuthenicationController.accountByID);
-    router.get("/account/exist/:email", AuthenicationController.accountExist);
-    router.post(
-        "/account/profile/upload",
-        UploadService.uploadDisplayPicture.single("file"),
-        AuthenicationController.uploadDisplayPicture
-    );
-    router.delete("/account/delete/:id", AuthenicationController.deleteAccount);
-    router.delete(
-        "/account/email/delete/:email",
-        AuthenicationController.deleteAccountByEmail
-    );
+  router.use(AuthenticationMiddleware.verify); //--use middleware--//
+
+  router.get("/account/read_all", AuthenicationController.accounts);
+  router.get("/account/read", AuthenicationController.accountProfile);
+  router.put("/account/update", AuthenicationController.updateAccount);
+  router.put("/account/flag", AuthenicationController.flagAccount);
+
+  router.post(
+    "/account/legacy-resetpassword",
+    // LegacyResetPasswordValidator,
+    AuthenicationController.legacyPasswordReset
+  );
+
+
+  router.post(
+    "/account/auth/resetpassword",
+    AuthenicationController.resetAuthPassword
+  );
+
+  router.get("/account/auth/account", AuthenicationController.authAccountByID);
+  router.put("/account/update/:id", AuthenicationController.updateAccountById);
+  router.get("/account/read/:id", AuthenicationController.accountByID);
+  router.get("/account/exist/:email", AuthenicationController.accountExist);
+  router.post(
+    "/account/profile/upload",
+    UploadService.uploadDisplayPicture.single("file"),
+    AuthenicationController.uploadDisplayPicture
+  );
+  router.delete("/account/delete/:id", AuthenicationController.deleteAccount);
+  router.delete(
+    "/account/email/delete/:email",
+    AuthenicationController.deleteAccountByEmail
+  );
 
     /* --------------------------------- SCHOOL --------------------------------- */
     router.get("/school/classes/:id", SchoolManagementController.classes);

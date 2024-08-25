@@ -587,7 +587,6 @@ class LessonController {
             const lessonsWithinNextWeek = allLessons.filter((lesson) => {
                 const lessonStartDate = new Date(lesson.start_date);
                 const lessonEndDate = new Date(lesson.end_date);
-                // return lessonStartDate >= nextMonday && lessonStartDate <= nextSunday;
 
                 return lessonStartDate > today;
             });
@@ -1128,7 +1127,7 @@ class LessonController {
         const { id } = req.params;
         const data = req.body;
 
-        // try {
+        try {
             const lessonSlideInstance = await LessonSlide.findByPk(id);
 
             const slide_data = await LessonController.processQuestions(
@@ -1144,12 +1143,12 @@ class LessonController {
                 message: ResponseStatus.pass.update,
                 data: response ?? [],
             });
-        // } catch (error) {
-        //     res.status(500).json({
-        //         error: "server error",
-        //         extra: error.message,
-        //     });
-        // }
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
     }
 
     static async createLessonSlide(req, res) {
