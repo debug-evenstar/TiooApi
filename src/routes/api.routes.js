@@ -219,6 +219,7 @@ const OpenRoutesGroup = (router) => {
         LessonController.updateTemplateImage
     );
     router.get("/open/pricing/", SchoolFront.openPricing);
+    router.get("/open/textbooks", Library.getLibraryTextbooks);
     router.get("/open/textbook/:id", Library.getLibraryTextbook);
     router.get("/open/subjects/:id/topics", SubjectController.getTopics);
     router.post("/open/lesson/asktutor", LessonController.askAITutor);
