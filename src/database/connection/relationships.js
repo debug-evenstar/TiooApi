@@ -30,7 +30,8 @@ class Relationships {
     OnboardingQuestion,
     Topic,
     BookCategory,
-    Question
+    Question,
+    LessonProgress,
   ) {
     //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -246,6 +247,11 @@ class Relationships {
 
     Account.hasMany(CartItem, { foreignKey: "account_id" });
     CartItem.belongsTo(Account, { foreignKey: "account_id" });
+
+
+    Account.hasMany(LessonProgress,{foreignKey: "student_id", });
+    LessonProgress.belongsTo(Account, { foreignKey: "student_id"});
+
 
     //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 

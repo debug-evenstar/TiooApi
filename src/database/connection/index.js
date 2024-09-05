@@ -133,17 +133,20 @@ const OnboardingQuestion = (db.onboarding = require("../onboardingQuestion.model
 ));
 
 
-
+const LessonProgress = (db.lessonProgress = require("../lessonprogress.model")(
+  sequelize,
+  Sequelize
+));
 
 const Topic = (db.topic = require("../topic.model"))(
   sequelize,Sequelize
-)
+);
 
 const BookCategory = (db.bookcategory = require("../bookcategory.model"))(sequelize,Sequelize);
 
 const Question = (db.question = require("../question.model"))(
   sequelize,Sequelize
-)
+);
 
 const models = [
   Account,
@@ -174,7 +177,8 @@ const models = [
   OnboardingQuestion,
   Topic,
   BookCategory,
-  Question
+  Question,
+  LessonProgress
 ];
 
 Relationships.group(...models);
@@ -215,5 +219,6 @@ module.exports = {
   OnboardingQuestion,
   Topic,
   BookCategory,
-  Question
+  Question,
+  LessonProgress
 };
