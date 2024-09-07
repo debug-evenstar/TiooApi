@@ -40,7 +40,6 @@ class AuthController {
                 });
             }
 
-
             // req.body.status = 'registered';
             req.body.name = `${req.body.first_name} ${req.body.last_name}`;
 

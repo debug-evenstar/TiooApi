@@ -17,6 +17,7 @@ const {
     Group,
     Textbook,
     Chapter,
+    LessonProgress,
 } = require("../database/connection");
 const { use } = require("chai");
 const AuthorizationSeed = require("../seeders/seed.authorization");
@@ -25,6 +26,8 @@ const LessonTemplateProvider = require("../providers/AI/lesson.template");
 const e = require("express");
 const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
 const AdminLibraryController = require("./admin/management/library.controller");
+const ResponseMessage = require("../config/message.config");
+const { data } = require("../seeders/notification.seeds");
 
 class TextbookController {
     /* ---------------------------------------------------------------------------------------------- */
@@ -357,10 +360,77 @@ class TextbookController {
         return AdminLibraryController.updateLesson(req, res);
     }
 
-    static async    deleteTextbookLesson(req, res) {
+    static async deleteTextbookLesson(req, res) {
         req.query.material_type = "textbook";
         return AdminLibraryController.deleteLesson(req, res);
     }
+
+    static async updateProgressRecord(req, res) {
+        const { textbooks_id, lesson_id, slide_id, slide_index } = req.body;
+        // console.log(req.body);
+        // return res.send(req.body)
+        const userId = req.userData.id;
+
+        const record = await LessonProgress.findOne({
+            where: {
+                student_id: userId, textbook_id: textbooks_id, lesson_id
+            }
+        });
+        if (record) {
+            // update our record
+            if (record.dataValues.slide_index < slide_index) {
+                await record.update({
+                    slide_id, slide_index
+                })
+            }
+            return res.send({
+                error: false,
+                message: ResponseMessage.pass.create,
+                data: record
+            })
+        }
+        return res.send({
+            error: true,
+            message: "No record to update"
+        })
+    }
+
+    static async getOrCreateProgressRecord(req, res) {
+        const { textbook_id, lesson_id } = req.params;
+        const userId = req.userData.id;
+
+        const record = await LessonProgress.findOne({
+            where: {
+                student_id: userId, textbook_id, lesson_id
+            }
+        });
+
+        if (record) {
+            return res.send({
+                error: false,
+                data: record,
+            })
+        }
+
+        // create a new one
+        try {
+            const progressRecord = await LessonProgress.create({
+                student_id: userId, lesson_id, textbook_id
+            })
+            return res.send({
+                error: false,
+                message: ResponseMessage.pass.create,
+                data: progressRecord
+            })
+        } catch (error) {
+            console.log(error);
+            return res.send({
+                error: true,
+                message: error.message
+            })
+        }
+    }
+
 }
 
 module.exports = TextbookController;
