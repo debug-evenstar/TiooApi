@@ -361,7 +361,8 @@ class StudentController {
                     account_type: 'student',
                     '$Student.id$': { [Sequelize.Op.not]: null },
 
-                }, include: [Student, SchoolManagement]
+                }, include: [Student]
+                // }, include: [Student, SchoolManagement]
             });
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: studentAccount });
@@ -432,6 +433,7 @@ class StudentController {
                 }
             });
 
+            
             const student = await classInstance.getStudents({ joinTableAttributes: [] });
         } catch (error) {
             console.log(error);
@@ -903,26 +905,26 @@ class StudentController {
 
             const studentClass = await studentInstance.getClass();
 
-            const studentLibrary = await Subject.findAll({where: {library: true}});
-            
+            const studentLibrary = await Subject.findAll({ where: { library: true } });
+
             // await studentClass.getSubjects({where: {library: true}, through: []});
 
-            const response = await Promise.all(studentLibrary.map( async (library)=>{
+            const response = await Promise.all(studentLibrary.map(async (library) => {
 
                 const lessons = await library.getLessons();
 
                 delete library.dataValues.ClassSubjects;
                 delete library.dataValues.ages;
 
-              const payload = {
-                ...library.dataValues,
-                lessons: lessons.length,
-                class: studentClass.id,
+                const payload = {
+                    ...library.dataValues,
+                    lessons: lessons.length,
+                    class: studentClass.id,
 
-            };
+                };
 
 
-              return payload;
+                return payload;
 
             }));
 
@@ -950,17 +952,17 @@ class StudentController {
 
             const students = await school.getStudents();
 
-            const response = await Promise.all(students.map( async (student)=>{
+            const response = await Promise.all(students.map(async (student) => {
 
                 const studentAccount = await student.getAccount();
 
-               const {name, email, phone, id } = studentAccount;
+                const { name, email, phone, id } = studentAccount;
 
-                return  {id, name, email, phone, age: student.age, school: school.school_name };
+                return { id, name, email, phone, age: student.age, school: school.school_name };
 
             }));
 
-            const filteredData = response.filter((data)=> data.id != account_id );
+            const filteredData = response.filter((data) => data.id != account_id);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: filteredData });
 
