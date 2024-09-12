@@ -38,11 +38,12 @@ class AITutorProvider {
         return response?.data ?? errorResponse.data;
     }
 
-    async queryAITutor(lesson, slide_id, conversation) {
+    async queryAITutor(lesson, slide_id, conversation, student) {
         const body = {
             slide_id,
             lesson,
-            conversation
+            conversation,
+            student
         }
         const path = "lesson/asktutor";
         let errorResponse = {};

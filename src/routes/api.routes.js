@@ -649,6 +649,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get("/lessons/:id", LessonController.lessonTemplate);
     router.post("/lessons/:id/slides", LessonController.createLessonSlide);
     router.get("/lessons/check", LessonController.subjectGroupedLessons);
+    router.post("/lesson/asktutor", LessonController.askAITutor);
 
     router.get("/chapter/subject/:id", ChapterController.read);
 
