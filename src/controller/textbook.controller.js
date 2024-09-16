@@ -18,6 +18,7 @@ const {
     Textbook,
     Chapter,
     LessonProgress,
+    BookCategory,
 } = require("../database/connection");
 const { use } = require("chai");
 const AuthorizationSeed = require("../seeders/seed.authorization");
@@ -219,6 +220,24 @@ class TextbookController {
             });
         }
     }
+
+
+
+
+    /* ---------------------------------------------------------------------------------------------- */
+    /*                                            BOOK CATEGORIES                                            */
+    /* ---------------------------------------------------------------------------------------------- */
+
+    static async getBookCategories(req,res){
+        // return await db
+        const cats = await BookCategory.findAll();
+        return res.send({
+            error: false,
+            data: cats
+        });
+    }
+
+
 
     /* ---------------------------------------------------------------------------------------------- */
     /*                                            CHAPTERS                                            */
