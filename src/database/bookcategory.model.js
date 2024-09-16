@@ -9,16 +9,13 @@ module.exports = (sequelize, DataTypes) => {
                 primaryKey: true,
                 autoIncrement: true,
             },
-            textbook_id: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-            },
-            category: {
+            name: {
                 type: DataTypes.STRING,
                 allowNull: false,
-            },
+            }
+
         },
-        { timestamps: true, tableName :'book_category' }
+        { timestamps: false, tableName :'book_categories' }
     );
 
     return BookCategory;

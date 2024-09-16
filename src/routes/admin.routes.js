@@ -148,6 +148,7 @@ const AdminRoutesGroup = (router) => {
     router.post('/library/textbooks/:id/lessons', [UploadService.uploadLesson.array('preview'), TextbookValidator.CreateTextbookLesson], TextbookController.createTextbookLesson);
     router.put('/library/textbooks/:id/lessons/:lessonid', [UploadService.uploadLesson.array('preview'), TextbookValidator.CreateTextbookLesson], TextbookController.updateTextbookLesson);
     router.delete('/library/textbooks/:id/lessons/:lessonid', TextbookController.deleteTextbookLesson);
+    router.get('/library/textbooks/categories',TextbookController.getBookCategories)
 
 
     /* ------------------------------------------- LESSONS ------------------------------------------ */
