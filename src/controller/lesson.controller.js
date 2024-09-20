@@ -1195,6 +1195,7 @@ class LessonController {
 
     static async askAITutor(req, res) {
         const data = req.body;
+        const { name, id } = req.userData;
         try {
             const lessonInstance = await Lesson.findByPk(data.lesson_id, {
                 include: [
@@ -1217,7 +1218,8 @@ class LessonController {
             }
 
             const response = await AITutorProvider.queryAITutor(
-                lessonInstance.dataValues, data.slide_id, data.conversation
+                lessonInstance.dataValues, data.slide_id, data.conversation, 
+                { first_name : name.split(" ")[0], id }
             );
 
             return res.status(ResponseStatus.code.success).json({

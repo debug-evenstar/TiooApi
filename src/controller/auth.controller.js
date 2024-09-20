@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
-const { Account, Validation, TempValidation, Teacher, SchoolManagement, Student, Keypairs, ClassArm, } = require('../database/connection');
+const { Account, Validation, TempValidation, Teacher, SchoolManagement, Student, Keypairs, ClassArm, Referral, } = require('../database/connection');
 const TokenMiddleware = require('../middleware/token.middleware');
 const Mailer = require('../services/mailer');
 require('dotenv').config();
@@ -43,7 +43,27 @@ class AuthController {
             // req.body.status = 'registered';
             req.body.name = `${req.body.first_name} ${req.body.last_name}`;
 
+
             const registeredAccount = await Account.create(req.body);
+
+
+
+            // referral entry logic
+            if (req.body.ref) {
+                const referrer = await Account.findOne({
+                    where: {
+                        referral_code: req.body.ref
+                    }
+                })
+                if (referrer) {
+                    const referralRecord = await Referral.create({
+                        referrer_id: referrer.id,
+                        referred_id: registeredAccount.id,
+                        referral_type: req.body.ref_type ?? "student"
+                    })
+                }
+            }
+
 
             const newValidation = await Validation.create({ otp, account_id: registeredAccount.id });
             const response = await registeredAccount.setValidation(newValidation);
@@ -56,14 +76,14 @@ class AuthController {
             //     });
 
             //     const { publicKey, privateKey } = HashUtils.generateKeyPair();
-                
+
             //     const createKeypairs = await Keypairs.create({
             //         public_key: crypto.randomBytes(20).toString('base64'),
             //         private_key: crypto.randomBytes(20).toString('base64'),
             //     });
-                
+
             //     await registeredSchoolManagement.setKeypair(createKeypairs);
-                
+
             //     await registeredAccount.setSchoolManagement(registeredSchoolManagement);
             // }
 
@@ -282,7 +302,7 @@ class AuthController {
         try {
             const validation = await Validation.findOne({ where: { otp } });
             // return res.send(validation);
-            
+
             if (!validation) {
                 return res.status(ResponseStatus.code.forbidden).json({
                     error: true,
@@ -1125,11 +1145,11 @@ class AuthController {
     }
 
     /* -------------------------- LEGACY RESET PASSWORD ------------------------- */
-    static async legacyPasswordReset(req,res) {
-        const { new_password, password_confirmation , password } = req.body;
+    static async legacyPasswordReset(req, res) {
+        const { new_password, password_confirmation, password } = req.body;
         const { id } = req.userData;
 
-        if(password_confirmation != new_password){
+        if (password_confirmation != new_password) {
             return res.send({
                 error: true,
                 message: "passwords do not match",
@@ -1142,9 +1162,9 @@ class AuthController {
 
         // return res.json({ password, isValidPassword});
 
-        if(!isValidPassword){
+        if (!isValidPassword) {
             return res.send({
-                error: true, 
+                error: true,
                 message: "Invalid password"
             });
         }
@@ -1153,7 +1173,7 @@ class AuthController {
         const hashPassword = await account.hashPassword(new_password);
 
         await account.update({ password: hashPassword });
-        
+
         return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.update });
     }
 

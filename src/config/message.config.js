@@ -13,8 +13,8 @@ const ResponseMessage = {
         login: 'LoggedIn successfully',
         invite: 'Invite Accepted',
         send_invite: 'Invitation Sent',
-        sucess: "sucess",
-        reset: "Password Reset Sucessful, Kindly check email for Further Instrution"
+        sucess: "success",
+        reset: "Password Reset Successful, Kindly check email for Further Instrution"
     },
     fail: {
         bad_request: 'Bad Request',

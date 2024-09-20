@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const { generateCode } = require("../utils/string");
 
 module.exports = (sequelize, Sequelize) => {
   const Account = sequelize.define(
@@ -49,6 +50,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.JSON,
         allowNull: true,
       },
+      referral_code: {
+        type: Sequelize.STRING,
+        allowNull: true,
+        unique: true,
+      },
     },
     {
       indexes: [{ unique: true, fields: ["email"] }],
@@ -65,6 +71,20 @@ module.exports = (sequelize, Sequelize) => {
   Account.beforeCreate(async (user, options) => {
     const hashedPassword = await bcrypt.hash(user.password, 10);
     user.password = hashedPassword;
+
+    let referralCode;
+
+    // Attempt to generate a unique referral code
+    while (!referralCode) {
+      const code = generateCode();
+      const existingCode = await Account.findOne({ where: { referral_code: code } });
+  
+      if (!existingCode) {
+        referralCode = code;
+      }
+    }
+  
+    user.referral_code = referralCode;
   });
 
   Account.prototype.comparePassword = async function (password) {
