@@ -16,6 +16,10 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.JSON,
                 allowNull: false,
             },
+            question_id:{
+                type: Sequelize.INTEGER,
+                allowNull: false,
+            }
         },
         { timestamps: true }
     );

@@ -20,6 +20,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
+            slide_id:{
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            }
         },
         { timestamps: true }
     );

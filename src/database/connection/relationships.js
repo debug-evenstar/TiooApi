@@ -67,6 +67,10 @@ class Relationships {
       foreignKey: "account_id",
       // as: 'account'
     });
+
+   Question.belongsTo(LessonSlide,{
+      foreignKey:'slide_id'
+    })
     // Account.hasOne(SchoolManagement, {
     //     allowNull: true,
     //     onDelete: "CASCADE",

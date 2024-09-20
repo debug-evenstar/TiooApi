@@ -1166,16 +1166,18 @@ class LessonController {
                     message: ResponseStatus.fail.not_found,
                 });
             }
-
-            const slide_data = await LessonController.processQuestions(
-                data.slide_data, true
-            );
+          
+       
             const lessonSlideInstance = await LessonSlide.create({
                 slide_index: data.slide_index,
-                slide_data: slide_data,
+                slide_data:  data.slide_data,
                 lesson_id: id,
             });
-
+              //create Questions
+              const slide_data = await LessonController.processQuestions(
+                data.slide_data, true,lessonSlideInstance.id
+            );
+          
             await lessonInstance.addLessonSlides([lessonSlideInstance]);
 
             return res.status(ResponseStatus.code.success).json({
@@ -1231,7 +1233,7 @@ class LessonController {
         }
     }
 
-    static async processQuestions(slideData, isNew = false) {
+    static async processQuestions(slideData, isNew = false,lessonslideId) {
         for (
             let componentIndex = 0;
             componentIndex < slideData.length;
@@ -1258,7 +1260,10 @@ class LessonController {
                             question.hash = questionHash;
                         }
                     }
-                    const { title, query, hash, media } = question;
+                    //include the slideid 
+                    question.slide_id= lessonslideId;
+
+                    const { title, query, hash, medi,slide_id } = question;
                     const topicIds = question.topics ?? [];
                     const topics = await Topic.findAll({
                         where: { id: topicIds },
@@ -1269,6 +1274,7 @@ class LessonController {
                             query,
                             hash,
                             media,
+
                         });
                         topics && (await newQuestion.addTopics(topics));
                     } else {
