@@ -75,6 +75,7 @@ const ReferralController = require("../controller/referrals.controller");
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
 const OpenRoutesGroup = (router) => {
+
     router.get("/error/logs", ErrorLogs.fetchErrors);
     router.post(
         "/account/signin",
