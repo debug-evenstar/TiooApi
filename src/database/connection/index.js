@@ -151,6 +151,8 @@ const Question = (db.question = require("../question.model"))(
   sequelize,Sequelize
 );
 
+
+
 const models = [
   Account,
   Validation,
