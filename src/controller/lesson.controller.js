@@ -1,5 +1,6 @@
 const ResponseStatus = require("../config/message.config");
 const { validationResult, param } = require("express-validator");
+
 const {
     Lesson,
     Subject,
@@ -12,6 +13,7 @@ const {
     Textbook,
     Question,
     Topic,
+    db,
 } = require("../database/connection");
 
 const fs = require("fs-extra");
@@ -26,6 +28,7 @@ const { equal } = require("../utils/array");
 const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
 const { getAllFuncs } = require("../utils/objects");
 const { randomString } = require("../utils/string");
+const sequelize = require("sequelize");
 
 class LessonController {
     /*-----------------------------------| UPLOAD LESSON |-----------------------------------*/
@@ -1151,6 +1154,8 @@ class LessonController {
         }
     }
 
+
+
     static async createLessonSlide(req, res) {
         const { id } = req.params;
         const data = req.body;
@@ -1263,9 +1268,9 @@ class LessonController {
                         }
                     }
                     //include the slideid 
-                    question.slide_id= lessonslideId;
-
-                    const { title, query, hash, medi,slide_id } = question;
+             
+                    console.log(lessonslideId)    
+                    const { title, query, hash, media} = question;
                     const topicIds = question.topics ?? [];
                     const topics = await Topic.findAll({
                         where: { id: topicIds },
@@ -1276,8 +1281,10 @@ class LessonController {
                             query,
                             hash,
                             media,
+                            slide_id: lessonslideId,
 
                         });
+                        console.log(newQuestion)
                         topics && (await newQuestion.addTopics(topics));
                     } else {
                         const existingQuestion = await Question.findOne({
@@ -1288,6 +1295,7 @@ class LessonController {
                                 title,
                                 query,
                                 media,
+                                slide_id: lessonslideId,
                             });
                             await existingQuestion.removeTopics();
                             topics && (await existingQuestion.addTopics(topics));
@@ -1300,6 +1308,167 @@ class LessonController {
         }
         return slideData;
     }
+
+    /* -------------------------------------------------------------------------- */
+    /*                          GET THE LINKED QUESTIONS                          */
+    /* -------------------------------------------------------------------------- */
+    static async getLinkedQuestions(req, res) {
+        const {  id } = req.userData;
+    
+        const topics = await db.sequelize.query('SELECT * FROM `topic_questions` WHERE `topic_id` = :topicId', {
+            replacements: { topicId: req.params.topicid }, type: Sequelize.QueryTypes.SELECT 
+            
+          });
+        if(topics.length>0){
+                let questionlist=[];
+                
+                /* -------------------------------------------------------------------------- */
+                /*         Wait for list to be created of all the required information        */
+                /* -------------------------------------------------------------------------- */
+               await Promise.all(topics.map(async (item,index)=>{
+               
+                   const resultArray= await db.sequelize.query('SELECT * FROM `questions` WHERE `id` = :questionId', {
+                        replacements: { questionId: item.question_id },type: Sequelize.QueryTypes.SELECT 
+            
+                        
+                      });
+                      /* -------------------------------------------------------------------------- */
+                      /*             ONLY carry out this merge if the lists are eistent             */
+                      /* -------------------------------------------------------------------------- */
+                      if(resultArray.length>0){
+                          questionlist = [...questionlist, ...resultArray];
+                      }
+                   
+                }));
+
+                /* -------------------------------------------------------------------------- */
+                /*                       GET THE SUBJECT IN WRITTEN FORM                      */
+                /* -------------------------------------------------------------------------- */
+
+
+                /* -------------------------------------------------------------------------- */
+                /*     CREATE A JSON THAT HAS EVERYTHING NEEDED FOR THE TEXTBOOK CURATION     */
+                /* -------------------------------------------------------------------------- */
+               let TheChosenTopic = await db.sequelize.query('SELECT * FROM `topics` WHERE `id` = :topicId', {
+                    replacements: { topicId: req.params.topicid }, type: Sequelize.QueryTypes.SELECT 
+                    
+                  });
+              let   TheSubject= await db.sequelize.query('SELECT * FROM `subjects` WHERE `id` = :subjectId', {
+                    replacements: { subjectId: TheChosenTopic[0].subject_id }, type: Sequelize.QueryTypes.SELECT 
+                    
+                  });
+
+                  /* -------------------------------------------------------------------------- */
+                  /*                        GENERATE RANDOM TEXTBOOK IDS                        */
+                  /* -------------------------------------------------------------------------- */
+                  const generateTextbookId=()=> {
+                    return Math.floor(Math.random() * 6) + 1;
+                    
+                 }
+                /* -------------------------------------------------------------------------- */
+                  /*                        GENERATE RANDOM TEXTBOOK IDS                        */
+                  /* -------------------------------------------------------------------------- */
+                
+
+
+                const textbookJson = {
+                    name:`My Curated Past Questions ${generateTextbookId()}`,
+                    description: `Past Questions on ${TheSubject[0].name}`,
+                    author:"Tioo Curator",
+                    cover_photo:"https://img.freepik.com/free-photo/white-book-cover-dark_125540-753.jpg",
+                    published:0,
+                    subject_id: TheSubject[0].id,
+                    account_id:id,
+                    is_premium:0,
+                    category_id:0,
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                    
+
+                }
+
+                const chapterJson={
+                    name:`Past Questions ${TheSubject[0].name}`,
+                    index:0,
+                    description:`Answer the questions on ${TheSubject[0].name} `,
+                    textbook_id:0
+                }
+
+                const lessonJson={
+                    topic:TheChosenTopic[0].name,
+                    duration:" 1 Hour",
+                    curriculum:"Custom",
+                    description:"Past Questions",
+                    objective:"Past Questions Practice",
+                    additional_instruction:"None",
+                    status:"ACTIVE",
+                    published:1,
+                    term:1,
+                    chapter:1,
+                    preview:["https://img.freepik.com/free-photo/white-book-cover-dark_125540-753.jpg"],
+                    library:1,
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                     class_id:1,
+                     chapter_id:0,
+                     textbook_id:0
+                }
+
+                let slidesforpastQuestions=[];
+               await Promise.all(questionlist.map(async (question)=>{
+                        
+                   const fecthedSlides= await db.sequelize.query('SELECT * FROM `lesson_slides` WHERE `id` = :lessonslideId', {
+                    replacements: { lessonslideId: question.slide_id },type: Sequelize.QueryTypes.SELECT 
+        
+                    
+                  });
+                  slidesforpastQuestions.push(fecthedSlides[0]);
+               })) 
+
+                res.status(200).json({ numberofquestions:questionlist.length, textbook:textbookJson,chapter:chapterJson,lesson:lessonJson , lessonslides:slidesforpastQuestions  });
+        }else{
+
+            res.status(200).json({ numberofquestions:0, textbook:"none",chapter:"none",lesson:"none", lessonslides:"none" });
+     
+        }
+
+    }
+
+    static async curateQuestions(req, res) {
+        /* -------------------------------------------------------------------------- */
+        /*                              SAVE THE TEXTBOOK                             */
+        /* -------------------------------------------------------------------------- */
+        const {textbook,chapter,lesson,lessonslides}= req.body;
+        const textbookInstance = await Textbook.create(textbook);
+        /* -------------------------------------------------------------------------- */
+        /*                               Modify chapter                               */
+        /* -------------------------------------------------------------------------- */
+        chapter.textbook_id=textbookInstance.id;
+        const chapterInstance = await Chapter.create(chapter);
+        /* --------------------------------MODIFY-LESSON----------------------------------------- */
+        lesson.chapter_id=chapterInstance.id;
+        lesson.textbook_id=textbookInstance.id;
+        const lessonInstance = await Lesson.create(lesson);
+
+        /* -------------------------------------------------------------------------- */
+        /*                         MODIFY LESSONS SLIDES ARRAY                        */
+        /* -------------------------------------------------------------------------- */
+        let lessonSlideInstance=[];
+        await Promise.all(lessonslides.map(async (lessonslides,i)=>{
+            delete lessonslides.id;
+            lessonslides.lesson_id = lessonInstance.id;
+           let createdSlide=  await LessonSlide.create(lessonslides);
+           lessonSlideInstance.push(createdSlide);
+        }))
+          res.status(200).send({textbook:textbookInstance,chapter:chapterInstance,lesson:lessonInstance,lessonslides:lessonSlideInstance});
+    }
+    
+
+
+
+
 }
+
+
 
 module.exports = LessonController;

@@ -22,6 +22,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     idle: dbConfig.pool.idle,
   },
   logging: false, // Disable logging of SQL queries
+  
 });
 
 const db = {};
@@ -190,6 +191,7 @@ Relationships.group(...models);
 formatRelationshipAliases(...models);
 
 module.exports = {
+  sequelize,
   db,
   Account,
   Validation,

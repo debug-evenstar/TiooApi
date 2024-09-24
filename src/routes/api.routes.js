@@ -210,6 +210,8 @@ const OpenRoutesGroup = (router) => {
         LessonController.updateLessonTemplate
     );
     router.post("/open/lesson/:id/slide", LessonController.createLessonSlide);
+  
+
     router.put(
         "/open/lesson/templateimage/:id",
         UploadService.uploadTemplateImage.array("image"),
@@ -649,6 +651,8 @@ const AuthorizedRoutesGroup = (router) => {
     );
     router.put("/lesson/template/:id", LessonController.updateLessonTemplate);
     router.post("/lesson/:id/slide", LessonController.createLessonSlide);
+    router.get("/lesson/questions/:topicid", LessonController.getLinkedQuestions);
+    router.post("/lesson/questions/curate", LessonController.curateQuestions);
     router.put(
         "/lesson/templateimage/:id",
         UploadService.uploadTemplateImage.single("image"),
@@ -659,8 +663,11 @@ const AuthorizedRoutesGroup = (router) => {
     router.post("/lessons/:id/slides", LessonController.createLessonSlide);
     router.get("/lessons/check", LessonController.subjectGroupedLessons);
     router.post("/lesson/asktutor", LessonController.askAITutor);
-
+    router.get("/lesson/", LessonController.askAITutor);
+  
     router.get("/chapter/subject/:id", ChapterController.read);
+
+
 
     router.get("/logging", LoggingController.read);
     router.delete("/logging", LoggingController.clear);

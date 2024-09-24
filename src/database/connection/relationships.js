@@ -55,9 +55,7 @@ class Relationships {
       // as: 'account'
     });
 
-   Question.belongsTo(LessonSlide,{
-      foreignKey:'slide_id'
-    })
+
     // Account.hasOne(SchoolManagement, {
     //     allowNull: true,
     //     onDelete: "CASCADE",
@@ -357,7 +355,7 @@ class Relationships {
       through: "topic_questions",
       foreignKey: "question_id",
     });
-
+    Question.belongsTo(LessonSlide,{foreignKey: 'slide_id'})
     // AccountType.hasMany(OnboardingQuestion, { foreignKey: 'account_type_id'});
     // OnboardingQuestion.belongsTo(AccountType,{ foreignKey: 'account_type_id'});
   }

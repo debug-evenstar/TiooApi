@@ -15,10 +15,6 @@ module.exports = (sequelize, Sequelize) => {
             slide_data: {
                 type: Sequelize.JSON,
                 allowNull: false,
-            },
-            question_id:{
-                type: Sequelize.INTEGER,
-                allowNull: false,
             }
         },
         { timestamps: true }
