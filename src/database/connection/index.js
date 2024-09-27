@@ -151,6 +151,7 @@ const Question = (db.question = require("../question.model"))(
   sequelize,Sequelize
 );
 
+const SubCategory = (db.subcategory = require("../subcategory.model"))(sequelize,Sequelize);
 
 
 const models = [
@@ -185,6 +186,7 @@ const models = [
   Question,
   LessonProgress,
   Referral,
+  SubCategory,
 ];
 
 Relationships.group(...models);
@@ -228,4 +230,5 @@ module.exports = {
   Question,
   LessonProgress,
   Referral,
+  SubCategory,
 };

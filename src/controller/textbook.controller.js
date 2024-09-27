@@ -19,7 +19,10 @@ const {
     Chapter,
     LessonProgress,
     BookCategory,
+    SubCategory,
 } = require("../database/connection");
+
+
 const { use } = require("chai");
 const AuthorizationSeed = require("../seeders/seed.authorization");
 const TokenMiddleware = require("../middleware/token.middleware");
@@ -228,14 +231,109 @@ class TextbookController {
     /*                                            BOOK CATEGORIES                                     */
     /* ---------------------------------------------------------------------------------------------- */
 
-    static async getBookCategories(req,res){
-        // return await db
-        const cats = await BookCategory.findAll();
+    static async createOrUpdateBookCategory(req, res) {
+        const { name } = req.body;
+        const id = req.body.id;
+
+        if (id) {
+            const cat = await BookCategory.findByPk(id)
+            if (cat) {
+                await cat.update({ name: name });
+                return res.send({
+                    error: false,
+                    message: ResponseMessage.pass.update
+                });
+            }
+            return res.send({
+                error: false,
+                message: ResponseMessage.fail.not_found
+            });
+        }
+
+        await BookCategory.create({
+            name: name
+        });
+
         return res.send({
+            error: false,
+            message: ResponseMessage.pass.create
+        });
+
+    }
+
+    static async getBookCategories(req, res) {
+        const cats = await BookCategory.findAll({
+            include: [
+                { model: SubCategory, as: 'sub_categories' }
+            ]
+        });
+        return res.status(ResponseMessage.code.success).json({
             error: false,
             data: cats
         });
     }
+
+    static async getBookCategory(req, res) {
+        const id = req.params.id;
+        const cat = await BookCategory.findByPk(id, {
+            include: [
+                { model: SubCategory, as: 'sub_categories' }
+            ]
+        });
+        return res.status(ResponseMessage.code.success).json({
+            error: false,
+            data: cat
+        });
+    }
+
+
+    static async deleteBookCategory(req, res) {
+        const { id } = req.body;
+
+        const cat = await BookCategory.findByPk(id);
+        if (cat)
+            await cat.delete();
+
+        return res.status(ResponseMessage.code.success).json({
+            error: false,
+            message: ResponseMessage.pass.delete
+        });
+    }
+
+
+    static async addSubCategory(req, res) {
+        const id = req.params.id;
+        const { name } = req.body;
+
+        const sub = await SubCategory.create({
+            parent_id: id,
+            name: name
+        });
+
+        return res.status(ResponseMessage.code.success).json({
+            error: false,
+            data: sub
+        });
+    }
+
+
+    static async deleteSubCategory(req, res) {
+        const { id } = req.body;
+
+        const cat = await SubCategory.findByPk(id);
+        if (cat)
+            await cat.delete();
+
+        return res.status(ResponseMessage.code.success).json({
+            error: false,
+            message: ResponseMessage.pass.delete
+        });
+    }
+
+
+
+
+
 
 
 
