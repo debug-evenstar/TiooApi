@@ -16,6 +16,8 @@ module.exports = (sequelize, Sequelize) => {
       email: {
         type: Sequelize.STRING,
       },
+
+      
       phone: {
         type: Sequelize.STRING,
       },
@@ -78,12 +80,12 @@ module.exports = (sequelize, Sequelize) => {
     while (!referralCode) {
       const code = generateCode();
       const existingCode = await Account.findOne({ where: { referral_code: code } });
-  
+
       if (!existingCode) {
         referralCode = code;
       }
     }
-  
+
     user.referral_code = referralCode;
   });
 
