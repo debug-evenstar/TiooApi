@@ -27,8 +27,6 @@ class LibraryController {
       include: Shelf,
     });
 
-    let response = textbooks;
-
     if (account && !account.Shelf) {
       // create a shelf for the user
       await account.createShelf({
@@ -38,7 +36,7 @@ class LibraryController {
       await account.reload();
     }
 
-    response = textbooks.map((textbook) => {
+    const response = textbooks.map((textbook) => {
       const inShelf = account?.Shelf?.shelf?.includes(textbook.id) ?? false;
       return {
         ...textbook.get({ plain: true }),

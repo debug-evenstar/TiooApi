@@ -236,7 +236,7 @@ class Relationships {
     CartItem.belongsTo(Account, { foreignKey: "account_id" });
 
 
-    Account.hasMany(LessonProgress, { foreignKey: "student_id", });
+    Account.hasMany(LessonProgress, { foreignKey: "student_id", as: 'lesson_progress' });
     LessonProgress.belongsTo(Account, { foreignKey: "student_id" });
 
     Account.hasMany(Referral, { foreignKey: 'referrer_id', as: 'user' });

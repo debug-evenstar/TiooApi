@@ -19,6 +19,7 @@ const {
     Chapter,
     LessonProgress,
     BookCategory,
+    Shelf,
 } = require("../database/connection");
 const { use } = require("chai");
 const AuthorizationSeed = require("../seeders/seed.authorization");
@@ -223,12 +224,100 @@ class TextbookController {
 
 
 
+    static async fetchTextbookStudyInfo(req, res) {
+        try {
+            const { id } = req.params;
+            const user_id = req.userData.id;
+
+            if (!id) {
+                return res.status(ResponseMessage.code.bad_request).json({
+                    error: true,
+                    message: "please provide a valid book id"
+                });
+            }
+
+            const textbookInstance = await Textbook.findByPk(req.params.id, {
+                include: [
+                    {
+                        model: Chapter,
+                        as: "chapters",
+                        include: [
+                            {
+                                model: Lesson,
+                                as: "lessons",
+                                include: [
+                                    {
+                                        model: LessonSlide,
+                                        as: "lesson_slides",
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    Subject,
+                ],
+                order: [
+                    [{ model: Chapter, as: "chapters" }, "id", "ASC"],
+                    [
+                        { model: Chapter, as: "chapters" },
+                        { model: Lesson, as: "lessons" },
+                        { model: LessonSlide, as: "lesson_slides" },
+                        "slide_index",
+                        "ASC",
+                    ],
+                ],
+            });
+
+
+            const account = await Account.findByPk(user_id, {
+                include: [
+                    {
+                        as: 'lesson_progress',
+                        model: LessonProgress
+                    },
+                    Shelf
+                ],
+            });
+
+            const textbook = { ...textbookInstance.get({ plain: true }) }
+
+            const inShelf = account?.Shelf?.shelf?.includes(textbookInstance.id);
+            const lesson_progress = account.lesson_progress;
+
+            const getLessonRecord = (id) => account.lesson_progress.find((i) => i.lesson_id == id);
+
+            textbook.chapters.forEach((chapter) => {
+                chapter.lessons.forEach(lesson => {
+                    const record = getLessonRecord(lesson.id);
+                    lesson.is_completed = record ? record.is_completed : false;
+                    lesson.has_started = record ? record.slide_index != 0 : false;
+                })
+            })
+
+            const response = { ...textbook, lesson_progress, inShelf };
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: response
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
+
+
 
     /* ---------------------------------------------------------------------------------------------- */
     /*                                            BOOK CATEGORIES                                            */
     /* ---------------------------------------------------------------------------------------------- */
 
-    static async getBookCategories(req,res){
+    static async getBookCategories(req, res) {
         // return await db
         const cats = await BookCategory.findAll();
         return res.send({
@@ -384,24 +473,52 @@ class TextbookController {
         return AdminLibraryController.deleteLesson(req, res);
     }
 
+    /**
+     * 
+     * Update the progress record of a student or user;
+     *  
+     * @param {*} req 
+     * @param {*} res 
+     * @returns 
+     */
     static async updateProgressRecord(req, res) {
+
         const { textbooks_id, lesson_id, slide_id, slide_index } = req.body;
-        // console.log(req.body);
-        // return res.send(req.body)
+
         const userId = req.userData.id;
+
+        const lessonInstance = await Lesson.findByPk(lesson_id, {
+            include: [{
+                model: LessonSlide,
+                as: 'lesson_slides'
+            }]
+        });
 
         const record = await LessonProgress.findOne({
             where: {
                 student_id: userId, textbook_id: textbooks_id, lesson_id
             }
         });
-        if (record) {
-            // update our record
+        if (record && lessonInstance) {
+
+            if (record.dataValues.is_completed) {
+                // no need to modify
+                return res.status(304).json({ error: false, data: record })
+            }
+
             if (record.dataValues.slide_index < slide_index) {
                 await record.update({
                     slide_id, slide_index
                 })
             }
+
+
+            if (lessonInstance.lesson_slides.length == slide_index + 1) {
+                await record.update({
+                    is_completed: true
+                })
+            }
+
             return res.send({
                 error: false,
                 message: ResponseMessage.pass.create,
