@@ -230,7 +230,6 @@ class TextbookController {
             const user_id = req.userData.id;
 
             if (!id) {
-                console.log(id, req.params);
                 return res.status(ResponseMessage.code.bad_request).json({
                     error: true,
                     message: "please provide a valid book id"
