@@ -230,11 +230,11 @@ const OpenRoutesGroup = (router) => {
 
 const AuthorizedRoutesGroup = (router) => {
     router.use(AuthenticationMiddleware.verify); //--use middleware--//
-    
+
     /* --------------------------------- ACCOUNT REFERRALS -------------------------------- */
-    router.get("/account/referrals",ReferralController.getUserReferrals)
-    
-    
+    router.get("/account/referrals", ReferralController.getUserReferrals)
+
+
     /* --------------------------------- ACCOUNT -------------------------------- */
 
 
@@ -609,7 +609,7 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.get("/lesson/alllessons", LessonController.allLessons);
     router.get("/lesson/read", LessonController.upcomingNextWeeksLessons);
-    router.get("/lesson/student/read",LessonController.studentUpcomingNextWeeksLessons);
+    router.get("/lesson/student/read", LessonController.studentUpcomingNextWeeksLessons);
     router.get("/lesson/subjectlessons/:id", LessonController.subjectLessons);
     router.get("/lesson/groups", LessonController.subjectGroups);
     router.post(
@@ -617,7 +617,7 @@ const AuthorizedRoutesGroup = (router) => {
         UploadService.uploadLesson.array("files"),
         LessonController.addLessonToGroup
     );
-    router.post("/lesson/generate/groups/:id",LessonController.generateLessonWithGroup);
+    router.post("/lesson/generate/groups/:id", LessonController.generateLessonWithGroup);
     router.post("/lesson/groups/:id/editarms", LessonController.editGroupArms);
     router.delete(
         "/lesson/groups/:id/lesson/:lesson",
@@ -729,18 +729,30 @@ const AuthorizedRoutesGroup = (router) => {
         "/onboarding/account-types",
         OnboardingController.addAccountType
     );
+    
     router.post(
         "/onboarding/account-type/:id/questions",
         OnboardingController.addAccountQuestion
     );
+
     router.get(
         "/onboarding/account-type/:id/questions",
         OnboardingController.getAccountQuestions
     );
+
+    router.get("/onboarding/metadata",
+        OnboardingController.getMetaData
+    );
+
     router.post(
         "/onboarding/save-metadata/",
         OnboardingController.saveMetaData
     );
+
+    router.post('/onboarding/save-exam-metadata',
+        OnboardingController.saveExamMetaData
+    );
+
 
     /* ---------------------------- External Schools ---------------------------- */
     router.post(
