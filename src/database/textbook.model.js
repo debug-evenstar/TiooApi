@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
             },
-            category_id:{
+            category_id: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },

@@ -31,6 +31,10 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         allowNull: false,
         defaultValue: 0
+      },
+      is_completed: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       }
     },{
       tableName: 'lesson_progress',
