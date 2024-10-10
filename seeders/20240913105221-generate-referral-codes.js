@@ -2,7 +2,6 @@
 
 const { generateCode } = require("../src/utils/string");
 
-generat
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const accounts = await queryInterface.sequelize.query(

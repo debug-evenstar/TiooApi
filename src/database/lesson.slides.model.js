@@ -16,6 +16,7 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.JSON,
                 allowNull: false,
             },
+
         },
         { timestamps: true }
     );
