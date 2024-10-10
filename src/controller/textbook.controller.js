@@ -3,18 +3,18 @@ const { validationResult } = require("express-validator");
 const ResponseStatus = require("../config/message.config");
 const {
     Account,
-    Authorization,
-    Permission,
-    Validation,
-    Admin,
-    SchoolManagement,
-    ClassArm,
+    // Authorization,
+    // Permission,
+    // Validation,
+    // Admin,
+    // SchoolManagement,
+    // ClassArm,
     Subject,
     Lesson,
     Class,
-    Library,
+    // Library,
     LessonSlide,
-    Group,
+    // Group,
     Textbook,
     Chapter,
     LessonProgress,
@@ -25,14 +25,14 @@ const {
 
 
 const { use } = require("chai");
-const AuthorizationSeed = require("../seeders/seed.authorization");
-const TokenMiddleware = require("../middleware/token.middleware");
-const LessonTemplateProvider = require("../providers/AI/lesson.template");
-const e = require("express");
+// const AuthorizationSeed = require("../seeders/seed.authorization");
+// const TokenMiddleware = require("../middleware/token.middleware");
+// const LessonTemplateProvider = require("../providers/AI/lesson.template");
+// const e = require("express");
 const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
 const AdminLibraryController = require("./admin/management/library.controller");
 const ResponseMessage = require("../config/message.config");
-const { data } = require("../seeders/notification.seeds");
+// const { data } = require("../seeders/notification.seeds");
 
 class TextbookController {
     /* ---------------------------------------------------------------------------------------------- */
@@ -43,7 +43,7 @@ class TextbookController {
 
         data.library = true;
 
-        let cover = "";
+        // let cover = "";
 
         if (req.file) {
             const filePath = req.file.path;
