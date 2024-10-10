@@ -1,3 +1,4 @@
+
 class Relationships {
   static group(
     Account,
@@ -31,6 +32,8 @@ class Relationships {
     Question,
     LessonProgress,
     Referral,
+    SubCategory,
+
   ) {
     //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -242,6 +245,9 @@ class Relationships {
     Account.hasMany(Referral, { foreignKey: 'referrer_id', as: 'user' });
     Referral.belongsTo(Account, { foreignKey: 'referrer_id' });
 
+
+    BookCategory.hasMany(SubCategory,{foreignKey: 'parent_id', as: 'sub_categories'});
+    SubCategory.belongsTo(BookCategory,{ foreignKey: 'parent_id'})
 
     //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 

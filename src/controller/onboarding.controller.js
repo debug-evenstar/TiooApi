@@ -24,13 +24,12 @@ class OnboardingController {
 
   static async saveMetaData(req, res) {
     const user = req.userData;
-    const answers = req.body.answers;
     const accountType = req.body.account_type;
 
 
     if (user) {
       const account = await Account.findByPk(user.id);
-      account.metadata = answers;
+      account.metadata = req.body;
       account.onboarded = true;
       account.account_type = accountType.toLowerCase();
       await account.save();
@@ -49,6 +48,7 @@ class OnboardingController {
 
     if (account) {
       const data = { ...account.metadata, exam_data: req.body};
+
       await account.update({
         metadata: data
       });
@@ -72,11 +72,11 @@ class OnboardingController {
 
     if (account) {
 
-
       return res.status(200).json({
         error: false,
         data: account.metadata
       });
+      
     }
 
     return res.status(404).json({

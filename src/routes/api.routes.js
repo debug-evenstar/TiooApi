@@ -223,6 +223,7 @@ const OpenRoutesGroup = (router) => {
     router.get("/open/textbooks", Library.getLibraryTextbooks);
     router.get("/open/textbook/:id", Library.getLibraryTextbook);
     router.get("/open/subjects/:id/topics", SubjectController.getTopics);
+    router.get("/open/subjects/topics",SubjectController.getSubjectsWithTopics);
     router.post("/open/lesson/asktutor", LessonController.askAITutor);
 };
 

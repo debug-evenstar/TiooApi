@@ -40,6 +40,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.INTEGER,
                 allowNull: true
             },
+            book_type: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
             author: {
                 type: DataTypes.STRING,
                 allowNull: true,
