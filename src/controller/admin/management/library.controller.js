@@ -955,7 +955,7 @@ class AdminLibraryController {
             const lessonInstance = await Lesson.findByPk(id);
 
             const response = await lessonInstance.update({
-                library_status: data.status,
+                status: data.status,
             });
 
             return res.status(ResponseStatus.code.success).json({
