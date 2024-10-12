@@ -70,6 +70,7 @@ const TokenMiddleware = require("../middleware/token.middleware");
 const OnboardingController = require("../controller/onboarding.controller");
 const TextbookValidator = require("./validators/TextbookValidator");
 const LibraryController = require("../controller/library.controller");
+const ReferralController = require("../controller/referrals.controller");
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -223,15 +224,21 @@ const OpenRoutesGroup = (router) => {
     router.get("/open/textbooks", Library.getLibraryTextbooks);
     router.get("/open/textbook/:id", Library.getLibraryTextbook);
     router.get("/open/subjects/:id/topics", SubjectController.getTopics);
+    router.get("/open/subjects/topics",SubjectController.getSubjectsWithTopics);
     router.post("/open/lesson/asktutor", LessonController.askAITutor);
 };
 
 /*------------------------------| AUTHORIZED ROUTES |------------------------------*/
 
 const AuthorizedRoutesGroup = (router) => {
+    router.use(AuthenticationMiddleware.verify); //--use middleware--//
+
+    /* --------------------------------- ACCOUNT REFERRALS -------------------------------- */
+    router.get("/account/referrals", ReferralController.getUserReferrals)
+
+
     /* --------------------------------- ACCOUNT -------------------------------- */
 
-    router.use(AuthenticationMiddleware.verify); //--use middleware--//
 
     router.get("/account/read_all", AuthenicationController.accounts);
     router.get("/account/read", AuthenicationController.accountProfile);
@@ -517,7 +524,7 @@ const AuthorizedRoutesGroup = (router) => {
     );
     router.post("/front/student/shelf/add-book", Library.addTextbookToShelf);
     router.get("/front/student/shelf/get-books", Library.getStudentShelf);
-    router.get("/front/student/textbook/:id", Library.getLibraryTextbook);
+    router.get("/front/student/textbook/:id", TextbookController.fetchTextbookStudyInfo);
     router.post(
         "/front/student/shelf/remove-book",
         Library.removeTextbookFromShelf
@@ -599,11 +606,12 @@ const AuthorizedRoutesGroup = (router) => {
     router.post('/library/textbooks/progress', TextbookController.updateProgressRecord);
     router.get('/library/textbooks/progress/:textbook_id/:lesson_id', TextbookController.getOrCreateProgressRecord);
 
+
     /* --------------------------------- LESSON -------------------------------- */
 
     router.get("/lesson/alllessons", LessonController.allLessons);
     router.get("/lesson/read", LessonController.upcomingNextWeeksLessons);
-    router.get("/lesson/student/read",LessonController.studentUpcomingNextWeeksLessons);
+    router.get("/lesson/student/read", LessonController.studentUpcomingNextWeeksLessons);
     router.get("/lesson/subjectlessons/:id", LessonController.subjectLessons);
     router.get("/lesson/groups", LessonController.subjectGroups);
     router.post(
@@ -611,7 +619,7 @@ const AuthorizedRoutesGroup = (router) => {
         UploadService.uploadLesson.array("files"),
         LessonController.addLessonToGroup
     );
-    router.post("/lesson/generate/groups/:id",LessonController.generateLessonWithGroup);
+    router.post("/lesson/generate/groups/:id", LessonController.generateLessonWithGroup);
     router.post("/lesson/groups/:id/editarms", LessonController.editGroupArms);
     router.delete(
         "/lesson/groups/:id/lesson/:lesson",
@@ -723,18 +731,30 @@ const AuthorizedRoutesGroup = (router) => {
         "/onboarding/account-types",
         OnboardingController.addAccountType
     );
+    
     router.post(
         "/onboarding/account-type/:id/questions",
         OnboardingController.addAccountQuestion
     );
+
     router.get(
         "/onboarding/account-type/:id/questions",
         OnboardingController.getAccountQuestions
     );
+
+    router.get("/onboarding/metadata",
+        OnboardingController.getMetaData
+    );
+
     router.post(
         "/onboarding/save-metadata/",
         OnboardingController.saveMetaData
     );
+
+    router.post('/onboarding/save-exam-metadata',
+        OnboardingController.saveExamMetaData
+    );
+
 
     /* ---------------------------- External Schools ---------------------------- */
     router.post(

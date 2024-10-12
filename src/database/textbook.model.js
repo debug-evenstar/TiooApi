@@ -27,7 +27,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
             },
-
+            category_id: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
             is_premium: {
                 type: DataTypes.BOOLEAN,
                 allowNull: false,
@@ -36,6 +39,10 @@ module.exports = (sequelize, DataTypes) => {
             account_id: {
                 type: DataTypes.INTEGER,
                 allowNull: true
+            },
+            book_type: {
+                type: DataTypes.STRING,
+                allowNull: true,
             },
             author: {
                 type: DataTypes.STRING,

@@ -34,18 +34,47 @@ class AdminLibraryController {
         const data = req.body;
         data.library = true;
 
+        // if (req.file) {
+        //     const filePath = req.file.path;
+        //     try{
+        //         const ImageResponse = await cloudinaryUploadImage(filePath);
+        //         req.body.cover_photo = ImageResponse.secure_url;
+        //     }catch(error){
+        //         res.status(500).json({
+        //             error: "server error",
+        //             extra: error,
+        //         });
+        //     }
+        // }
+
+
+
+        let retries = 3;
+        let uploadSuccess = false;
+
         if (req.file) {
-            const filePath = req.file.path;
-            try{
-                const ImageResponse = await cloudinaryUploadImage(filePath);
-                req.body.cover_photo = ImageResponse.secure_url;
-            }catch(error){
-                res.status(500).json({
-                    error: "server error",
-                    extra: error,
-                });
+            // const filePath = req.file.path;
+            while (retries > 0 && !uploadSuccess) {
+                try {
+                    const ImageResponse = await cloudinaryUploadImage(req.file.path);
+                    req.body.cover_photo = ImageResponse.secure_url;
+                    uploadSuccess = true;
+                }
+                catch (error) {
+                    retries--;
+                }
             }
+
         }
+
+
+        if (!uploadSuccess) {
+            return res.status(500).json({
+                error: "server error",
+                extra: error,
+            });
+        }
+
 
         try {
             let classes = JSON.parse(req.body.classes);
@@ -54,7 +83,7 @@ class AdminLibraryController {
 
         try {
             const classInstance = await Class.findAll({
-                where: { id: [...req.body.classes]},
+                where: { id: [...req.body.classes] },
             });
 
             if (!classInstance) {
@@ -68,7 +97,7 @@ class AdminLibraryController {
 
             req.body.is_premium = req.body.plan.toLowerCase() != "basic"
 
-            const textbookInstance = await Textbook.create({ ... req.body } );
+            const textbookInstance = await Textbook.create({ ...req.body });
 
             const subjectInstance = await Subject.findByPk(req.body.subject_id);
 
@@ -86,7 +115,6 @@ class AdminLibraryController {
                 data: textbookInstance,
             });
         } catch (error) {
-            console.log(error);
             res.status(500).json({
                 error: "server error",
                 extra: error.message,
@@ -116,7 +144,7 @@ class AdminLibraryController {
             const textbookInstance = await textbook.update(req.body);
 
             if (req.body.classes) {
-                
+
                 const classInstance = await Class.findAll({
                     where: { id: [...req.body.classes] },
                 });
@@ -160,10 +188,10 @@ class AdminLibraryController {
             // const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
             const textbookInstance = await Textbook.findAll({
-                include: [{ 
-                    model: Chapter, as : "chapters",
-                    include : [
-                        { model : Lesson, as : "lessons"}
+                include: [{
+                    model: Chapter, as: "chapters",
+                    include: [
+                        { model: Lesson, as: "lessons" }
                     ]
                 }],
             });
@@ -349,7 +377,7 @@ class AdminLibraryController {
                 : lessonInstance.preview;
 
             delete req.body.chapter_id;
-            
+
             await lessonInstance.update(req.body);
 
             if (req.body.class) {
@@ -927,7 +955,7 @@ class AdminLibraryController {
             const lessonInstance = await Lesson.findByPk(id);
 
             const response = await lessonInstance.update({
-                library_status: data.status,
+                status: data.status,
             });
 
             return res.status(ResponseStatus.code.success).json({

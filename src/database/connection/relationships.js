@@ -1,4 +1,3 @@
-const { Topic, Question, BookCategory } = require(".");
 
 class Relationships {
   static group(
@@ -32,6 +31,9 @@ class Relationships {
     BookCategory,
     Question,
     LessonProgress,
+    Referral,
+    SubCategory,
+
   ) {
     //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -45,18 +47,6 @@ class Relationships {
       as: "account",
     });
 
-
-    Textbook.hasOne(BookCategory, {
-      foreignKey: "textbook_id",
-      // as: "category",
-      unique: true,
-    });
-
-
-    BookCategory.belongsTo(Textbook,{
-      foreignKey: 'textbook_id',
-      // as: "textbook"
-    });
 
     Account.hasOne(Shelf, {
       foreignKey: "account_id",
@@ -249,9 +239,15 @@ class Relationships {
     CartItem.belongsTo(Account, { foreignKey: "account_id" });
 
 
-    Account.hasMany(LessonProgress,{foreignKey: "student_id", });
-    LessonProgress.belongsTo(Account, { foreignKey: "student_id"});
+    Account.hasMany(LessonProgress, { foreignKey: "student_id", as: 'lesson_progress' });
+    LessonProgress.belongsTo(Account, { foreignKey: "student_id" });
 
+    Account.hasMany(Referral, { foreignKey: 'referrer_id', as: 'user' });
+    Referral.belongsTo(Account, { foreignKey: 'referrer_id' });
+
+
+    BookCategory.hasMany(SubCategory,{foreignKey: 'parent_id', as: 'sub_categories'});
+    SubCategory.belongsTo(BookCategory,{ foreignKey: 'parent_id'})
 
     //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 

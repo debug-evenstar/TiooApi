@@ -132,6 +132,9 @@ const OnboardingQuestion = (db.onboarding = require("../onboardingQuestion.model
   Sequelize
 ));
 
+const Referral = (db.referral = require("../referral.model")(
+  sequelize, Sequelize
+))
 
 const LessonProgress = (db.lessonProgress = require("../lessonprogress.model")(
   sequelize,
@@ -147,6 +150,9 @@ const BookCategory = (db.bookcategory = require("../bookcategory.model"))(sequel
 const Question = (db.question = require("../question.model"))(
   sequelize,Sequelize
 );
+
+const SubCategory = (db.subcategory = require("../subcategory.model"))(sequelize,Sequelize);
+
 
 const models = [
   Account,
@@ -178,7 +184,9 @@ const models = [
   Topic,
   BookCategory,
   Question,
-  LessonProgress
+  LessonProgress,
+  Referral,
+  SubCategory,
 ];
 
 Relationships.group(...models);
@@ -220,5 +228,7 @@ module.exports = {
   Topic,
   BookCategory,
   Question,
-  LessonProgress
+  LessonProgress,
+  Referral,
+  SubCategory,
 };
