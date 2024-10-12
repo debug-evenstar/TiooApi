@@ -731,7 +731,7 @@ class LessonController {
                         orderBy: { slide_index: "asc" },
                     },
                     Textbook,
-                    Chapter
+                    Chapter,
                 ],
             });
 
@@ -739,6 +739,45 @@ class LessonController {
                 error: false,
                 message: ResponseStatus.pass.read,
                 data: lessonInstance,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
+
+    static async deleteLessonSlide(req, res) {
+        const { id } = req.params;
+
+        try {
+            const lessonSlideInstance = await LessonSlide.findByPk(id);
+
+            if (!lessonSlideInstance) {
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: true,
+                    message: ResponseStatus.fail.not_found,
+                });
+            }
+            const lessonId = lessonSlideInstance.lesson_id;
+            const deleteSlide = await lessonSlideInstance.destroy();
+
+            // Reassign slide indices
+            const allLessonSlides = await LessonSlide.findAll({
+                where : {lesson_id : lessonId}
+            });
+
+            allLessonSlides.forEach(async (slide, index) => {
+                slide.slide_index = index;
+                await slide.save();
+            })
+
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.delete,
+                data: allLessonSlides,
             });
         } catch (error) {
             res.status(500).json({
@@ -1168,7 +1207,8 @@ class LessonController {
             }
 
             const slide_data = await LessonController.processQuestions(
-                data.slide_data, true
+                data.slide_data,
+                true
             );
             const lessonSlideInstance = await LessonSlide.create({
                 slide_index: data.slide_index,
@@ -1204,7 +1244,7 @@ class LessonController {
                     },
                     Textbook,
                     Chapter,
-                    Class
+                    Class,
                 ],
             });
 
@@ -1216,8 +1256,10 @@ class LessonController {
             }
 
             const response = await AITutorProvider.queryAITutor(
-                lessonInstance.dataValues, data.slide_id, data.conversation, 
-                { first_name : name.split(" ")[0], id }
+                lessonInstance.dataValues,
+                data.slide_id,
+                data.conversation,
+                { first_name: name.split(" ")[0], id }
             );
 
             return res.status(ResponseStatus.code.success).json({
@@ -1284,7 +1326,8 @@ class LessonController {
                                 media,
                             });
                             await existingQuestion.removeTopics();
-                            topics && (await existingQuestion.addTopics(topics));
+                            topics &&
+                                (await existingQuestion.addTopics(topics));
                         }
                     }
                     componentData.data[questionIndex] = question;
