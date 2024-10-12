@@ -264,7 +264,6 @@ class TextbookController {
                     [
                         { model: Chapter, as: "chapters" },
                         { model: Lesson, as: "lessons" },
-                        { model: LessonSlide, as: "lesson_slides" },
                         "created_at",
                         "ASC",
                     ],
