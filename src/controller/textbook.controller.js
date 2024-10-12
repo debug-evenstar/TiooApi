@@ -256,16 +256,16 @@ class TextbookController {
                     },
                     Subject,
                 ],
-                // order: [
-                //     [{ model: Chapter, as: "chapters" }, "id", "ASC"],
-                //     [
-                //         { model: Chapter, as: "chapters" },
-                //         { model: Lesson, as: "lessons" },
-                //         { model: LessonSlide, as: "lesson_slides" },
-                //         "slide_index",
-                //         "ASC",
-                //     ],
-                // ],
+                order: [
+                    [{ model: Chapter, as: "chapters" }, "id", "ASC"],
+                    [
+                        { model: Chapter, as: "chapters" },
+                        { model: Lesson, as: "lessons" },
+                        { model: LessonSlide, as: "lesson_slides" },
+                        "created_at",
+                        "ASC",
+                    ],
+                ],
             });
 
 
