@@ -36,7 +36,7 @@ module.exports = (sequelize, Sequelize) => {
             description: {
                 type: Sequelize.STRING,
                 allowNull: true,
-                defaultValue: "none",
+                defaultValue: "",
             },
             objective: {
                 type: Sequelize.STRING,
