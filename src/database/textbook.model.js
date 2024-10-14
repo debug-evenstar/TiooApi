@@ -11,6 +11,10 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
+            subject_id: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            },
             description: {
                 type: DataTypes.STRING,
                 allowNull: true,
@@ -23,8 +27,29 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.BOOLEAN,
                 defaultValue: false,
             },
+            category_id: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            is_premium: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            account_id: {
+                type: DataTypes.INTEGER,
+                allowNull: true
+            },
+            book_type: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            author: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            }
         },
-        { timestamps: true, paranoid : true }
+        { timestamps: true, paranoid: true }
     );
 
     return Textbook;

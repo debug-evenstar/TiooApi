@@ -1,4 +1,4 @@
-const { Subject, Class, Teacher, Account, Lesson, ClassArm, SchoolManagement, LessonSlide } = require('../database/connection/');
+const { Subject, Class, Teacher, Account, Lesson, ClassArm, SchoolManagement, LessonSlide, Topic } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 const Sequelize = require('sequelize');
 const IncludeManager = require('./helper/includes');
@@ -17,7 +17,7 @@ class SubjectController {
 
             let classarmInstances = [];
 
-            if (req.body.classArms) { 
+            if (req.body.classArms) {
                 classarmInstances = await ClassArm.findAll({ where: { id: [...req.body.classArms] } });
             }
 
@@ -30,24 +30,24 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
-    
+
     /*-----------------------------------| READ ALL SUBJECTS |-----------------------------------*/
 
     static async readAll(req, res) {
 
         try {
             const subjectInstance = await Subject.findAll({
-                ...(req.query.default ? { where : { default : true}} : {}),
+                ...(req.query.default ? { where: { default: true } } : {}),
                 include: IncludeManager.parseParamIncludes(req.query)
             });
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: subjectInstance });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -65,21 +65,21 @@ class SubjectController {
             });
 
 
-            const response = await Promise.all(subjectInstance.map( async (element)=>{
+            const response = await Promise.all(subjectInstance.map(async (element) => {
 
-              const classes = await element.getClasses();
-              const teachers = await element.getTeachers();
-              const lessons = await element.getLessons();
+                const classes = await element.getClasses();
+                const teachers = await element.getTeachers();
+                const lessons = await element.getLessons();
 
-              element.dataValues.class_count = classes.length;
-              element.dataValues.teacher_count = teachers.length;
-              element.dataValues.textbook_count = lessons.length;
+                element.dataValues.class_count = classes.length;
+                element.dataValues.teacher_count = teachers.length;
+                element.dataValues.textbook_count = lessons.length;
 
-              return element;
+                return element;
 
             }));
 
-            
+
 
             // console.log(classes);
 
@@ -87,7 +87,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -108,7 +108,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -134,7 +134,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -171,7 +171,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -190,7 +190,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -208,7 +208,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -232,7 +232,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -251,7 +251,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
 
     }
@@ -268,7 +268,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -277,7 +277,7 @@ class SubjectController {
     static async subjectsWithLessonCount(req, res) {
 
         try {
-            const schoolManagement = await SchoolManagement.findOne({where  : {AccountId : req.userData.id}});
+            const schoolManagement = await SchoolManagement.findOne({ where: { AccountId: req.userData.id } });
             const subjectsLessons = await Subject.findAll({
                 where: { SchoolManagementId: schoolManagement.id },
                 include: [
@@ -296,7 +296,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -330,13 +330,13 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
     static async studentLessons(req, res) {
 
-        
+
         const { id } = req.userData
 
         const account_id = req.query.account_id ? req.query.account_id : id;
@@ -346,19 +346,19 @@ class SubjectController {
             const studentAccount = await Account.findByPk(account_id);
 
             const studentInstance = await studentAccount.getStudent({
-                include : [ClassArm, Class]
+                include: [ClassArm, Class]
             });
 
             let classArmLessons = await studentInstance.ClassArm.getLessons({
-                include : [ LessonSlide ]
+                include: [LessonSlide]
             });
 
-            classArmLessons = classArmLessons.filter( lesson => lesson.SubjectId == req.params.id );
+            classArmLessons = classArmLessons.filter(lesson => lesson.SubjectId == req.params.id);
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: classArmLessons });
 
         } catch (error) {
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -400,7 +400,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -424,7 +424,7 @@ class SubjectController {
 
         } catch (error) {
             console.log(error);
-            res.status(500).json({ error: 'server error' ,  extra: error.message });
+            res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
 
@@ -455,19 +455,16 @@ class SubjectController {
                 }
             );
 
-           const response = await Promise.all(subjectInstance.map( async (element)=>{
-             const rawClasses = await element.getClasses()
-             const lessonCount = element.Lessons.length
+            const response = await Promise.all(subjectInstance.map(async (element) => {
+                const rawClasses = await element.getClasses()
+                const lessonCount = element.Lessons.length
 
-             const classes = rawClasses.map((element)=> ({ id: element.id, naming: element.naming, type: element.type }));
+                const classes = rawClasses.map((element) => ({ id: element.id, naming: element.naming, type: element.type }));
 
-             console.log(classes);
+                delete element.dataValues.Lessons;
 
-
-             delete element.dataValues.Lessons;
-
-             return {...element.dataValues, classes: classes}
-           }))
+                return { ...element.dataValues, classes: classes }
+            }))
 
             // ------------------------------------------
 
@@ -480,6 +477,102 @@ class SubjectController {
 
     }
 
+
+    static async getTopics(req, res) {
+
+        try {
+
+            const subjectId = req.params.id;
+
+            const subjectInstance = await Subject.findByPk(subjectId);
+
+            if (!subjectInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Subject not found" });
+            }
+
+            const topics = await subjectInstance.getTopics();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: topics });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+    static async getSubjectsWithTopics(req, res) {
+        try {
+            const subjects = await Subject.findAll({
+                include: [{
+                    model: Topic,
+                    attributes: ['name', 'id']
+
+                }],
+                attributes: ['name', 'id']
+            });
+
+            if (!subjects) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "No subjects found" });
+            }
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: subjects
+            });
+
+        } catch (error) {
+            return res.status(500).json({ error: 'server error', extra: error.message });
+        }
+    }
+
+    static async addSubjectTopic(req, res) {
+
+        try {
+
+            const subjectId = req.params.id;
+
+            const subjectInstance = await Subject.findByPk(subjectId);
+
+            if (!subjectInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Subject not found" });
+            }
+
+            const name = req.body.topic;
+
+            const topicInstance = await Topic.create({ name, subject_id: subjectInstance.dataValues.id });
+
+            // await subjectInstance.addTopic(topicInstance);
+
+            const topics = await subjectInstance.getTopics();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.create, data: topics });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
+
+    static async deleteTopic(req, res) {
+
+        try {
+
+            const topicId = req.params.id;
+
+            const topicInstance = await Topic.findByPk(topicId);
+
+            if (!topicInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: "Topic not found" });
+            }
+
+            await topicInstance.destroy();
+
+            return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.delete });
+
+        } catch (error) {
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
 
 }
 

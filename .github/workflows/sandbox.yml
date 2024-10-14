@@ -1,4 +1,4 @@
-name: Build & Deploy
+name: Deploy To Staging
 on:
   push:
     branches: [sandbox]

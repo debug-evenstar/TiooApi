@@ -278,7 +278,6 @@ class SchoolManagementController {
             const classInstance = await Class.findByPk(classId);
 
             if (!classInstance) {
-                console.log("class instance", classInstance)
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
@@ -303,14 +302,12 @@ class SchoolManagementController {
             const schoolInstance = await SchoolManagement.findByPk(sid);
 
             if (!schoolInstance) {
-                console.log("school instance", schoolId)
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
             const classInstance = await Class.findByPk(cid);
 
             if (!classInstance) {
-                console.log("class instance", classInstance)
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
@@ -604,8 +601,6 @@ class SchoolManagementController {
 
             await authorization.setAccount(registeredAdmin);
 
-            console.log("this is the new admin password", password)
-
             Mailer().to(data.email).from(process.env.MAIL_FROM, "Praxeum").subject("Admin Access").template("emails.InviteAdmin", { name: data.name, email: data.email, password: data.password }).send();
 
             return res.status(ResponseStatus.code.success).json({
@@ -648,8 +643,6 @@ class SchoolManagementController {
                 let permissions = await Permission.findAll({ where: { code: items } });
 
                 const roles = permissions.map((permission) => ({ code: permission.code, name: permission.name }));
-
-                console.log(permissions);
 
                 const data = {
                     id: element.id,

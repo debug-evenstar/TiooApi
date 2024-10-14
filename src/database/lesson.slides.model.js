@@ -4,6 +4,10 @@ module.exports = (sequelize, Sequelize) => {
     const LessonSlides = sequelize.define(
         "LessonSlides",
         {
+            lesson_id: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+            },
             slide_index: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
@@ -12,6 +16,7 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.JSON,
                 allowNull: false,
             },
+
         },
         { timestamps: true }
     );

@@ -11,8 +11,7 @@ module.exports = (sequelize, DataTypes) => {
             },
             name: {
                 type: DataTypes.STRING,
-                allowNull: true,
-                defaultValue: "Chapter 1",
+                allowNull: false,
             },
             index: {
                 type: DataTypes.INTEGER,

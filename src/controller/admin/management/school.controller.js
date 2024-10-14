@@ -485,7 +485,6 @@ class AdminSchoolController {
             if (!docs_index) {
                 filePath = path.join(absoluteFilesDirectory, '', path.basename(parsedPathArray[0]));
             } else if (parsedPathArray.length > parseInt(docs_index)) {
-                console.log(parsedPathArray.length, parseInt(docs_index))
                 filePath = path.join(absoluteFilesDirectory, '', path.basename(parsedPathArray[docs_index]));
             } else {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: 'No document with this index' });

@@ -17,6 +17,7 @@ const {
     Group,
     Textbook,
     Chapter,
+    BookCategory,
 } = require("../../../database/connection");
 const { use } = require("chai");
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
@@ -31,21 +32,54 @@ class AdminLibraryController {
     /* ---------------------------------------------------------------------------------------------- */
     static async createLibraryTextbook(req, res) {
         const data = req.body;
-
         data.library = true;
 
-        let cover = "";
+        // if (req.file) {
+        //     const filePath = req.file.path;
+        //     try{
+        //         const ImageResponse = await cloudinaryUploadImage(filePath);
+        //         req.body.cover_photo = ImageResponse.secure_url;
+        //     }catch(error){
+        //         res.status(500).json({
+        //             error: "server error",
+        //             extra: error,
+        //         });
+        //     }
+        // }
+
+
+
+        let retries = 3;
+        let uploadSuccess = false;
 
         if (req.file) {
-            const filePath = req.file.path;
-            const ImageResponse = await cloudinaryUploadImage(filePath);
-            req.body.cover_photo = ImageResponse.secure_url;
+            // const filePath = req.file.path;
+            while (retries > 0 && !uploadSuccess) {
+                try {
+                    const ImageResponse = await cloudinaryUploadImage(req.file.path);
+                    req.body.cover_photo = ImageResponse.secure_url;
+                    uploadSuccess = true;
+                }
+                catch (error) {
+                    retries--;
+                }
+            }
+
         }
+
+
+        if (!uploadSuccess) {
+            return res.status(500).json({
+                error: "server error",
+                extra: error,
+            });
+        }
+
 
         try {
             let classes = JSON.parse(req.body.classes);
             req.body.classes = classes;
-        } catch (err) {}
+        } catch (err) { }
 
         try {
             const classInstance = await Class.findAll({
@@ -61,11 +95,15 @@ class AdminLibraryController {
 
             const classIds = classInstance.map((element) => element.id);
 
-            const textbookInstance = await Textbook.create(req.body);
+            req.body.is_premium = req.body.plan.toLowerCase() != "basic"
+
+            const textbookInstance = await Textbook.create({ ...req.body });
 
             const subjectInstance = await Subject.findByPk(req.body.subject_id);
 
+
             await textbookInstance.addClasses(classInstance);
+
 
             await subjectInstance.addTextbook(textbookInstance);
 
@@ -77,7 +115,6 @@ class AdminLibraryController {
                 data: textbookInstance,
             });
         } catch (error) {
-            console.log(error);
             res.status(500).json({
                 error: "server error",
                 extra: error.message,
@@ -86,8 +123,6 @@ class AdminLibraryController {
     }
 
     static async updateLibraryTextbook(req, res) {
-        const data = req.body;
-
         const { id } = req.params;
 
         try {
@@ -103,16 +138,24 @@ class AdminLibraryController {
                 textbook.subject_id
             );
 
+
+            req.body.is_premium = req.body.plan.toLowerCase() != "basic"
+
             const textbookInstance = await textbook.update(req.body);
 
             if (req.body.classes) {
+
                 const classInstance = await Class.findAll({
                     where: { id: [...req.body.classes] },
                 });
+
                 const classIds = classInstance.map((element) => element.id);
                 await textbookInstance.removeClasses();
                 await textbookInstance.addClasses(classInstance);
             }
+
+
+
 
             if (req.body.subject_id) {
                 const subjectInstance = await Subject.findByPk(
@@ -145,13 +188,21 @@ class AdminLibraryController {
             // const accountInstance = await Account.findOne({ where: { email: ResponseStatus.tio.email } });
 
             const textbookInstance = await Textbook.findAll({
-                include: [{ model: Lesson }],
+                include: [{
+                    model: Chapter, as: "chapters",
+                    include: [
+                        { model: Lesson, as: "lessons" }
+                    ]
+                }],
             });
 
             const response = await Promise.all(
                 textbookInstance.map(async (element) => {
                     const rawClasses = await element.getClasses();
-                    const lessonCount = element.Lessons.length;
+                    // [1, 2, 3, 4].reduce((a, b) => a + b, 0)
+                    const lessonCount = element.chapters.map(
+                        (ch) => ch.lessons.length
+                    ).reduce((a, b) => a + b, 0);
 
                     const classes = rawClasses.map((element) => ({
                         id: element.id,
@@ -159,7 +210,7 @@ class AdminLibraryController {
                         type: element.type,
                     }));
 
-                    delete element.dataValues.Lessons;
+                    delete element.dataValues.chapters;
 
                     return { ...element.dataValues, classes, lessonCount };
                 })
@@ -241,7 +292,7 @@ class AdminLibraryController {
                     preview.push(ImageResponse.secure_url);
                 }
             } else {
-                if (req.files) {
+                if (req.files && req.files.length > 0) {
                     const filePath = req.files[0].path;
                     const ImageResponse = await cloudinaryUploadImage(filePath);
                     preview.push(ImageResponse.secure_url);
@@ -294,20 +345,20 @@ class AdminLibraryController {
     static async updateLesson(req, res) {
         try {
             let preview = [];
-            if (req.files["preview"] && req.files["preview"].length > 0) {
-                for (var item of req.files["preview"]) {
-                    const ImageResponse = await cloudinaryUploadImage(
-                        item.path
-                    );
-                    preview.push(ImageResponse.secure_url);
-                }
-            } else {
-                if (req.files) {
-                    const filePath = req.files[0].path;
-                    const ImageResponse = await cloudinaryUploadImage(filePath);
-                    preview.push(ImageResponse.secure_url);
-                }
-            }
+            // if (req.files["preview"] && req.files["preview"].length > 0) {
+            //     for (var item of req.files["preview"]) {
+            //         const ImageResponse = await cloudinaryUploadImage(
+            //             item.path
+            //         );
+            //         preview.push(ImageResponse.secure_url);
+            //     }
+            // } else {
+            //     if (req.files) {
+            //         const filePath = req.files[0].path;
+            //         const ImageResponse = await cloudinaryUploadImage(filePath);
+            //         preview.push(ImageResponse.secure_url);
+            //     }
+            // }
 
             const textbookInstance = await Textbook.findByPk(req.params.id);
 
@@ -324,6 +375,8 @@ class AdminLibraryController {
             req.body.preview = preview.length
                 ? preview
                 : lessonInstance.preview;
+
+            delete req.body.chapter_id;
 
             await lessonInstance.update(req.body);
 
@@ -428,8 +481,6 @@ class AdminLibraryController {
 
         if (req.file) {
             req.body.files = [req.file.path];
-
-            console.log(req.body.files);
         }
 
         req.body.start_date = today;
@@ -469,6 +520,8 @@ class AdminLibraryController {
                 return res.status(ResponseStatus.code.not_found).json({
                     error: false,
                     message: ResponseStatus.fail.not_found,
+
+                    
                     data: {},
                 });
             }
@@ -749,8 +802,6 @@ class AdminLibraryController {
             if (req.file) {
                 payload.files = [req.file.path];
                 filePath = req.file.path;
-
-                console.log(payload.files);
             }
 
             payload.start_date = today;
@@ -877,8 +928,6 @@ class AdminLibraryController {
                 });
             }
 
-            console.log(libraryInstance);
-
             libraryInstance.library_status =
                 libraryInstance.library_status == "unpublished"
                     ? "published"
@@ -908,7 +957,7 @@ class AdminLibraryController {
             const lessonInstance = await Lesson.findByPk(id);
 
             const response = await lessonInstance.update({
-                library_status: data.status,
+                status: data.status,
             });
 
             return res.status(ResponseStatus.code.success).json({

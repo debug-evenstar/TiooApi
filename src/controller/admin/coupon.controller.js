@@ -28,8 +28,6 @@ class CouponController {
 
             const response = await couponInstance.addAccounts(accountInstance);
 
-            console.log(response);
-
             return res.status(ResponseStatus.code.success).json({
                 error: false,
                 message: ResponseStatus.pass.added,

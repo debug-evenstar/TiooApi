@@ -9,31 +9,42 @@ const snakeToPascal = (string) => {
 module.exports = {
     formatRelationshipAliases : (...models) => {
         models.forEach((model) => {
-            if (model.name == "Lesson") {
-                const associations = Object.values(model.associations)
-                associations.forEach((association, index) => {
-                    const associationName = Object.keys(model.associations)[index];
-                    model.associations[associationName].options.name.plural = snakeToPascal(association.options.name.plural);
+            const associations = Object.values(model.associations)
+            associations.forEach((association, index) => {
+                const associationName = Object.keys(model.associations)[index];
+                let singular, plural, singlularProperties, pluralProperties;
+                if (association.options.name.singular) {
                     model.associations[associationName].options.name.singular = snakeToPascal(association.options.name.singular);
-                    const plural = model.associations[associationName].options.name.plural
-                    const singular =  model.associations[associationName].options.name.singular;
-                    const accessors = {
-                        get: `get${plural}`,
-                        set: `set${plural}`,
-                        addMultiple: `add${plural}`,
+                    singular =  model.associations[associationName].options.name.singular;
+                    singlularProperties = {
                         add: `add${singular}`,
                         create: `create${singular}`,
                         remove: `remove${singular}`,
-                        removeMultiple: `remove${plural}`,
                         hasSingle: `has${singular}`,
+                    };
+                }
+
+                if ( association.options.name.plural ) {
+                    model.associations[associationName].options.name.plural = snakeToPascal(association.options.name.plural);
+                    plural = model.associations[associationName].options.name.plural
+                    pluralProperties = {
+                        get: `get${plural}`,
+                        set: `set${plural}`,
+                        addMultiple: `add${plural}`,
+                        removeMultiple: `remove${plural}`,
                         hasAll: `has${plural}`,
                         count: `count${plural}`
                     };
-                    model.associations[associationName].accessors = accessors;
-                    model.associationAccessor = plural;
-                    association.mixin(association.source.prototype);
-                });
-            }
+                }
+
+                const accessors = {
+                    ...singlularProperties ?? {},
+                    ...pluralProperties ?? {}
+                };
+                model.associations[associationName].accessors = accessors;
+                model.associationAccessor = plural ?? singular;
+                association.mixin(association.source.prototype);
+            });
         });
     }
 }

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { Account, Admin, ErrorLog, Keypairs, Authorization } = require('../database/connection');
+const { Account, Admin, Keypairs, Authorization } = require('../database/connection');
 const ResponseMessage = require('../config/message.config');
 const { school } = require('../controller/billing.controller');
 
@@ -60,18 +60,10 @@ class TokenMiddleware {
 
 
         } catch (err) {
-            var logError = await ErrorLog.create({
-                error_name: "Error at Verify Middleware",
-                error_description: err.toString(),
-                route: `${req.originalUrl}`,
-                method: `${req.method}`,
-                error_code: "401",
-            });
-
-            if (logError) {
+            // console.log(err);
+            // if (logError) {
                 return res.status(401).json({ message: 'Authentication failed. Token invalid.' });
-
-            }
+            // }
         }
     }
 
@@ -98,14 +90,6 @@ class TokenMiddleware {
 
     //     } catch (err) {
     //         console.log(err)
-    //         var logError = await ErrorLog.create({
-    //             error_name: "Error at Admin Middleware",
-    //             error_description: err.toString(),
-    //             route: `${req.originalUrl}`,
-    //             method: `${req.method}`,
-    //             error_code: "401",
-    //         });
-
     //         if (logError) {
     //             return res.status(401).json({ message: 'Authentication failed. Public Key invalid.' });
     //         }
@@ -123,15 +107,17 @@ class TokenMiddleware {
             const decoded = jwt.verify(token, process.env.JWT_SECRETE);
             const email = decoded.userdata.email;
 
+
             Admin.findOne({ where: { email: email } }).then((user) => {
 
                 if (!user) {
                     return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.adminUnauthorized });
                 }
-
-                if (user.account_type !== 'admin') {
-                    return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.adminUnauthorized });
-                }
+    
+                // if (user.account_type !== 'admin') {
+                //     return res.status(ResponseMessage.code.unauthorized).json({ message: ResponseMessage.fail.adminUnauthorized });
+                // }
+                
 
                 const encryptedData = decoded.userData;
                 const fetchedData = user.dataValues;
@@ -145,18 +131,9 @@ class TokenMiddleware {
             });
 
         } catch (err) {
-            console.log(err)
-            var logError = await ErrorLog.create({
-                error_name: "Error at Admin Middleware",
-                error_description: err.toString(),
-                route: `${req.originalUrl}`,
-                method: `${req.method}`,
-                error_code: "401",
-            });
-
-            if (logError) {
-                return res.status(401).json({ message: 'Authentication failed. Token invalid.' });
-            }
+            console.log(err);
+            return res.status(401).json({ message: 'Authentication failed. Token invalid.' });
+            
         }
     }
 
@@ -168,8 +145,6 @@ class TokenMiddleware {
             const data = req.userData;
 
             const authorization = await Authorization.findByPk(data.id);
-
-            console.log(authorization.permissions);
 
             const userAuthorizations = authorization.permissions || [];
 

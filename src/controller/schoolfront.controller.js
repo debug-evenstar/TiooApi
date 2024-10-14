@@ -1,7 +1,6 @@
 const { validationResult, body } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
 const { Account, Validation, SchoolManagement, Permission, Admin, Authorization, Preference, Subject, Textbook, CartItem, Class, Price, LessonSlide, } = require('../database/connection');
-const SyncDB = require('../server/syncDatabase');
 const AuthorizationSeed = require('../seeders/seed.authorization');
 
 const { Op } = require('sequelize');
@@ -61,8 +60,6 @@ class SchoolFront {
                 const data = await accountInstance.addTextbook(textbookInstance);
 
                 await subjectInstance.addTextbook(textbookInstance)
-
-                console.log(subjectInstance);
 
             }
 

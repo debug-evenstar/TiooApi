@@ -1,7 +1,6 @@
 const { validationResult, body } = require('express-validator');
 const ResponseStatus = require('../config/message.config');
 const { Account, Validation, SchoolManagement, Permission, Admin, Authorization, Preference, } = require('../database/connection');
-const SyncDB = require('../server/syncDatabase');
 const AuthorizationSeed = require('../seeders/seed.authorization');
 
 class PreferenceController {
