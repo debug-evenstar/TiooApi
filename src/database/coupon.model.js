@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
     const Coupon = sequelize.define(
-        'Coupon',
+        "Coupon",
         {
             campaign: {
                 type: DataTypes.STRING,
@@ -13,17 +13,16 @@ module.exports = (sequelize, DataTypes) => {
             status: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: 'Active'
+                defaultValue: "Active",
             },
             amount: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 defaultValue: 0,
             },
-        }, {
-        timestamps: true,
-    });
+        },
+        { timestamps: true }
+    );
 
     return Coupon;
 };
-

@@ -1,31 +1,28 @@
-const bcrypt = require('bcrypt');
-const NotificatinSeed = require('../seeders/notification.seeds');
+const bcrypt = require("bcrypt");
+const NotificatinSeed = require("../seeders/notification.seeds");
 
 module.exports = (sequelize, DataTypes) => {
     const Notification = sequelize.define(
-        'Notification',
+        "Notification",
         {
             title: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                defaultValue: '',
-
+                defaultValue: "",
             },
             caption: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                defaultValue: '',
-
+                defaultValue: "",
             },
             type: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                defaultValue: 'school',
-
+                defaultValue: "school",
             },
-        }, {
-        timestamps: false,
-    });
+        },
+        { timestamps: true }
+    );
 
     Notification.seedIfEmpty = async () => {
         const count = await Notification.count();
@@ -37,7 +34,6 @@ module.exports = (sequelize, DataTypes) => {
     Notification.sync().then(() => {
         Notification.seedIfEmpty();
     });
-
 
     return Notification;
 };

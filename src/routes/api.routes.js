@@ -183,6 +183,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get('/class/:id/arms', ClassArmsController.readAllByClass);
     router.get('/class/arms/read/:id', ClassArmsController.readById);
     router.get('/class/arms/students/:id', ClassArmsController.classArmStudents);
+    router.get('/class/arms/teachers/:id', ClassArmsController.classArmTeachers);
     router.get('/class/arms/:id/subjects', ClassArmsController.classArmSubjects); // This is the a better route format /entity/:entityId/relationship
     router.put('/class/arms/update/:id', ClassArmsController.updateById);
     router.get('/class/classarms', ClassArmsController.classArmsByClass)
@@ -316,88 +317,6 @@ const AuthorizedRoutesGroup = (router) => {
 };
 
 
-/*------------------------------| Admin ROUTES |------------------------------*/
-
-const AdminRoutesGroup = (router) => {
-
-    router.use(AuthenticationMiddleware.admin) //--use middleware--//
-
-    router.get('/admin/schools', AdminController.schools);
-    router.get('/admin/home/dashboard', HomeController.dashboard);
-    router.get('/admin/home/dashboard/activeusers', HomeController.activeUser);
-
-    /* --------------------------------- PRICING -------------------------------- */
-
-    router.post('/admin/settings/pricing', PriceController.create);
-    router.get('/admin/settings/pricing', PriceController.read);
-    router.put('/admin/settings/pricing', PriceController.update);
-    router.delete('/admin/settings/pricing/:id', PriceController.delete);
-
-    // router.get('/admin/user',  TokenMiddleware.checkAuthorization(['manage_admin']), AuthorizationController.readAdminUser);
-    router.post('/admin/user', AuthorizationController.addAdminUser);
-    router.get('/admin/user', AuthorizationController.readAdminUser);
-    router.delete('/admin/user', AuthorizationController.deleteAdmin);
-    router.get('/admin/permissions', AuthorizationController.readPermissions);
-    router.post('/admin/permissions', AuthorizationController.createPermissions);
-
-
-    router.get('/admin/freelancer', AdminController.freeLancers);
-    router.get('/admin/freelancer/:id', AdminController.freeLancersById);
-
-    router.post('/admin/coupon', CouponController.create);
-    router.get('/admin/coupon', CouponController.read);
-    router.delete('/admin/coupon', CouponController.delete);
-    router.put('/admin/coupon', CouponController.update);
-    router.post('/admin/coupon/activate', CouponController.activate);
-
-    router.get('/admin/management/schools', AdminSchoolController.read);
-    router.get('/admin/management/groupedLessons', AdminSchoolController.lessonsGroupedByClasses);
-    router.get('/admin/management/lessons', AdminSchoolController.lessons);
-    router.get('/admin/management/schools/extra', AdminSchoolController.readWithExtra);
-    router.post('/admin/management/lessons/:id/template', UploadService.uploadLessonTemplate.single('template'), AdminSchoolController.uploadLessonTemplate);
-    router.get('/admin/management/lesson/:id/download', AdminSchoolController.downloadLessons)
-    router.get('/admin/management/subject/groups', AdminSchoolController.subjectGroups)
-    router.get('/admin/management/lesson/check', AdminSchoolController.subjectGroupedLessons);
-    router.put('/admin/management/lesson/:id/status', AdminSchoolController.adminUpdateLessonStatus);
-    router.put('/admin/management/librarylesson/:id/status', AdminLibraryController.updateLibraryLessonStatus);
-
-    router.get('/admin/management/subjects/lessons', AdminSchoolController.lessonsGroupedBySubjects);
-    router.get('/admin/management/subject/lessons', AdminSchoolController.lessonsBySubjectId);
-    router.get('/admin/management/subjects/lessons/count', AdminLibraryController.readLibraryMaterial);
-
-    router.get('/admin/management/class/:id/arms', AdminSchoolController.readAllByClass);
-    router.get('/admin/management/class/readwitharms', AdminSchoolController.readAllWithArms);
-
-    router.get('/admin/management/freelancers', AdminFreelancerController.read);
-    router.get('/admin/management/freelancers/extra', AdminFreelancerController.readWithExtra);
-
-    router.get('/admin/school/dashboard/home', AdminSchoolController.dashboardHome);
-    router.get('/admin/school/dashboard/subjects', AdminSchoolController.dashboardSubject);
-
-    router.post('/admin/library', UploadService.uploadLesson.single('file'), AdminLibraryController.create);
-    router.get('/admin/library', AdminLibraryController.read);
-    router.delete('/admin/librarylesson/:id', AdminLibraryController.deleteLibraryLesson);
-    router.delete('/admin/library/:id', AdminLibraryController.deleteLibrary);
-    router.post('/admin/library/subject', UploadService.uploadLessonTemplate.single('cover'), AdminLibraryController.libraryMaterial);
-    router.put('/admin/library/subject/:id', UploadService.uploadLessonTemplate.single('cover'), AdminLibraryController.updateLibraryMaterial);
-
-    router.put('/admin/librarylesson/:id', AdminLibraryController.updateLibraryLesson);
-
-     
-    // router.post('/admin/library/lesson', UploadService.uploadLesson.single('file'), AdminLibraryController.createLibraryLesson);
-    
-    router.get('/admin/library/lesson/check', AdminLibraryController.subjectGroupedLessons);
-    router.get('/admin/librarysubject/:id/classes', AdminLibraryController.libraryClasses);
-    router.post('/admin/librarysubject/status/:id', AdminLibraryController.toggleLibrarySubjectStatus);
-    router.post('/admin/publish/librarylesson/:id', AdminLibraryController.togglePublishLibraryLesson);
-
-    router.post('/admin/librarylesson/template', UploadService.uploadLesson.fields([{ name: 'template' }, { name: 'preview' }, { name: 'cover' }]), AdminLibraryController.adminLibraryLessonUploadTemplate);
-    router.put('/admin/updatelibrarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.adminUpdateLibraryLessonUploadTemplate);
-    router.put('/admin/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.addLibraryLesson);
-    router.put('/admin/librarylesson/template/:id',  AdminLibraryController.updateLibraryLessonTemplate);
-
-
-};
 
 
 // const ExternalSchoolRoutesGroup = (router) => {
@@ -411,7 +330,7 @@ const AdminRoutesGroup = (router) => {
 
 OpenRoutesGroup(router);
 AuthorizedRoutesGroup(router);
-AdminRoutesGroup(router);
+
 
 
 module.exports = router;

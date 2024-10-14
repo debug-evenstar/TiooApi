@@ -1,19 +1,19 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 module.exports = (sequelize, DataTypes) => {
     const Group = sequelize.define(
-        'Group',
+        "Group",
         {
             naming: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: false,
             },
             ref_cid: {
-                type: DataTypes.INTEGER
+                type: DataTypes.INTEGER,
             },
-        }, {
-        timestamps: false,
-    });
+        },
+        { timestamps: false }
+    );
 
     return Group;
 };

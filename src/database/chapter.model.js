@@ -1,8 +1,8 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 module.exports = (sequelize, DataTypes) => {
     const Chapter = sequelize.define(
-        'Chapter',
+        "Chapter",
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -12,15 +12,19 @@ module.exports = (sequelize, DataTypes) => {
             name: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: 'Chapter 1',
+                defaultValue: "Chapter 1",
             },
-            title: {
+            index: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            },
+            description: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
-        }, {
-        timestamps: false,
-    });
+        },
+        { timestamps: false }
+    );
 
     return Chapter;
 };

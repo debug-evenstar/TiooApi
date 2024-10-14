@@ -1,4 +1,5 @@
 const globalRoute = require('./api.routes');
+const adminRoute = require('./admin.routes');
 
 
 class Routes {
@@ -16,6 +17,7 @@ class Routes {
         register(){
             let instance = this
             instance.app.use('/', globalRoute);
+            instance.app.use('/admin', adminRoute);
         }
 }
 

@@ -1,26 +1,31 @@
 module.exports = (sequelize, DataTypes) => {
     const Textbook = sequelize.define(
-        'Textbook',
+        "Textbook",
         {
             id: {
                 type: DataTypes.INTEGER,
                 primaryKey: true,
                 autoIncrement: true,
             },
-            subject_pair: {
-                type: DataTypes.INTEGER,
+            name: {
+                type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: 0,
             },
-            grades: {
-                type: DataTypes.JSON,
+            description: {
+                type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: [],
             },
-
-        }, {
-        timestamps: false,
-    });
+            cover_photo: {
+                type: DataTypes.STRING,
+                allowNull: true,
+            },
+            published: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+            },
+        },
+        { timestamps: true, paranoid : true }
+    );
 
     return Textbook;
 };

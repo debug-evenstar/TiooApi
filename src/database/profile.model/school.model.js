@@ -1,11 +1,10 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 module.exports = (sequelize, DataTypes) => {
     const SchoolManagement = sequelize.define(
-        'SchoolManagement',
+        "SchoolManagement",
         {
-
-            //================= PERSONAL INFORMATION=========// 
+            //================= PERSONAL INFORMATION=========//
 
             id: {
                 type: DataTypes.INTEGER,
@@ -14,54 +13,47 @@ module.exports = (sequelize, DataTypes) => {
             },
             school_types: {
                 type: DataTypes.TEXT,
-                defaultValue: JSON.stringify(['primary', 'secondary']),
-                // get() {
-                //     const value = this.getDataValue('school_types');
-                //     return value ? JSON.parse(value) : [];
-                // },
+                defaultValue: JSON.stringify(["primary", "secondary"]),
             },
             school_name: {
                 type: DataTypes.TEXT,
-                allowNull: false
+                allowNull: false,
             },
             naming_types: {
                 type: DataTypes.TEXT,
-                defaultValue: "nurs-sec"
+                defaultValue: "nurs-sec",
             },
             others: {
                 type: DataTypes.JSON,
-                allowNull: true
+                allowNull: true,
             },
 
-            dateOfBirth: {
+            dob: {
                 type: DataTypes.DATE,
                 allowNull: true,
             },
             gender: {
                 type: DataTypes.STRING,
                 allowNull: true,
-
             },
             nationality: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: "Nigeria"
+                defaultValue: "Nigeria",
             },
-            residentialAddress: {
+            residential_address: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
 
-
-            //=========== IDENTIFICATION DOCUMENT =========// 
-
+            //=========== IDENTIFICATION DOCUMENT =========//
 
             ssn: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
 
-            schoo_owner: {
+            owner: {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
@@ -123,10 +115,9 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.JSON,
                 defaultValue: [],
             },
-
-        }, {
-        timestamps: false,
-    });
+        },
+        { timestamps: true }
+    );
 
     return SchoolManagement;
 };

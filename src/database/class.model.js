@@ -1,8 +1,8 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 module.exports = (sequelize, DataTypes) => {
     const Class = sequelize.define(
-        'Class',
+        "Class",
         {
             id: {
                 type: DataTypes.INTEGER,
@@ -11,21 +11,24 @@ module.exports = (sequelize, DataTypes) => {
             },
             type: {
                 type: DataTypes.STRING,
-                defaultValue: 'Primary',
+                defaultValue: "Primary",
             },
-            naming: {
+            name: {
                 type: DataTypes.STRING,
-                defaultValue: 'Primary 1',
+                defaultValue: "Primary 1",
             },
             equivalent: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 defaultValue: 0,
-              },
-
-        }, {
-        timestamps: false,
-    });
+            },
+            default: {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+            },
+        },
+        { timestamps: true }
+    );
 
     return Class;
 };

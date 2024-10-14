@@ -1,31 +1,31 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 
 module.exports = (sequelize, DataTypes) => {
     const ErrorLog = sequelize.define(
-        'ErrorLog',
+        "ErrorLog",
         {
             error_name: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: false,
             },
             error_description: {
-                type: DataTypes.STRING
+                type: DataTypes.STRING,
             },
             route: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: false,
             },
             method: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: false,
             },
             error_code: {
                 type: DataTypes.STRING,
-                allowNull: false
+                allowNull: false,
             },
-        }, {
-        timestamps: false,
-    });
+        },
+        { timestamps: false }
+    );
 
     return ErrorLog;
 };

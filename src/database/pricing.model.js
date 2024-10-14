@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
     const Price = sequelize.define(
-        'Price',
+        "Price",
         {
             teachers_price: {
                 type: DataTypes.FLOAT,
@@ -17,39 +17,38 @@ module.exports = (sequelize, DataTypes) => {
             tag: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: 'exceptions',
+                defaultValue: "exceptions",
             },
             currency: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: 'NGN',
+                defaultValue: "NGN",
             },
 
             tab: {
                 type: DataTypes.STRING,
                 allowNull: true,
-                defaultValue: 'school',
+                defaultValue: "school",
             },
             students_breakdown: {
                 type: DataTypes.JSON,
-                defaultValue: { "quater": 0.000, "half": 0.000, "yearly": 0.000 },
+                defaultValue: { quater: 0.0, half: 0.0, yearly: 0.0 },
                 get() {
-                    const value = this.getDataValue('students_breakdown');
-                    return value ? value : {}; 
+                    const value = this.getDataValue("students_breakdown");
+                    return value ? value : {};
                 },
             },
             teachers_breakdown: {
                 type: DataTypes.JSON,
-                defaultValue: { "quater": 0.000, "half": 0.000, "yearly": 0.000 },
+                defaultValue: { quater: 0.0, half: 0.0, yearly: 0.0 },
                 get() {
-                    const value = this.getDataValue('teachers_breakdown');
+                    const value = this.getDataValue("teachers_breakdown");
                     return value ? value : {};
                 },
             },
-        }, {
-        timestamps: false,
-    });
+        },
+        { timestamps: false }
+    );
 
     return Price;
 };
-
