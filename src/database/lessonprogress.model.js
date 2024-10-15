@@ -36,18 +36,18 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.BOOLEAN,
         defaultValue: false
       },
-      created_at: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
-      },
+      // created_at: {
+      //   allowNull: false,
+      //   type: Sequelize.DATE,
+      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      // },
 
-      updated_at: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-        onUpdate: Sequelize.literal('CURRENT_TIMESTAMP')
-      }
+      // updated_at: {
+      //   allowNull: false,
+      //   type: Sequelize.DATE,
+      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      //   onUpdate: Sequelize.literal('CURRENT_TIMESTAMP')
+      // }
     }, {
     tableName: 'lesson_progress',
     timestamps: true,
