@@ -35,7 +35,7 @@ module.exports = {
     body("password")
       .notEmpty()
       .withMessage("password field is required")
-      .isLength({ max: 12, min: 6 })
+      .isLength({ min: 6 })
       .withMessage("Password must be up to six chars long"),
     // body('school').if(body('account_type').equals('school')).isString().notEmpty()
   ],
