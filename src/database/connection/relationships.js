@@ -31,6 +31,7 @@ class Relationships {
     Question,
     LessonProgress,
     Referral,
+    ExamIllustration,
   ) {
     //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 

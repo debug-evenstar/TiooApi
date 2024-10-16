@@ -151,6 +151,11 @@ const Question = (db.question = require("../question.model"))(
   sequelize,Sequelize
 );
 
+const ExamIllustration = (db.examillustrations = require("../examillustration.model")(
+  sequelize,
+  Sequelize
+));
+
 const models = [
   Account,
   Validation,
@@ -183,6 +188,7 @@ const models = [
   Question,
   LessonProgress,
   Referral,
+  ExamIllustration,
 ];
 
 Relationships.group(...models);
@@ -226,4 +232,5 @@ module.exports = {
   Question,
   LessonProgress,
   Referral,
+  ExamIllustration,
 };
