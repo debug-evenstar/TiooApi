@@ -1307,7 +1307,7 @@ class AuthController {
 
         // console.log(link, hash);
 
-        Mailer().to(account.email).from(process.env.MAIL_FROM, "Praxeum").subject("Verify Email").template("emails.VerificationEmail", { otp }).send();
+        Mailer().to(account.email).from(process.env.MAIL_FROM, "Tioo").subject("Verify Email").template("emails.VerificationEmail", { otp }).send();
     }
 
 
