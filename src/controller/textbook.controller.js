@@ -369,6 +369,26 @@ class TextbookController {
         return AdminLibraryController.createLesson(req, res);
     }
 
+    static async previewTextbookLessonSource(req, res) {
+        req.query.material_type = "textbook";
+        return AdminLibraryController.previewLessonSource(req, res);
+    }
+
+    static async generateTextbookLesson(req, res) {
+        req.query.material_type = "textbook";
+        return AdminLibraryController.generateLesson(req, res);
+    }
+
+    static async getTextbookIllustrations(req, res) {
+        req.query.material_type = "textbook";
+        return AdminLibraryController.getIllustrations(req, res);
+    }
+
+    static async uploadTextbookIllustrations(req, res) {
+        req.query.material_type = "textbook";
+        return AdminLibraryController.uploadIllustrations(req, res);
+    }
+
     static async fetchTextbookLessons(req, res) {
         req.query.material_type = "textbook";
         return await AdminLibraryController.fetchLessons(req, res);
