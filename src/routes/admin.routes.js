@@ -31,6 +31,7 @@ const LessonController = require('../controller/lesson.controller');
 const TextbookController = require('../controller/textbook.controller');
 const TeacherController = require('../controller/teacher.controller');
 const LibraryController = require('../controller/library.controller');
+const Constants = require('../utils/constants');
 
 
 
@@ -150,11 +151,17 @@ const AdminRoutesGroup = (router) => {
     router.delete('/library/textbooks/:id/lessons/:lessonid', TextbookController.deleteTextbookLesson);
     router.get('/library/textbooks/categories',TextbookController.getBookCategories)
 
+    // Exams Endpoints
+
+    router.post('/library/textbooks/preview-source', [UploadService.uploadLessonContentPDF.single(Constants.LESSON_SG_FILE_UPLOAD_FIELDNAME)], TextbookController.previewTextbookLessonSource);
+    router.post('/library/textbooks/generate-lessons', TextbookController.generateTextbookLesson);
+    router.get('/library/textbooks/illustrations', TextbookController.getTextbookIllustrations);
+    router.post('/library/textbooks/illustrations', [UploadService.uploadIllustrations.array(Constants.ILLUSTRATIONS_FILE_UPLOAD_FIELDNAME)], TextbookController.uploadTextbookIllustrations);
+
 
     /* ------------------------------------------- LESSONS ------------------------------------------ */
     router.get('/lessons/:id', LessonController.lessonTemplate)
     router.post('/lessons/:id/slides', LessonController.createLessonSlide)
-
 
     router.get('/lessons/check', LessonController.subjectGroupedLessons);
 
@@ -178,7 +185,6 @@ const AdminRoutesGroup = (router) => {
     router.put('/updatelibrarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.adminUpdateLibraryLessonUploadTemplate);
     router.put('/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.addLibraryLesson);
     router.put('/librarylesson/template/:id',  AdminLibraryController.updateLibraryLessonTemplate);
-
 
 };
 
