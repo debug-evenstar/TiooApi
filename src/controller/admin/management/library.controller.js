@@ -18,6 +18,7 @@ const {
     Textbook,
     Chapter,
     BookCategory,
+    ExamIllustration,
 } = require("../../../database/connection");
 const { use } = require("chai");
 const AuthorizationSeed = require("../../../seeders/seed.authorization");
@@ -25,6 +26,11 @@ const TokenMiddleware = require("../../../middleware/token.middleware");
 const LessonTemplateProvider = require("../../../providers/AI/lesson.template");
 const e = require("express");
 const cloudinaryUploadImage = require("../../../utils/cloudinary.utilities");
+const { OpenAISlideGenProvider } = require("../../../providers/AI/slide/openAISlideGenProvider");
+const Constants = require("../../../utils/constants");
+const { SystemPromptTemplate } = require("../../../providers/AI/slide/systemPromptTemplate");
+const { Settings } = require("../../../providers/AI/slide/llm/settings");
+const { C } = require("../../../providers/AI/slide/common/c");
 
 class AdminLibraryController {
     /* ---------------------------------------------------------------------------------------------- */
@@ -403,6 +409,199 @@ class AdminLibraryController {
                 message: ResponseStatus.pass.delete,
                 data: response,
             });
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
+
+    static async previewLessonSource(req, res) {
+        try {
+
+            const files = req.files;
+
+            if (!files || !Array.isArray(files) || files.length == 0) {
+                const error = new Error("No files were uploaded.");
+
+                //console.error(error.message);
+                //TODO log, notify monitor
+
+                return res.status(ResponseStatus.code.bad_request).json({
+                    error: error.message,
+                    message: ResponseStatus.fail.bad_request,
+                    data: {},
+                });
+            }
+
+            const provider = new OpenAISlideGenProvider();
+            const parseText = await provider.pdfTextParse(Constants.LESSON_PDF_FILE_LOCATION,
+             Constants.LESSON_SG_EXTRACTED_FILE_LOCATION, 
+             { parser: 'pdftext'});
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.sucess,
+                data: { extracted_text: parseText }
+            });
+
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
+
+    static async generateLesson(req, res) {
+        const { id } = req.params;
+        const data = req.body;
+
+        try {
+            if (!data || !data.questions_text || !data.questions_count) {
+                return res.status(ResponseStatus.code.bad_request).json({
+                    error: '',
+                    message: ResponseStatus.fail.bad_request,
+                    data: {},
+                });
+            }
+
+            const textbookInstance = await Textbook.findByPk(req.params.id);
+
+            if (!textbookInstance) {
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: false,
+                    message: ResponseStatus.fail.not_found,
+                    data: {},
+                });
+            }
+
+            const pastQuestionsText = data.questions_text;
+            const questionsCount = data.questions_count;
+            const yearsOrSemestersCount = 1; // 1 year per source supported for now
+
+            if (!pastQuestionsText || !questionsCount) {
+                return res.status(ResponseStatus.code.bad_request).json({
+                    error: false,
+                    message: ResponseStatus.fail.bad_request,
+                    data: {},
+                });
+            }
+
+            const provider = new OpenAISlideGenProvider();
+
+            const sysPromptTemplate = new SystemPromptTemplate(data.exam_name, 
+                data.subject_course, data.exam_type);
+            const sysPrompt = sysPromptTemplate.sysPrompt;
+
+            const settings = new Settings();
+            settings.system_prompt = sysPrompt;
+            settings.max_token_length = C.MAX_MODEL_TOKENS;
+            settings.temperature = 0.5; //make the output more deterministic
+
+            const loopRecord = { loop_count: 0, aggregate_tokens: 0, aggregate_cost: 0.00 };
+
+            //send to AI to generate
+            const extractionResult = await provider.extractStructuredData(pastQuestionsText, questionsCount, 
+                yearsOrSemestersCount, sysPromptTemplate.completionLoopControl, 
+                settings, new Map(), 0, 0, 
+                loopRecord
+            );
+
+            //log result's record
+            const record = extractionResult.loop_record;
+
+            //save to database
+            const pa = extractionResult.past_questions;
+            
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
+
+    static async getIllustrations(req, res) {
+        const body = req.body;
+        try {
+
+            if (!body || !body.name || !body.subject_course || !body.year_semester) {
+                return res.status(ResponseStatus.code.bad_request).json({
+                    error: 'Exam name, subject/course, and year/semester is required.',
+                    message: ResponseStatus.fail.bad_request,
+                    data: {},
+                });
+            }
+
+            const images = await ExamIllustration.findAll({ 
+                where: { 
+                    name: body.name,
+                    subject_course: body.subject_course,
+                    year_semester: body.year_semester, 
+                }, 
+            });
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.sucess,
+                data: images,
+            });
+
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
+
+    static async uploadIllustrations(req, res) {
+        const body = req.body;
+        try {
+            const files = req.files;
+
+            if (!files || !Array.isArray(files) || files.length == 0) {
+                const error = new Error("No images were uploaded.");
+
+                //console.error(error.message);
+                //TODO log, notify monitor
+
+                return res.status(ResponseStatus.code.bad_request).json({
+                    error: error.message,
+                    message: ResponseStatus.fail.bad_request,
+                    data: {},
+                });
+            }
+
+            if (!body || !body.name || !body.subject_course || !body.year_semester) {
+                return res.status(ResponseStatus.code.bad_request).json({
+                    error: 'Exam name, subject/course, and year/semester is required.',
+                    message: ResponseStatus.fail.bad_request,
+                    data: {},
+                });
+            }
+
+            const items = [];
+            files.forEach(async (file) => {
+                const imageUploadResponse = await cloudinaryUploadImage(
+                    file.path
+                );
+                items.push({ name: body.name, subjec_course: body.subject_course, 
+                    year_semester: body.year_semester, url: imageUploadResponse.secure_url }
+                );
+            });
+
+            //should be single inserts as there is no validation for bulk insert
+            const images = await ExamIllustration.bulkCreate(items);
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.added,
+                data: images,
+            });
+
         } catch (error) {
             res.status(500).json({
                 error: "server error",
