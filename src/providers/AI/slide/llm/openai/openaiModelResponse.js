@@ -1,21 +1,18 @@
-import { ChatCompletion } from "openai/resources/chat/completions";
-import { ModelResponseInterface } from "../modelResponseInterface";
-import { CompletionUsage } from "openai/resources/completions";
 
-export class OpenAIModelResponse implements ModelResponseInterface {
-    id!: string;
-    choices!: ChatCompletion.Choice[];
-    created!: number;
-    model!: string;
-    object: string = "chat.completion";
-    system_fingerprint?: string | undefined;
-    usage?: CompletionUsage | undefined;
+export class OpenAIModelResponse {
+    id = '';
+    choices = [];
+    created = '';
+    model = '';
+    object = "chat.completion";
+    system_fingerprint = ''
+    usage = {};
 
     constructor() {
         
     }
 
-    response(): object {
+    response() {
         return {
             id: this.id,
             choices: this.choices,

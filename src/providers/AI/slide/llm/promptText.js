@@ -1,11 +1,11 @@
-export interface PromptText {
+export class PromptText {
     /**
    * The text content.
    */
-  text: string;
+  text = '';
 
   /**
    * The type of the content part.
    */
-  type: 'text';
+  type = 'text';
 }

@@ -1,10 +1,10 @@
 import { PromptImageURL } from "./promptImageURL";
 
-export interface PromptImage {
-    image_url: PromptImageURL;
+export class PromptImage {
+    image_url = PromptImageURL;
 
     /**
      * The type of the content part.
      */
-    type: 'image_url';
+    type = 'image_url';
 }

@@ -1,21 +1,25 @@
-import { AISlideGenProvider } from './aiSlideGenProvider';
-import { Question, YearSemester, CompletionsLoopRecord, LLMExtractionResult, PastQuestions } from './pastQuestionModel';
-import { promisify } from 'util';
-import { exec } from 'node:child_process';
-import path from 'path';
-import fs from 'fs';
-import { get_encoding, encoding_for_model, TiktokenModel } from "tiktoken";
-import { PromptProperties } from './llm/promptProperties';
-import { OpenAIModel } from './llm/openai/openaiModel';
-import { OpenAIModelResponse } from './llm/openai/openaiModelResponse';
-import { Settings } from './llm/settings';
-import 'dotenv/config';
-import { PromptPart } from './llm/promptPart';
-import { C } from './common/c';
+const { Question, YearSemester, CompletionsLoopRecord, LLMExtractionResult, PastQuestions } = require('./pastQuestionModel');
+const { promisify } = require('util');
+const { exec } = require('node:child_process');
+const path = require('path');
+const fs = require('fs');
+const { get_encoding, encoding_for_model } = require("tiktoken");
+const { PromptProperties } = require('./llm/promptProperties');
+const { OpenAIModel } = require('./llm/openai/openaiModel');
+const { OpenAIModelResponse } = require('./llm/openai/openaiModelResponse');
+const { Settings } = require('./llm/settings');
+const dotenv = require('dotenv/config');
+const { PromptPart } = require('./llm/promptPart');
+const { C } = require('./common/c');
 
-export class AISlideGenProviderImpl implements AISlideGenProvider {
+export class OpenAISlideGenProvider {
 
     constructor() {
+    }
+
+    ParserOptions = {
+        parser: '',
+        envPath: ''
     }
     
 
@@ -27,8 +31,7 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
      * @param options Options for the parser of choice and any virtual environment path to source.
      * @returns 
      */
-    async pdfTextParse(pdfPath: string, outputPath: string, 
-        options: { parser: string, envPath?: string }): Promise<string> {
+    async pdfTextParse(pdfPath, outputPath, options){
         if (options.parser === 'pdftext') {
             const command = `pdftext ${pdfPath} --out_path ${outputPath} --keep_hyphens`;
             let fullCommand = '';
@@ -62,8 +65,8 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
             throw new Error('Unsupported parser.');
         }
     }
-    calculateTextTokenCount(text: string, model: string): number {
-        const enc = encoding_for_model( model as TiktokenModel);
+    calculateTextTokenCount(text, model) {
+        const enc = encoding_for_model( model);
 
         const tokens = enc.encode(text);
         
@@ -71,26 +74,26 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
 
         return tokens.length;
     }
-    calculateImageTokenCount(imagePath: string): number {
+    calculateImageTokenCount(imagePath) {
         //TODO
         return 0;
     }
-    calculateOpenAIModelCost(inTokenCount: number, outTokenCount: number, 
-        costPerInToken: number, costPerOutToken: number): number {
+    calculateOpenAIModelCost(inTokenCount, outTokenCount, 
+        costPerInToken, costPerOutToken) {
         return (costPerInToken * inTokenCount) + (costPerOutToken * outTokenCount);
     }
-    concatStringArray(stringArray: string[]): string {
+    concatStringArray(stringArray) {
         let concat = ""
         stringArray.forEach((text) => {
             concat += text + " ";
         })
         return concat.trim();
     }
-    async extractStructuredData(pdfText: string | string[], totalQuestions: number, 
-        totalYears: number, completionLoopControl: string, settings: Settings, 
-        retrievedQuestionsMap: Map<string, Question[]>, 
-        retrievedQuestionsTotal: Question[], retrievedYearsTotal: YearSemester[], 
-        loopRecord: CompletionsLoopRecord): Promise<LLMExtractionResult | null> {
+    async extractStructuredData(pdfText, questionsCount, 
+        yearsCount, completionLoopControl, settings, 
+        retrievedQuestionsMap, 
+        retrievedQuestionsTotal, retrievedYearsTotal, 
+        loopRecord) {
         
         loopRecord.loop_count++;
 
@@ -100,8 +103,8 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
         prompt.messages.push({role: C.SYSTEM_ROLE, content: settings.system_prompt});
 
         if (Array.isArray(pdfText)) {
-            const promptParts: PromptPart[] = [];
-            pdfText.forEach((text: string) => {
+            const promptParts = [];
+            pdfText.forEach((text) => {
                 if (this.isValidURL(text)) {
                     promptParts.push({image_url: {url: text}, type: 'image_url'});
                 } else {
@@ -123,12 +126,12 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
         prompt.stop_sequence = settings.stop_sequence;
 
         const openai = new OpenAIModel();
-        const oaiRes: OpenAIModelResponse = await openai.generateText(prompt) as OpenAIModelResponse; // can check instance in the future
+        const oaiRes = await openai.generateText(prompt); // can check instance in the future
 
-        const outTokensCount = oaiRes.usage?.completion_tokens; //ConvoUtils.textTokenCount(oaiRes.choices[0].message.content);
-        const totalTokens = oaiRes.usage?.total_tokens;
+        const outTokensCount = oaiRes.usage.completion_tokens; //ConvoUtils.textTokenCount(oaiRes.choices[0].message.content);
+        const totalTokens = oaiRes.usage.total_tokens;
 
-        loopRecord.aggregate_tokens += totalTokens!!;
+        loopRecord.aggregate_tokens += totalTokens;
 
         //console.log("Actual Out Tokens: " + outputTokens);
         //console.log("Actual Total Tokens: " + totalTokens);
@@ -136,7 +139,7 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
         const inTokenCount = this.calculateTextTokenCount(
             Array.isArray(pdfText)? this.concatStringArray(pdfText) 
             : pdfText, settings.model);
-        const openAICost = this.calculateOpenAIModelCost(inTokenCount, outTokensCount!!, 
+        const openAICost = this.calculateOpenAIModelCost(inTokenCount, outTokensCount, 
             settings.cost_per_in_tokens, settings.cost_per_out_tokens);
 
         loopRecord.aggregate_cost += openAICost;
@@ -148,11 +151,11 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
 
         //jsonDataExtract = sanitizeJSON(jsonDataExtract!!);
 
-        const pastQuestionsJson = JSON.parse(jsonDataExtract!!) as PastQuestions;
+        const pastQuestionsJson = JSON.parse(jsonDataExtract);
 
         const yearsSemesters = pastQuestionsJson.years_semesters; //All the years/semesters for this iteration
 
-        const questions: Question[] = []; // All the questions for this iteration irrespective of the year/semester or question number
+        const questions = []; // All the questions for this iteration irrespective of the year/semester or question number
 
         questions.push(...yearsSemesters[0].questions);
 
@@ -187,7 +190,7 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
         
         const yearsSemestersExtractedCount = yearsSemesters.length; // number of years/semesters extracted in this iteration
         
-        if (retrievedQuestionsTotal.length >= totalQuestions) { //retrievedQuestionsTotal.length === totalQuestions) {
+        if (retrievedQuestionsTotal.length >= questionsCount) { //retrievedQuestionsTotal.length === questionsCount) {
 
             pastQuestionsJson.years_semesters[0].questions = retrievedQuestionsTotal; //retrievedYearsTotal;
 
@@ -195,7 +198,7 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
         }
 
         const curSysPrompt = settings.system_prompt;
-        const newCompletionLoopControl = `Start from question number ${questions[questionsExtractedCount - 1].question_number + 1} down to as much as possible. Generate as much as you can without exceeding the maximum completion tokens or outputing an invalid JSON. You can do 10 to 15 at a time.`
+        const newCompletionLoopControl = `Start = require(question number ${questions[questionsExtractedCount - 1].question_number + 1} down to as much as possible. Generate as much as you can without exceeding the maximum completion tokens or outputing an invalid JSON. You can do 10 to 15 at a time.`
         
         curSysPrompt.replace(completionLoopControl, "replaceValue");
         completionLoopControl = newCompletionLoopControl;
@@ -204,26 +207,26 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
         //Cut already processed sections out here.
         let usedSectionStartText = questions[0].question_number + "."; //questions[0].question_number + ". " + questions[0].question;
 
-        //Start cutting sections out from an instruction/passage/illustration link.
+        //Start cutting sections out = require(an instruction/passage/illustration link.
         const instrLength = questions[0].instruction.length;
         const passLength = questions[0].passage.length;
         const illusLength = questions[0].illustration.length;
         if (instrLength > 0) {
-            //if instruction is available, then start cutting from there assumming it's
+            //if instruction is available, then start cutting = require(there assumming it's
             // before the question.
             const prefixCalc = 10 / 100 * questions[0].instruction.length;
             const prefixLength = prefixCalc < 10 ? 
                 questions[0].instruction.length : prefixCalc;
             usedSectionStartText = questions[0].instruction.substring(0, prefixLength);
         } else if (instrLength === 0 && passLength > 0) {
-            //if passage is available and instruction isn't, then start cutting from there assumming it's
+            //if passage is available and instruction isn't, then start cutting = require(there assumming it's
             // before the question.
             const prefixCalc = 10 / 100 * questions[0].passage.length;
             const prefixLength = prefixCalc < 10 ? 
                 questions[0].passage.length : prefixCalc;
             usedSectionStartText = questions[0].passage.substring(0, prefixLength);
         } else if (instrLength === 0 && illusLength > 0) {
-            //if illustration available and instruction isn't available, then cut from there assuming it's
+            //if illustration available and instruction isn't available, then cut = require(there assuming it's
             // before the question.
             usedSectionStartText = questions[0].illustration;
         }
@@ -273,12 +276,12 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
 
         const rePartitionedPdfText = this.sliceUpByMarkdownURLs(sectionedPdfText);
 
-        return await this.extractStructuredData(rePartitionedPdfText, totalQuestions,  totalYears, 
+        return await this.extractStructuredData(rePartitionedPdfText, questionsCount,  yearsCount, 
             completionLoopControl, settings, retrievedQuestionsMap, 
             retrievedQuestionsTotal, retrievedYearsTotal, loopRecord);
 
     }
-    sanitizeJSON(jsonStr: string): string {
+    sanitizeJSON(jsonStr) {
         // Remove any non-printable characters
         let sanitized = jsonStr.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
 
@@ -319,7 +322,7 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
         sanitized = sanitized.replace(/](?!\s*[,}\]])/g, '],');
 
         // Balance brackets and braces
-        const balanceBrackets = (str: string, open: string, close: string) => {
+        const balanceBrackets = (str, open, close) => {
             let count = 0;
             for (let char of str) {
                 if (char === open) count++;
@@ -340,8 +343,8 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
             return sanitized;
         }
     }
-    sliceUpByMarkdownURLs(extractedText: string): string[] {
-        const result: string[] = [];
+    sliceUpByMarkdownURLs(extractedText) {
+        const result = [];
         const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
         let lastIndex = 0;
         let match;
@@ -368,17 +371,17 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
 
         return result;
     }
-    isValidURL(link: string): boolean {
+    isValidURL(link) {
         if (!link || link.length === 0)
             return false;
 
         return /^(https:\/\/)(([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})(:\d+)?(\/\S*)?$/i.test(link);
     }
-    sliceByUsedUpSection(extractedText: string | string[], usedSectionStartText: string, 
-        usedSectionEndText: string, usedSectionStartAlts: string[], 
-        usedSectionEndAlts: string[]): string {
+    sliceByUsedUpSection(extractedText, usedSectionStartText, 
+        usedSectionEndText, usedSectionStartAlts, 
+        usedSectionEndAlts) {
         
-        //Remove the used up section of the text from the extracted text. 
+        //Remove the used up section of the text = require(the extracted text. 
         //Any section of extracted text that has been made structured already doens't have to go 
         //in with the others in the completions loop. This is to save tokens and not confuse 
         //the LLM.
@@ -424,5 +427,4 @@ export class AISlideGenProviderImpl implements AISlideGenProvider {
 
         return text.slice(0, start) + text.slice(end + endTextLength);
     }
-    
 }

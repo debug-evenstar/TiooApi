@@ -1,3 +1,3 @@
-export interface ModelResponseInterface {
-    response(): object;
+export class ModelResponseInterface {
+    function response(): object;
 }

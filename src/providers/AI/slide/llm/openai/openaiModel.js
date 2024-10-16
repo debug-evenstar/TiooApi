@@ -1,16 +1,15 @@
-import OpenAI from 'openai';
-import { ModelInterface } from '../modelInterface';
-import { PromptProperties } from '../promptProperties';
-import { ModelResponseInterface } from '../modelResponseInterface';
-import { OpenAIModelResponse } from './openaiModelResponse';
-export class OpenAIModel implements ModelInterface {
-    private openai;
+const { OpenAI } = require('openai');
+const { PromptProperties } = require('../promptProperties');
+const { ModelResponseInterface } = require('../modelResponseInterface');
+const { OpenAIModelResponse } = require('./openaiModelResponse');
+export class OpenAIModel {
+    openai;
 
     constructor() {
         this.openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     }
 
-    async generateText(prompt: PromptProperties): Promise<ModelResponseInterface> {
+    async generateText(prompt) {
         const arr = JSON.parse(JSON.stringify(prompt.messages));
         const completion = await this.openai.chat.completions.create({
             messages: arr,
@@ -43,5 +42,4 @@ export class OpenAIModel implements ModelInterface {
             //process.stdout.write(chunk.choices[0]?.delta?.content || "");
         //}
     }
-
 }

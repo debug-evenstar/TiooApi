@@ -2,7 +2,7 @@ import { C } from "../common/c";
 import { Settings } from "./settings";
 import { PromptProperties } from "./promptProperties";
 
-export const initPromptProperties = (message: string, settings: Settings) => {
+export const initPromptProperties = (message, settings) => {
     const prompt = new PromptProperties();
     prompt.messages[0] = {role: "system", content: settings.system_prompt};
     prompt.messages[1] = {role: "user", content: message};
