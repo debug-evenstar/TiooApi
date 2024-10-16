@@ -35,11 +35,24 @@ module.exports = (sequelize, Sequelize) => {
       is_completed: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
-      }
-    },{
-      tableName: 'lesson_progress',
-      timestamps: false
-    });
+      },
+      // created_at: {
+      //   allowNull: false,
+      //   type: Sequelize.DATE,
+      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      // },
+
+      // updated_at: {
+      //   allowNull: false,
+      //   type: Sequelize.DATE,
+      //   defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      //   onUpdate: Sequelize.literal('CURRENT_TIMESTAMP')
+      // }
+    }, {
+    tableName: 'lesson_progress',
+    timestamps: true,
+    underscored: true,
+  });
 
   return LessonProgress;
 }
