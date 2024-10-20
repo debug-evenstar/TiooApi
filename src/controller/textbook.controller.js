@@ -292,8 +292,9 @@ class TextbookController {
                 }
             });
             const getLessonRecord = (id) =>
-                account.lesson_progress.find((i) => i.lesson_id == id);
+                lesson_progress.find((i) => i.lesson_id == id);
 
+            
             textbook.chapters.forEach((chapter) => {
                 chapter.lessons.forEach((lesson) => {
                     const record = getLessonRecord(lesson.id);
