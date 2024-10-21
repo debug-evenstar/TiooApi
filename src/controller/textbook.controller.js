@@ -283,11 +283,18 @@ class TextbookController {
             const inShelf = account?.Shelf?.shelf?.includes(
                 textbookInstance.id
             );
-            const lesson_progress = account.lesson_progress;
+            // const lesson_progress = account.lesson_progress;
 
+            const lesson_progress = await LessonProgress.findAll({
+                where: {
+                    student_id: user_id,
+                    textbook_id: id,
+                }
+            });
             const getLessonRecord = (id) =>
-                account.lesson_progress.find((i) => i.lesson_id == id);
+                lesson_progress.find((i) => i.lesson_id == id);
 
+            
             textbook.chapters.forEach((chapter) => {
                 chapter.lessons.forEach((lesson) => {
                     const record = getLessonRecord(lesson.id);
