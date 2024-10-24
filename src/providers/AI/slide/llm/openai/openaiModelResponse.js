@@ -1,12 +1,12 @@
 
-export class OpenAIModelResponse {
+class OpenAIModelResponse {
     id = '';
     choices = [];
-    created = '';
+    created = 0;
     model = '';
     object = "chat.completion";
-    system_fingerprint = ''
-    usage = {};
+    system_fingerprint
+    usage
 
     constructor() {
         
@@ -47,3 +47,5 @@ export class OpenAIModelResponse {
         }
     }*/
 }
+
+module.exports = OpenAIModelResponse;

@@ -1,6 +1,4 @@
-import { PromptPart } from "./promptPart";
-
-export class Prompt {
+class Prompt {
     role = '';
     content = '' || [];
 
@@ -8,3 +6,5 @@ export class Prompt {
         
     }
 }
+
+module.exports = Prompt;

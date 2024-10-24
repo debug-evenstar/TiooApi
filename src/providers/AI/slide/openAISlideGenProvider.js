@@ -1,18 +1,18 @@
-const { Question, YearSemester, CompletionsLoopRecord, LLMExtractionResult, PastQuestions } = require('./pastQuestionModel');
-const { promisify } = require('util');
-const { exec } = require('node:child_process');
-const path = require('path');
-const fs = require('fs');
+const { Question, YearSemester, CompletionsLoopRecord, LLMExtractionResult, PastQuestions } = require("./pastQuestionModel");
+const { promisify } = require("util");
+const { exec } = require("node:child_process");
+const path = require("path");
+const fs = require("fs");
 const { get_encoding, encoding_for_model } = require("tiktoken");
-const { PromptProperties } = require('./llm/promptProperties');
-const { OpenAIModel } = require('./llm/openai/openaiModel');
-const { OpenAIModelResponse } = require('./llm/openai/openaiModelResponse');
-const { Settings } = require('./llm/settings');
-const dotenv = require('dotenv/config');
-const { PromptPart } = require('./llm/promptPart');
-const { C } = require('./common/c');
+const { PromptProperties } = require("./llm/promptProperties");
+const { OpenAIModel } = require("./llm/openai/openaiModel");
+const { OpenAIModelResponse } = require("./llm/openai/openaiModelResponse");
+const { Settings } = require("./llm/settings");
+const dotenv = require("dotenv/config");
+//const { PromptPart } = require("./llm/promptPart");
+const { C } = require("./common/c");
 
-export class OpenAISlideGenProvider {
+class OpenAISlideGenProvider {
 
     constructor() {
     }
@@ -428,3 +428,5 @@ export class OpenAISlideGenProvider {
         return text.slice(0, start) + text.slice(end + endTextLength);
     }
 }
+
+module.exports = OpenAISlideGenProvider;

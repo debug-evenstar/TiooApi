@@ -1,4 +1,4 @@
-export class PromptImageURL {
+class PromptImageURL {
     /**
      * Either a URL of the image or the base64 encoded image data.
      */
@@ -10,3 +10,5 @@ export class PromptImageURL {
      */
     detail = 'auto' || 'low' || 'high';
 }
+
+module.exports = PromptImageURL;

@@ -1,4 +1,4 @@
-export class C {
+class C {
     static USER_ROLE = "user";
 
     static SYSTEM_ROLE = "system";
@@ -9,3 +9,5 @@ export class C {
 
     static MAX_MODEL_TOKENS = 16383 //context length for gpt-4o-2024-08-06
 }
+
+module.exports = C;

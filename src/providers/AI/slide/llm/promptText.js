@@ -1,4 +1,4 @@
-export class PromptText {
+class PromptText {
     /**
    * The text content.
    */
@@ -9,3 +9,5 @@ export class PromptText {
    */
   type = 'text';
 }
+
+module.exports = PromptText;

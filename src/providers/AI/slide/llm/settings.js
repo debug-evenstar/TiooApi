@@ -1,4 +1,4 @@
-export class Settings {
+class Settings {
     temperature = 1.0
     max_token_length = 256
     stop_sequence = ''
@@ -10,3 +10,5 @@ export class Settings {
     cost_per_in_tokens = 0.00
     cost_per_out_tokens = 0.00
 }
+
+module.exports = Settings;

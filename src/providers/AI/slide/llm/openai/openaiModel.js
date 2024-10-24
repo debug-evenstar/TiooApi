@@ -1,8 +1,8 @@
 const { OpenAI } = require('openai');
 const { PromptProperties } = require('../promptProperties');
-const { ModelResponseInterface } = require('../modelResponseInterface');
 const { OpenAIModelResponse } = require('./openaiModelResponse');
-export class OpenAIModel {
+
+class OpenAIModel {
     openai;
 
     constructor() {
@@ -43,3 +43,5 @@ export class OpenAIModel {
         //}
     }
 }
+
+module.exports = OpenAIModel;

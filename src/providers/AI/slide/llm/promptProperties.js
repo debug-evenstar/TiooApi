@@ -1,5 +1,4 @@
-import { Prompt } from './prompt';
-export class PromptProperties {
+class PromptProperties {
 
     messages = [];
     model = "";
@@ -11,6 +10,7 @@ export class PromptProperties {
     top_p = 1.0;
 
     constructor() {
-        
     }
 }
+
+module.exports = PromptProperties;

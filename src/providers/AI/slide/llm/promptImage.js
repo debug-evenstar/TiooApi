@@ -1,6 +1,6 @@
-import { PromptImageURL } from "./promptImageURL";
+const { PromptImageURL } = require("./promptImageURL");
 
-export class PromptImage {
+class PromptImage {
     image_url = PromptImageURL;
 
     /**
@@ -8,3 +8,5 @@ export class PromptImage {
      */
     type = 'image_url';
 }
+
+module.exports = PromptImage;

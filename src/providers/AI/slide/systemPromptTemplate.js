@@ -1,4 +1,4 @@
-export class SystemPromptTemplate {
+class SystemPromptTemplate {
 
     examName = 'JAMB';
     subjectCourse = 'Mathematics';
@@ -59,3 +59,5 @@ export class SystemPromptTemplate {
 
     sysPrompt = `${this.introInstructions} ${this.jsonTemplate} ${this.templateFieldDefinitions} ${this.filterInstructions} ${this.closingInstructions}`;
 }
+
+module.exports = SystemPromptTemplate;
