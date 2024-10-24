@@ -1118,13 +1118,13 @@ class AuthController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.no_user });
             }
             let validation;
-            validation = await Validation.findOne({ where: { accountId: account.id } });
-
+            validation = await Validation.findOne({ where: { account_id: account.id } });
+            const expiry = new Date(Date.now() + 30 * 60 * 1000);
             if (!validation) {
-                const newValidation = await Validation.create({ otp: random_hash });
+                const newValidation = await Validation.create({ otp: random_hash  });
                 validation = await account.setValidation(newValidation);
             } else {
-                const newValidation = await validation.update({ otp: random_hash });
+                const newValidation = await validation.update({ otp: random_hash, expires_at: expiry });
             }
 
             const link = `${process.env.DEV}/new-password/${validation.otp}/${account.email}`;
@@ -1198,7 +1198,7 @@ class AuthController {
                 });
             }
 
-            const validation = await Validation.findOne({ where: { accountId: account.id } });
+            const validation = await Validation.findOne({ where: { account_id: account.id } });
 
             const isCodeValid = await validation.compareOTP(data.code);
 
