@@ -71,6 +71,7 @@ const OnboardingController = require("../controller/onboarding.controller");
 const TextbookValidator = require("./validators/TextbookValidator");
 const LibraryController = require("../controller/library.controller");
 const ReferralController = require("../controller/referrals.controller");
+const StudyPlanController = require("../controller/studyPlan.controller");
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -761,7 +762,24 @@ const AuthorizedRoutesGroup = (router) => {
         "/resetpassword/account/student/external",
         ExternalSchoolController.ResetPassword
     );
+
+
+
+
+    /* ------------------------- Study Plan ---------------------------- */
+    router.post("/account/studyplan/target-score",StudyPlanController.setTargetScore);
+    router.post("/account/studyplan",StudyPlanController.updateStudyPlan);
+
+    
+
+
+
+
+
+
+
 };
+
 
 OpenRoutesGroup(router);
 AuthorizedRoutesGroup(router);
