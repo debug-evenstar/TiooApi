@@ -36,6 +36,21 @@ class StudyPlanController {
     });
   }
 
+  static async getStudyPlan(req,res){
+    const { id } = req.userData;
+    
+    const record = await StudyPlan.findOne({
+      where: {
+        account_id: id
+      }
+    })
+
+    return res.send({
+      error: false,
+      data: record
+    })
+  }
+
   static async setTargetScore(req, res) {
     const { id } = req.userData;
     const { target_score } = req.body;

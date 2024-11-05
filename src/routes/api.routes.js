@@ -769,6 +769,7 @@ const AuthorizedRoutesGroup = (router) => {
     /* ------------------------- Study Plan ---------------------------- */
     router.post("/account/studyplan/target-score",StudyPlanController.setTargetScore);
     router.post("/account/studyplan",StudyPlanController.updateStudyPlan);
+    router.get("/account/studyplan",StudyPlanController.getStudyPlan);
 
     
 
