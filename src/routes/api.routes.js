@@ -206,6 +206,7 @@ const OpenRoutesGroup = (router) => {
 
     router.get("/open/lesson/:id/template", LessonController.lessonTemplate);
     router.delete("/slides/:id", LessonController.deleteLessonSlide);
+    router.post("/slides/:id/reorder", LessonController.reorderLessonSlide);
     router.put(
         "/open/lesson/template/:id",
         LessonController.updateLessonTemplate
