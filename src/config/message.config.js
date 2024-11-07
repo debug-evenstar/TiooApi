@@ -10,7 +10,7 @@ const ResponseMessage = {
         register: 'Account created successfully',
         send_otp: 'OTP has been resent. Kindly check email for OTP',
         verify: 'Verification successful',
-        login: 'LoggedIn successfully',
+        login: 'Login successful',
         invite: 'Invite Accepted',
         send_invite: 'Invitation Sent',
         sucess: "success",

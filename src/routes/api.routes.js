@@ -71,6 +71,7 @@ const OnboardingController = require("../controller/onboarding.controller");
 const TextbookValidator = require("./validators/TextbookValidator");
 const LibraryController = require("../controller/library.controller");
 const ReferralController = require("../controller/referrals.controller");
+const StudyPlanController = require("../controller/studyPlan.controller");
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -205,6 +206,7 @@ const OpenRoutesGroup = (router) => {
 
     router.get("/open/lesson/:id/template", LessonController.lessonTemplate);
     router.delete("/slides/:id", LessonController.deleteLessonSlide);
+    router.post("/slides/:id/reorder", LessonController.reorderLessonSlide);
     router.put(
         "/open/lesson/template/:id",
         LessonController.updateLessonTemplate
@@ -761,7 +763,25 @@ const AuthorizedRoutesGroup = (router) => {
         "/resetpassword/account/student/external",
         ExternalSchoolController.ResetPassword
     );
+
+
+
+
+    /* ------------------------- Study Plan ---------------------------- */
+    router.post("/account/studyplan/target-score",StudyPlanController.setTargetScore);
+    router.post("/account/studyplan",StudyPlanController.updateStudyPlan);
+    router.get("/account/studyplan",StudyPlanController.getStudyPlan);
+
+    
+
+
+
+
+
+
+
 };
+
 
 OpenRoutesGroup(router);
 AuthorizedRoutesGroup(router);

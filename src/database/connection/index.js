@@ -141,6 +141,10 @@ const LessonProgress = (db.lessonProgress = require("../lessonprogress.model")(
   Sequelize
 ));
 
+const StudyPlan = (db.studyplan = require("../studyplan.model")(
+  sequelize, Sequelize
+));
+
 const Topic = (db.topic = require("../topic.model"))(
   sequelize,Sequelize
 );
@@ -187,6 +191,7 @@ const models = [
   LessonProgress,
   Referral,
   SubCategory,
+  StudyPlan,
 ];
 
 Relationships.group(...models);
@@ -231,4 +236,5 @@ module.exports = {
   LessonProgress,
   Referral,
   SubCategory,
+  StudyPlan,
 };
