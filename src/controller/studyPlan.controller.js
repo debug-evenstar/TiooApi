@@ -16,6 +16,8 @@ class StudyPlanController {
       }
     })
 
+
+
     if (!studyplan) {
       await StudyPlan.create({
         account_id: id,
@@ -65,7 +67,7 @@ class StudyPlanController {
       await StudyPlan.create({
         account_id: id,
         target_score: target_score,
-        data: {},
+        data: [],
       })
     } else {
       studyplan.target_score = target_score;
