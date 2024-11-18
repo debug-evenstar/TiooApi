@@ -33,6 +33,7 @@ class Relationships {
     LessonProgress,
     Referral,
     SubCategory,
+    StudyPlan,
 
   ) {
     //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
@@ -41,6 +42,7 @@ class Relationships {
       foreignKey: "account_id",
       as: "validation",
     });
+
 
     Validation.belongsTo(Account, {
       foreignKey: "account_id",
@@ -140,6 +142,17 @@ class Relationships {
       allowNull: true,
       foreignKey: "school_management_id",
     });
+
+
+
+
+
+    Account.hasOne(StudyPlan, {
+      foreignKey: "account_id",
+      as: "study_plan"
+    })
+
+    StudyPlan.belongsTo(Account,{ foreignKey: "account_id"});
 
     //---------/ ONE-TO-MANY - SCHOOL -*- CLASS | TEACHERS | STUDENT | SUBJECT /--------------------
 

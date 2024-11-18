@@ -724,11 +724,13 @@ class LessonController {
 
         try {
             const lessonInstance = await Lesson.findByPk(id, {
+                order :[
+                    [{ model: LessonSlide, as: "lesson_slides" }, "slide_index", "ASC"]
+                ],
                 include: [
                     {
                         model: LessonSlide,
                         as: "lesson_slides",
-                        orderBy: { slide_index: "asc" },
                     },
                     Textbook,
                     Chapter,
@@ -739,6 +741,67 @@ class LessonController {
                 error: false,
                 message: ResponseStatus.pass.read,
                 data: lessonInstance,
+            });
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
+
+    static async reorderLessonSlide(req, res) {
+        const { id } = req.params;
+        const data = req.body;
+        try {
+
+            let lessonSlideInstance = await LessonSlide.findByPk(id);
+
+            if (!lessonSlideInstance) {
+                return res.status(ResponseStatus.code.not_found).json({
+                    error: true,
+                    message: ResponseStatus.fail.not_found,
+                });
+            }
+            const lessonId = lessonSlideInstance.lesson_id;
+
+            const allLessonSlides = await LessonSlide.findAll({
+                where: { lesson_id: lessonId },
+                order: [["slide_index", "ASC"]],
+            });
+
+            // Fix slides indexing if faulty
+            for (let i = 0; i < allLessonSlides.length; i++) {
+                const slide = allLessonSlides[i];
+                slide.slide_index = i;
+                await slide.save();
+            }
+
+            // Reload lesson slide instance
+            lessonSlideInstance = allLessonSlides.find((s) => s.id == lessonSlideInstance.id);
+            const slideIndex = lessonSlideInstance.slide_index;
+
+            // Reassign slide indices
+
+            if (
+                slideIndex + data.direction <= allLessonSlides.length - 1 &&
+                slideIndex + data.direction >= 0
+            ) {
+                const newIndex = slideIndex + data.direction;
+                allLessonSlides[newIndex].slide_index = slideIndex;
+                await allLessonSlides[newIndex].save();
+                allLessonSlides[slideIndex].slide_index = newIndex;
+                await allLessonSlides[slideIndex].save();
+
+                allLessonSlides.sort((a, b) => {
+                    return a.slide_index - b.slide_index;
+                });
+            }
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.sucess,
+                data: allLessonSlides,
             });
         } catch (error) {
             res.status(500).json({
@@ -765,14 +828,14 @@ class LessonController {
 
             // Reassign slide indices
             const allLessonSlides = await LessonSlide.findAll({
-                where : {lesson_id : lessonId}
+                where: { lesson_id: lessonId },
+                order: [["slide_index", "ASC"]],
             });
 
             allLessonSlides.forEach(async (slide, index) => {
                 slide.slide_index = index;
                 await slide.save();
-            })
-
+            });
 
             return res.status(ResponseStatus.code.success).json({
                 error: false,
