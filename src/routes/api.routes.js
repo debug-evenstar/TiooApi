@@ -72,6 +72,7 @@ const TextbookValidator = require("./validators/TextbookValidator");
 const LibraryController = require("../controller/library.controller");
 const ReferralController = require("../controller/referrals.controller");
 const StudyPlanController = require("../controller/studyPlan.controller");
+const ExamsController = require("../controller/exams.controller");
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -226,7 +227,7 @@ const OpenRoutesGroup = (router) => {
     router.get("/open/textbooks", Library.getLibraryTextbooks);
     router.get("/open/textbook/:id", Library.getLibraryTextbook);
     router.get("/open/subjects/:id/topics", SubjectController.getTopics);
-    router.get("/open/subjects/topics",SubjectController.getSubjectsWithTopics);
+    router.get("/open/subjects/topics", SubjectController.getSubjectsWithTopics);
     router.post("/open/lesson/asktutor", LessonController.askAITutor);
 };
 
@@ -733,7 +734,7 @@ const AuthorizedRoutesGroup = (router) => {
         "/onboarding/account-types",
         OnboardingController.addAccountType
     );
-    
+
     router.post(
         "/onboarding/account-type/:id/questions",
         OnboardingController.addAccountQuestion
@@ -768,17 +769,24 @@ const AuthorizedRoutesGroup = (router) => {
 
 
     /* ------------------------- Study Plan ---------------------------- */
-    router.post("/account/studyplan/target-score",StudyPlanController.setTargetScore);
-    router.post("/account/studyplan",StudyPlanController.updateStudyPlan);
-    router.get("/account/studyplan",StudyPlanController.getStudyPlan);
-
-    
+    router.post("/account/studyplan/target-score", StudyPlanController.setTargetScore);
+    router.post("/account/studyplan", StudyPlanController.updateStudyPlan);
+    router.get("/account/studyplan/", StudyPlanController.getStudyPlans);
 
 
 
+    /* ------------------------- Exams ---------------------------- */
 
+    router.get("/exams", ExamsController.fetchExams);
+    router.get('/exams/account', ExamsController.getAccountExams);
+    router.get("/exams/:id", ExamsController.fetchExam);
 
+    router.post("/exams/register", ExamsController.registerExams);
+    router.post('/exams/register/:exam_id', ExamsController.registerExam);
+    router.post('/exams/unregister/:exam_id', ExamsController.unRegisterExam);
 
+    router.get("/universities", ExamsController.getUniversities);
+    router.get("/universities/:id", ExamsController.getUniversity);
 
 };
 

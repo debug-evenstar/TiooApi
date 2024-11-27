@@ -16,6 +16,10 @@ module.exports = (sequelize, Sequelize) => {
         },
         onDelete: 'CASCADE',
       },
+      exam_id:{
+        type: Sequelize.INTEGER,
+        allowNull: false,
+      },
       target_score: {
         type: Sequelize.INTEGER,
         allowNull: false,

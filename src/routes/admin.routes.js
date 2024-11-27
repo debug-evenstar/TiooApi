@@ -31,6 +31,7 @@ const LessonController = require('../controller/lesson.controller');
 const TextbookController = require('../controller/textbook.controller');
 const TeacherController = require('../controller/teacher.controller');
 const LibraryController = require('../controller/library.controller');
+const ExamsController = require('../controller/exams.controller');
 
 
 
@@ -152,13 +153,13 @@ const AdminRoutesGroup = (router) => {
     /* ------------------------------------------- BOOK CATEGORIES ------------------------------------------ */
 
     router.get('/library/textbooks/categories', TextbookController.getBookCategories)
+    router.get('/library/textbooks/categories/by/:name', TextbookController.getCategoryByName)
     router.post('/library/textbooks/categories', TextbookController.createOrUpdateBookCategory)
-    router.delete('/library/textbooks/categories', TextbookController.deleteBookCategory)
+    router.delete('/library/textbooks/categories/:id', TextbookController.deleteBookCategory)
     router.get('/library/textbooks/categories/:id', TextbookController.getBookCategory)
-    router.post('/library/textbooks/categories/:id/sub-categories', TextbookController.addSubCategory)
-    router.delete('/library/textbooks/categories/:id/sub-categories', TextbookController.deleteSubCategory)
-
-
+    router.post('/library/textbooks/categories/:id/sub-categories', UploadService.uploadExamCover.single('cover'), TextbookController.addSubCategory)
+    router.put('/library/textbooks/sub-categories/:id', UploadService.uploadExamCover.single('cover'), TextbookController.updateSubCategory)
+    router.delete('/library/textbooks/sub-categories/:id', TextbookController.deleteSubCategory)
 
 
     /* ------------------------------------------- LESSONS ------------------------------------------ */
@@ -178,6 +179,18 @@ const AdminRoutesGroup = (router) => {
     router.put('/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.addLibraryLesson);
     router.put('/librarylesson/template/:id', AdminLibraryController.updateLibraryLessonTemplate);
 
+
+    /* ------------------------- Exam ---------------------------- */
+    router.get("/exams", ExamsController.fetchExams);
+    router.post("/exams", UploadService.uploadExamCover.single('cover'), ExamsController.createExam);
+    router.put("/exams/:id", UploadService.uploadExamCover.single('cover'), ExamsController.updateExam);
+    router.delete("/exams/:id", ExamsController.deleteExam);
+
+    router.get("/universities", ExamsController.getUniversities);
+    router.get("/universities/:id", ExamsController.getUniversity);
+    router.delete("/universities/:id", ExamsController.deleteUniversity);
+    router.post("/universities",UploadService.uploadExamCover.single('cover') , ExamsController.createUniversity);
+    router.put("/universities/:id",UploadService.uploadExamCover.single('cover') , ExamsController.updateUniversity);
 
 };
 

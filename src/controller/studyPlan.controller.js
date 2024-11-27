@@ -8,24 +8,24 @@ class StudyPlanController {
 
   static async updateStudyPlan(req, res) {
     const { id } = req.userData;
-    const { schedule } = req.body;
+    const { schedule, exam_id } = req.body;
 
-    const studyplan = await StudyPlan.findOne({
+    let studyplan = await StudyPlan.findOne({
       where: {
         account_id: id,
+        exam_id: exam_id,
       }
     })
 
-
-
     if (!studyplan) {
-      await StudyPlan.create({
+      studyplan = await StudyPlan.create({
         account_id: id,
         target_score: 0,
+        exam_id: exam_id,
         data: schedule,
       })
     } else {
-  
+
       await studyplan.update({
         data: schedule
       });
@@ -38,34 +38,37 @@ class StudyPlanController {
     });
   }
 
-  static async getStudyPlan(req,res){
+  static async getStudyPlans(req, res) {
     const { id } = req.userData;
-    
-    const record = await StudyPlan.findOne({
+    // const { exam_id } = req.params;
+
+    const records = await StudyPlan.findAll({
       where: {
-        account_id: id
+        account_id: id,
+        // exam_id: exam_id,
       }
     })
 
     return res.send({
       error: false,
-      data: record
+      data: records
     })
   }
 
   static async setTargetScore(req, res) {
     const { id } = req.userData;
-    const { target_score } = req.body;
-
+    const { target_score, exam_id } = req.body;
     const studyplan = await StudyPlan.findOne({
       where: {
         account_id: id,
+        exam_id: exam_id,
       }
     })
 
     if (!studyplan) {
       await StudyPlan.create({
         account_id: id,
+        exam_id: exam_id,
         target_score: target_score,
         data: [],
       })
@@ -73,6 +76,7 @@ class StudyPlanController {
       studyplan.target_score = target_score;
       await studyplan.save();
     }
+
     return res.status(200).json({
       error: false,
       message: "Saved schedule successfully",
