@@ -31,6 +31,7 @@ const { use } = require("chai");
 const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
 const AdminLibraryController = require("./admin/management/library.controller");
 const ResponseMessage = require("../config/message.config");
+const { Op } = require("sequelize");
 // const { data } = require("../seeders/notification.seeds");
 
 class TextbookController {
@@ -53,7 +54,7 @@ class TextbookController {
         try {
             let classes = JSON.parse(req.body.classes);
             req.body.classes = classes;
-        } catch (err) {}
+        } catch (err) { }
 
         try {
             const classInstance = await Class.findAll({
@@ -88,7 +89,7 @@ class TextbookController {
             console.log(error);
             res.status(500).json({
                 error: "server error",
-                extra: error.message,
+                extra: error?.message,
             });
         }
     }
@@ -369,10 +370,17 @@ class TextbookController {
     }
 
     static async deleteBookCategory(req, res) {
-        const { id } = req.body;
+        const { id } = req.params;
 
         const cat = await BookCategory.findByPk(id);
-        if (cat) await cat.delete();
+        if (cat) {
+            await SubCategory.destroy({
+                where: {
+                    parent_id: cat.id
+                }
+            })
+            await cat.destroy();
+        }
 
         return res.status(ResponseMessage.code.success).json({
             error: false,
@@ -380,13 +388,35 @@ class TextbookController {
         });
     }
 
+    static async getCategoryByName(req,res){
+        const { name } = req.params;
+        const cat = await BookCategory.find({
+            where: {
+                name: { [Op.iLike]: `%${name}%` }
+            }
+        })
+
+        return res.send({
+            error: false,
+            data: cat
+        })
+    }
+
     static async addSubCategory(req, res) {
         const id = req.params.id;
         const { name } = req.body;
 
+        if (req.file) {
+            const filePath = req.file.path;
+            const ImageResponse = await cloudinaryUploadImage(filePath);
+            req.body.cover = ImageResponse.secure_url;
+        }
+
+
         const sub = await SubCategory.create({
             parent_id: id,
             name: name,
+            cover: req.body.cover
         });
 
         return res.status(ResponseMessage.code.success).json({
@@ -395,11 +425,41 @@ class TextbookController {
         });
     }
 
+    static async updateSubCategory(req, res) {
+        const id = req.params.id;
+        const { name } = req.body;
+
+        if (req.file) {
+            const filePath = req.file.path;
+            const ImageResponse = await cloudinaryUploadImage(filePath);
+            req.body.cover = ImageResponse.secure_url;
+        }
+
+        const sub = await SubCategory.findByPk(id);
+
+        if (sub) {
+            await sub.update({
+                name, name,
+                cover: req.body.cover
+            })
+        }
+
+        return res.send({
+            error: false,
+            message: "Updated successfully"
+        })
+    }
+
+
+
+
     static async deleteSubCategory(req, res) {
-        const { id } = req.body;
+        const { id } = req.params;
 
         const cat = await SubCategory.findByPk(id);
-        if (cat) await cat.delete();
+        if (cat) {
+            await cat.destroy()
+        }
 
         return res.status(ResponseMessage.code.success).json({
             error: false,

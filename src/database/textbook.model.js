@@ -47,7 +47,15 @@ module.exports = (sequelize, DataTypes) => {
             author: {
                 type: DataTypes.STRING,
                 allowNull: true,
-            }
+            },
+            university_id: {
+                type: DataTypes.INTEGER,
+                allowNull: true
+            },
+            exam_id: {
+                type: DataTypes.INTEGER,
+                allowNull: true
+            },
         },
         { timestamps: true, paranoid: true }
     );
