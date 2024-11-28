@@ -200,10 +200,13 @@ const models = [
   Referral,
   SubCategory,
   StudyPlan,
+<<<<<<< HEAD
   ExamSet,
+=======
   Exam,
   University,
   AccountExam,
+>>>>>>> adjustment/exams
 ];
 
 Relationships.group(...models);
@@ -249,8 +252,11 @@ module.exports = {
   Referral,
   SubCategory,
   StudyPlan,
-  ExamSet,
+<<<<<<< HEAD
+  ExamSet
+=======
   Exam,
   University,
   AccountExam,
+>>>>>>> adjustment/exams
 };
