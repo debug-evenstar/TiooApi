@@ -26,11 +26,13 @@ const ErrorLogs = require('../controller/error.controller');
 const ExternalSchoolController = require('../controller/external_school/auth.controller');
 const TokenMiddleware = require('../middleware/token.middleware');
 const TextbookValidator = require('./validators/TextbookValidator');
+const ExamSetValidator = require("./validators/ExamSetValidator");
 const LessonValidator = require('./validators/LessonValidator');
 const LessonController = require('../controller/lesson.controller');
 const TextbookController = require('../controller/textbook.controller');
 const TeacherController = require('../controller/teacher.controller');
 const LibraryController = require('../controller/library.controller');
+const ExamSetController = require('../controller/examset.controller');
 
 
 
@@ -179,6 +181,12 @@ const AdminRoutesGroup = (router) => {
     router.put('/librarylesson/template/:id', AdminLibraryController.updateLibraryLessonTemplate);
 
 
+    router.get('/exam-set', ExamSetController.getSets);
+    router.get('/exam-set/subjects', ExamSetController.getSubjectsWithLessons);
+    router.post('/exam-set', ExamSetController.createSet);
+    router.put('/exam-set/:id', ExamSetController.updateSet);
+    router.delete('/exam-set/:id', ExamSetController.deleteSet);
+    router.post('/exam-set/:id/status', ExamSetController.setStatus);
 };
 
 OpenRoutesGroup(router);

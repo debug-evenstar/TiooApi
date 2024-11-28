@@ -158,6 +158,8 @@ const Question = (db.question = require("../question.model"))(
 const SubCategory = (db.subcategory = require("../subcategory.model"))(sequelize,Sequelize);
 
 
+const ExamSet = (db.examset = require("../examset.model"))(sequelize,Sequelize);
+
 const models = [
   Account,
   Validation,
@@ -192,6 +194,7 @@ const models = [
   Referral,
   SubCategory,
   StudyPlan,
+  ExamSet,
 ];
 
 Relationships.group(...models);
@@ -237,4 +240,5 @@ module.exports = {
   Referral,
   SubCategory,
   StudyPlan,
+  ExamSet
 };
