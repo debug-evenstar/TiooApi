@@ -1,12 +1,18 @@
 const { Op } = require("sequelize");
 const ResponseMessage = require("../config/message.config");
-const { ExamSet, Subject, Textbook, Lesson } = require("../database/connection");
+const { ExamSet, Subject, Textbook, Lesson, Exam } = require("../database/connection");
 
 class ExamSetController {
 
 
     static async getSets(req, res) {
-        const sets = await ExamSet.findAll();
+        const { exam_id } = req.params;
+
+        const sets = await ExamSet.findAll({
+            where: {
+                exam_id: exam_id
+            }
+        });
         return res.send({
             error: false,
             data: sets
@@ -55,11 +61,17 @@ class ExamSetController {
     }
 
 
-    static async setStatus(req,res){
+    static async setActive(req, res) {
         const { id } = req.params;
         const set = await ExamSet.findByPk(id);
-        if(set){
-            set.status = req.body.status;
+        if (set) {
+
+            await ExamSet.update(
+                {status: false},
+                {where: {}}
+            );
+
+            set.status = true;
             await set.save();
             return res.send({
                 error: false,
@@ -74,7 +86,13 @@ class ExamSetController {
     }
 
     static async getSubjectsWithLessons(req, res) {
+
+
+        const { exam_id } = req.params;
         const subjects = await Subject.findAll({
+            where: {
+                exam_id: exam_id,
+            },
             include: [
                 {
                     model: Textbook,
@@ -94,7 +112,7 @@ class ExamSetController {
             const lessons = await Promise.all(sub.Textbooks.map(async (book) => {
                 const les = await Lesson.findAll({
                     where: { textbook_id: book.id },
-                    attributes: ['id','topic','created_at','updated_at'],
+                    attributes: ['id', 'topic', 'created_at', 'updated_at'],
                 });
                 return les;
             }));

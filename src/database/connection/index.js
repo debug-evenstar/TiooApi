@@ -162,9 +162,9 @@ const Exam = (db.exam = require('../exam.model'))(sequelize, Sequelize);
 
 const University = (db.university = require('../university.model'))(sequelize, Sequelize);
 
-const AccountExam = (db.accountexam = require('../accountexam.model'))(sequelize,Sequelize);
+const AccountExam = (db.accountexam = require('../accountexam.model'))(sequelize, Sequelize);
 
-const ExamSet = (db.examset = require("../examset.model"))(sequelize,Sequelize);
+const ExamSet = (db.examset = require("../examset.model"))(sequelize, Sequelize);
 
 const models = [
   Account,
@@ -200,13 +200,10 @@ const models = [
   Referral,
   SubCategory,
   StudyPlan,
-<<<<<<< HEAD
-  ExamSet,
-=======
   Exam,
   University,
   AccountExam,
->>>>>>> adjustment/exams
+  ExamSet,
 ];
 
 Relationships.group(...models);
@@ -252,11 +249,8 @@ module.exports = {
   Referral,
   SubCategory,
   StudyPlan,
-<<<<<<< HEAD
-  ExamSet
-=======
   Exam,
   University,
   AccountExam,
->>>>>>> adjustment/exams
+  ExamSet,
 };

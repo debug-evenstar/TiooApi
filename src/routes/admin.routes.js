@@ -182,12 +182,12 @@ const AdminRoutesGroup = (router) => {
     router.put('/librarylesson/template/:id', AdminLibraryController.updateLibraryLessonTemplate);
 
 
-    router.get('/exam-set', ExamSetController.getSets);
-    router.get('/exam-set/subjects', ExamSetController.getSubjectsWithLessons);
+    router.get('/exam-set/exam/:exam_id', ExamSetController.getSets);
+    router.get('/exam-set/subjects/:exam_id', ExamSetController.getSubjectsWithLessons);
     router.post('/exam-set', ExamSetController.createSet);
     router.put('/exam-set/:id', ExamSetController.updateSet);
     router.delete('/exam-set/:id', ExamSetController.deleteSet);
-    router.post('/exam-set/:id/status', ExamSetController.setStatus);
+    router.post('/exam-set/:id/status', ExamSetController.setActive);
     /* ------------------------- Exam ---------------------------- */
     router.get("/exams", ExamsController.fetchExams);
     router.post("/exams", UploadService.uploadExamCover.single('cover'), ExamsController.createExam);
@@ -197,8 +197,8 @@ const AdminRoutesGroup = (router) => {
     router.get("/universities", ExamsController.getUniversities);
     router.get("/universities/:id", ExamsController.getUniversity);
     router.delete("/universities/:id", ExamsController.deleteUniversity);
-    router.post("/universities",UploadService.uploadExamCover.single('cover') , ExamsController.createUniversity);
-    router.put("/universities/:id",UploadService.uploadExamCover.single('cover') , ExamsController.updateUniversity);
+    router.post("/universities", UploadService.uploadExamCover.single('cover'), ExamsController.createUniversity);
+    router.put("/universities/:id", UploadService.uploadExamCover.single('cover'), ExamsController.updateUniversity);
 
 };
 

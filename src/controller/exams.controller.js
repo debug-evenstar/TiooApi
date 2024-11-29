@@ -83,7 +83,13 @@ class ExamsController {
     const exam = await Exam.findByPk(id);
 
     if (exam) {
+      await ExamSet.destroy({
+        where: {
+          exam_id: id
+        }
+      });
       await exam.destroy();
+
       return res.send({
         error: false,
         message: ResponseMessage.pass.delete

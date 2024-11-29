@@ -6,6 +6,14 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true, 
       allowNull: false,
     },
+    exam_id: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'exams',
+        key: 'id',
+      }
+    },
     status: {
       type: Sequelize.BOOLEAN,
       defaultValue: false,
