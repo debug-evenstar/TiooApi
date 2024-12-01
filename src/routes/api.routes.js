@@ -73,6 +73,7 @@ const LibraryController = require("../controller/library.controller");
 const ReferralController = require("../controller/referrals.controller");
 const StudyPlanController = require("../controller/studyPlan.controller");
 const ExamsController = require("../controller/exams.controller");
+const ExamSetController = require("../controller/examset.controller");
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -787,6 +788,9 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.get("/universities", ExamsController.getUniversities);
     router.get("/universities/:id", ExamsController.getUniversity);
+
+    router.get('/exam-set/:set_id', ExamSetController.getExamSet);
+
 
 };
 

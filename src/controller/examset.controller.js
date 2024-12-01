@@ -1,9 +1,55 @@
 const { Op } = require("sequelize");
 const ResponseMessage = require("../config/message.config");
-const { ExamSet, Subject, Textbook, Lesson, Exam } = require("../database/connection");
+const { ExamSet, Subject, Textbook, Lesson, Exam, LessonSlide } = require("../database/connection");
 
 class ExamSetController {
 
+    static async getExamSet(req, res) {
+        const { set_id } = req.params;
+
+        const set = await ExamSet.findByPk(set_id);
+
+        if (set == null) {
+            return res.status(404).send({
+                error: true,
+                message: "Not found",
+            })
+
+        }
+
+        console.log(set.data);
+
+
+        const subjectLessonMap = await Promise.all(set.data.map(async item => {
+            const subject = await Subject.findByPk(item.subject_id, {
+                attributes: ['id','name']
+            });
+            const lesson = await Lesson.findByPk(item.lesson_id, {
+                order :[
+                    [{ model: LessonSlide, as: "lesson_slides" }, "slide_index", "ASC"]
+                ],
+                include: [
+                    {
+                        model: LessonSlide,
+                        as: "lesson_slides",
+                    },
+                ],
+            });
+
+            return { subject, lesson}
+        }));
+
+        
+
+        console.log(subjectLessonMap)
+
+        return res.send({
+            error: false,
+            data: subjectLessonMap
+        });
+
+
+    }
 
     static async getSets(req, res) {
         const { exam_id } = req.params;
@@ -67,11 +113,15 @@ class ExamSetController {
         if (set) {
 
             await ExamSet.update(
-                {status: false},
-                {where: {}}
+                { active: false },
+                {
+                    where: {
+                        id: { [Op.not]: id }
+                    }
+                }
             );
 
-            set.status = true;
+            set.active = true;
             await set.save();
             return res.send({
                 error: false,

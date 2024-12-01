@@ -24,7 +24,7 @@ module.exports = {
           key: 'id',
         }
       },
-      status: {
+      active: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
       },
