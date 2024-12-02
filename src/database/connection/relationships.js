@@ -1,5 +1,3 @@
-const { University } = require(".");
-
 class Relationships {
   static group(
     Account,
@@ -38,6 +36,8 @@ class Relationships {
     Exam,
     University,
     AccountExam,
+    ExamSet,
+    ExamSession,
   ) {
     //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -155,7 +155,9 @@ class Relationships {
       as: "study_plan"
     })
 
-    StudyPlan.belongsTo(Account,{ foreignKey: "account_id"});
+    StudyPlan.belongsTo(Account, { foreignKey: "account_id" });
+
+    ExamSession.belongsTo(ExamSet, { foreignKey: 'exam_set_id', as: 'exam_set' });
 
     //---------/ ONE-TO-MANY - SCHOOL -*- CLASS | TEACHERS | STUDENT | SUBJECT /--------------------
 
@@ -262,18 +264,22 @@ class Relationships {
     Referral.belongsTo(Account, { foreignKey: 'referrer_id' });
 
 
-    BookCategory.hasMany(SubCategory,{foreignKey: 'parent_id', as: 'sub_categories'});
-    SubCategory.belongsTo(BookCategory,{ foreignKey: 'parent_id'})
+    BookCategory.hasMany(SubCategory, { foreignKey: 'parent_id', as: 'sub_categories' });
+    SubCategory.belongsTo(BookCategory, { foreignKey: 'parent_id' })
 
-    BookCategory.hasMany(Exam,{ foreignKey: 'category_id', as: 'exams'});
-    Exam.belongsTo(Exam,{ foreignKey: 'category_id'});
+    BookCategory.hasMany(Exam, { foreignKey: 'category_id', as: 'exams' });
+    Exam.belongsTo(Exam, { foreignKey: 'category_id' });
 
-    University.hasMany(Exam, { foreignKey: 'university_id', as: 'exams'});
-    Exam.belongsTo(University, { foreignKey: 'university_id'})
+    University.hasMany(Exam, { foreignKey: 'university_id', as: 'exams' });
+    Exam.belongsTo(University, { foreignKey: 'university_id' })
 
 
-    Exam.hasOne(StudyPlan, { foreignKey: 'exam_id', as: 'study_plan'});
-    StudyPlan.belongsTo(Exam, { foreignKey: 'exam_id'});
+    Exam.hasOne(StudyPlan, { foreignKey: 'exam_id', as: 'study_plan' });
+    StudyPlan.belongsTo(Exam, { foreignKey: 'exam_id' });
+
+    Account.hasMany(ExamSession, { foreignKey: 'account_id', as: 'exam_session' });
+    ExamSession.belongsTo(Account, { foreignKey: 'account_id' });
+
 
     //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 
@@ -389,8 +395,8 @@ class Relationships {
     // AccountType.hasMany(OnboardingQuestion, { foreignKey: 'account_type_id'});
     // OnboardingQuestion.belongsTo(AccountType,{ foreignKey: 'account_type_id'});
 
-    Account.belongsToMany(Exam,{ foreignKey: 'account_id', as: 'exams', through: AccountExam});
-    Exam.belongsToMany(Account,{ foreignKey: 'exam_id', through: AccountExam});
+    Account.belongsToMany(Exam, { foreignKey: 'account_id', as: 'exams', through: AccountExam });
+    Exam.belongsToMany(Account, { foreignKey: 'exam_id', through: AccountExam });
 
 
   }

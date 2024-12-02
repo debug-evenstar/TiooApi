@@ -166,6 +166,8 @@ const AccountExam = (db.accountexam = require('../accountexam.model'))(sequelize
 
 const ExamSet = (db.examset = require("../examset.model"))(sequelize, Sequelize);
 
+const ExamSession = (db.examsession = require("../exam.session.model"))(sequelize, Sequelize);
+
 const models = [
   Account,
   Validation,
@@ -204,6 +206,7 @@ const models = [
   University,
   AccountExam,
   ExamSet,
+  ExamSession,
 ];
 
 Relationships.group(...models);
@@ -253,4 +256,5 @@ module.exports = {
   University,
   AccountExam,
   ExamSet,
+  ExamSession,
 };
