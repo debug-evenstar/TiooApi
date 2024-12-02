@@ -178,6 +178,8 @@ const AdminRoutesGroup = (router) => {
     router.put('/librarylesson/template', UploadService.uploadLessonTemplate.single('template'), AdminLibraryController.addLibraryLesson);
     router.put('/librarylesson/template/:id', AdminLibraryController.updateLibraryLessonTemplate);
 
+    router.post('/lessons/generate-response', LessonController.generateQuestionResponse)
+
 
 };
 
