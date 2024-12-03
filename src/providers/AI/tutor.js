@@ -52,6 +52,20 @@ class AITutorProvider {
     }
 
 
+    async generateQuestionAnswer(lesson, slide_id, conversation, query) {
+        const body = {
+            slide_id,
+            lesson,
+            conversation,
+            query
+        }
+        const path = "lesson/generate-answer";
+        let errorResponse = {};
+        const response = await this.request("POST", path, { body });
+        return response ?? errorResponse;
+    }
+
+
 }
 
 module.exports = (new AITutorProvider())

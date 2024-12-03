@@ -1400,6 +1400,51 @@ class LessonController {
         }
         return slideData;
     }
+
+    static async generateQuestionResponse(req, res) {
+        const data = req.body;
+        const { name, id } = req.userData;
+        try {
+            const lessonInstance = await Lesson.findByPk(data.lesson_id, {
+                include: [
+                    {
+                        model: LessonSlide,
+                        as: "lesson_slides",
+                        orderBy: { slide_index: "asc" },
+                    },
+                    Textbook,
+                    Chapter,
+                    Class,
+                ],
+            });
+
+            if (!lessonInstance) {
+                return res.status(ResponseStatus.code.bad_request).json({
+                    error: true,
+                    message: ResponseStatus.fail.not_found,
+                });
+            }
+            const response = await AITutorProvider.generateQuestionAnswer(
+                lessonInstance.dataValues,
+                data.slide_id,
+                data.conversation,
+                data.query ?? ""
+            );
+            console.log(response)
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false,
+                message: ResponseStatus.pass.read,
+                data: response.data,
+            });
+
+        } catch (error) {
+            res.status(500).json({
+                error: "server error",
+                extra: error.message,
+            });
+        }
+    }
 }
 
 module.exports = LessonController;
