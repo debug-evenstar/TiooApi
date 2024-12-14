@@ -1,11 +1,38 @@
 const { Op } = require("sequelize");
 const ResponseMessage = require("../config/message.config");
-const { ExamSet, Subject, Textbook, Lesson, Exam, LessonSlide } = require("../database/connection");
+const { ExamSet, Subject, Textbook, Lesson, Exam, LessonSlide, Account, AccountExam } = require("../database/connection");
 
 class ExamSetController {
 
+    static async getSetByExam(req, res) {
+        const { exam_id } = req.params;
+
+        const set = await ExamSet.findOne({
+            where: {
+                exam_id: exam_id,
+                active: true,
+            },
+            attributes: ['id','name']
+        })
+
+        if (set) {
+            return res.send({
+                error: false,
+                data: set
+            });
+        }
+
+        return res.status(404).send({
+            error: true,
+            message: "Not found",
+        });
+
+    }
+
+
     static async getExamSet(req, res) {
         const { set_id } = req.params;
+        const user_id = req.userData.id;
 
         const set = await ExamSet.findByPk(set_id);
 
@@ -14,18 +41,23 @@ class ExamSetController {
                 error: true,
                 message: "Not found",
             })
-
         }
 
-        console.log(set.data);
-
-
-        const subjectLessonMap = await Promise.all(set.data.map(async item => {
+        const accountExam = await AccountExam.findOne({
+            where: {
+                account_id: user_id,
+                exam_id: set.exam_id,
+            }
+        });
+        
+        const userSubjectIds = accountExam.subjects?.map((sub) => sub.id);
+        const setData = set.data.filter((i) => userSubjectIds.includes(i.subject_id));
+        const subjectLessonMap = await Promise.all(setData.map(async item => {
             const subject = await Subject.findByPk(item.subject_id, {
-                attributes: ['id','name']
+                attributes: ['id', 'name']
             });
             const lesson = await Lesson.findByPk(item.lesson_id, {
-                order :[
+                order: [
                     [{ model: LessonSlide, as: "lesson_slides" }, "slide_index", "ASC"]
                 ],
                 include: [
@@ -36,16 +68,13 @@ class ExamSetController {
                 ],
             });
 
-            return { subject, lesson}
+            return { subject, lesson }
         }));
 
-        
-
-        console.log(subjectLessonMap)
 
         return res.send({
             error: false,
-            data: subjectLessonMap
+            data: { set, subjectLessonMap }
         });
 
 
@@ -140,9 +169,6 @@ class ExamSetController {
 
         const { exam_id } = req.params;
         const subjects = await Subject.findAll({
-            where: {
-                exam_id: exam_id,
-            },
             include: [
                 {
                     model: Textbook,

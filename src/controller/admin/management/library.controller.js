@@ -163,7 +163,7 @@ class AdminLibraryController {
                 const subjectInstance = await Subject.findByPk(
                     req.body.subject_id
                 );
-                await previousSubjectInstance.removeTextbook(textbookInstance);
+                await previousSubjectInstance?.removeTextbook(textbookInstance);
                 await subjectInstance.addTextbook(textbookInstance);
             }
 

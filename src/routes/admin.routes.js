@@ -183,16 +183,19 @@ const AdminRoutesGroup = (router) => {
 
 
     router.get('/exam-set/exam/:exam_id', ExamSetController.getSets);
-    router.get('/exam-set/subjects/:exam_id', ExamSetController.getSubjectsWithLessons);
+    router.get('/exam-set/subjects', ExamSetController.getSubjectsWithLessons);
     router.post('/exam-set', ExamSetController.createSet);
     router.put('/exam-set/:id', ExamSetController.updateSet);
     router.delete('/exam-set/:id', ExamSetController.deleteSet);
     router.post('/exam-set/:id/status', ExamSetController.setActive);
     /* ------------------------- Exam ---------------------------- */
     router.get("/exams", ExamsController.fetchExams);
+    router.post("/exams/subjects/:exam_id", ExamsController.addSubjectsToExam);
+    router.post("/exams/textbooks/:exam_id", ExamsController.addTextbooksToExam);
     router.post("/exams", UploadService.uploadExamCover.single('cover'), ExamsController.createExam);
     router.put("/exams/:id", UploadService.uploadExamCover.single('cover'), ExamsController.updateExam);
     router.delete("/exams/:id", ExamsController.deleteExam);
+
 
     router.get("/universities", ExamsController.getUniversities);
     router.get("/universities/:id", ExamsController.getUniversity);

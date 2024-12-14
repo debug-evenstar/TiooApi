@@ -38,6 +38,8 @@ class Relationships {
     AccountExam,
     ExamSet,
     ExamSession,
+    ExamSubject,
+    ExamTextbook,
   ) {
     //------------------/ ONE-TO-ONE - ACCOUNT -*- VALIDATION | SHCOOL | TEACHER | STUDENT  /--------------------
 
@@ -159,6 +161,16 @@ class Relationships {
 
     ExamSession.belongsTo(ExamSet, { foreignKey: 'exam_set_id', as: 'exam_set' });
 
+    Exam.hasOne(StudyPlan, { foreignKey: 'exam_id', as: 'study_plan' });
+    StudyPlan.belongsTo(Exam, { foreignKey: 'exam_id' });
+
+    Exam.hasOne(ExamSet, { foreignKey: 'exam_id', as: 'exam_set' });
+    ExamSet.belongsTo(Exam, { foreignKey: 'exam_id' });
+
+    ExamSet.hasOne(ExamSession, { foreignKey: 'exam_set_id', as: 'exam_session'} );
+    ExamSession.belongsTo(ExamSession, { foreignKey: 'exam_set_id'});
+
+
     //---------/ ONE-TO-MANY - SCHOOL -*- CLASS | TEACHERS | STUDENT | SUBJECT /--------------------
 
     // SchoolManagement.hasMany(Teacher, {
@@ -260,8 +272,8 @@ class Relationships {
     Account.hasMany(LessonProgress, { foreignKey: "student_id", as: 'lesson_progress' });
     LessonProgress.belongsTo(Account, { foreignKey: "student_id" });
 
-    Account.hasMany(Referral, { foreignKey: 'referrer_id', as: 'user' });
-    Referral.belongsTo(Account, { foreignKey: 'referrer_id' });
+    // Account.hasMany(Referral, { foreignKey: 'referrer_id', as: 'user' });
+    // Referral.belongsTo(Account, { foreignKey: 'referrer_id' });
 
 
     BookCategory.hasMany(SubCategory, { foreignKey: 'parent_id', as: 'sub_categories' });
@@ -274,12 +286,22 @@ class Relationships {
     Exam.belongsTo(University, { foreignKey: 'university_id' })
 
 
-    Exam.hasOne(StudyPlan, { foreignKey: 'exam_id', as: 'study_plan' });
-    StudyPlan.belongsTo(Exam, { foreignKey: 'exam_id' });
+    Account.hasMany(Referral, { foreignKey: 'referrer_id', as: 'referred_users'});
+    Account.hasMany(Referral, { foreignKey: 'referred_id', as: 'referrals'});
+    Referral.belongsTo(Account, { foreignKey: 'referrer_id', as: 'referrer_account'});
+    Referral.belongsTo(Account, { foreignKey: 'referred_id', as: 'referred_account'});
+
+
 
     Account.hasMany(ExamSession, { foreignKey: 'account_id', as: 'exam_session' });
     ExamSession.belongsTo(Account, { foreignKey: 'account_id' });
 
+
+    // Exam.hasMany(ExamSet, { foreignKey: 'exam_id', as: 'exam_set' });
+    // ExamSet.belongsTo(Exam, { foreignKey: 'exam_id' });
+
+    // ExamSet.hasMany(ExamSession, { foreignKey: 'exam_set_id', as: 'exam_session'} );
+    // ExamSession.belongsTo(ExamSession, { foreignKey: 'exam_set_id'});
 
     //---------/ MANY-TO-MANY - [SUBJECTS -*- TEACHERS] |   [SUBJECTS -*- TEACHERS] /--------------------
 
@@ -398,6 +420,13 @@ class Relationships {
     Account.belongsToMany(Exam, { foreignKey: 'account_id', as: 'exams', through: AccountExam });
     Exam.belongsToMany(Account, { foreignKey: 'exam_id', through: AccountExam });
 
+
+    Exam.belongsToMany(Subject, { foreignKey: 'exam_id', through: ExamSubject, as: 'subjects' });
+    Subject.belongsToMany(Exam, { foreignKey: 'subject_id', through: ExamSubject });
+
+    Exam.belongsToMany(Textbook, { foreignKey: 'exam_id', through: ExamTextbook, as: 'textbooks' });
+    Textbook.belongsToMany(Exam, { foreignKey: 'textbook_id', through: ExamTextbook });
+    
 
   }
 }

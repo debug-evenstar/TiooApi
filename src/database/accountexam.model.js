@@ -15,6 +15,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.INTEGER,
         allowNull: false,
       },
+      // { id: number, name: string }[]
       subjects: {
         type: Sequelize.JSON,
         allowNull: true,

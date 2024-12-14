@@ -25,3 +25,4 @@ module.exports = {
     await queryInterface.removeColumn('exam_id');
   }
 };
+

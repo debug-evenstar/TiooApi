@@ -1,4 +1,4 @@
-const { Subject, Class, Teacher, Account, Lesson, ClassArm, SchoolManagement, LessonSlide, Topic } = require('../database/connection/');
+const { Subject, Class, Teacher, Account, Lesson, ClassArm, SchoolManagement, LessonSlide, Topic, Exam } = require('../database/connection/');
 const ResponseStatus = require('../config/message.config');
 const Sequelize = require('sequelize');
 const IncludeManager = require('./helper/includes');
@@ -11,7 +11,16 @@ class SubjectController {
 
         try {
 
+            const { exam_id } = req.body;
+
+
             const subjectInstance = await Subject.create(req.body);
+
+            if (exam_id && subjectInstance) {
+                const exam = await Exam.findByPk(exam_id);
+                if (exam)
+                    await exam.addSubject(subjectInstance);
+            }
 
             const classInstance = await Class.findAll({ where: { id: [...req.body.classes] } });
 

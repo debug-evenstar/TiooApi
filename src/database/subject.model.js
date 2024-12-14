@@ -17,14 +17,6 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING,
                 allowNull: true,
             },
-            exam_id: {
-                type: DataTypes.INTEGER,
-                allowNull: true,
-                references: {
-                  model: 'exams',
-                  key: 'id',
-                }
-            },
             cover: {
                 type: DataTypes.STRING,
                 allowNull: true,

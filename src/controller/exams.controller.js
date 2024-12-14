@@ -1,5 +1,5 @@
 const ResponseMessage = require("../config/message.config");
-const { Exam, University, AccountExam, Account, StudyPlan } = require("../database/connection");
+const { Exam, University, AccountExam, Account, StudyPlan, Subject, ExamSet, ExamSession, Textbook } = require("../database/connection");
 const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
 
 class ExamsController {
@@ -15,7 +15,11 @@ class ExamsController {
 
 
     const exams = await Exam.findAll({
-      where: whereClause
+      where: whereClause,
+      include: [
+        { model: Subject, required: false, as: 'subjects'},
+        { model: Textbook, required: false, as: 'textbooks'}
+      ]
     })
 
     return res.send({
@@ -28,17 +32,34 @@ class ExamsController {
     try {
       const { id } = req.params;
       const user_id = req.userData.id;
-
       const exam = await Exam.findByPk(id, {
         include: [{
           model: StudyPlan,
           where: {
             account_id: user_id,
           },
+          required: false,
           as: 'study_plan',
           attributes: ['target_score'],
+
+        },
+        {
+          model: ExamSet,
+          as: 'exam_set',
+          attributes: ['id'],
           required: false,
-        }]
+          include: [{
+            model: ExamSession,
+            as: 'exam_session',
+            required: false,
+            where: {
+              account_id: user_id,
+            },
+            attributes: ['id', 'account_id', 'exam_set_id', 'score'],
+          }]
+        },
+        { model: Subject, as: 'subjects', attributes: ['name', 'id'] }
+        ]
       });
       if (exam) {
 
@@ -298,6 +319,68 @@ class ExamsController {
     })
   }
 
+
+  static async addSubjectsToExam(req, res) {
+
+    const { exam_id } = req.params;
+    const { subject_ids } = req.body;
+
+    try {
+      const exam = await Exam.findByPk(exam_id);
+      if (exam) {
+        await exam.setSubjects([]);
+        await exam.addSubjects(subject_ids);
+        return res.send({
+          error: false,
+          message: "Attached subjects to exam"
+        });
+      }
+
+      return res.status(404).send({
+        error: true,
+        message: "Exam with id not found"
+      });
+    }
+    catch (error) {
+      return res.send({
+        error: true,
+        message: ResponseMessage.fail.server,
+      });
+    }
+
+
+  }
+
+  static async addTextbooksToExam(req, res) {
+
+    const { exam_id } = req.params;
+    const { textbook_ids } = req.body;
+
+    try {
+      const exam = await Exam.findByPk(exam_id);
+      if (exam) {
+        await exam.setTextbooks([]);
+        await exam.addTextbooks(textbook_ids);
+        return res.send({
+          error: false,
+          message: "Attached textbooks to exam"
+        });
+      }
+
+      return res.status(404).send({
+        error: true,
+        message: "Exam with id not found"
+      });
+    }
+    catch (error) {
+      return res.status(500).send({
+        error: true,
+        message: error,
+      });
+    }
+
+
+  }
 }
 
 module.exports = ExamsController;

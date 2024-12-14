@@ -63,7 +63,7 @@ const {
     AcceptValidator,
 } = require("./validators/StudentValidators");
 const UploadService = require("../services/upload.service");
-const { Authorization } = require("../database/connection");
+const { Authorization, ExamSession } = require("../database/connection");
 const ErrorLogs = require("../controller/error.controller");
 const ExternalSchoolController = require("../controller/external_school/auth.controller");
 const TokenMiddleware = require("../middleware/token.middleware");
@@ -74,6 +74,7 @@ const ReferralController = require("../controller/referrals.controller");
 const StudyPlanController = require("../controller/studyPlan.controller");
 const ExamsController = require("../controller/exams.controller");
 const ExamSetController = require("../controller/examset.controller");
+const ExamSessionController = require("../controller/exam.sesssion.controller");
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -777,10 +778,15 @@ const AuthorizedRoutesGroup = (router) => {
 
 
     /* ------------------------- Exams ---------------------------- */
+    router.post('/exams/session/:set_id',ExamSessionController.createSession);
+
+
 
     router.get("/exams", ExamsController.fetchExams);
     router.get('/exams/account', ExamsController.getAccountExams);
     router.get("/exams/:id", ExamsController.fetchExam);
+
+
 
     router.post("/exams/register", ExamsController.registerExams);
     router.post('/exams/register/:exam_id', ExamsController.registerExam);
@@ -789,6 +795,7 @@ const AuthorizedRoutesGroup = (router) => {
     router.get("/universities", ExamsController.getUniversities);
     router.get("/universities/:id", ExamsController.getUniversity);
 
+    router.get('/exam-set/exam/:exam_id', ExamSetController.getSetByExam);
     router.get('/exam-set/:set_id', ExamSetController.getExamSet);
 
 
