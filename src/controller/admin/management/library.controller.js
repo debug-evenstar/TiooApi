@@ -51,6 +51,7 @@ class AdminLibraryController {
 
         let retries = 3;
         let uploadSuccess = false;
+        let g_error = null;
 
         if (req.file) {
             // const filePath = req.file.path;
@@ -61,6 +62,7 @@ class AdminLibraryController {
                     uploadSuccess = true;
                 }
                 catch (error) {
+                    g_error = error;
                     retries--;
                 }
             }
@@ -71,7 +73,7 @@ class AdminLibraryController {
         if (!uploadSuccess) {
             return res.status(500).json({
                 error: "server error",
-                extra: error,
+                extra: g_error?.message,
             });
         }
 
@@ -161,7 +163,7 @@ class AdminLibraryController {
                 const subjectInstance = await Subject.findByPk(
                     req.body.subject_id
                 );
-                await previousSubjectInstance.removeTextbook(textbookInstance);
+                await previousSubjectInstance?.removeTextbook(textbookInstance);
                 await subjectInstance.addTextbook(textbookInstance);
             }
 
