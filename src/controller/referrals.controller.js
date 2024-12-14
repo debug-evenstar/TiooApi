@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { Referral, Account } = require("../database/connection");
 
 class ReferralController {
@@ -18,21 +19,22 @@ class ReferralController {
     //   }
     // })
 
-
     const referrals = await Referral.findAll({
       where: {
         referrer_id: userData.id
       },
       include: [{
         model: Account,
+        as: 'referred_account',
         attributes: ['id','name','email']
       }],
       attributes: ['created_at']
     })
 
+    const data = referrals.map((u) => ({ created_at: u.created_at, ...u.referred_account.dataValues}))
     return res.send({
       error: false,
-      data: referrals.map((u) => ({ created_at: u.created_at, ...u.Account.dataValues}))
+      data: data
     })
 
   }

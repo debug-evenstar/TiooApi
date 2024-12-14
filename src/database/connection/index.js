@@ -125,7 +125,7 @@ const CartItem = (db.cartItems = require("../cartItem.model")(
   Sequelize
 ));
 
-const Shelf = (db.shelf = require("../shelf.model")(sequelize,Sequelize));
+const Shelf = (db.shelf = require("../shelf.model")(sequelize, Sequelize));
 
 const OnboardingQuestion = (db.onboarding = require("../onboardingQuestion.model")(
   sequelize,
@@ -146,17 +146,30 @@ const StudyPlan = (db.studyplan = require("../studyplan.model")(
 ));
 
 const Topic = (db.topic = require("../topic.model"))(
-  sequelize,Sequelize
+  sequelize, Sequelize
 );
 
-const BookCategory = (db.bookcategory = require("../bookcategory.model"))(sequelize,Sequelize);
+const BookCategory = (db.bookcategory = require("../bookcategory.model"))(sequelize, Sequelize);
 
 const Question = (db.question = require("../question.model"))(
-  sequelize,Sequelize
+  sequelize, Sequelize
 );
 
-const SubCategory = (db.subcategory = require("../subcategory.model"))(sequelize,Sequelize);
+const SubCategory = (db.subcategory = require("../subcategory.model"))(sequelize, Sequelize);
 
+const Exam = (db.exam = require('../exam.model'))(sequelize, Sequelize);
+
+
+const University = (db.university = require('../university.model'))(sequelize, Sequelize);
+
+const AccountExam = (db.accountexam = require('../accountexam.model'))(sequelize, Sequelize);
+
+const ExamSet = (db.examset = require("../examset.model"))(sequelize, Sequelize);
+
+const ExamSession = (db.examsession = require("../exam.session.model"))(sequelize, Sequelize);
+
+const ExamSubject = (db.examsubject = require("../examsubject.model"))(sequelize, Sequelize);
+const ExamTextbook = (db.examtextbook = require("../examtextbook.model"))(sequelize, Sequelize);
 
 const models = [
   Account,
@@ -192,6 +205,13 @@ const models = [
   Referral,
   SubCategory,
   StudyPlan,
+  Exam,
+  University,
+  AccountExam,
+  ExamSet,
+  ExamSession,
+  ExamSubject,
+  ExamTextbook,
 ];
 
 Relationships.group(...models);
@@ -237,4 +257,11 @@ module.exports = {
   Referral,
   SubCategory,
   StudyPlan,
+  Exam,
+  University,
+  AccountExam,
+  ExamSet,
+  ExamSession,
+  ExamSubject,
+  ExamTextbook
 };
