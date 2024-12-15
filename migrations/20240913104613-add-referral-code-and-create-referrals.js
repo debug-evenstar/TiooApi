@@ -2,11 +2,11 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('accounts', 'referral_code', {
-      type: Sequelize.STRING,
-      allowNull: true,
-      unique: true,
-    });
+    // await queryInterface.addColumn('accounts', 'referral_code', {
+    //   type: Sequelize.STRING,
+    //   allowNull: true,
+    //   unique: true,
+    // });
 
     await queryInterface.createTable('referrals', {
       id: {
