@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
             author: {
                 type: DataTypes.STRING,
                 allowNull: true,
-            }
+            },
         },
         { timestamps: true, paranoid: true }
     );

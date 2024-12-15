@@ -16,6 +16,11 @@ module.exports = (sequelize, Sequelize) => {
         }
       },
 
+      cover: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+
       name: {
         type: Sequelize.STRING,
         allowNull: false,
