@@ -779,13 +779,13 @@ const AuthorizedRoutesGroup = (router) => {
 
     /* ------------------------- Exams ---------------------------- */
     router.post('/exams/session/:set_id',ExamSessionController.createSession);
+    router.get('/exams/session/:set_id',ExamSessionController.getSession);
 
 
 
     router.get("/exams", ExamsController.fetchExams);
     router.get('/exams/account', ExamsController.getAccountExams);
     router.get("/exams/:id", ExamsController.fetchExam);
-
 
 
     router.post("/exams/register", ExamsController.registerExams);

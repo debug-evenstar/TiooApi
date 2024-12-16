@@ -41,7 +41,6 @@ class ExamsController {
           required: false,
           as: 'study_plan',
           attributes: ['target_score'],
-
         },
         {
           model: ExamSet,

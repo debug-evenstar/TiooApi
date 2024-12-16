@@ -15,10 +15,9 @@ class ExamSessionController {
     try {
       const { set_id } = req.params;
       const { id } = req.userData;
-
       const session = await ExamSession.findOne({
-        where: { set_id, account_id: id },
-        include: [ExamSet, Account],
+        where: { account_id: id },
+        order: [ [ 'created_at', 'DESC' ]],
       });
 
       if (!session) {
@@ -57,18 +56,26 @@ class ExamSessionController {
       const { id } = req.userData;
       const { score, slides, answers } = req.body;
 
-      const [session, created] = await ExamSession.findOrCreate({
-        where: { exam_set_id: set_id, account_id: id },
-        defaults: { score, slides, answers },
-      });
+      // const [session, created] = await ExamSession.findOrCreate({
+      //   where: { exam_set_id: set_id, account_id: id },
+      //   defaults: { score, slides, answers },
+      // });
 
-      if (!created) {
-        await session.update({ score, slides, answers });
-      }
+      const session = await ExamSession.create({
+        exam_set_id: set_id, 
+        account_id: id,
+        score, slides, answers
+      })
 
-      const message = created
-        ? "Session created successfully"
-        : "Session updated successfully";
+      // if (!created) {
+      //   await session.update({ score, slides, answers });
+      // }
+
+      // const message = created
+      //   ? "Session created successfully"
+      //   : "Session updated successfully";
+
+      const message = "Session created succesfully";
 
       return ExamSessionController.sendResponse(res, 200, true, session, message);
     } catch (error) {
