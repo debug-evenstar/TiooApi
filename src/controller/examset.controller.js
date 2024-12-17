@@ -50,7 +50,7 @@ class ExamSetController {
             }
         });
         
-        const userSubjectIds = accountExam.subjects?.map((sub) => sub.id);
+        const userSubjectIds = accountExam?.subjects?.map((sub) => sub.id);
         const setData = set.data.filter((i) => userSubjectIds.includes(i.subject_id));
         const subjectLessonMap = await Promise.all(setData.map(async item => {
             const subject = await Subject.findByPk(item.subject_id, {
