@@ -6,7 +6,7 @@ class ExamSetController {
 
     static async getSetByExam(req, res) {
         const { exam_id } = req.params;
-
+        const user_id  = req.userData.id;
         const set = await ExamSet.findOne({
             where: {
                 exam_id: exam_id,
@@ -15,17 +15,49 @@ class ExamSetController {
             attributes: ['id','name']
         })
 
-        if (set) {
-            return res.send({
-                error: false,
-                data: set
+        if (!set) {
+            return res.status(404).send({
+                error: true,
+                message: "Not found",
             });
         }
 
-        return res.status(404).send({
-            error: true,
-            message: "Not found",
+
+        const accountExam = await AccountExam.findOne({
+            where: {
+                account_id: user_id,
+                exam_id: set.exam_id,
+            }
         });
+        
+        const userSubjectIds = accountExam?.subjects?.map((sub) => sub.id);
+        const setData = set.data.filter((i) => userSubjectIds.includes(i.subject_id));
+        const subjectLessonMap = await Promise.all(setData.map(async item => {
+            const subject = await Subject.findByPk(item.subject_id, {
+                attributes: ['id', 'name']
+            });
+            const lesson = await Lesson.findByPk(item.lesson_id, {
+                order: [
+                    [{ model: LessonSlide, as: "lesson_slides" }, "slide_index", "ASC"]
+                ],
+                include: [
+                    {
+                        model: LessonSlide,
+                        as: "lesson_slides",
+                    },
+                ],
+            });
+
+            return { subject, lesson }
+        }));
+
+
+        return res.send({
+            error: false,
+            data: { set, subjectLessonMap }
+        });
+
+
 
     }
 
