@@ -64,17 +64,17 @@ module.exports = {
                     type: Sequelize.DATE,
                 },
             })
-            .then(() =>
-                queryInterface.addIndex(
-                    "accounts",
-                    [
-                        {
-                            attribute: "email",
-                        },
-                    ],
-                    { unique: true, fields: ["email"] }
-                )
-            );
+            // .then(() =>
+            //     queryInterface.addIndex(
+            //         "accounts",
+            //         [
+            //             {
+            //                 attribute: "email",
+            //             },
+            //         ],
+            //         { unique: true, fields: ["email"] }
+            //     )
+            // );
     },
 
     async down(queryInterface, Sequelize) {
