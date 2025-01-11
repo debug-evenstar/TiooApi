@@ -503,6 +503,7 @@ class AuthController {
                 onboarded: user.metadata !== null,
                 verification_status: user.verification_status,
                 flag: user.status,
+                display_image: user.display_image,
             }
 
             // if (user.account_type === "school") {

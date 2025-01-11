@@ -494,6 +494,11 @@ const AuthorizedRoutesGroup = (router) => {
         "/student/personalinfo",
         StudentController.updatePersonalInformation
     );
+    router.post(
+        "/student/updateinfo",
+        UploadService.uploadDisplayPicture.single("file"),
+        StudentController.updateStudentInfo
+    );
     router.get("/student/library", StudentController.independentStudentLibrary);
 
     router.get("/student/network", StudentController.independentStudentNetwork);
@@ -778,8 +783,8 @@ const AuthorizedRoutesGroup = (router) => {
 
 
     /* ------------------------- Exams ---------------------------- */
-    router.post('/exams/session/:set_id',ExamSessionController.createSession);
-    router.get('/exams/session/:set_id',ExamSessionController.getSession);
+    router.post('/exams/session/:set_id', ExamSessionController.createSession);
+    router.get('/exams/session/:set_id', ExamSessionController.getSession);
 
 
 

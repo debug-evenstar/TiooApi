@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 const { Sequelize, where } = require('sequelize');
 const TokenMiddleware = require('../middleware/token.middleware');
 const { Account, SchoolManagement, Validation, Teacher, Class, Subject, Invite, Student, ClassArm } = require("../database/connection");
+const cloudinaryUploadImage = require("../utils/cloudinary.utilities");
 
 const AuthController = require('../controller/auth.controller');
 
@@ -433,7 +434,7 @@ class StudentController {
                 }
             });
 
-            
+
             const student = await classInstance.getStudents({ joinTableAttributes: [] });
         } catch (error) {
             console.log(error);
@@ -805,6 +806,7 @@ class StudentController {
 
         const { id } = req.userData
 
+        // const account_id = id;
         const account_id = req.query.account_id ? req.query.account_id : id;
 
         try {
@@ -815,23 +817,20 @@ class StudentController {
                 return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
             }
 
-            const studentInstance = await accountInstance.getStudent({ include: [SchoolManagement, Class] });
+            // const studentInstance = await accountInstance.getStudent({ include: [SchoolManagement, Class] });
 
-            if (!studentInstance) {
-                return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.unauthorized });
-            }
+            // if (!studentInstance) {
+            //     return res.status(ResponseStatus.code.unauthorized).json({ error: true, message: ResponseStatus.fail.unauthorized });
+            // }
 
             const payload = {
                 account_id: accountInstance.id,
                 fullname: accountInstance.name,
+                name: accountInstance.name,
                 phone: accountInstance.phone,
-                school: studentInstance.SchoolManagement.school_name,
-                class: studentInstance.Class.naming,
-                age: studentInstance.age !== null ? studentInstance.age : 0,
-                address: studentInstance.residential_address,
-                gender: studentInstance.gender,
-                country: studentInstance.country,
-                nationality: studentInstance.nationality
+                // school: studentInstance.SchoolManagement.school_name,
+                // class: studentInstance.Class.naming,
+                display_image: accountInstance.display_image
             }
 
             return res.status(ResponseStatus.code.success).json({ error: false, message: ResponseStatus.pass.read, data: payload });
@@ -971,6 +970,42 @@ class StudentController {
             res.status(500).json({ error: 'server error', extra: error.message });
         };
     }
+
+
+    static async updateStudentInfo(req, res) {
+
+        const { id } = req.userData
+
+        const account_id = id;
+
+
+        try {
+            if (req.file) {
+                const filePath = req.file.path;
+                const ImageResponse = await cloudinaryUploadImage(filePath);
+                req.body.display_image = ImageResponse.secure_url;
+            }
+
+            const accountInstance = await Account.findByPk(parseInt(account_id));
+
+            if (!accountInstance) {
+                return res.status(ResponseStatus.code.not_found).json({ error: true, message: ResponseStatus.fail.not_found });
+            }
+
+            await accountInstance.update(req.body);
+
+
+            return res.status(ResponseStatus.code.success).json({
+                error: false, message: ResponseStatus.pass.read,
+                data: { ...req.body, display_image: accountInstance.display_image }
+            });
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'server error', extra: error.message });
+        };
+    }
+
 
 }
 
