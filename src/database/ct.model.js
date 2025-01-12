@@ -119,4 +119,6 @@ module.exports = (sequelize, Sequelize) => {
         defaultValue: Sequelize.fn('NOW'),
       },
     });
+
+    return CTModel
 }
