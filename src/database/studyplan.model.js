@@ -29,6 +29,19 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.JSON,
         allowNull: false,
       },
+
+      // { subject_id: number, score: number}[]
+      target_scores:{
+        type: Sequelize.JSON,
+        allowNull: false,
+      },
+      
+      vision_statement:{
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+
+
     }, {
     timestamps: true,
   }

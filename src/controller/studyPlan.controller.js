@@ -57,7 +57,7 @@ class StudyPlanController {
 
   static async setTargetScore(req, res) {
     const { id } = req.userData;
-    const { target_score, exam_id } = req.body;
+    const { target_score, exam_id, target_scores, vision_statement } = req.body;
     const studyplan = await StudyPlan.findOne({
       where: {
         account_id: id,
@@ -70,10 +70,14 @@ class StudyPlanController {
         account_id: id,
         exam_id: exam_id,
         target_score: target_score,
+        target_scores: target_scores,
         data: [],
+        vision_statement,
       })
     } else {
       studyplan.target_score = target_score;
+      studyplan.target_scores = target_scores;
+      studyplan.vision_statement = vision_statement;
       await studyplan.save();
     }
 
