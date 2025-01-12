@@ -75,6 +75,7 @@ const StudyPlanController = require("../controller/studyPlan.controller");
 const ExamsController = require("../controller/exams.controller");
 const ExamSetController = require("../controller/examset.controller");
 const ExamSessionController = require("../controller/exam.sesssion.controller");
+const CTController = require("../controller/CTController");
 
 /*------------------------------| OPEN ROUTES |------------------------------*/
 
@@ -802,6 +803,11 @@ const AuthorizedRoutesGroup = (router) => {
 
     router.get('/exam-set/exam/:exam_id', ExamSetController.getSetByExam);
     router.get('/exam-set/:set_id', ExamSetController.getExamSet);
+
+
+
+    // CT ROUTES
+    router.post('ct/profile', CTController.handleFormSubmission);
 
 
 };
