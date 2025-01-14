@@ -1,5 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
-  const CTModel = sequelize.define("CTModel",
+  const CTProfile = sequelize.define(
+    "CTProfile",
     {
       id: {
         type: Sequelize.INTEGER,
@@ -15,7 +16,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      registrationNo: {
+      registration_no: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -23,11 +24,11 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      firstName: {
+      first_name: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      otherName: {
+      other_name: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -35,27 +36,23 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      telegramPhone: {
+      telegram_phone: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      whatsappNumber: {
+      whatsapp_number: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      parentName: {
+      parent_name: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      parentPhone: {
+      parent_phone: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      desiredCourse: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      desiredUtmeScore: {
+      desired_course: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -63,15 +60,15 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      subjectCombination: {
+      subject_combination: {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-      weakSubject: {
+      weak_subject: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      mainChallenge: {
+      main_challenge: {
         type: Sequelize.TEXT,
         allowNull: true,
       },
@@ -79,23 +76,23 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-      paymentDate: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      senderName: {
+      payment_date: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      bankName: {
+      sender_name: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      referralSource: {
+      bank_name: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      reasonForJoining: {
+      referral_source: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      reason_for_joining: {
         type: Sequelize.TEXT,
         allowNull: true,
       },
@@ -103,22 +100,25 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      receiptFiles: {
+      receipt_files: {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-
-      createdAt: {
+      created_at: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.fn('NOW'),
+        defaultValue: Sequelize.fn("NOW"),
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.fn('NOW'),
+        defaultValue: Sequelize.fn("NOW"),
       },
-    });
+    },
+    {
+      tableName: "ct_profiles",
+    }
+  );
 
-    return CTModel
-}
+  return CTProfile;
+};

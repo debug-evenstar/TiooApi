@@ -172,7 +172,7 @@ const ExamSubject = (db.examsubject = require("../examsubject.model"))(sequelize
 const ExamTextbook = (db.examtextbook = require("../examtextbook.model"))(sequelize, Sequelize);
 
 
-const CTModel = (db.ctmodel = require('../ct.model'))(sequelize,Sequelize);
+const CTProfile = (db.ctprofile = require('../ctprofile.model'))(sequelize,Sequelize);
 
 const models = [
   Account,
@@ -215,7 +215,7 @@ const models = [
   ExamSession,
   ExamSubject,
   ExamTextbook,
-  CTModel,
+  CTProfile,
 ];
 
 Relationships.group(...models);
@@ -268,5 +268,5 @@ module.exports = {
   ExamSession,
   ExamSubject,
   ExamTextbook,
-  CTModel,
+  CTProfile,
 };

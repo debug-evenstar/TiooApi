@@ -807,7 +807,7 @@ const AuthorizedRoutesGroup = (router) => {
 
 
     // CT ROUTES
-    router.post('ct/profile', CTController.handleFormSubmission);
+    router.post('/ct/profile', CTController.handleFormSubmission);
 
 
 };

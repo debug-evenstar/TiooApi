@@ -1,78 +1,105 @@
+const { CTProfile } = require("../database/connection");
+
 class CTController {
-
-  static async handleFormSubmission(req, res){
-
+  static async handleFormSubmission(req, res) {
     const user_id = req.userData.id;
 
     try {
       const {
         email,
-        registrationNo,
         surname,
-        firstName,
-        otherName,
+        first_name,
+        other_name,
         gender,
-        telegramPhone,
-        whatsappNumber,
-        parentName,
-        parentPhone,
-        desiredCourse,
-        desiredUtmeScore,
+        telegram_phone,
+        whatsapp_number,
+        parent_name,
+        parent_phone,
+        desired_course,
         institution,
-        subjectCombination,
-        weakSubject,
-        mainChallenge,
+        subject_combination,
+        weak_subject,
+        main_challenge,
         fear,
-        paymentDate,
-        senderName,
-        bankName,
-        referralSource,
-        reasonForJoining,
+        payment_date,
+        sender_name,
+        bank_name,
+        referral_source,
+        reason_for_joining,
         birthday,
       } = req.body;
 
-      const receiptFiles = req.files?.receiptFiles; // Handle uploaded files (if using middleware like multer)
-      const profilePicture = req.files?.profilePicture; // Handle profile picture upload
+      const receipt_files = req.files?.receiptFiles; // Handle uploaded files (if using middleware like multer)
+      const profile_picture = req.files?.profilePicture; // Handle profile picture upload
 
-      const newProfile = await CTModel.create({
-        account_id: user_id,
-        email,
-        registrationNo,
-        surname,
-        firstName,
-        otherName,
-        gender,
-        telegramPhone,
-        whatsappNumber,
-        parentName,
-        parentPhone,
-        desiredCourse,
-        desiredUtmeScore,
-        institution,
-        subjectCombination,
-        weakSubject,
-        mainChallenge,
-        fear,
-        paymentDate,
-        senderName,
-        bankName,
-        referralSource,
-        reasonForJoining,
-        birthday,
-        receiptFiles: JSON.stringify(receiptFiles || []), // Convert file data to JSON string
-      });
+      let profile = await CTProfile.findOne({
+        where: { account_id: user_id }
+      })
+
+      if (profile) {
+        await profile.update({
+          surname,
+          first_name,
+          other_name,
+          gender,
+          telegram_phone,
+          whatsapp_number,
+          parent_name,
+          parent_phone,
+          desired_course,
+          institution,
+          subject_combination,
+          weak_subject,
+          main_challenge,
+          fear,
+          payment_date,
+          sender_name,
+          bank_name,
+          referral_source,
+          reason_for_joining,
+          birthday,
+          receipt_files: JSON.stringify(receipt_files || []), // Convert file data to JSON string
+        });
+      } else {
+        profile = await CTProfile.create({
+          account_id: user_id,
+          email,
+          surname,
+          first_name,
+          other_name,
+          gender,
+          telegram_phone,
+          whatsapp_number,
+          parent_name,
+          parent_phone,
+          desired_course,
+          institution,
+          subject_combination,
+          weak_subject,
+          main_challenge,
+          fear,
+          payment_date,
+          sender_name,
+          bank_name,
+          referral_source,
+          reason_for_joining,
+          birthday,
+          receipt_files: JSON.stringify(receipt_files || []), // Convert file data to JSON string
+        });
+      }
+
 
       res.status(201).json({
-        success: true,
+        error: false,
         message: "Profile created successfully!",
-        data: newProfile,
+        data: profile,
       });
     } catch (error) {
       console.error("Error submitting form:", error);
       res.status(500).json({
-        success: false,
-        message: "Failed to submit form. Please try again.",
-        error: error.message,
+        error: false,
+        // message: "Failed to submit form. Please try again.",
+        message: error.message,
       });
     }
   }
